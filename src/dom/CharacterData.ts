@@ -18,6 +18,21 @@ export abstract class CharacterData extends Node {
   private _data: string = ''
 
   /** 
+   * Gets or sets the data associated with a {@link CharacterData} node.
+   * For other node types returns `null`. 
+   */
+  get nodeValue(): string | null { return this.data }
+  set nodeValue(value: string | null) { this.data = value || '' }
+
+  /** 
+   * Returns the concatenation of data of all the {@link CharacterData}
+   * node descendants in tree order. When set, replaces the text 
+   * contents of the node with the given value. 
+   */
+  get textContent(): string | null { return this.data }
+  set textContent(value: string | null) { this.data = value || '' }
+
+  /** 
    * Gets or sets the text data of the node. 
    */
   get data(): string { return this._data }

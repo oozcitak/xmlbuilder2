@@ -118,24 +118,8 @@ export abstract class Node {
    * Gets or sets the data associated with a {@link CharacterData} node.
    * For other node types returns `null`. 
    */
-  get nodeValue(): string | null {
-    if (this.nodeType === NodeType.Text || 
-      this.nodeType === NodeType.Comment || 
-      this.nodeType === NodeType.ProcessingInstruction) {
-        return this.data
-      }
-    else
-      return null
-  }
-
-  set nodeValue(value: string | null) {
-    if (this.nodeType === NodeType.Text || 
-      this.nodeType === NodeType.Comment || 
-      this.nodeType === NodeType.ProcessingInstruction)
-      {
-        this.data = value || ''
-      }
-  }
+  get nodeValue(): string | null { return null }
+  set nodeValue(value: string | null) { }
 
   /** 
    * Returns the concatenation of data of all the {@link CharacterData}
@@ -143,12 +127,7 @@ export abstract class Node {
    * contents of the node with the given value. 
    */
   get textContent(): string | null {
-    if (this.nodeType === NodeType.Text || 
-      this.nodeType === NodeType.Comment || 
-      this.nodeType === NodeType.ProcessingInstruction) {
-        return this.data
-    }
-    else if (this.nodeType === NodeType.Element ||
+    if (this.nodeType === NodeType.Element ||
       this.nodeType === NodeType.DocumentFragment) {
         let str = ''
         for (let child of this.children) {
@@ -161,12 +140,7 @@ export abstract class Node {
   }
 
   set textContent(value: string | null) {
-    if (this.nodeType === NodeType.Text || 
-      this.nodeType === NodeType.Comment || 
-      this.nodeType === NodeType.ProcessingInstruction) {
-        this.data = value || ''
-      }
-      else if (this.nodeType === NodeType.Element ||
+    if (this.nodeType === NodeType.Element ||
         this.nodeType === NodeType.DocumentFragment) {
           this.children = []
           if (value) {
