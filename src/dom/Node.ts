@@ -1,11 +1,27 @@
 import { NodeType } from "./NodeType";
 import { DocumentPosition } from "./DocumentPosition";
+import { DocumentFragment } from "./DocumentFragment";
 import { Text } from "./Text";
 
 /**
- * Represents a generic XML node
+ * Represents a generic XML node.
  */
 export abstract class Node {
+
+  public readonly children: Array<Node> = []
+
+  /**
+   * Initializes a new instance of `Node`.
+   *
+   * @param parent - the parent node
+   */
+  protected constructor (parent: Node | null) 
+  {
+    this._parentNode = parent
+  }
+    
+  protected abstract _nodeType: NodeType
+  protected abstract _nodeName: string
 
   protected _parentNode: Node | null = null
   protected _baseURI: string | null = null
@@ -14,17 +30,17 @@ export abstract class Node {
   /** 
    * Returns the type of node. 
    */
-  protected nodeType: NodeType = 0
+  get nodeType(): NodeType { return this._nodeType }
 
   /** 
    * Returns a string appropriate for the type of node. 
    */
-  protected nodeName: string = ''
+  get nodeName(): string { return this._nodeName }
 
   /** 
    * Returns the associated base URL. 
    */
-  get baseURI(): string | null { return this._baseURI }  
+  get baseURI(): string | null { return this._baseURI }
 
   /** 
    * Returns the parent document. 
@@ -160,16 +176,6 @@ export abstract class Node {
           }
       }
   }
-
-  public readonly children: Array<Node> = []
-  public readonly attribs: { [index: string]: Attrib; } = {}
-
-  /**
-   * Initializes a new instance of `Node`.
-   *
-   * @param parent - the parent node
-   */
-  protected constructor (parent: Node) { }
 
   /** Determines whether a node has any children. */
   hasChildNodes(): boolean { return (this.children.length !== 0) }
