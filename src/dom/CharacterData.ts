@@ -98,4 +98,15 @@ export abstract class CharacterData extends Node {
       data +
       this.data.slice(offset + count)
   }
+
+  /**
+   * Returns `count` number of characters from node data starting at
+   * the given `offset`.
+   * 
+   * @param offset - the offset at which retrieval starts
+   * @param count - the number of characters to return
+   */
+  substringData(offset: number, count: number): string {
+    return this.data.substr(offset, count)
+  }
 }
