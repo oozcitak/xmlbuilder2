@@ -13,6 +13,7 @@ import { Text } from "./Text"
 import { Comment } from "./Comment"
 import { ProcessingInstruction } from "./ProcessingInstruction"
 import { NodeFilter } from "./NodeFilter"
+import { Attr } from "./Attr"
 
 /**
  * Represents a document node.
@@ -27,6 +28,8 @@ export class Document extends Node {
   origin: string | undefined
   compatMode: string | undefined
   characterSet: string | undefined
+  charset: string | undefined
+  inputEncoding: string | undefined
   contentType: string | undefined
 
   /**
@@ -153,7 +156,7 @@ export class Document extends Node {
   /**
    * Returns a new {@link Element} with the given `localName`.
    * 
-   * @param localName - the local name
+   * @param localName - local name
    * 
    * @returns the new {@link Element}
    */
@@ -162,9 +165,11 @@ export class Document extends Node {
   }
 
   /**
-   * Returns a new {@link Element} with the given `localName`.
+   * Returns a new {@link Element} with the given `namespace` and
+   * `qualifiedName`.
    * 
-   * @param localName - the local name
+   * @param namespace - namespace URL
+   * @param qualifiedName - qualified name
    * 
    * @returns the new {@link Element}
    */
@@ -182,6 +187,10 @@ export class Document extends Node {
       throw DOMError.NamespaceError
 
     if(prefix === "xml" && namespace !== Namespace.XML)
+      throw DOMError.NamespaceError
+
+    if(namespace !== Namespace.XMLNS && 
+      (prefix === "xmlns" || qualifiedName === "xmlns"))
       throw DOMError.NamespaceError
 
     if(namespace === Namespace.XMLNS && 
@@ -280,6 +289,56 @@ export class Document extends Node {
     return node
   }
 
+  /**
+   * Returns a new {@link Attr} with the given `localName`.
+   * 
+   * @param localName - local name
+   * 
+   * @returns the new {@link Attr}
+   */
+  createAttribute(localName: string): Attr {
+    if (!localName.match(XMLSpec10.Name))
+      throw DOMError.InvalidCharacterError
+
+    return new Attr(null, null, '', localName, '')
+  }
+
+  /**
+   * Returns a new {@link Attr} with the given `namespace` and
+   * `qualifiedName`.
+   * 
+   * @param namespace - namespace URL
+   * @param qualifiedName - qualified name
+   * 
+   * @returns the new {@link Attr}
+   */
+  createAttributeNS(namespace: string, qualifiedName: string): Attr {
+    if (!qualifiedName.match(XMLSpec10.Name))
+      throw DOMError.InvalidCharacterError
+    if (!qualifiedName.match(XMLSpec10.QName))
+      throw DOMError.NamespaceError
+
+    let parts = qualifiedName.split(':')
+    let prefix = (parts.length === 2 ? parts[0] : null)
+    let localName = (parts.length === 2 ? parts[1] : qualifiedName)
+  
+    if(prefix && !namespace)
+      throw DOMError.NamespaceError
+  
+    if(prefix === "xml" && namespace !== Namespace.XML)
+      throw DOMError.NamespaceError
+  
+    if(namespace !== Namespace.XMLNS && 
+      (prefix === "xmlns" || qualifiedName === "xmlns"))
+      throw DOMError.NamespaceError
+
+    if(namespace === Namespace.XMLNS && 
+      (prefix !== "xmlns" || qualifiedName !== "xmlns"))
+      throw DOMError.NamespaceError
+
+    return new Attr(null, namespace, prefix || '', localName, '')
+  } 
+  
   /**
    * Creates an event of the type specified.
    * 
