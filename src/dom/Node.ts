@@ -1,32 +1,36 @@
 import { NodeType } from "./NodeType";
 import { DocumentPosition } from "./DocumentPosition";
 import { DocumentFragment } from "./DocumentFragment";
+import { Document } from "./Document";
 import { Text } from "./Text";
+import { NodeList } from "./NodeList";
+import { Element } from "./Element";
 
 /**
  * Represents a generic XML node.
  */
 export abstract class Node {
 
-  public readonly children: Array<Node> = []
-
-  /**
-   * Initializes a new instance of `Node`.
-   *
-   * @param parent - the parent node
-   */
-  protected constructor (parent: Node | null) 
-  {
-    this._parentNode = parent
-  }
-    
   protected abstract _nodeType: NodeType
   protected abstract _nodeName: string
 
   protected _parentNode: Node | null = null
   protected _baseURI: string | null = null
-  protected _childNodeList: NodeList | null = null
-
+  protected _ownerDocument: Document | null = null
+  protected _childNodeList: NodeList = new NodeList()
+  protected _prevSibling: Node | null = null
+  protected _nextSibling: Node | null = null
+  
+  /**
+   * Initializes a new instance of `Node`.
+   *
+   * @param parent - the parent node
+   */
+  protected constructor (ownerDocument: Document | null = null) 
+  {
+    this._ownerDocument = ownerDocument
+  }
+  
   /** 
    * Returns the type of node. 
    */
@@ -46,15 +50,11 @@ export abstract class Node {
    * Returns the parent document. 
    */
   get ownerDocument(): Document | null {
-    let node: Node | null = this
-    while (node) {
-      if (node.nodeType === NodeType.Document)
-        return <Document>node
-      else
-        node = node.parentNode
-    }
-    return null
-  }  
+    return this._ownerDocument 
+  }
+  set ownerDocument(value: Document | null) { 
+    this._ownerDocument = value
+  }
 
   /** 
    * Returns the parent node. 
@@ -74,45 +74,31 @@ export abstract class Node {
   /** 
    * Returns a NodeList of child nodes. 
    */
-  get childNodes(): NodeList {
-    if (!this._childNodeList || !this._childNodeList.nodes)
-      this._childNodeList = new NodeList(this.children)
-    return this._childNodeList
-  }
+  get childNodes(): NodeList { return this._childNodeList }
 
   /** 
    * Returns the first child node. 
    */
   get firstChild(): Node | null { 
-    return this.children[0] || null 
+    return this._childNodeList[0]
   }
 
   /** 
    * Returns the last child node. 
    */
   get lastChild(): Node | null { 
-    return this.children[this.children.length - 1] || null
+    return this._childNodeList[this._childNodeList.length - 1]
   }
 
   /** 
    * Returns the previous sibling node. 
    */
-  get previousSibling(): Node | null {
-      if (!this.parentNode) return null
-
-      let i = this.parentNode.children.indexOf(this)
-      return this.parentNode.children[i - 1] || null
-  }
+  get previousSibling(): Node | null { return this._prevSibling }
 
   /** 
    * Returns the next sibling node. 
    */
-  get nextSibling(): Node | null {
-      if (!this.parentNode) return null
-
-      let i = this.parentNode.children.indexOf(this)
-      return this.parentNode.children[i + 1] || null
-  }
+  get nextSibling(): Node | null { return this._nextSibling }
 
   /** 
    * Gets or sets the data associated with a {@link CharacterData} node.
@@ -130,7 +116,7 @@ export abstract class Node {
     if (this.nodeType === NodeType.Element ||
       this.nodeType === NodeType.DocumentFragment) {
         let str = ''
-        for (let child of this.children) {
+        for (let child of this._childNodeList) {
           if (child.textContent) str += child.textContent
         }
         return str
@@ -138,21 +124,22 @@ export abstract class Node {
     else
       return null
   }
-
   set textContent(value: string | null) {
     if (this.nodeType === NodeType.Element ||
         this.nodeType === NodeType.DocumentFragment) {
-          this.children = []
+          this._childNodeList = new NodeList()
           if (value) {
-            let node = new Text(value)
+            let node = new Text(this.ownerDocument, value)
             node.setParent(this)
-            this.children.push(node)
+            this._childNodeList.push(node)
           }
       }
   }
 
   /** Determines whether a node has any children. */
-  hasChildNodes(): boolean { return (this.children.length !== 0) }
+  hasChildNodes(): boolean { 
+    return (this._childNodeList.length !== 0) 
+  }
 
   /**
    * Puts all {@link Text} nodes in the full depth of the sub-tree
@@ -170,12 +157,25 @@ export abstract class Node {
    * constructor for nodes. The duplicate node has no parent 
    * ({@link parentNode} returns `null`).
    *
+   * @param document - new owner document
    * @param deep - if `true`, recursively clone the subtree under the 
    * specified node; if `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
-  cloneNode(deep: boolean = false): Node {
+  cloneNode(document: Document | boolean | null = null,
+    deep: boolean = false): Node {
+
+    if (typeof document === "boolean") {
+      deep = document
+      document = null
+    }
+
+    if(!document)
+      document = this.ownerDocument
+      
     let clonedSelf = Object.create(this)
+
+    clonedSelf.ownerDocument = document
 
     // remove parent element
     clonedSelf._parentNode = null
@@ -188,7 +188,7 @@ export abstract class Node {
     // clone child nodes
     if (deep) {
       clonedSelf.children = []
-      for (let child of this.children) {
+      for (let child of this.childNodes) {
         let clonedChild = child.cloneNode(deep)
         clonedChild._parentNode = clonedSelf
         clonedSelf.children.push(clonedChild)
@@ -268,31 +268,31 @@ export abstract class Node {
     if (newChild.nodeType === NodeType.DocumentFragment) {
       let lastInsertedNode = null
 
-      for (let childNode of newChild.children)
+      for (let childNode of newChild.childNodes)
         lastInsertedNode = this.insertBefore(childNode, refChild)
 
       return lastInsertedNode
     }
     else if (refChild) {
         // remove newChild if it is already in the tree
-        let index = this.children.indexOf(newChild)
+        let index = this.childNodes.indexOf(newChild)
         if (index !== -1)
-          this.children.splice(index, 1)
+          this.childNodes.splice(index, 1)
         else
           newChild._parentNode = this
 
         // temporarily remove children starting *with* refChild
-        index = this.children.indexOf(refChild)
-        let removed = this.children.splice(index)
+        index = this.childNodes.indexOf(refChild)
+        let removed = this.childNodes.splice(index)
       
         // add the new child
-        this.children.push(newChild)
+        this.childNodes.push(newChild)
       
         // add back removed children after new child
-        Array.prototype.push.apply(this.children, removed)
+        Array.prototype.push.apply(this.childNodes, removed)
     }
     else
-      this.children.push(newChild)
+      this.childNodes.push(newChild)
 
     return newChild
   }
@@ -314,21 +314,21 @@ export abstract class Node {
     if (newChild.nodeType === NodeType.DocumentFragment) {
       let lastInsertedNode = null
 
-      for (let childNode of newChild.children)
+      for (let childNode of newChild.childNodes)
         lastInsertedNode = this.appendChild(childNode)
 
       return lastInsertedNode
     }
     else {
       // remove newChild if it is already in the tree
-      let index = this.children.indexOf(newChild)
+      let index = this.childNodes.indexOf(newChild)
       if (index !== -1)
-        this.children.splice(index, 1)
+        this.childNodes.splice(index, 1)
       else
         newChild._parentNode = this
   
       // add newChild
-      this.children.push(newChild)
+      this.childNodes.push(newChild)
   
       return newChild
     }
@@ -346,16 +346,16 @@ export abstract class Node {
    */
   replaceChild(newChild: Node, oldChild: Node): Node {
     // remove newChild if it is already in the tree
-    let index = this.children.indexOf(newChild)
+    let index = this.childNodes.indexOf(newChild)
     if (index !== -1)
-      this.children.splice(index, 1)
+      this.childNodes.splice(index, 1)
     else
       newChild._parentNode = this
 
     // find and replace oldChild
-    index = this.children.indexOf(oldChild)
+    index = this.childNodes.indexOf(oldChild)
     if (index !== -1)
-      this.children[index] = newChild
+      this.childNodes[index] = newChild
 
     return oldChild
   }
@@ -369,9 +369,9 @@ export abstract class Node {
   * @returns the removed child node
   */
   removeChild(oldChild: Node): Node {
-    let index = this.children.indexOf(oldChild)
+    let index = this.childNodes.indexOf(oldChild)
     if (index !== -1)
-      this.children.splice(index, 1)
+      this.childNodes.splice(index, 1)
 
     return oldChild
   }

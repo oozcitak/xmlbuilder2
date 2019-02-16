@@ -1,6 +1,6 @@
 import { NodeType } from "./NodeType";
-import { Node } from "./Node";
 import { CharacterData } from "./CharacterData";
+import { Document } from "./Document";
 
 /**
  * Represents a text node.
@@ -13,12 +13,13 @@ export class Text extends CharacterData {
   /**
    * Initializes a new instance of `Text`.
    *
-   * @param parent - the parent node
+   * @param ownerDocument - the parent document
+   * @param data - the text content
    */
-  protected constructor (parent: Node | null, data: string = '') 
+  public constructor (ownerDocument: Document | null = null, 
+    data: string | null = null)
   {
-    super(parent)
-    this.data = data
+    super(ownerDocument, data)
   }
     
   /** 
@@ -49,7 +50,7 @@ export class Text extends CharacterData {
     let newData = this.data.slice(offset)
     this.data = this.data.slice(0, offset)
 
-    let newNode = new Text(this.parentNode, newData)
+    let newNode = new Text(this.ownerDocument, newData)
 
     if (this.parentNode)
       this.parentNode.insertBefore(newNode, this)

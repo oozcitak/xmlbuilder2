@@ -1,21 +1,26 @@
-import { Node } from "./Node";
+import { Node } from "./Node"
+import { Document } from "./Document"
 
 /**
  * Represents a generic text node.
  */
 export abstract class CharacterData extends Node {
 
+  protected _data: string
+
   /**
    * Initializes a new instance of `CharacterData`.
    *
-   * @param parent - the parent node
+   * @param ownerDocument - the parent document
+   * @param data - the text content
    */
-  protected constructor (parent: Node | null) 
+  protected constructor (ownerDocument: Document | null = null, 
+    data: string | null = null)
   {
-    super(parent)
+    super(ownerDocument)
+
+    this._data = data || ''
   }
-    
-  private _data: string = ''
 
   /** 
    * Gets or sets the data associated with a {@link CharacterData} node.
