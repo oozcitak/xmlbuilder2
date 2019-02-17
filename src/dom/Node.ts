@@ -1,4 +1,3 @@
-import { DocumentPosition } from "./DocumentPosition";
 import { DocumentFragment } from "./DocumentFragment";
 import { Document } from "./Document";
 import { Text } from "./Text";
@@ -9,6 +8,7 @@ import { Element } from "./Element";
  * Represents a generic XML node.
  */
 export abstract class Node {
+  // node type
   static readonly Element = 1
   static readonly Attribute = 2
   static readonly Text = 3
@@ -21,6 +21,14 @@ export abstract class Node {
   static readonly DocumentType = 10
   static readonly DocumentFragment = 11
   static readonly Notation = 12 // historical
+
+  // document position
+  static readonly Disconnected = 0x01
+  static readonly Preceding = 0x02
+  static readonly Following = 0x04
+  static readonly Contains = 0x08
+  static readonly ContainedBy = 0x10
+  static readonly ImplementationSpecific = 0x20
 
   protected _parentNode: Node | null = null
   protected _baseURI: string | null = null
@@ -222,11 +230,10 @@ export abstract class Node {
    * @param node - the node to compare with
    */
   isEqualNode(node?: Node | null): boolean {
-    if (!node || this.nodeType !== node.nodeType)
+    if (!node || this.nodeType !== node.nodeType ||
+      this.childNodes.length !== node.childNodes.length) {
       return false
-    else if (this.childNodes.length !== node.childNodes.length)
-      return false
-    else
+    } else {
       for (let i = 0; i < this.childNodes.length; i++) {
         if (this.childNodes[i].isEqualNode(node.childNodes[i])) {
           return false
@@ -234,6 +241,7 @@ export abstract class Node {
       }
 
       return true
+    }
   }
 
   /**
@@ -249,7 +257,7 @@ export abstract class Node {
    * Returns a bitmask indicating the position of a node relative to 
    * this node.
    */
-  compareDocumentPosition(node: Node): DocumentPosition {
+  compareDocumentPosition(node: Node): number {
     throw new Error("This DOM method is not implemented." + this.debugInfo())
   }
 

@@ -3,7 +3,7 @@ import { Element } from "./Element"
 import { DOMImplementation } from "./DOMImplementation"
 import { DocType } from "./DocType"
 import { DOMError } from "./DOMError"
-import { ElementCollection } from "./ElementCollection"
+import { HTMLCollection } from "./HTMLCollection"
 import { Utility } from "./Utility"
 import { XMLSpec10 } from "./XMLSpec10"
 import { Namespace } from "./Namespace"
@@ -80,19 +80,19 @@ export class Document extends Node {
   }
 
   /**
-   * Returns a {@link ElementCollection} of all descendant elements 
+   * Returns a {@link HTMLCollection} of all descendant elements 
    * whose local name is `localName`.
    * 
    * @param localName - the local name to match or `*` to match all
    * descendant elements.
    * 
-   * @returns an {@link ElementCollection} of matching descendant
+   * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByTagName (localName: string): ElementCollection {
+  getElementsByTagName (localName: string): HTMLCollection {
     let matchAll = (localName == '*')
 
-    let list = new ElementCollection()
+    let list = new HTMLCollection()
 
     if (this.documentElement) {
       Utility.forEachDescendant (this.documentElement, function(node: Node) {
@@ -108,7 +108,7 @@ export class Document extends Node {
   }
 
   /**
-   * Returns a {@link ElementCollection} of all descendant elements 
+   * Returns a {@link HTMLCollection} of all descendant elements 
    * whose namespace is `namespace` and local name is `localName`.
    * 
    * @param namespace - the namespace to match or `*` to match any
@@ -116,14 +116,14 @@ export class Document extends Node {
    * @param localName - the local name to match or `*` to match any
    * local name.
    * 
-   * @returns an {@link ElementCollection} of matching descendant
+   * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByTagNameNS (namespace: string, localName: string): ElementCollection {
+  getElementsByTagNameNS (namespace: string, localName: string): HTMLCollection {
     let matchAllNamespace = (namespace == '*')
     let matchAllLocalName = (localName == '*')
 
-    let list = new ElementCollection()
+    let list = new HTMLCollection()
 
     if (this.documentElement) {
       Utility.forEachDescendant (this.documentElement, function(node: Node) {
@@ -140,7 +140,7 @@ export class Document extends Node {
   }
 
   /**
-   * Returns a {@link ElementCollection} of all descendant elements 
+   * Returns a {@link HTMLCollection} of all descendant elements 
    * whose classes are contained in the list of classes given in 
    * `classNames`.
    * 
@@ -149,7 +149,7 @@ export class Document extends Node {
    * 
    * @param classNames - a space-separated list of classes
    * 
-   * @returns an {@link ElementCollection} of matching descendant
+   * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
   getElementsByClassName (classNames: string): never {

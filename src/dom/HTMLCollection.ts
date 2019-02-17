@@ -3,7 +3,7 @@ import { Element } from "./Element";
 /**
  * Represents a collection of elements.
  */
-export class ElementCollection extends Array<Element> {
+export class HTMLCollection extends Array<Element> {
 
   /** 
    * Returns the element with index `index` from the collection.

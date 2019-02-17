@@ -155,9 +155,9 @@ export class Element extends Node {
     if(!other || this.namespaceURI !== other.namespaceURI || 
       this.prefix !== other.prefix ||
       this.localName !== other.localName ||
-      this.attributes.length !== other.attributes.length)
+      this.attributes.length !== other.attributes.length) {
       return false
-    else
+    } else {
       for (let i = 0; i < this.attributes.length; i++) {
         let att1 = this.attributes[i]
         let att2 = other.attributes[i]
@@ -167,6 +167,8 @@ export class Element extends Node {
           return false
         }
       }
+      
       return true
+    }
   }
 }
