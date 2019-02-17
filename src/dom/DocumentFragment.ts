@@ -7,9 +7,6 @@ import { Text } from "./Text"
  */
 export class DocumentFragment extends Node {
 
-  protected _nodeType: number = Node.DocumentFragment
-  protected _nodeName: string = '#document-fragment'
-
   /**
    * Initializes a new instance of `DocumentFragment`.
    *
@@ -19,6 +16,16 @@ export class DocumentFragment extends Node {
   {
     super(ownerDocument)
   }
+
+  /** 
+   * Returns the type of node. 
+   */
+  get nodeType(): number { return Node.DocumentFragment }
+
+  /** 
+   * Returns a string appropriate for the type of node. 
+   */
+  get nodeName(): string { return '#document-fragment' }
 
   /** 
    * Returns the concatenation of data of all the {@link CharacterData}

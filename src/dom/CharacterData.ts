@@ -22,6 +22,21 @@ export abstract class CharacterData extends Node {
     this._data = data || ''
   }
 
+  /**
+   * Determines if the given node is equal to this one.
+   * 
+   * @param node - the node to compare with
+   */
+  isEqualNode(node?: Node | null): boolean {
+    if (!super.isEqualNode(node))
+      return false
+
+    if(!node || this.data !== (<CharacterData>node).data)
+      return false
+    else
+      return true
+  }
+
   /** 
    * Gets or sets the data associated with a {@link CharacterData} node.
    */

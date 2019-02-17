@@ -7,7 +7,6 @@ import { Document } from "./Document"
  */
 export class DocType extends Node {
   
-  protected _nodeType: number = Node.DocumentType
   protected _nodeName: string
   protected _publicId: string
   protected _systemId: string
@@ -29,6 +28,16 @@ export class DocType extends Node {
     this._publicId = publicId
     this._systemId = systemId
   }
+
+  /** 
+   * Returns the type of node. 
+   */
+  get nodeType(): number { return Node.DocumentType }
+
+  /** 
+   * Returns a string appropriate for the type of node. 
+   */
+  get nodeName(): string { return this._nodeName }
 
   /**
    * Returns the name of the node.
@@ -70,5 +79,23 @@ export class DocType extends Node {
       this.publicId, this.systemId)
     clonedSelf._parentNode = null
     return clonedSelf
+  }
+
+  /**
+   * Determines if the given node is equal to this one.
+   * 
+   * @param node - the node to compare with
+   */
+  isEqualNode(node?: Node | null): boolean {
+    if (!super.isEqualNode(node))
+      return false
+
+    let other = <DocType>node
+    if(!other || this.name !== other.name || 
+      this.publicId !== other.publicId || 
+      this.systemId !== other.systemId)
+      return false
+    else
+      return true
   }
 }

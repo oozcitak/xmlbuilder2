@@ -9,9 +9,6 @@ import { Attr } from "./Attr";
  */
 export class Element extends Node {
 
-  protected _nodeType: number = Node.Element
-  protected _nodeName: string = ''
-
   protected _namespaceURI: string | null
   protected _prefix: string | null
   protected _localName: string
@@ -35,6 +32,16 @@ export class Element extends Node {
     this._localName = localName
   }
   
+  /** 
+   * Returns the type of node. 
+   */
+  get nodeType(): number { return Node.Element }
+
+  /** 
+   * Returns a string appropriate for the type of node. 
+   */
+  get nodeName(): string { return this.tagName }
+
   /** 
    * Gets the namespace URI.
    */
@@ -60,11 +67,6 @@ export class Element extends Node {
       this._prefix + ':' + this.localName : 
       this.localName)
   }
-
-  /** 
-   * Returns a string appropriate for the type of node. 
-   */
-  get nodeName(): string { return this.tagName }
 
   /** 
    * Returns a {@link NamedNodeMap} of attributes.
@@ -137,5 +139,34 @@ export class Element extends Node {
     }
 
     return clonedSelf
+  }
+
+
+  /**
+   * Determines if the given node is equal to this one.
+   * 
+   * @param node - the node to compare with
+   */
+  isEqualNode(node?: Node | null): boolean {
+    if (!super.isEqualNode(node))
+      return false
+
+    let other = <Element>node
+    if(!other || this.namespaceURI !== other.namespaceURI || 
+      this.prefix !== other.prefix ||
+      this.localName !== other.localName ||
+      this.attributes.length !== other.attributes.length)
+      return false
+    else
+      for (let i = 0; i < this.attributes.length; i++) {
+        let att1 = this.attributes[i]
+        let att2 = other.attributes[i]
+        if (att1.namespaceURI !== att2.namespaceURI ||
+          att1.localName !== att2.localName ||
+          att1.value !== att2.value) {
+          return false
+        }
+      }
+      return true
   }
 }

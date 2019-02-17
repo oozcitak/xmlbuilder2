@@ -7,9 +7,6 @@ import { Document } from "./Document";
  */
 export class Text extends CharacterData {
 
-  protected _nodeType: number = Node.Text
-  protected _nodeName: string = '#text'
-
   /**
    * Initializes a new instance of `Text`.
    *
@@ -21,7 +18,17 @@ export class Text extends CharacterData {
   {
     super(ownerDocument, data)
   }
-    
+
+  /** 
+   * Returns the type of node. 
+   */
+  get nodeType(): number { return Node.Text }
+
+  /** 
+   * Returns a string appropriate for the type of node. 
+   */
+  get nodeName(): string { return '#text' }
+
   /** 
    * Returns the combined data of all direct text node siblings.
    */

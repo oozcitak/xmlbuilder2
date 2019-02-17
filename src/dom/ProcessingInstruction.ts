@@ -7,8 +7,6 @@ import { Document } from "./Document";
  */
 export class ProcessingInstruction extends CharacterData {
 
-  protected _nodeType: number = Node.ProcessingInstruction
-  protected _nodeName: string = '#text'
   protected _target: string
 
   /**
@@ -23,7 +21,17 @@ export class ProcessingInstruction extends CharacterData {
     super(ownerDocument, data)
     this._target = target
   }
-    
+
+  /** 
+   * Returns the type of node. 
+   */
+  get nodeType(): number { return Node.ProcessingInstruction }
+
+  /** 
+   * Returns a string appropriate for the type of node. 
+   */
+  get nodeName(): string { return this._target }
+
   /** 
    * Gets the target of the {@link ProcessingInstruction} node.
    */
@@ -55,5 +63,20 @@ export class ProcessingInstruction extends CharacterData {
     clonedSelf._parentNode = null
 
     return clonedSelf
+  }
+
+  /**
+   * Determines if the given node is equal to this one.
+   * 
+   * @param node - the node to compare with
+   */
+  isEqualNode(node?: Node | null): boolean {
+    if (!super.isEqualNode(node))
+      return false
+
+    if(!node || this.target !== (<ProcessingInstruction>node).target)
+      return false
+    else
+      return true
   }
 }

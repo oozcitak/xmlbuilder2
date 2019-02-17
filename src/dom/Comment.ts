@@ -7,9 +7,6 @@ import { Document } from "./Document"
  */
 export class Comment extends CharacterData {
 
-  protected _nodeType: number = Node.Comment
-  protected _nodeName: string = '#comment'
-
   /**
    * Initializes a new instance of `Comment`.
    *
@@ -21,6 +18,16 @@ export class Comment extends CharacterData {
   {
     super(ownerDocument, data)
   }
+  
+  /** 
+   * Returns the type of node. 
+   */
+  get nodeType(): number { return Node.Comment }
+
+  /** 
+   * Returns a string appropriate for the type of node. 
+   */
+  get nodeName(): string { return '#comment' }
 
   /**
    * Returns a duplicate of this node, i.e., serves as a generic copy 

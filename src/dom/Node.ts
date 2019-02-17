@@ -22,9 +22,6 @@ export abstract class Node {
   static readonly DocumentFragment = 11
   static readonly Notation = 12 // historical
 
-  protected abstract _nodeType: number
-  protected abstract _nodeName: string
-
   protected _parentNode: Node | null = null
   protected _baseURI: string | null = null
   protected _ownerDocument: Document | null = null
@@ -43,12 +40,12 @@ export abstract class Node {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return this._nodeType }
+  abstract get nodeType(): number
 
   /** 
    * Returns a string appropriate for the type of node. 
    */
-  get nodeName(): string { return this._nodeName }
+  abstract get nodeName(): string
 
   /** 
    * Returns whether the node is rooted to a document node. 
@@ -225,7 +222,27 @@ export abstract class Node {
    * @param node - the node to compare with
    */
   isEqualNode(node?: Node | null): boolean {
-    throw new Error("This DOM method is not implemented." + this.debugInfo())
+    if (!node || this.nodeType !== node.nodeType)
+      return false
+    else if (this.childNodes.length !== node.childNodes.length)
+      return false
+    else
+      for (let i = 0; i < this.childNodes.length; i++) {
+        if (this.childNodes[i].isEqualNode(node.childNodes[i])) {
+          return false
+        }
+      }
+
+      return true
+  }
+
+  /**
+   * Determines if the given node is reference equal to this one.
+   * 
+   * @param node - the node to compare with
+   */
+  isSameNode(node?: Node | null): boolean {
+    return (node === this)
   }
 
   /**

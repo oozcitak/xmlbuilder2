@@ -19,9 +19,6 @@ import { Attr } from "./Attr"
  */
 export class Document extends Node {
 
-  protected _nodeType: number = Node.Document
-  protected _nodeName: string = '#document'
-
   URL: string | undefined
   documentURI: string | undefined
   origin: string | undefined
@@ -38,6 +35,16 @@ export class Document extends Node {
   {
     super(null)
   }
+
+  /** 
+   * Returns the type of node. 
+   */
+  get nodeType(): number { return Node.Document }
+
+  /** 
+   * Returns a string appropriate for the type of node. 
+   */
+  get nodeName(): string { return '#document' }
 
   /** 
    * Returns the {@link DOMImplementation} object that is associated 
