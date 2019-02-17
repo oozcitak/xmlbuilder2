@@ -11,7 +11,7 @@ export abstract class CharacterData extends Node {
   /**
    * Initializes a new instance of `CharacterData`.
    *
-   * @param ownerDocument - the parent document
+   * @param ownerDocument - the owner document
    * @param data - the text content
    */
   protected constructor (ownerDocument: Document | null = null, 
@@ -24,15 +24,12 @@ export abstract class CharacterData extends Node {
 
   /** 
    * Gets or sets the data associated with a {@link CharacterData} node.
-   * For other node types returns `null`. 
    */
   get nodeValue(): string | null { return this.data }
   set nodeValue(value: string | null) { this.data = value || '' }
 
   /** 
-   * Returns the concatenation of data of all the {@link CharacterData}
-   * node descendants in tree order. When set, replaces the text 
-   * contents of the node with the given value. 
+   * Gets or sets the data associated with a {@link CharacterData} node.
    */
   get textContent(): string | null { return this.data }
   set textContent(value: string | null) { this.data = value || '' }

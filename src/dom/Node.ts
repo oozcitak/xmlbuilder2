@@ -1,4 +1,3 @@
-import { NodeType } from "./NodeType";
 import { DocumentPosition } from "./DocumentPosition";
 import { DocumentFragment } from "./DocumentFragment";
 import { Document } from "./Document";
@@ -10,21 +9,31 @@ import { Element } from "./Element";
  * Represents a generic XML node.
  */
 export abstract class Node {
+  static readonly Element = 1
+  static readonly Attribute = 2
+  static readonly Text = 3
+  static readonly CData = 4
+  static readonly EntityReference = 5 // historical
+  static readonly Entity = 6 // historical
+  static readonly ProcessingInstruction = 7
+  static readonly Comment = 8
+  static readonly Document = 9
+  static readonly DocumentType = 10
+  static readonly DocumentFragment = 11
+  static readonly Notation = 12 // historical
 
-  protected abstract _nodeType: NodeType
+  protected abstract _nodeType: number
   protected abstract _nodeName: string
 
   protected _parentNode: Node | null = null
   protected _baseURI: string | null = null
   protected _ownerDocument: Document | null = null
   protected _childNodeList: NodeList = new NodeList()
-  protected _prevSibling: Node | null = null
-  protected _nextSibling: Node | null = null
   
   /**
    * Initializes a new instance of `Node`.
    *
-   * @param parent - the parent node
+   * @param ownerDocument - the owner document
    */
   protected constructor (ownerDocument: Document | null = null) 
   {
@@ -34,12 +43,23 @@ export abstract class Node {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): NodeType { return this._nodeType }
+  get nodeType(): number { return this._nodeType }
 
   /** 
    * Returns a string appropriate for the type of node. 
    */
   get nodeName(): string { return this._nodeName }
+
+  /** 
+   * Returns whether the node is rooted to a document node. 
+   */
+  get isConnected(): boolean {
+    let root = this.getRootNode()
+    if(!root)
+      return false
+    else
+      return (root.nodeType === Node.Document)
+  }
 
   /** 
    * Returns the associated base URL. 
@@ -65,14 +85,14 @@ export abstract class Node {
    * Returns the parent element. 
    */
   get parentElement(): Element | null { 
-    if (this.parentNode && this.parentNode.nodeType === NodeType.Element)
+    if (this.parentNode && this.parentNode.nodeType === Node.Element)
       return <Element>this.parentNode
     else
       return null
    }  
 
   /** 
-   * Returns a NodeList of child nodes. 
+   * Returns a {@link NodeList} of child nodes. 
    */
   get childNodes(): NodeList { return this._childNodeList }
 
@@ -80,25 +100,31 @@ export abstract class Node {
    * Returns the first child node. 
    */
   get firstChild(): Node | null { 
-    return this._childNodeList[0]
+    return this._childNodeList[0] || null
   }
 
   /** 
    * Returns the last child node. 
    */
   get lastChild(): Node | null { 
-    return this._childNodeList[this._childNodeList.length - 1]
+    return this._childNodeList[this._childNodeList.length - 1] || null
   }
 
   /** 
    * Returns the previous sibling node. 
    */
-  get previousSibling(): Node | null { return this._prevSibling }
+  get previousSibling(): Node | null {
+    let index = this._childNodeList.indexOf(this)
+    return this._childNodeList[index - 1] || null
+  }
 
   /** 
    * Returns the next sibling node. 
    */
-  get nextSibling(): Node | null { return this._nextSibling }
+  get nextSibling(): Node | null {
+    let index = this._childNodeList.indexOf(this)
+    return this._childNodeList[index + 1] || null
+  }
 
   /** 
    * Gets or sets the data associated with a {@link CharacterData} node.
@@ -112,31 +138,29 @@ export abstract class Node {
    * node descendants in tree order. When set, replaces the text 
    * contents of the node with the given value. 
    */
-  get textContent(): string | null {
-    if (this.nodeType === NodeType.Element ||
-      this.nodeType === NodeType.DocumentFragment) {
-        let str = ''
-        for (let child of this._childNodeList) {
-          if (child.textContent) str += child.textContent
-        }
-        return str
+  get textContent(): string | null { return null }
+  set textContent(value: string | null) { }
+
+  /**
+   * Returns the root node.
+   * 
+   * @param options - if options has `composed = true` this function
+   * returns the node's shadow-including root, otherwise it returns
+   * the node's root node.
+   */
+  getRootNode(options: object = { composed: false }): Node | null {
+    let root = <Node>this
+    let node = this.parentNode
+    while(node)
+    {
+      [root, node] = [node, node.parentNode]
     }
-    else
-      return null
-  }
-  set textContent(value: string | null) {
-    if (this.nodeType === NodeType.Element ||
-        this.nodeType === NodeType.DocumentFragment) {
-          this._childNodeList = new NodeList()
-          if (value) {
-            let node = new Text(this.ownerDocument, value)
-            node.setParent(this)
-            this._childNodeList.push(node)
-          }
-      }
+    return root
   }
 
-  /** Determines whether a node has any children. */
+  /** 
+   * Determines whether a node has any children.
+   */
   hasChildNodes(): boolean { 
     return (this._childNodeList.length !== 0) 
   }
@@ -149,7 +173,37 @@ export abstract class Node {
    * are no adjacent Text nodes.
    */
   normalize(): void {
-    throw new Error("This DOM method is not implemented." + this.debugInfo())
+    // remove empty text nodes
+    let node = this.firstChild
+    while (node) {
+      let nextNode = node.nextSibling
+      if (node.nodeType === Node.Text) {
+        let text = <Text>node
+        if (text.length === 0) {
+          this.removeChild(text)
+        }
+      }
+      node = nextNode
+    }
+    // combine adjacent text nodes
+    node = this.firstChild
+    while (node)
+    {
+      let nextNode = node.nextSibling
+      if (node.nodeType === Node.Text &&
+        nextNode && nextNode.nodeType === Node.Text) {
+        let text = <Text>node
+        let nextText = <Text>nextNode
+        text.appendData(nextText.data)
+        this.removeChild(nextText)
+      } else {
+        node = nextNode
+      }
+    }
+    // normalize child nodes
+    for (let child of this.childNodes) {
+      child.normalize()
+    }
   }
 
   /**
@@ -162,41 +216,8 @@ export abstract class Node {
    * specified node; if `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
-  cloneNode(document: Document | boolean | null = null,
-    deep: boolean = false): Node {
-
-    if (typeof document === "boolean") {
-      deep = document
-      document = null
-    }
-
-    if(!document)
-      document = this.ownerDocument
-      
-    let clonedSelf = Object.create(this)
-
-    clonedSelf.ownerDocument = document
-
-    // remove parent element
-    clonedSelf._parentNode = null
-
-    // clone attributes
-    clonedSelf.attribs = {}
-    for (let attName in this.attribs)
-      clonedSelf.attribs[attName] = this.attribs[attName].cloneNode()
-
-    // clone child nodes
-    if (deep) {
-      clonedSelf.children = []
-      for (let child of this.childNodes) {
-        let clonedChild = child.cloneNode(deep)
-        clonedChild._parentNode = clonedSelf
-        clonedSelf.children.push(clonedChild)
-      }
-    }
-
-    return clonedSelf
-  }
+  abstract cloneNode(document: Document | boolean | null,
+    deep: boolean): Node
 
   /**
    * Determines if the given node is equal to this one.
@@ -265,7 +286,7 @@ export abstract class Node {
    */
   insertBefore(newChild: Node | DocumentFragment, 
     refChild: Node | null): Node | null {
-    if (newChild.nodeType === NodeType.DocumentFragment) {
+    if (newChild.nodeType === Node.DocumentFragment) {
       let lastInsertedNode = null
 
       for (let childNode of newChild.childNodes)
@@ -311,7 +332,7 @@ export abstract class Node {
    * @returns the newly inserted child node
    */
   appendChild(newChild: Node): Node | null {
-    if (newChild.nodeType === NodeType.DocumentFragment) {
+    if (newChild.nodeType === Node.DocumentFragment) {
       let lastInsertedNode = null
 
       for (let childNode of newChild.childNodes)

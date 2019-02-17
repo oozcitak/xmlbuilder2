@@ -1,4 +1,4 @@
-import { NodeType } from "./NodeType";
+import { Node } from "./Node";
 import { CharacterData } from "./CharacterData";
 import { Document } from "./Document";
 
@@ -7,13 +7,13 @@ import { Document } from "./Document";
  */
 export class Text extends CharacterData {
 
-  protected _nodeType: NodeType = NodeType.Text
+  protected _nodeType: number = Node.Text
   protected _nodeName: string = '#text'
 
   /**
    * Initializes a new instance of `Text`.
    *
-   * @param ownerDocument - the parent document
+   * @param ownerDocument - the owner document
    * @param data - the text content
    */
   public constructor (ownerDocument: Document | null = null, 
@@ -29,12 +29,12 @@ export class Text extends CharacterData {
   {
     let prev = this.previousSibling
     let prevText = ''
-    if(prev && prev.nodeType === NodeType.Text)
+    if(prev && prev.nodeType === Node.Text)
       prevText = (<Text>prev).wholeText
 
     let next = this.nextSibling
     let nextText = ''
-    if(next && next.nodeType === NodeType.Text)
+    if(next && next.nodeType === Node.Text)
       nextText = (<Text>next).wholeText
   
     return prevText + this.data + nextText
@@ -56,5 +56,32 @@ export class Text extends CharacterData {
       this.parentNode.insertBefore(newNode, this)
 
     return newNode
+  }
+
+  /**
+   * Returns a duplicate of this node, i.e., serves as a generic copy 
+   * constructor for nodes. The duplicate node has no parent 
+   * ({@link parentNode} returns `null`).
+   *
+   * @param document - new owner document
+   * @param deep - if `true`, recursively clone the subtree under the 
+   * specified node; if `false`, clone only the node itself (and its 
+   * attributes, if it is an {@link Element}).
+   */
+  cloneNode(document: Document | boolean | null = null,
+    deep: boolean = false): Node {
+
+    if (typeof document === "boolean") {
+      deep = document
+      document = null
+    }
+
+    if(!document)
+      document = this.ownerDocument
+      
+    let clonedSelf = new Text(document, this.data)
+    clonedSelf._parentNode = null
+
+    return clonedSelf
   }
 }

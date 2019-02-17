@@ -24,8 +24,8 @@ export class Attr {
    * @param localName - the local name of the element
    */
   public constructor (ownerElement: Element | null,
-    namespaceURI: string | null, prefix: string, localName: string,
-    value: string) 
+    namespaceURI: string | null, prefix: string | null,
+    localName: string, value: string) 
   {
     this._namespaceURI = namespaceURI
     this._prefix = prefix

@@ -1,4 +1,3 @@
-import { NodeType } from "./NodeType"
 import { Node } from "./Node"
 import { Element } from "./Element"
 import { DOMImplementation } from "./DOMImplementation"
@@ -20,8 +19,8 @@ import { Attr } from "./Attr"
  */
 export class Document extends Node {
 
-  protected _nodeType: NodeType
-  protected _nodeName: string
+  protected _nodeType: number = Node.Document
+  protected _nodeName: string = '#document'
 
   URL: string | undefined
   documentURI: string | undefined
@@ -37,10 +36,7 @@ export class Document extends Node {
    */
   public constructor () 
   {
-    super()
-
-    this._nodeType = NodeType.Document
-    this._nodeName = '#document'
+    super(null)
   }
 
   /** 
@@ -58,7 +54,7 @@ export class Document extends Node {
   get doctype (): DocType | null
   {
     for (let child of this.childNodes) {
-      if (child.nodeType === NodeType.DocType)
+      if (child.nodeType === Node.DocumentType)
         return <DocType>child
     }
     return null
@@ -70,7 +66,7 @@ export class Document extends Node {
   get documentElement (): Element | null
   {
     for (let child of this.childNodes) {
-      if (child.nodeType === NodeType.Element)
+      if (child.nodeType === Node.Element)
         return <Element>child
     }
     return null
@@ -93,7 +89,7 @@ export class Document extends Node {
 
     if (this.documentElement) {
       Utility.forEachDescendant (this.documentElement, function(node: Node) {
-        if (node.nodeType === NodeType.Element) {
+        if (node.nodeType === Node.Element) {
           let ele = <Element>node
           if (matchAll || ele.localName === localName)
             list.push(ele)
@@ -124,7 +120,7 @@ export class Document extends Node {
 
     if (this.documentElement) {
       Utility.forEachDescendant (this.documentElement, function(node: Node) {
-        if (node.nodeType === NodeType.Element) {
+        if (node.nodeType === Node.Element) {
           let ele = <Element>node
           if ((matchAllLocalName || ele.localName === localName) &&
               (matchAllNamespace || ele.namespaceURI === namespace))
@@ -260,7 +256,7 @@ export class Document extends Node {
    * @returns the clone
    */
   importNode(node: Node, deep: boolean = false): Node {
-    if(node.nodeType === NodeType.Document)
+    if(node.nodeType === Node.Document)
       throw DOMError.NotSupportedError
 
     return node.cloneNode(this, deep)
@@ -274,7 +270,7 @@ export class Document extends Node {
    * @returns the adopted node
    */
   adoptNode(node: Node): Node {
-    if(node.nodeType === NodeType.Document)
+    if(node.nodeType === Node.Document)
       throw DOMError.NotSupportedError
 
     let oldDocument = node.ownerDocument
@@ -381,5 +377,31 @@ export class Document extends Node {
   createTreeWalker(root: Node, whatToShow: number = NodeFilter.ShowAll,
     filter: NodeFilter | null = null): never {
       throw DOMError.NotSupportedError
+  }
+
+  /**
+   * Returns a duplicate of this node, i.e., serves as a generic copy 
+   * constructor for nodes. The duplicate node has no parent 
+   * ({@link parentNode} returns `null`).
+   *
+   * @param document - new owner document
+   * @param deep - if `true`, recursively clone the subtree under the 
+   * specified node; if `false`, clone only the node itself (and its 
+   * attributes, if it is an {@link Element}).
+   */
+  cloneNode(document: Document | boolean | null = null,
+    deep: boolean = false): Node {
+
+    if (typeof document === "boolean") {
+      deep = document
+      document = null
+    }
+
+    if(!document)
+      document = this.ownerDocument
+      
+    let clonedSelf = new Document()
+    clonedSelf._parentNode = null
+    return clonedSelf
   }
 }
