@@ -2,6 +2,7 @@ import { Node } from "./Node"
 import { Document } from "./Document"
 import { Text } from "./Text"
 import { NamedNodeMap } from "./NamedNodeMap"
+import { DOMTokenList } from "./DOMTokenList"
 import { Attr } from "./Attr";
 
 /**
@@ -69,9 +70,198 @@ export class Element extends Node {
   }
 
   /** 
+   * Gets or sets the identifier of this element.
+   */
+  get id(): string { return this.getAttribute('id') || ''}
+  set id(value: string) { this.setAttribute('id', value) }
+
+  /** 
+   * Gets or sets the class name of this element.
+   */
+  get className(): string { return this.getAttribute('class') || '' }
+  set className(value: string) { this.setAttribute('class', value) }
+
+  /** 
+   * Returns a {@link DOMTokenList} with tokens from the class attribute.
+   */
+  get classList(): DOMTokenList { return new DOMTokenList(this, 'class') }
+
+  /** 
    * Returns a {@link NamedNodeMap} of attributes.
    */
   get attributes(): NamedNodeMap { return this._attributes }
+
+  /**
+   * Determines if the element node contains any attributes.
+   */
+  hasAttributes(): boolean { return (this.attributes.length !== 0) }
+
+  /**
+   * Returns the list of all attribute's qualified names.
+   */
+  getAttributeNames(): string[] {
+    let names: string[] = []
+    
+    for(let att of this.attributes) {
+      names.push(att.name)
+    }
+
+    return names
+  }
+
+  /**
+   * Returns the value of the attribute with the given `qualifiedName`.
+   * 
+   * @param qualifiedName - qualified name to search for
+   */
+  getAttribute(qualifiedName: string): string | null {
+    let att = this.attributes.getNamedItem(qualifiedName)
+    return (att ? att.value : null)
+  }
+
+  /**
+   * Returns the value of the attribute with the given `namespace` and 
+   * `qualifiedName`.
+   * 
+   * @param namespace - namespace to search for
+   * @param localName - local name to search for
+   */
+  getAttributeNS(namespace: string, localName: string): string | null {
+    let att = this.attributes.getNamedItemNS(namespace, localName)
+    return (att ? att.value : null)
+  }
+  
+  /**
+   * Sets the value of the attribute with the given `qualifiedName`.
+   * 
+   * @param qualifiedName - qualified name to search for
+   * @param value - attribute value to set
+   */
+  setAttribute(qualifiedName: string, value: string): void {
+    let att = this.attributes.getNamedItem(qualifiedName)
+    if (att) att.value = value
+  }
+
+  /**
+   * Sets the value of the attribute with the given `namespace` and 
+   * `qualifiedName`.
+   * 
+   * @param namespace - namespace to search for
+   * @param localName - local name to search for
+   * @param value - attribute value to set
+   */
+  setAttributeNS(namespace: string, localName: string, value: string): void {
+    let att = this.attributes.getNamedItemNS(namespace, localName)
+    if (att) att.value = value
+  }
+
+  /**
+   * Removes the attribute with the given `qualifiedName`.
+   * 
+   * @param qualifiedName - qualified name to search for
+   */
+  removeAttribute(qualifiedName: string): void {
+    try {
+      this.attributes.removeNamedItem(qualifiedName)
+    } catch(e) {
+      if (e.name !== "NotFoundError")
+        throw e
+    }
+  }
+
+  /**
+   * Removes the attribute with the given `namespace` and 
+   * `qualifiedName`.
+   * 
+   * @param namespace - namespace to search for
+   * @param localName - local name to search for
+   */
+  removeAttributeNS(namespace: string, localName: string): void {
+    try {
+      this.attributes.removeNamedItemNS(namespace, localName)
+    } catch(e) {
+      if (e.name !== "NotFoundError")
+        throw e
+    }
+  }
+
+  /**
+   * Determines whether the attribute with the given `qualifiedName`
+   * exists.
+   * 
+   * @param qualifiedName - qualified name to search for
+   */
+  hasAttribute(qualifiedName: string): boolean {
+    for(let att of this.attributes) {
+      if (att.name === qualifiedName)
+        return true
+    }
+
+    return false
+  }
+
+  /**
+   * Determines whether the attribute with the given `namespace` and 
+   * `qualifiedName` exists.
+   * 
+   * @param namespace - namespace to search for
+   * @param localName - local name to search for
+   */
+  hasAttributeNS(namespace: string, localName: string): boolean {
+    for(let att of this.attributes) {
+      if (att.namespaceURI === namespace && att.localName === localName)
+        return true
+    }
+
+    return false
+  }
+
+  /**
+   * Returns the attribute with the given `qualifiedName`.
+   * 
+   * @param qualifiedName - qualified name to search for
+   */
+  getAttributeNode(qualifiedName: string): Attr | null {
+    return this.attributes.getNamedItem(qualifiedName)
+  }
+
+  /**
+   * Returns the attribute with the given `namespace` and 
+   * `qualifiedName`.
+   * 
+   * @param namespace - namespace to search for
+   * @param localName - local name to search for
+   */
+  getAttributeNodeNS(namespace: string, localName: string): Attr | null {
+    return this.attributes.getNamedItemNS(namespace, localName)
+  }
+
+  /**
+   * Sets the attribute given with `attr`.
+   * 
+   * @param attr - attribute to set
+   */
+  setAttributeNode(attr: Attr): Attr | null {
+    return this.attributes.setNamedItem(attr)
+  }
+
+  /**
+   * Sets the attribute given with `attr`.
+   * 
+   * @param attr - attribute to set
+   */
+  setAttributeNodeNS(attr: Attr): Attr | null {
+    return this.attributes.setNamedItemNS(attr)
+  }
+
+  /**
+   * Removes the given attribute.
+   * 
+   * @param attr - attribute to remove
+   */
+  removeAttributeNode(attr: Attr): Attr {
+    return this.attributes.removeNamedItemNS(attr.namespaceURI || '', attr.localName)
+  }
 
   /** 
    * Returns the concatenation of data of all the {@link CharacterData}

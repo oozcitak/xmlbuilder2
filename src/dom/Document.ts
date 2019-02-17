@@ -2,7 +2,7 @@ import { Node } from "./Node"
 import { Element } from "./Element"
 import { DOMImplementation } from "./DOMImplementation"
 import { DocType } from "./DocType"
-import { DOMError } from "./DOMError"
+import { DOMException } from "./DOMException"
 import { HTMLCollection } from "./HTMLCollection"
 import { Utility } from "./Utility"
 import { XMLSpec10 } from "./XMLSpec10"
@@ -153,7 +153,7 @@ export class Document extends Node {
    * elements
    */
   getElementsByClassName (classNames: string): never {
-    throw DOMError.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -178,27 +178,27 @@ export class Document extends Node {
    */
   createElementNS(namespace: string | null, qualifiedName: string): Element {
     if (!qualifiedName.match(XMLSpec10.Name))
-      throw DOMError.InvalidCharacterError
+      throw DOMException.InvalidCharacterError
     if (!qualifiedName.match(XMLSpec10.QName))
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
     
     let parts = qualifiedName.split(':')
     let prefix = (parts.length === 2 ? parts[0] : null)
     let localName = (parts.length === 2 ? parts[1] : qualifiedName)
 
     if(prefix && !namespace)
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
 
     if(prefix === "xml" && namespace !== Namespace.XML)
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
 
     if(namespace !== Namespace.XMLNS && 
       (prefix === "xmlns" || qualifiedName === "xmlns"))
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
 
     if(namespace === Namespace.XMLNS && 
       (prefix !== "xmlns" || qualifiedName !== "xmlns"))
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
 
     return new Element(this, namespace, prefix || '', localName)
   }
@@ -248,9 +248,9 @@ export class Document extends Node {
   createProcessingInstruction(target: string, data: string): ProcessingInstruction
   {
     if (!target.match(XMLSpec10.Name))
-      throw DOMError.InvalidCharacterError
+      throw DOMException.InvalidCharacterError
     if (!data.includes("?>"))
-      throw DOMError.InvalidCharacterError
+      throw DOMException.InvalidCharacterError
 
     return new ProcessingInstruction(this, target, data)
   }
@@ -264,7 +264,7 @@ export class Document extends Node {
    */
   importNode(node: Node, deep: boolean = false): Node {
     if(node.nodeType === Node.Document)
-      throw DOMError.NotSupportedError
+      throw DOMException.NotSupportedError
 
     return node.cloneNode(this, deep)
   }
@@ -278,7 +278,7 @@ export class Document extends Node {
    */
   adoptNode(node: Node): Node {
     if(node.nodeType === Node.Document)
-      throw DOMError.NotSupportedError
+      throw DOMException.NotSupportedError
 
     let oldDocument = node.ownerDocument
 
@@ -301,7 +301,7 @@ export class Document extends Node {
    */
   createAttribute(localName: string): Attr {
     if (!localName.match(XMLSpec10.Name))
-      throw DOMError.InvalidCharacterError
+      throw DOMException.InvalidCharacterError
 
     return new Attr(null, null, '', localName, '')
   }
@@ -317,27 +317,27 @@ export class Document extends Node {
    */
   createAttributeNS(namespace: string, qualifiedName: string): Attr {
     if (!qualifiedName.match(XMLSpec10.Name))
-      throw DOMError.InvalidCharacterError
+      throw DOMException.InvalidCharacterError
     if (!qualifiedName.match(XMLSpec10.QName))
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
 
     let parts = qualifiedName.split(':')
     let prefix = (parts.length === 2 ? parts[0] : null)
     let localName = (parts.length === 2 ? parts[1] : qualifiedName)
   
     if(prefix && !namespace)
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
   
     if(prefix === "xml" && namespace !== Namespace.XML)
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
   
     if(namespace !== Namespace.XMLNS && 
       (prefix === "xmlns" || qualifiedName === "xmlns"))
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
 
     if(namespace === Namespace.XMLNS && 
       (prefix !== "xmlns" || qualifiedName !== "xmlns"))
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
 
     return new Attr(null, namespace, prefix || '', localName, '')
   } 
@@ -351,7 +351,7 @@ export class Document extends Node {
    * @param type - a string representing the type of event to be created
    */
   createEvent(type: any): never {
-    throw DOMError.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -361,7 +361,7 @@ export class Document extends Node {
    * exception.
    */
   createRange(): never {
-    throw DOMError.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -372,7 +372,7 @@ export class Document extends Node {
    */
   createNodeIterator(root: Node, whatToShow: number = NodeFilter.ShowAll,
     filter: NodeFilter | null = null): never {
-      throw DOMError.NotSupportedError
+      throw DOMException.NotSupportedError
   }
 
   /**
@@ -383,7 +383,7 @@ export class Document extends Node {
    */
   createTreeWalker(root: Node, whatToShow: number = NodeFilter.ShowAll,
     filter: NodeFilter | null = null): never {
-      throw DOMError.NotSupportedError
+      throw DOMException.NotSupportedError
   }
 
   /**

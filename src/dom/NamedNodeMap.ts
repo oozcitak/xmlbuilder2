@@ -1,5 +1,5 @@
 import { Attr } from "./Attr";
-import { DOMError } from "./DOMError";
+import { DOMException } from "./DOMException";
 
 /**
  * Represents a collection of nodes.
@@ -30,7 +30,7 @@ export class NamedNodeMap extends Array<Attr> {
    * `qualifiedName`.
    * 
    * @param namespace - namespace to search for
-   * @param qualifiedName - qualified name to search for
+   * @param localName - local name to search for
    */
   getNamedItemNS(namespace: string, localName: string): Attr | null {
     for(let att of this) {
@@ -47,7 +47,7 @@ export class NamedNodeMap extends Array<Attr> {
    */
   setNamedItem(attr: Attr): Attr | null {
     if (!attr.ownerElement)
-      throw DOMError.InUseAttributeError
+      throw DOMException.InUseAttributeError
 
     let oldAttr = this.getNamedItemNS(attr.namespaceURI || '', attr.localName)
     if (oldAttr === attr) return attr
@@ -86,7 +86,7 @@ export class NamedNodeMap extends Array<Attr> {
     }
 
     if(index === -1)
-      throw DOMError.NotFoundError
+      throw DOMException.NotFoundError
 
     let removed = this[index]
     this.splice(index, 1)
@@ -98,7 +98,7 @@ export class NamedNodeMap extends Array<Attr> {
    * `qualifiedName`.
    * 
    * @param namespace - namespace to search for
-   * @param qualifiedName - qualified name to search for
+   * @param localName - local name to search for
    */
   removeNamedItemNS(namespace: string, localName: string): Attr {
     let index = -1
@@ -111,7 +111,7 @@ export class NamedNodeMap extends Array<Attr> {
     }
 
     if(index === -1)
-      throw DOMError.NotFoundError
+      throw DOMException.NotFoundError
 
     let removed = this[index]
     this.splice(index, 1)

@@ -23,12 +23,15 @@ export class HTMLCollection extends Array<Element> {
 
     for (let child of this) {
       let ele = <Element>child
+
       if (ele.id === name)
         return ele
+
       let nameAtt = ele.getAttribute('name')
-      if(nameAtt && nameAtt === name)
+      if(nameAtt === name)
         return ele
-      return null
     }
+        
+    return null
   }
 }

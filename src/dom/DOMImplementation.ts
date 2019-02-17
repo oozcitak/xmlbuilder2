@@ -1,5 +1,5 @@
 import { DocType } from "./DocType"
-import { DOMError } from "./DOMError"
+import { DOMException } from "./DOMException"
 import { Document } from "./Document"
 import { XMLSpec10 } from "./XMLSpec10"
 
@@ -19,11 +19,11 @@ export class DOMImplementation {
    */
   createDocumentType(qualifiedName: string, publicId: string, systemId: string): DocType {
     if (!qualifiedName.match(XMLSpec10.Name))
-      throw DOMError.InvalidCharacterError
+      throw DOMException.InvalidCharacterError
     if (!qualifiedName.match(XMLSpec10.QName))
-      throw DOMError.NamespaceError
+      throw DOMException.NamespaceError
       
-    return new DocType(qualifiedName, publicId, systemId)
+    return new DocType(null, qualifiedName, publicId, systemId)
   }
 
   /**
@@ -33,7 +33,8 @@ export class DOMImplementation {
    * @param offset - the offset at which insertion starts
    * @param data - the string of text to add to node data
    */
-  createDocument(namespace: string, qualifiedName: string, doctype: DocType | null = null): Document {
+  createDocument(namespace: string, qualifiedName: string,
+    doctype: DocType | null = null): Document {
     let document = new Document()
 
     if(doctype)
@@ -56,7 +57,7 @@ export class DOMImplementation {
    * @param title - document title
    */
   createHTMLDocument(title: string = ''): never {
-    throw DOMError.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**

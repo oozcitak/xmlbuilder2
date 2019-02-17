@@ -325,7 +325,7 @@ export abstract class Node {
         if (index !== -1)
           this.childNodes.splice(index, 1)
         else
-          newChild._parentNode = this
+          (<Node>newChild)._parentNode = this
 
         // temporarily remove children starting *with* refChild
         index = this.childNodes.indexOf(refChild)
