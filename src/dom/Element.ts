@@ -6,6 +6,7 @@ import { DOMTokenList } from "./DOMTokenList"
 import { Attr } from "./Attr";
 import { HTMLCollection } from "./HTMLCollection";
 import { Utility } from "./Utility";
+import { DOMException } from "./DOMException";
 
 /**
  * Represents an element node.
@@ -271,6 +272,55 @@ export class Element extends Node {
     return this.attributes.removeNamedItemNS(attr.namespaceURI || '', attr.localName)
   }
 
+  /**
+   * Creates a shadow root for element and returns it.
+   * 
+   * This method is not supported by this module and will throw an
+   * exception.
+   * 
+   * @param init - A ShadowRootInit dictionary.
+   */
+  attachShadow(init: object): never {
+    throw DOMException.NotImplementedError  
+  }
+  
+  /**
+   * Returns element’s shadow root, if any, and if shadow root’s mode
+   * is "open", and null otherwise.
+   * 
+   * This method is not supported by this module and will throw an
+   * exception.
+   */
+  get shadowRoot(): never {
+    throw DOMException.NotImplementedError  
+  }
+
+  /**
+   * Returns the first (starting at element) inclusive ancestor that
+   * matches selectors, and `null` otherwise.
+   * 
+   * This method is not supported by this module and will throw an
+   * exception.
+   * 
+   * @param selectors 
+   */
+  closest(selectors: string): Element | null {
+    throw DOMException.NotImplementedError  
+  }
+
+  /**
+   * Returns `true` if matching selectors against element’s root yields 
+   * element, and `false` otherwise.
+   * 
+   * This method is not supported by this module and will throw an
+   * exception.
+   * 
+   * @param selectors 
+   */
+  matches(selectors: string): boolean {
+    throw DOMException.NotImplementedError  
+  }
+
   /** 
    * Returns the concatenation of data of all the {@link CharacterData}
    * node descendants in tree order. When set, replaces the text 
@@ -457,5 +507,79 @@ export class Element extends Node {
     })
 
     return list
+  }
+
+  /**
+   * Inserts a given element node at a given position relative to this
+   * node.
+   * 
+   * @param where - a string defining where to insert the element node.
+   *   - `beforebegin` before this element itself.
+   *   - `afterbegin` before the first child.
+   *   - `beforeend` after the last child.
+   *   - `afterend` after this element itself.
+   * @param element - the element to insert
+   * 
+   * @returns the inserted element
+   */
+  insertAdjacentElement(where: string, element: Element): Element | null {
+    switch (where.toLowerCase()) {
+      case 'beforebegin':
+        if (!this.parentNode) return null
+
+        this.parentNode.insertBefore(element, this)
+        break
+      case 'afterbegin':
+        this.insertBefore(element, this.firstChild)
+        break
+      case 'beforeend':
+        this.insertBefore(element, null)
+        break
+      case 'afterend':
+        if (!this.parentNode) return null
+
+        this.parentNode.insertBefore(element, this.nextSibling)
+        break
+    }
+
+    return element
+  }
+
+  /**
+   * Inserts a given text node at a given position relative to this
+   * node.
+   * 
+   * @param where - a string defining where to insert the element node.
+   *   - `beforebegin` before this element itself.
+   *   - `afterbegin` before the first child.
+   *   - `beforeend` after the last child.
+   *   - `afterend` after this element itself.
+   * @param data - text node data 
+   * 
+   * @returns the inserted element
+   */
+  insertAdjacentText(where: string, data: string): void {
+    if (!this.ownerDocument) return
+
+    let text = this.ownerDocument.createTextNode(data)
+
+    switch (where.toLowerCase()) {
+      case 'beforebegin':
+        if (!this.parentNode) return
+
+        this.parentNode.insertBefore(text, this)
+        break
+      case 'afterbegin':
+        this.insertBefore(text, this.firstChild)
+        break
+      case 'beforeend':
+        this.insertBefore(text, null)
+        break
+      case 'afterend':
+        if (!this.parentNode) return
+
+        this.parentNode.insertBefore(text, this.nextSibling)
+        break
+    }
   }
 }

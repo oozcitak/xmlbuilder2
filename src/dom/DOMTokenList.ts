@@ -154,7 +154,7 @@ export class DOMTokenList {
    * @param token - the token to check
    */
   supports(token: string): boolean {
-    throw DOMException.NotSupportedError
+    throw DOMException.NotImplementedError
   }
 
   /**

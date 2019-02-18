@@ -57,7 +57,7 @@ export class DOMImplementation {
    * @param title - document title
    */
   createHTMLDocument(title: string = ''): never {
-    throw DOMException.NotSupportedError
+    throw DOMException.NotImplementedError
   }
 
   /**

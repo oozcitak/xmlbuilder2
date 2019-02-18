@@ -45,4 +45,5 @@ export class DOMException extends Error {
   static TimeoutError = new DOMException("TimeoutError", "The operation timed out.")
   static InvalidNodeTypeError = new DOMException("InvalidNodeTypeError", "The supplied node is incorrect or has an incorrect ancestor for this operation.")
   static DataCloneError = new DOMException("DataCloneError", "The object can not be cloned.")
+  static NotImplementedError = new DOMException("NotImplementedError", "The DOM method is not implemented by this module.")
 }
