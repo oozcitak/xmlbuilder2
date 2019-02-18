@@ -4,6 +4,8 @@ import { Text } from "./Text"
 import { NamedNodeMap } from "./NamedNodeMap"
 import { DOMTokenList } from "./DOMTokenList"
 import { Attr } from "./Attr";
+import { HTMLCollection } from "./HTMLCollection";
+import { Utility } from "./Utility";
 
 /**
  * Represents an element node.
@@ -85,6 +87,12 @@ export class Element extends Node {
    * Returns a {@link DOMTokenList} with tokens from the class attribute.
    */
   get classList(): DOMTokenList { return new DOMTokenList(this, 'class') }
+
+  /** 
+   * Gets or sets the slot attribute of this element.
+   */
+  get slot(): string { return this.getAttribute('slot') || ''}
+  set slot(value: string) { this.setAttribute('slot', value) }
 
   /** 
    * Returns a {@link NamedNodeMap} of attributes.
@@ -360,5 +368,94 @@ export class Element extends Node {
       
       return true
     }
+  }
+
+  /**
+   * Returns a {@link HTMLCollection} of all descendant elements 
+   * whose qualified name is `qualifiedName`.
+   * 
+   * @param qualifiedName - the qualified name to match or `*` to match
+   * all descendant elements.
+   * 
+   * @returns an {@link HTMLCollection} of matching descendant
+   * elements
+   */
+  getElementsByTagName (qualifiedName: string): HTMLCollection {
+    let matchAll = (qualifiedName == '*')
+
+    let list = new HTMLCollection()
+
+    Utility.forEachDescendant (this, function(node: Node) {
+      if (node.nodeType === Node.Element) {
+        let ele = <Element>node
+        if (matchAll || ele.tagName === qualifiedName)
+          list.push(ele)
+      }
+    })
+
+    return list
+  }
+
+  /**
+   * Returns a {@link HTMLCollection} of all descendant elements 
+   * whose namespace is `namespace` and local name is `localName`.
+   * 
+   * @param namespace - the namespace to match or `*` to match any
+   * namespace.
+   * @param localName - the local name to match or `*` to match any
+   * local name.
+   * 
+   * @returns an {@link HTMLCollection} of matching descendant
+   * elements
+   */
+  getElementsByTagNameNS (namespace: string, localName: string): HTMLCollection {
+    let matchAllNamespace = (namespace == '*')
+    let matchAllLocalName = (localName == '*')
+
+    let list = new HTMLCollection()
+
+    Utility.forEachDescendant (this, function(node: Node) {
+      if (node.nodeType === Node.Element) {
+        let ele = <Element>node
+        if ((matchAllLocalName || ele.localName === localName) &&
+            (matchAllNamespace || ele.namespaceURI === namespace))
+          list.push(ele)
+      }
+    })
+
+    return list
+  }
+
+  /**
+   * Returns a {@link HTMLCollection} of all descendant elements 
+   * whose classes are contained in the list of classes given in 
+   * `classNames`.
+   * 
+   * @param classNames - a space-separated list of classes
+   * 
+   * @returns an {@link HTMLCollection} of matching descendant
+   * elements
+   */
+  getElementsByClassName (classNames: string): HTMLCollection {
+    let list = new HTMLCollection()
+
+    let arr = DOMTokenList.TokenArrayFromString(classNames)
+    Utility.forEachDescendant (this, function(node: Node) {
+      if (node.nodeType === Node.Element) {
+        let ele = <Element>node
+        let classes = ele.classList
+        let allClassesFound = true
+        for (let className of arr) {
+          if (!classes.contains(className)) {
+            allClassesFound = false
+            break
+          }
+        }
+        if (allClassesFound)
+          list.push(ele)
+      }
+    })
+
+    return list
   }
 }

@@ -167,14 +167,8 @@ export class DOMTokenList {
     return arr.join(' ')
   }
   set value(value: string) {
-    let arr = value.split(DOMTokenList.WhiteSpace)
-
-    // remove empty strings
-    let filtered: string[] = []
-    for(let str of arr)
-      if (str) filtered.push(str)
-
-    let attValue = filtered.join(' ')
+    let arr = DOMTokenList.TokenArrayFromString(value)
+    let attValue = arr.join(' ')
     this._ownerElement.setAttribute(this._localName, attValue)
   }
 
@@ -187,19 +181,30 @@ export class DOMTokenList {
   }
 
   /**
-   * Gets or sets a set of strings created from the associated
-   * attribute's value by splitting at ASCII whitespace characters.
+   * Converts a string containg the space separated list of tokens
+   * to an array.
+   * 
+   * @param tokens - token list as a string
    */
-  get valueAsSet(): Set<string> {
-    let attValue = this._ownerElement.getAttribute(this._localName) || ''
-    let arr = attValue.split(DOMTokenList.WhiteSpace)
+  static TokenArrayFromString(tokens: string): string[] {
+    let arr = tokens.split(DOMTokenList.WhiteSpace)
 
     // remove empty strings
     let filtered: string[] = []
     for(let str of arr)
       if (str) filtered.push(str)
+    
+    return filtered
+  }
 
-    return new Set(filtered)
+  /**
+   * Gets or sets a set of strings created from the associated
+   * attribute's value by splitting at ASCII whitespace characters.
+   */
+  get valueAsSet(): Set<string> {
+    let attValue = this._ownerElement.getAttribute(this._localName) || ''
+    let arr = DOMTokenList.TokenArrayFromString(attValue)
+    return new Set(arr)
   }
   set valueAsSet(set: Set<string>) {
     if (!this._ownerElement.hasAttribute(this._localName) && set.size === 0)

@@ -81,30 +81,19 @@ export class Document extends Node {
 
   /**
    * Returns a {@link HTMLCollection} of all descendant elements 
-   * whose local name is `localName`.
+   * whose qualified name is `qualifiedName`.
    * 
-   * @param localName - the local name to match or `*` to match all
+   * @param qualifiedName - the qualified name to match or `*` to match all
    * descendant elements.
    * 
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByTagName (localName: string): HTMLCollection {
-    let matchAll = (localName == '*')
-
-    let list = new HTMLCollection()
-
-    if (this.documentElement) {
-      Utility.forEachDescendant (this.documentElement, function(node: Node) {
-        if (node.nodeType === Node.Element) {
-          let ele = <Element>node
-          if (matchAll || ele.localName === localName)
-            list.push(ele)
-        }
-      })
-    }
-
-    return list
+  getElementsByTagName (qualifiedName: string): HTMLCollection {
+    if (this.documentElement)
+      return this.documentElement.getElementsByTagName(qualifiedName)
+    else
+      return new HTMLCollection()
   }
 
   /**
@@ -120,23 +109,10 @@ export class Document extends Node {
    * elements
    */
   getElementsByTagNameNS (namespace: string, localName: string): HTMLCollection {
-    let matchAllNamespace = (namespace == '*')
-    let matchAllLocalName = (localName == '*')
-
-    let list = new HTMLCollection()
-
-    if (this.documentElement) {
-      Utility.forEachDescendant (this.documentElement, function(node: Node) {
-        if (node.nodeType === Node.Element) {
-          let ele = <Element>node
-          if ((matchAllLocalName || ele.localName === localName) &&
-              (matchAllNamespace || ele.namespaceURI === namespace))
-            list.push(ele)
-        }
-      })
-    }
-
-    return list
+    if (this.documentElement)
+      return this.documentElement.getElementsByTagNameNS(namespace, localName)
+    else
+      return new HTMLCollection()
   }
 
   /**
@@ -144,16 +120,16 @@ export class Document extends Node {
    * whose classes are contained in the list of classes given in 
    * `classNames`.
    * 
-   * This method is not supported by this module and will throw an
-   * exception.
-   * 
    * @param classNames - a space-separated list of classes
    * 
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByClassName (classNames: string): never {
-    throw DOMException.NotSupportedError
+  getElementsByClassName (classNames: string): HTMLCollection {
+    if (this.documentElement)
+      return this.documentElement.getElementsByClassName(classNames)
+    else
+      return new HTMLCollection()
   }
 
   /**
