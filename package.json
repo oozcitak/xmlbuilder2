@@ -19,21 +19,22 @@
   },
   "main": "./lib/index",
   "engines": {
-    "node": ">=4.0"
+    "node": ">=6.0"
   },
   "dependencies": {},
   "devDependencies": {
     "typescript": "*",
-	"mocha": "*",
-	"chai": "*",
-	"ts-node": "*",
-	"@types/chai": "*",
-	"@types/mocha": "*",
-	"istanbul": "*"
+    "mocha": "*",
+    "chai": "*",
+    "ts-node": "*",
+    "@types/chai": "*",
+    "@types/mocha": "*",
+    "nyc": "*"
   },
   "scripts": {
     "prepublishOnly": "tsc",
     "postpublish": "rm -rf lib",
-    "test": "mocha --require ts-node/register test/**/*.ts istanbul report text lcov"
+    "test": "mocha -r ts-node/register tests/**/*.test.ts",
+    "cover": "nyc -r lcov -e .ts -x \"tests/*.test.ts\" mocha -r ts-node/register tests/**/*.test.ts && nyc report"
   }
 }

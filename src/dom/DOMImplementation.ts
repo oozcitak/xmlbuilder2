@@ -11,7 +11,6 @@ export class DOMImplementation {
 
   /**
    * Creates and returns a {@link DocType}.
-   * the given `offset`.
    * 
    * @param qualifiedName - the qualified name
    * @param publicId - the `PUBLIC` identifier
@@ -27,11 +26,11 @@ export class DOMImplementation {
   }
 
   /**
-   * Creates and returns a {@link DocType}.
-   * the given `offset`.
+   * Creates and returns a {@link Document}.
    * 
-   * @param offset - the offset at which insertion starts
-   * @param data - the string of text to add to node data
+   * @param namespace - the namespace of the document element
+   * @param qualifiedName - the qualified name of the document element
+   * @param doctype - a {@link DocType} to assign to this document
    */
   createDocument(namespace: string, qualifiedName: string,
     doctype: DocType | null = null): Document {

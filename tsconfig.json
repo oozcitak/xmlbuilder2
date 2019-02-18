@@ -1,14 +1,12 @@
 {
     "compilerOptions": {
-        "module": "system",
-		"lib": [ "es2015" ],
 		"target": "es2015",
+        "module": "commonjs",
 		"locale": "en",
 		"strict": true,
 		"newLine": "lf",
-		"outDir": "lib",
-		"outFile": "index.js",
-        "sourceMap": true
+        "sourceMap": true,
+        "esModuleInterop": true
     },
     "include": [
         "src/**/*"
