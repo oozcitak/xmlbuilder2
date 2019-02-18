@@ -1,7 +1,7 @@
 import { DocType } from "./DocType"
 import { DOMException } from "./DOMException"
 import { Document } from "./Document"
-import { XMLSpec10 } from "./XMLSpec10"
+import { XMLSpec } from "./XMLSpec"
 
 /**
  * Represents an object providing methods which are not dependent on 
@@ -18,9 +18,9 @@ export class DOMImplementation {
    * @param publicId - the `SYSTEM` identifier
    */
   createDocumentType(qualifiedName: string, publicId: string, systemId: string): DocType {
-    if (!qualifiedName.match(XMLSpec10.Name))
+    if (!qualifiedName.match(XMLSpec.Name))
       throw DOMException.InvalidCharacterError
-    if (!qualifiedName.match(XMLSpec10.QName))
+    if (!qualifiedName.match(XMLSpec.QName))
       throw DOMException.NamespaceError
 
     return new DocType(null, qualifiedName, publicId, systemId)

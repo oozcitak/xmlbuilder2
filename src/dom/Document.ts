@@ -5,7 +5,7 @@ import { DocType } from "./DocType"
 import { DOMException } from "./DOMException"
 import { HTMLCollection } from "./HTMLCollection"
 import { Utility } from "./Utility"
-import { XMLSpec10 } from "./XMLSpec10"
+import { XMLSpec } from "./XMLSpec"
 import { DocumentFragment } from "./DocumentFragment"
 import { Text } from "./Text"
 import { Comment } from "./Comment"
@@ -148,9 +148,9 @@ export class Document extends Node {
    * @returns the new {@link Element}
    */
   createElementNS(namespace: string | null, qualifiedName: string): Element {
-    if (!qualifiedName.match(XMLSpec10.Name))
+    if (!qualifiedName.match(XMLSpec.Name))
       throw DOMException.InvalidCharacterError
-    if (!qualifiedName.match(XMLSpec10.QName))
+    if (!qualifiedName.match(XMLSpec.QName))
       throw DOMException.NamespaceError
 
     let parts = qualifiedName.split(':')
@@ -215,7 +215,7 @@ export class Document extends Node {
    * @returns the new {@link ProcessingInstruction}
    */
   createProcessingInstruction(target: string, data: string): ProcessingInstruction {
-    if (!target.match(XMLSpec10.Name))
+    if (!target.match(XMLSpec.Name))
       throw DOMException.InvalidCharacterError
     if (!data.includes("?>"))
       throw DOMException.InvalidCharacterError
@@ -268,7 +268,7 @@ export class Document extends Node {
    * @returns the new {@link Attr}
    */
   createAttribute(localName: string): Attr {
-    if (!localName.match(XMLSpec10.Name))
+    if (!localName.match(XMLSpec.Name))
       throw DOMException.InvalidCharacterError
 
     return new Attr(null, null, '', localName, '')
@@ -284,9 +284,9 @@ export class Document extends Node {
    * @returns the new {@link Attr}
    */
   createAttributeNS(namespace: string, qualifiedName: string): Attr {
-    if (!qualifiedName.match(XMLSpec10.Name))
+    if (!qualifiedName.match(XMLSpec.Name))
       throw DOMException.InvalidCharacterError
-    if (!qualifiedName.match(XMLSpec10.QName))
+    if (!qualifiedName.match(XMLSpec.QName))
       throw DOMException.NamespaceError
 
     let parts = qualifiedName.split(':')
