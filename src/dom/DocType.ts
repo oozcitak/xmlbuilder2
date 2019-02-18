@@ -6,7 +6,7 @@ import { Document } from "./Document"
  * any particular document
  */
 export class DocType extends Node {
-  
+
   protected _nodeName: string
   protected _publicId: string
   protected _systemId: string
@@ -19,9 +19,8 @@ export class DocType extends Node {
    * @param publicId - the `PUBLIC` identifier
    * @param publicId - the `SYSTEM` identifier
    */
-  public constructor (ownerDocument: Document | null = null, 
-    name: string, publicId: string = '', systemId: string = '') 
-  {
+  public constructor(ownerDocument: Document | null = null,
+    name: string, publicId: string = '', systemId: string = '') {
     super(ownerDocument)
 
     this._nodeName = name
@@ -72,10 +71,10 @@ export class DocType extends Node {
       document = null
     }
 
-    if(!document)
+    if (!document)
       document = this.ownerDocument
-      
-    let clonedSelf = new DocType(document, this.name, 
+
+    let clonedSelf = new DocType(document, this.name,
       this.publicId, this.systemId)
     clonedSelf._parentNode = null
     return clonedSelf
@@ -91,11 +90,31 @@ export class DocType extends Node {
       return false
 
     let other = <DocType>node
-    if(!other || this.name !== other.name || 
-      this.publicId !== other.publicId || 
+    if (!other || this.name !== other.name ||
+      this.publicId !== other.publicId ||
       this.systemId !== other.systemId)
       return false
     else
       return true
+  }
+
+  /**
+   * Returns the prefix for a given namespace URI, if present, and 
+   * `null` if not.
+   * 
+   * @param namespace - the namespace to search
+   */
+  lookupPrefix(namespace: string | null): string | null {
+    return null
+  }
+
+  /**
+   * Returns the namespace URI for a given prefix if present, and `null`
+   * if not.
+   * 
+   * @param prefix - the prefix to search
+   */
+  lookupNamespaceURI(prefix: string | null): string | null {
+    return null
   }
 }

@@ -13,9 +13,8 @@ export class Text extends CharacterData {
    * @param ownerDocument - the owner document
    * @param data - the text content
    */
-  public constructor (ownerDocument: Document | null = null, 
-    data: string | null = null)
-  {
+  public constructor(ownerDocument: Document | null = null,
+    data: string | null = null) {
     super(ownerDocument, data)
   }
 
@@ -32,18 +31,17 @@ export class Text extends CharacterData {
   /** 
    * Returns the combined data of all direct text node siblings.
    */
-  get wholeText(): string 
-  {
+  get wholeText(): string {
     let prev = this.previousSibling
     let prevText = ''
-    if(prev && prev.nodeType === Node.Text)
+    if (prev && prev.nodeType === Node.Text)
       prevText = (<Text>prev).wholeText
 
     let next = this.nextSibling
     let nextText = ''
-    if(next && next.nodeType === Node.Text)
+    if (next && next.nodeType === Node.Text)
       nextText = (<Text>next).wholeText
-  
+
     return prevText + this.data + nextText
   }
 
@@ -83,9 +81,9 @@ export class Text extends CharacterData {
       document = null
     }
 
-    if(!document)
+    if (!document)
       document = this.ownerDocument
-      
+
     let clonedSelf = new Text(document, this.data)
     clonedSelf._parentNode = null
 

@@ -14,9 +14,8 @@ export abstract class CharacterData extends Node {
    * @param ownerDocument - the owner document
    * @param data - the text content
    */
-  protected constructor (ownerDocument: Document | null = null, 
-    data: string | null = null)
-  {
+  protected constructor(ownerDocument: Document | null = null,
+    data: string | null = null) {
     super(ownerDocument)
 
     this._data = data || ''
@@ -31,7 +30,7 @@ export abstract class CharacterData extends Node {
     if (!super.isEqualNode(node))
       return false
 
-    if(!node || this.data !== (<CharacterData>node).data)
+    if (!node || this.data !== (<CharacterData>node).data)
       return false
     else
       return true
@@ -77,7 +76,7 @@ export abstract class CharacterData extends Node {
    * @param data - the string of text to add to node data
    */
   insertData(offset: number, data: string): void {
-    this.data = 
+    this.data =
       this.data.slice(0, offset) +
       data +
       this.data.slice(offset)
@@ -91,7 +90,7 @@ export abstract class CharacterData extends Node {
    * @param count - the number of characters to delete
    */
   deleteData(offset: number, count: number): void {
-    this.data = 
+    this.data =
       this.data.slice(0, offset) +
       this.data.slice(offset + count)
   }
@@ -105,7 +104,7 @@ export abstract class CharacterData extends Node {
    * @param data - the string of text to add to node data
    */
   replaceData(offset: number, count: number, data: string): void {
-    this.data = 
+    this.data =
       this.data.slice(0, offset) +
       data +
       this.data.slice(offset + count)

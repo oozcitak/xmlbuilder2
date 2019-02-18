@@ -3,6 +3,8 @@ import { Document } from "./Document";
 import { Text } from "./Text";
 import { NodeList } from "./NodeList";
 import { Element } from "./Element";
+import { Attr } from "./Attr";
+import { Utility } from "./Utility";
 
 /**
  * Represents a generic XML node.
@@ -30,21 +32,26 @@ export abstract class Node {
   static readonly ContainedBy = 0x10
   static readonly ImplementationSpecific = 0x20
 
+  // namespaces
+  static readonly HTML = "http://www.w3.org/1999/xhtml"
+  static readonly XML = "http://www.w3.org/XML/1998/namespace"
+  static readonly XMLNS = "http://www.w3.org/2000/xmlns/"
+
   protected _parentNode: Node | null = null
-  protected _baseURI: string | null = null
   protected _ownerDocument: Document | null = null
   protected _childNodeList: NodeList = new NodeList()
-  
+
+  baseURI: string | undefined
+
   /**
    * Initializes a new instance of `Node`.
    *
    * @param ownerDocument - the owner document
    */
-  protected constructor (ownerDocument: Document | null = null) 
-  {
+  protected constructor(ownerDocument: Document | null = null) {
     this._ownerDocument = ownerDocument
   }
-  
+
   /** 
    * Returns the type of node. 
    */
@@ -60,41 +67,59 @@ export abstract class Node {
    */
   get isConnected(): boolean {
     let root = this.getRootNode()
-    if(!root)
+    if (!root)
       return false
     else
       return (root.nodeType === Node.Document)
   }
 
   /** 
-   * Returns the associated base URL. 
-   */
-  get baseURI(): string | null { return this._baseURI }
-
-  /** 
    * Returns the parent document. 
    */
   get ownerDocument(): Document | null {
-    return this._ownerDocument 
+    return this._ownerDocument
   }
-  set ownerDocument(value: Document | null) { 
+  set ownerDocument(value: Document | null) {
     this._ownerDocument = value
+  }
+
+  /**
+   * Returns the root node.
+   * 
+   * @param options - if options has `composed = true` this function
+   * returns the node's shadow-including root, otherwise it returns
+   * the node's root node.
+   */
+  getRootNode(options: object = { composed: false }): Node | null {
+    let root = <Node>this
+    let node = this.parentNode
+    while (node) {
+      [root, node] = [node, node.parentNode]
+    }
+    return root
   }
 
   /** 
    * Returns the parent node. 
    */
-  get parentNode(): Node | null { return this._parentNode }  
+  get parentNode(): Node | null { return this._parentNode }
 
   /** 
    * Returns the parent element. 
    */
-  get parentElement(): Element | null { 
+  get parentElement(): Element | null {
     if (this.parentNode && this.parentNode.nodeType === Node.Element)
       return <Element>this.parentNode
     else
       return null
-   }  
+  }
+
+  /** 
+   * Determines whether a node has any children.
+   */
+  hasChildNodes(): boolean {
+    return (this._childNodeList.length !== 0)
+  }
 
   /** 
    * Returns a {@link NodeList} of child nodes. 
@@ -104,14 +129,14 @@ export abstract class Node {
   /** 
    * Returns the first child node. 
    */
-  get firstChild(): Node | null { 
+  get firstChild(): Node | null {
     return this._childNodeList[0] || null
   }
 
   /** 
    * Returns the last child node. 
    */
-  get lastChild(): Node | null { 
+  get lastChild(): Node | null {
     return this._childNodeList[this._childNodeList.length - 1] || null
   }
 
@@ -147,30 +172,6 @@ export abstract class Node {
   set textContent(value: string | null) { }
 
   /**
-   * Returns the root node.
-   * 
-   * @param options - if options has `composed = true` this function
-   * returns the node's shadow-including root, otherwise it returns
-   * the node's root node.
-   */
-  getRootNode(options: object = { composed: false }): Node | null {
-    let root = <Node>this
-    let node = this.parentNode
-    while(node)
-    {
-      [root, node] = [node, node.parentNode]
-    }
-    return root
-  }
-
-  /** 
-   * Determines whether a node has any children.
-   */
-  hasChildNodes(): boolean { 
-    return (this._childNodeList.length !== 0) 
-  }
-
-  /**
    * Puts all {@link Text} nodes in the full depth of the sub-tree
    * underneath this node into a "normal" form where only markup 
    * (e.g., tags, comments, processing instructions, CDATA sections,
@@ -192,8 +193,7 @@ export abstract class Node {
     }
     // combine adjacent text nodes
     node = this.firstChild
-    while (node)
-    {
+    while (node) {
       let nextNode = node.nextSibling
       if (node.nodeType === Node.Text &&
         nextNode && nextNode.nodeType === Node.Text) {
@@ -254,43 +254,114 @@ export abstract class Node {
   }
 
   /**
-   * Returns a bitmask indicating the position of a node relative to 
-   * this node.
+   * Returns a bitmask indicating the position of the given `node`
+   * relative to this node.
    */
   compareDocumentPosition(node: Node): number {
-    throw new Error("This DOM method is not implemented." + this.debugInfo())
+    if (node === this) return 0
+
+    let node1: Node | null = node
+    let node2: Node | null = this
+
+    let attr1: Attr | null = null
+    let attr2: Attr | null = null
+
+    if (node1.nodeType === Node.Attribute) {
+      attr1 = <Attr>node1
+      node1 = attr1.ownerElement
+    }
+
+    if (node2.nodeType === Node.Attribute) {
+      attr2 = <Attr>node2
+      node2 = attr2.ownerElement
+
+      if (attr1 && node1 && (node1 === node2)) {
+        for (let attr of (<Element>node2).attributes) {
+          if (attr.isEqualNode(attr1)) {
+            return Node.ImplementationSpecific | Node.Preceding
+          } else if (attr.isEqualNode(attr2)) {
+            return Node.ImplementationSpecific | Node.Following
+          }
+        }
+      }
+    }
+
+    if (!node1 || !node2 || (node1.getRootNode != node2.getRootNode)) {
+      return Node.Disconnected | Node.ImplementationSpecific |
+        Node.Preceding
+      // TODO: return preceding or following consistently
+      // Use a cached Math.random() value
+    }
+
+    if ((!attr1 && Utility.isAncestorOf(node2, node1)) ||
+      (attr2 && (node1 === node2))) {
+      return Node.Contains | Node.Preceding
+    }
+
+    if ((!attr2 && Utility.isDescendantOf(node2, node1)) ||
+      (attr1 && (node1 === node2))) {
+      return Node.ContainedBy | Node.Following
+    }
+
+    if (Utility.isPreceding(node2, node1))
+      return Node.Preceding
+
+    return Node.Following
   }
 
   /**
    * Returns `true` if given node is an inclusive descendant of this
    * node, and `false` otherwise (including when other node is `null`).
+   * 
+   * @param node - the node to check
    */
   contains(node: Node | null): boolean {
-    throw new Error("This DOM method is not implemented." + this.debugInfo())
+    if (!node) return false
+    return ((node === this) || Utility.isDescendantOf(this, node))
   }
 
   /**
    * Returns the prefix for a given namespace URI, if present, and 
    * `null` if not.
+   * 
+   * @param namespace - the namespace to search
    */
   lookupPrefix(namespace: string | null): string | null {
-    throw new Error("This DOM method is not implemented." + this.debugInfo())
+    if (!namespace) return null
+
+    if (this.parentElement)
+      return this.parentElement.lookupPrefix(namespace)
+
+    return null
   }
 
   /**
    * Returns the namespace URI for a given prefix if present, and `null`
    * if not.
+   * 
+   * @param prefix - the prefix to search
    */
   lookupNamespaceURI(prefix: string | null): string | null {
-    throw new Error("This DOM method is not implemented." + this.debugInfo())
+    if (!prefix) prefix = null
+
+    if (this.parentElement)
+      return this.parentElement.lookupNamespaceURI(prefix)
+
+    return null
   }
 
   /**
    * Returns `true` if the namespace is the default namespace on this
    * node or `false` if not.
+   * 
+   * @param namespace - the namespace to check
    */
   isDefaultNamespace(namespace: string | null): boolean {
-    throw new Error("This DOM method is not implemented." + this.debugInfo())
+    if (!namespace) namespace = null
+
+    let defaultNamespace = this.lookupNamespaceURI(null)
+
+    return defaultNamespace === namespace
   }
 
   /**
@@ -309,7 +380,7 @@ export abstract class Node {
    * 
    * @returns the newly inserted child node
    */
-  insertBefore(newChild: Node | DocumentFragment, 
+  insertBefore(newChild: Node | DocumentFragment,
     refChild: Node | null): Node | null {
     if (newChild.nodeType === Node.DocumentFragment) {
       let lastInsertedNode = null
@@ -320,22 +391,22 @@ export abstract class Node {
       return lastInsertedNode
     }
     else if (refChild) {
-        // remove newChild if it is already in the tree
-        let index = this.childNodes.indexOf(newChild)
-        if (index !== -1)
-          this.childNodes.splice(index, 1)
-        else
-          (<Node>newChild)._parentNode = this
+      // remove newChild if it is already in the tree
+      let index = this.childNodes.indexOf(newChild)
+      if (index !== -1)
+        this.childNodes.splice(index, 1)
+      else
+        (<Node>newChild)._parentNode = this
 
-        // temporarily remove children starting *with* refChild
-        index = this.childNodes.indexOf(refChild)
-        let removed = this.childNodes.splice(index)
-      
-        // add the new child
-        this.childNodes.push(newChild)
-      
-        // add back removed children after new child
-        Array.prototype.push.apply(this.childNodes, removed)
+      // temporarily remove children starting *with* refChild
+      index = this.childNodes.indexOf(refChild)
+      let removed = this.childNodes.splice(index)
+
+      // add the new child
+      this.childNodes.push(newChild)
+
+      // add back removed children after new child
+      Array.prototype.push.apply(this.childNodes, removed)
     }
     else
       this.childNodes.push(newChild)
@@ -372,10 +443,10 @@ export abstract class Node {
         this.childNodes.splice(index, 1)
       else
         newChild._parentNode = this
-  
+
       // add newChild
       this.childNodes.push(newChild)
-  
+
       return newChild
     }
   }
@@ -434,10 +505,10 @@ export abstract class Node {
     if (!name && !parentName)
       return ''
     else if (!name)
-      return `parent: <${ parentName }>`
+      return `parent: <${parentName}>`
     else if (!parentName)
-      return `node: <${ name }>`
+      return `node: <${name}>`
     else
-      return `node: <${ name }>, parent: <${ parentName }>`
+      return `node: <${name}>, parent: <${parentName}>`
   }
 }

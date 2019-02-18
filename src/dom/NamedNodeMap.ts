@@ -19,7 +19,7 @@ export class NamedNodeMap extends Array<Attr> {
    * @param qualifiedName - qualified name to search for
    */
   getNamedItem(qualifiedName: string): Attr | null {
-    for(let att of this) {
+    for (let att of this) {
       if (att.name === qualifiedName) return att
     }
     return null
@@ -33,13 +33,13 @@ export class NamedNodeMap extends Array<Attr> {
    * @param localName - local name to search for
    */
   getNamedItemNS(namespace: string, localName: string): Attr | null {
-    for(let att of this) {
+    for (let att of this) {
       if (att.namespaceURI === namespace && att.localName === localName)
         return att
     }
     return null
   }
-  
+
   /**
    * Sets the attribute given with `attr`.
    * 
@@ -77,7 +77,7 @@ export class NamedNodeMap extends Array<Attr> {
    */
   removeNamedItem(qualifiedName: string): Attr {
     let index = -1
-    for(let i = 0; i < this.length; i++) {
+    for (let i = 0; i < this.length; i++) {
       let att = this[i]
       if (att.name === qualifiedName) {
         index = i
@@ -85,7 +85,7 @@ export class NamedNodeMap extends Array<Attr> {
       }
     }
 
-    if(index === -1)
+    if (index === -1)
       throw DOMException.NotFoundError
 
     let removed = this[index]
@@ -102,7 +102,7 @@ export class NamedNodeMap extends Array<Attr> {
    */
   removeNamedItemNS(namespace: string, localName: string): Attr {
     let index = -1
-    for(let i = 0; i < this.length; i++) {
+    for (let i = 0; i < this.length; i++) {
       let att = this[i]
       if (att.namespaceURI === namespace && att.localName === localName) {
         index = i
@@ -110,7 +110,7 @@ export class NamedNodeMap extends Array<Attr> {
       }
     }
 
-    if(index === -1)
+    if (index === -1)
       throw DOMException.NotFoundError
 
     let removed = this[index]

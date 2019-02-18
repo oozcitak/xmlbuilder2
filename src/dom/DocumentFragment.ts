@@ -12,8 +12,7 @@ export class DocumentFragment extends Node {
    *
    * @param ownerDocument - the owner document
    */
-  public constructor (ownerDocument: Document | null) 
-  {
+  public constructor(ownerDocument: Document | null) {
     super(ownerDocument)
   }
 
@@ -45,11 +44,11 @@ export class DocumentFragment extends Node {
     if (value)
       node = new Text(this.ownerDocument, value)
 
-    if(node && this.ownerDocument)
+    if (node && this.ownerDocument)
       this.ownerDocument.adoptNode(node)
-    
+
     this.childNodes.length = 0
-    
+
     if (node)
       node.appendChild(node)
   }
@@ -72,18 +71,38 @@ export class DocumentFragment extends Node {
       document = null
     }
 
-    if(!document)
+    if (!document)
       document = this.ownerDocument
-      
+
     let clonedSelf = new DocumentFragment(document)
     clonedSelf._parentNode = null
 
     // clone child nodes
-    for(let child of this.childNodes) {
+    for (let child of this.childNodes) {
       let clonedChild = child.cloneNode(document, deep)
       clonedSelf.appendChild(clonedChild)
     }
 
     return clonedSelf
+  }
+
+  /**
+   * Returns the prefix for a given namespace URI, if present, and 
+   * `null` if not.
+   * 
+   * @param namespace - the namespace to search
+   */
+  lookupPrefix(namespace: string | null): string | null {
+    return null
+  }
+
+  /**
+   * Returns the namespace URI for a given prefix if present, and `null`
+   * if not.
+   * 
+   * @param prefix - the prefix to search
+   */
+  lookupNamespaceURI(prefix: string | null): string | null {
+    return null
   }
 }

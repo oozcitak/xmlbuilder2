@@ -1,10 +1,11 @@
+import { Node } from "./Node";
 import { Element } from "./Element";
+import { Document } from "./Document";
 
 /**
  * Represents an attribute of an element node.
  */
-export class Attr {
-
+export class Attr extends Node {
   protected _namespaceURI: string | null
   protected _prefix: string | null
   protected _localName: string
@@ -23,16 +24,28 @@ export class Attr {
    * @param prefix - the namespace prefix
    * @param localName - the local name of the element
    */
-  public constructor (ownerElement: Element | null,
+  public constructor(ownerElement: Element | null,
     namespaceURI: string | null, prefix: string | null,
-    localName: string, value: string) 
-  {
+    localName: string, value: string) {
+    super(ownerElement ? ownerElement.ownerDocument : null)
+
     this._namespaceURI = namespaceURI
     this._prefix = prefix
     this._localName = localName
     this._value = localName
     this._ownerElement = ownerElement
   }
+
+
+  /** 
+   * Returns the type of node. 
+   */
+  get nodeType(): number { return Node.Attribute }
+
+  /** 
+   * Returns a string appropriate for the type of node. 
+   */
+  get nodeName(): string { return this.name }
 
   /** 
    * Gets the owner element node.
@@ -43,7 +56,7 @@ export class Attr {
    * Gets the namespace URI.
    */
   get namespaceURI(): string | null { return this._namespaceURI }
-    
+
   /** 
    * Gets the namespace prefix.
    */
@@ -60,8 +73,8 @@ export class Attr {
    * local name.
    */
   get name(): string {
-    return (this._prefix ? 
-      this._prefix + ':' + this.localName : 
+    return (this._prefix ?
+      this._prefix + ':' + this.localName :
       this.localName)
   }
 
@@ -70,4 +83,50 @@ export class Attr {
    */
   get value(): string { return this._value }
   set value(value: string) { this._value = value }
+
+  /**
+   * Returns a duplicate of this node, i.e., serves as a generic copy 
+   * constructor for nodes. The duplicate node has no parent 
+   * ({@link parentNode} returns `null`).
+   *
+   * @param document - new owner document
+   * @param deep - if `true`, recursively clone the subtree under the 
+   * specified node; if `false`, clone only the node itself (and its 
+   * attributes, if it is an {@link Element}).
+   */
+  cloneNode(document: Document | boolean | null = null,
+    deep: boolean = false): Node {
+    return new Attr(this.ownerElement,
+      this.namespaceURI, this.prefix, this.localName, this.value)
+  }
+
+  /**
+   * Returns the prefix for a given namespace URI, if present, and 
+   * `null` if not.
+   * 
+   * @param namespace - the namespace to search
+   */
+  lookupPrefix(namespace: string | null): string | null {
+    if (!namespace) return null
+
+    if (this.ownerElement)
+      return this.ownerElement.lookupPrefix(namespace)
+
+    return null
+  }
+
+  /**
+   * Returns the namespace URI for a given prefix if present, and `null`
+   * if not.
+   * 
+   * @param prefix - the prefix to search
+   */
+  lookupNamespaceURI(prefix: string | null): string | null {
+    if (!prefix) prefix = null
+
+    if (this.ownerElement)
+      return this.ownerElement.lookupNamespaceURI(prefix)
+
+    return null
+  }
 }

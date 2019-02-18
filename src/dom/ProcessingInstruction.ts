@@ -15,9 +15,8 @@ export class ProcessingInstruction extends CharacterData {
    * @param ownerDocument - the parent document
    * @param data - the text content
    */
-  public constructor (ownerDocument: Document | null = null, 
-    target: string, data: string | null = null)
-  {
+  public constructor(ownerDocument: Document | null = null,
+    target: string, data: string | null = null) {
     super(ownerDocument, data)
     this._target = target
   }
@@ -55,9 +54,9 @@ export class ProcessingInstruction extends CharacterData {
       document = null
     }
 
-    if(!document)
+    if (!document)
       document = this.ownerDocument
-      
+
     let clonedSelf = new ProcessingInstruction(document,
       this.target, this.data)
     clonedSelf._parentNode = null
@@ -74,7 +73,7 @@ export class ProcessingInstruction extends CharacterData {
     if (!super.isEqualNode(node))
       return false
 
-    if(!node || this.target !== (<ProcessingInstruction>node).target)
+    if (!node || this.target !== (<ProcessingInstruction>node).target)
       return false
     else
       return true

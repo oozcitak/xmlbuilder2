@@ -13,12 +13,11 @@ export class Comment extends CharacterData {
    * @param ownerDocument - the owner document
    * @param data - the text content
    */
-  public constructor (ownerDocument: Document | null = null, 
-    data: string | null = null)
-  {
+  public constructor(ownerDocument: Document | null = null,
+    data: string | null = null) {
     super(ownerDocument, data)
   }
-  
+
   /** 
    * Returns the type of node. 
    */
@@ -47,9 +46,9 @@ export class Comment extends CharacterData {
       document = null
     }
 
-    if(!document)
+    if (!document)
       document = this.ownerDocument
-      
+
     let clonedSelf = new Comment(document, this.data)
     clonedSelf._parentNode = null
     return clonedSelf

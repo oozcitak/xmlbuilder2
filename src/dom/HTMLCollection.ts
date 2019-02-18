@@ -19,7 +19,7 @@ export class HTMLCollection extends Array<Element> {
    * @param name - the name of the element to return
    */
   namedItem(name: string): Element | null {
-    if(!name) return null
+    if (!name) return null
 
     for (let child of this) {
       let ele = <Element>child
@@ -28,10 +28,10 @@ export class HTMLCollection extends Array<Element> {
         return ele
 
       let nameAtt = ele.getAttribute('name')
-      if(nameAtt === name)
+      if (nameAtt === name)
         return ele
     }
-        
+
     return null
   }
 }

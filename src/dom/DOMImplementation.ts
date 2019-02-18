@@ -22,7 +22,7 @@ export class DOMImplementation {
       throw DOMException.InvalidCharacterError
     if (!qualifiedName.match(XMLSpec10.QName))
       throw DOMException.NamespaceError
-      
+
     return new DocType(null, qualifiedName, publicId, systemId)
   }
 
@@ -37,10 +37,10 @@ export class DOMImplementation {
     doctype: DocType | null = null): Document {
     let document = new Document()
 
-    if(doctype)
+    if (doctype)
       document.appendChild(doctype)
 
-    if(qualifiedName) {
+    if (qualifiedName) {
       let element = document.createElementNS(namespace, qualifiedName)
       document.appendChild(element)
     }

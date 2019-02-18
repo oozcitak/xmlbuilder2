@@ -6,7 +6,6 @@ import { DOMException } from "./DOMException"
 import { HTMLCollection } from "./HTMLCollection"
 import { Utility } from "./Utility"
 import { XMLSpec10 } from "./XMLSpec10"
-import { Namespace } from "./Namespace"
 import { DocumentFragment } from "./DocumentFragment"
 import { Text } from "./Text"
 import { Comment } from "./Comment"
@@ -31,8 +30,7 @@ export class Document extends Node {
   /**
    * Initializes a new instance of `Document`.
    */
-  public constructor () 
-  {
+  public constructor() {
     super(null)
   }
 
@@ -50,16 +48,14 @@ export class Document extends Node {
    * Returns the {@link DOMImplementation} object that is associated 
    * with the document.
    */
-  get implementation (): DOMImplementation 
-  {
-     return new DOMImplementation() 
+  get implementation(): DOMImplementation {
+    return new DOMImplementation()
   }
 
   /** 
    * Returns the {@link DocType} or `null` if there is none.
    */
-  get doctype (): DocType | null
-  {
+  get doctype(): DocType | null {
     for (let child of this.childNodes) {
       if (child.nodeType === Node.DocumentType)
         return <DocType>child
@@ -70,8 +66,7 @@ export class Document extends Node {
   /** 
    * Returns the document element or `null` if there is none.
    */
-  get documentElement (): Element | null
-  {
+  get documentElement(): Element | null {
     for (let child of this.childNodes) {
       if (child.nodeType === Node.Element)
         return <Element>child
@@ -89,7 +84,7 @@ export class Document extends Node {
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByTagName (qualifiedName: string): HTMLCollection {
+  getElementsByTagName(qualifiedName: string): HTMLCollection {
     if (this.documentElement)
       return this.documentElement.getElementsByTagName(qualifiedName)
     else
@@ -108,7 +103,7 @@ export class Document extends Node {
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByTagNameNS (namespace: string, localName: string): HTMLCollection {
+  getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection {
     if (this.documentElement)
       return this.documentElement.getElementsByTagNameNS(namespace, localName)
     else
@@ -125,7 +120,7 @@ export class Document extends Node {
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByClassName (classNames: string): HTMLCollection {
+  getElementsByClassName(classNames: string): HTMLCollection {
     if (this.documentElement)
       return this.documentElement.getElementsByClassName(classNames)
     else
@@ -157,22 +152,22 @@ export class Document extends Node {
       throw DOMException.InvalidCharacterError
     if (!qualifiedName.match(XMLSpec10.QName))
       throw DOMException.NamespaceError
-    
+
     let parts = qualifiedName.split(':')
     let prefix = (parts.length === 2 ? parts[0] : null)
     let localName = (parts.length === 2 ? parts[1] : qualifiedName)
 
-    if(prefix && !namespace)
+    if (prefix && !namespace)
       throw DOMException.NamespaceError
 
-    if(prefix === "xml" && namespace !== Namespace.XML)
+    if (prefix === "xml" && namespace !== Node.XML)
       throw DOMException.NamespaceError
 
-    if(namespace !== Namespace.XMLNS && 
+    if (namespace !== Node.XMLNS &&
       (prefix === "xmlns" || qualifiedName === "xmlns"))
       throw DOMException.NamespaceError
 
-    if(namespace === Namespace.XMLNS && 
+    if (namespace === Node.XMLNS &&
       (prefix !== "xmlns" || qualifiedName !== "xmlns"))
       throw DOMException.NamespaceError
 
@@ -195,8 +190,7 @@ export class Document extends Node {
    * 
    * @returns the new {@link Text}
    */
-  createTextNode(data: string): Text
-  {
+  createTextNode(data: string): Text {
     return new Text(this, data)
   }
 
@@ -207,8 +201,7 @@ export class Document extends Node {
    * 
    * @returns the new {@link Comment}
    */
-  createComment(data: string): Comment
-  {
+  createComment(data: string): Comment {
     return new Comment(this, data)
   }
 
@@ -221,8 +214,7 @@ export class Document extends Node {
    * 
    * @returns the new {@link ProcessingInstruction}
    */
-  createProcessingInstruction(target: string, data: string): ProcessingInstruction
-  {
+  createProcessingInstruction(target: string, data: string): ProcessingInstruction {
     if (!target.match(XMLSpec10.Name))
       throw DOMException.InvalidCharacterError
     if (!data.includes("?>"))
@@ -239,12 +231,12 @@ export class Document extends Node {
    * @returns the clone
    */
   importNode(node: Node, deep: boolean = false): Node {
-    if(node.nodeType === Node.Document)
+    if (node.nodeType === Node.Document)
       throw DOMException.NotSupportedError
 
     return node.cloneNode(this, deep)
   }
-  
+
   /**
    * Moves `node` from another document and returns it.
    * 
@@ -253,16 +245,16 @@ export class Document extends Node {
    * @returns the adopted node
    */
   adoptNode(node: Node): Node {
-    if(node.nodeType === Node.Document)
+    if (node.nodeType === Node.Document)
       throw DOMException.NotSupportedError
 
     let oldDocument = node.ownerDocument
 
-    if(node.parentNode)
+    if (node.parentNode)
       node.parentNode.removeChild(node)
 
     node.ownerDocument = this
-    Utility.forEachDescendant(node, 
+    Utility.forEachDescendant(node,
       (child) => child.ownerDocument = this)
 
     return node
@@ -300,24 +292,24 @@ export class Document extends Node {
     let parts = qualifiedName.split(':')
     let prefix = (parts.length === 2 ? parts[0] : null)
     let localName = (parts.length === 2 ? parts[1] : qualifiedName)
-  
-    if(prefix && !namespace)
+
+    if (prefix && !namespace)
       throw DOMException.NamespaceError
-  
-    if(prefix === "xml" && namespace !== Namespace.XML)
+
+    if (prefix === "xml" && namespace !== Node.XML)
       throw DOMException.NamespaceError
-  
-    if(namespace !== Namespace.XMLNS && 
+
+    if (namespace !== Node.XMLNS &&
       (prefix === "xmlns" || qualifiedName === "xmlns"))
       throw DOMException.NamespaceError
 
-    if(namespace === Namespace.XMLNS && 
+    if (namespace === Node.XMLNS &&
       (prefix !== "xmlns" || qualifiedName !== "xmlns"))
       throw DOMException.NamespaceError
 
     return new Attr(null, namespace, prefix || '', localName, '')
-  } 
-  
+  }
+
   /**
    * Creates an event of the type specified.
    * 
@@ -348,7 +340,7 @@ export class Document extends Node {
    */
   createNodeIterator(root: Node, whatToShow: number = NodeFilter.ShowAll,
     filter: NodeFilter | null = null): never {
-      throw DOMException.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -359,7 +351,7 @@ export class Document extends Node {
    */
   createTreeWalker(root: Node, whatToShow: number = NodeFilter.ShowAll,
     filter: NodeFilter | null = null): never {
-      throw DOMException.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -380,11 +372,41 @@ export class Document extends Node {
       document = null
     }
 
-    if(!document)
+    if (!document)
       document = this.ownerDocument
-      
+
     let clonedSelf = new Document()
     clonedSelf._parentNode = null
     return clonedSelf
+  }
+
+  /**
+   * Returns the prefix for a given namespace URI, if present, and 
+   * `null` if not.
+   * 
+   * @param namespace - the namespace to search
+   */
+  lookupPrefix(namespace: string | null): string | null {
+    if (!namespace) return null
+
+    if (this.documentElement)
+      return this.documentElement.lookupPrefix(namespace)
+
+    return null
+  }
+
+  /**
+   * Returns the namespace URI for a given prefix if present, and `null`
+   * if not.
+   * 
+   * @param prefix - the prefix to search
+   */
+  lookupNamespaceURI(prefix: string | null): string | null {
+    if (!prefix) prefix = null
+
+    if (this.documentElement)
+      return this.documentElement.lookupNamespaceURI(prefix)
+
+    return null
   }
 }

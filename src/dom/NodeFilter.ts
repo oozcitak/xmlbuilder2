@@ -24,22 +24,20 @@ export class NodeFilter {
   static readonly ShowNotation = 0x800
 
   protected _callback: (node: Node) => number
-  
+
   /**
    * Initializes a new instance of `NodeFilter`.
    *
    * @param callback - the callback function
    */
-  public constructor (callback: (node: Node) => number) 
-  {
+  public constructor(callback: (node: Node) => number) {
     this._callback = callback
   }
 
   /** 
    * Callback function.
    */
-  acceptNode(node: Node): number 
-  {
+  acceptNode(node: Node): number {
     return this._callback(node)
   }
 }

@@ -17,7 +17,7 @@ export class Element extends Node {
   protected _prefix: string | null
   protected _localName: string
   protected _attributes: NamedNodeMap = new NamedNodeMap()
-  
+
   /**
    * Initializes a new instance of `Element`.
    *
@@ -26,16 +26,15 @@ export class Element extends Node {
    * @param prefix - the namespace prefix
    * @param localName - the local name of the element
    */
-  public constructor (ownerDocument: Document | null = null, 
-    namespaceURI: string | null, prefix: string | null, localName: string) 
-  {
+  public constructor(ownerDocument: Document | null = null,
+    namespaceURI: string | null, prefix: string | null, localName: string) {
     super(ownerDocument)
 
     this._namespaceURI = namespaceURI
     this._prefix = prefix
     this._localName = localName
   }
-  
+
   /** 
    * Returns the type of node. 
    */
@@ -50,7 +49,7 @@ export class Element extends Node {
    * Gets the namespace URI.
    */
   get namespaceURI(): string | null { return this._namespaceURI }
-    
+
   /** 
    * Gets the namespace prefix.
    */
@@ -67,15 +66,15 @@ export class Element extends Node {
    * local name.
    */
   get tagName(): string {
-    return (this._prefix ? 
-      this._prefix + ':' + this.localName : 
+    return (this._prefix ?
+      this._prefix + ':' + this.localName :
       this.localName)
   }
 
   /** 
    * Gets or sets the identifier of this element.
    */
-  get id(): string { return this.getAttribute('id') || ''}
+  get id(): string { return this.getAttribute('id') || '' }
   set id(value: string) { this.setAttribute('id', value) }
 
   /** 
@@ -92,7 +91,7 @@ export class Element extends Node {
   /** 
    * Gets or sets the slot attribute of this element.
    */
-  get slot(): string { return this.getAttribute('slot') || ''}
+  get slot(): string { return this.getAttribute('slot') || '' }
   set slot(value: string) { this.setAttribute('slot', value) }
 
   /** 
@@ -110,8 +109,8 @@ export class Element extends Node {
    */
   getAttributeNames(): string[] {
     let names: string[] = []
-    
-    for(let att of this.attributes) {
+
+    for (let att of this.attributes) {
       names.push(att.name)
     }
 
@@ -139,7 +138,7 @@ export class Element extends Node {
     let att = this.attributes.getNamedItemNS(namespace, localName)
     return (att ? att.value : null)
   }
-  
+
   /**
    * Sets the value of the attribute with the given `qualifiedName`.
    * 
@@ -172,7 +171,7 @@ export class Element extends Node {
   removeAttribute(qualifiedName: string): void {
     try {
       this.attributes.removeNamedItem(qualifiedName)
-    } catch(e) {
+    } catch (e) {
       if (e.name !== "NotFoundError")
         throw e
     }
@@ -188,7 +187,7 @@ export class Element extends Node {
   removeAttributeNS(namespace: string, localName: string): void {
     try {
       this.attributes.removeNamedItemNS(namespace, localName)
-    } catch(e) {
+    } catch (e) {
       if (e.name !== "NotFoundError")
         throw e
     }
@@ -201,7 +200,7 @@ export class Element extends Node {
    * @param qualifiedName - qualified name to search for
    */
   hasAttribute(qualifiedName: string): boolean {
-    for(let att of this.attributes) {
+    for (let att of this.attributes) {
       if (att.name === qualifiedName)
         return true
     }
@@ -217,7 +216,7 @@ export class Element extends Node {
    * @param localName - local name to search for
    */
   hasAttributeNS(namespace: string, localName: string): boolean {
-    for(let att of this.attributes) {
+    for (let att of this.attributes) {
       if (att.namespaceURI === namespace && att.localName === localName)
         return true
     }
@@ -281,9 +280,9 @@ export class Element extends Node {
    * @param init - A ShadowRootInit dictionary.
    */
   attachShadow(init: object): never {
-    throw DOMException.NotImplementedError  
+    throw DOMException.NotImplementedError
   }
-  
+
   /**
    * Returns element’s shadow root, if any, and if shadow root’s mode
    * is "open", and null otherwise.
@@ -292,7 +291,7 @@ export class Element extends Node {
    * exception.
    */
   get shadowRoot(): never {
-    throw DOMException.NotImplementedError  
+    throw DOMException.NotImplementedError
   }
 
   /**
@@ -305,7 +304,7 @@ export class Element extends Node {
    * @param selectors 
    */
   closest(selectors: string): Element | null {
-    throw DOMException.NotImplementedError  
+    throw DOMException.NotImplementedError
   }
 
   /**
@@ -318,7 +317,7 @@ export class Element extends Node {
    * @param selectors 
    */
   matches(selectors: string): boolean {
-    throw DOMException.NotImplementedError  
+    throw DOMException.NotImplementedError
   }
 
   /** 
@@ -339,11 +338,11 @@ export class Element extends Node {
     if (value)
       node = new Text(this.ownerDocument, value)
 
-    if(node && this.ownerDocument)
+    if (node && this.ownerDocument)
       this.ownerDocument.adoptNode(node)
-    
+
     this.childNodes.length = 0
-    
+
     if (node)
       node.appendChild(node)
   }
@@ -366,29 +365,28 @@ export class Element extends Node {
       document = null
     }
 
-    if(!document)
+    if (!document)
       document = this.ownerDocument
-      
-    let clonedSelf = new Element(document, 
+
+    let clonedSelf = new Element(document,
       this.namespaceURI, this.prefix, this.localName)
     clonedSelf._parentNode = null
 
     // clone attributes
-    for(let att of this.attributes) {
-      let clonedAtt = new Attr(clonedSelf, 
+    for (let att of this.attributes) {
+      let clonedAtt = new Attr(clonedSelf,
         att.namespaceURI, att.prefix, att.localName, att.value)
       clonedSelf.attributes.setNamedItem(clonedAtt)
     }
 
     // clone child nodes
-    for(let child of this.childNodes) {
+    for (let child of this.childNodes) {
       let clonedChild = child.cloneNode(document, deep)
       clonedSelf.appendChild(clonedChild)
     }
 
     return clonedSelf
   }
-
 
   /**
    * Determines if the given node is equal to this one.
@@ -400,7 +398,7 @@ export class Element extends Node {
       return false
 
     let other = <Element>node
-    if(!other || this.namespaceURI !== other.namespaceURI || 
+    if (!other || this.namespaceURI !== other.namespaceURI ||
       this.prefix !== other.prefix ||
       this.localName !== other.localName ||
       this.attributes.length !== other.attributes.length) {
@@ -415,7 +413,7 @@ export class Element extends Node {
           return false
         }
       }
-      
+
       return true
     }
   }
@@ -430,12 +428,12 @@ export class Element extends Node {
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByTagName (qualifiedName: string): HTMLCollection {
+  getElementsByTagName(qualifiedName: string): HTMLCollection {
     let matchAll = (qualifiedName == '*')
 
     let list = new HTMLCollection()
 
-    Utility.forEachDescendant (this, function(node: Node) {
+    Utility.forEachDescendant(this, function (node: Node) {
       if (node.nodeType === Node.Element) {
         let ele = <Element>node
         if (matchAll || ele.tagName === qualifiedName)
@@ -458,17 +456,17 @@ export class Element extends Node {
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByTagNameNS (namespace: string, localName: string): HTMLCollection {
+  getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection {
     let matchAllNamespace = (namespace == '*')
     let matchAllLocalName = (localName == '*')
 
     let list = new HTMLCollection()
 
-    Utility.forEachDescendant (this, function(node: Node) {
+    Utility.forEachDescendant(this, function (node: Node) {
       if (node.nodeType === Node.Element) {
         let ele = <Element>node
         if ((matchAllLocalName || ele.localName === localName) &&
-            (matchAllNamespace || ele.namespaceURI === namespace))
+          (matchAllNamespace || ele.namespaceURI === namespace))
           list.push(ele)
       }
     })
@@ -486,11 +484,11 @@ export class Element extends Node {
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByClassName (classNames: string): HTMLCollection {
+  getElementsByClassName(classNames: string): HTMLCollection {
     let list = new HTMLCollection()
 
     let arr = DOMTokenList.TokenArrayFromString(classNames)
-    Utility.forEachDescendant (this, function(node: Node) {
+    Utility.forEachDescendant(this, function (node: Node) {
       if (node.nodeType === Node.Element) {
         let ele = <Element>node
         let classes = ele.classList
@@ -581,5 +579,57 @@ export class Element extends Node {
         this.parentNode.insertBefore(text, this.nextSibling)
         break
     }
+  }
+
+  /**
+   * Returns the prefix for a given namespace URI, if present, and 
+   * `null` if not.
+   * 
+   * @param namespace - the namespace to search
+   */
+  lookupPrefix(namespace: string | null): string | null {
+    if (!namespace) return null
+
+    if (this.namespaceURI === namespace && this.prefix) {
+      return this.prefix
+    }
+
+    for (let attr of this.attributes) {
+      if (attr.prefix === "xmlns" && attr.value === namespace) {
+        return attr.localName
+      }
+    }
+
+    if (this.parentElement)
+      return this.parentElement.lookupPrefix(namespace)
+
+    return null
+  }
+
+  /**
+   * Returns the namespace URI for a given prefix if present, and `null`
+   * if not.
+   * 
+   * @param prefix - the prefix to search
+   */
+  lookupNamespaceURI(prefix: string | null): string | null {
+    if (!prefix) prefix = null
+
+    if (this.namespaceURI && this.prefix === prefix)
+      return this.namespaceURI
+
+    for (let attr of this.attributes) {
+      if (attr.namespaceURI === Node.XMLNS) {
+        if ((attr.prefix === 'xmlns' && attr.localName === prefix) ||
+          (!prefix && !attr.prefix && attr.localName == 'xmlns')) {
+          return attr.value || null
+        }
+      }
+    }
+
+    if (this.parentElement)
+      return this.parentElement.lookupNamespaceURI(prefix)
+
+    return null
   }
 }

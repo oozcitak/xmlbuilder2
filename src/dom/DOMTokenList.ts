@@ -22,8 +22,7 @@ export class DOMTokenList {
    * @param ownerElement - the owner element
    * @param localName - the local name of the associated attribute
    */
-  public constructor (ownerElement: Element, localName: string)
-  {
+  public constructor(ownerElement: Element, localName: string) {
     this._ownerElement = ownerElement
     this._localName = localName
   }
@@ -80,7 +79,7 @@ export class DOMTokenList {
     for (let token of tokens) {
       if (!token)
         throw DOMException.SyntaxError
-      else if(token.match(DOMTokenList.WhiteSpace))
+      else if (token.match(DOMTokenList.WhiteSpace))
         throw DOMException.InvalidCharacterError
       else
         set.delete(token)
@@ -101,8 +100,7 @@ export class DOMTokenList {
    * or `true` if the token is in the list after the call.
    */
   toggle(token: string, force: boolean | undefined = undefined): boolean {
-    if (force === undefined)
-    {
+    if (force === undefined) {
       let set = this.valueAsSet
       if (set.has(token)) {
         this.remove(token)
@@ -129,7 +127,7 @@ export class DOMTokenList {
   replace(token: string, newToken: string): boolean {
     if (!token || !newToken)
       throw DOMException.SyntaxError
-    else if(token.match(DOMTokenList.WhiteSpace) ||
+    else if (token.match(DOMTokenList.WhiteSpace) ||
       newToken.match(DOMTokenList.WhiteSpace))
       throw DOMException.InvalidCharacterError
 
@@ -161,7 +159,7 @@ export class DOMTokenList {
    * Gets the value of the token list as a string, or sets the token
    * list to the given value.
    */
-  get value(): string { 
+  get value(): string {
     let set = this.valueAsSet
     let arr = Array.from(set)
     return arr.join(' ')
@@ -191,9 +189,9 @@ export class DOMTokenList {
 
     // remove empty strings
     let filtered: string[] = []
-    for(let str of arr)
+    for (let str of arr)
       if (str) filtered.push(str)
-    
+
     return filtered
   }
 
