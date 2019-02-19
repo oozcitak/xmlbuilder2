@@ -1,6 +1,10 @@
 import { Node } from './Node'
+import { XMLSpec } from './XMLSpec'
+import { DOMException } from './DOMException'
+import { DOMImplementation } from './DOMImplementation'
 
 export class Utility {
+
   /**
    * Applies the given function to all descendant nodes of the given
    * node.
@@ -109,5 +113,56 @@ export class Utility {
       return false
     else
       return otherPos > nodePos
+  }
+
+  /**
+   * Validates the given qualified name.
+   * 
+   * @param qualifiedName - qualified name
+   */
+  static validateQName(qualifiedName: string): void {
+    if (!qualifiedName.match(XMLSpec.Name))
+      throw DOMException.InvalidCharacterError
+    if (!qualifiedName.match(XMLSpec.QName))
+      throw DOMException.InvalidCharacterError
+  }
+
+  /**
+   * Validates and extracts a namespace, prefix, and localName from the
+   * given namespace and qualified name.
+   * 
+   * @param namespace - namespace
+   * @param qualifiedName - qualified name
+   * 
+   * @returns an object with `namespace`, `prefix`, and `localName` 
+   * keys.
+   */
+  static extractNames(namespace: string | null, qualifiedName: string): { namespace: string | null, prefix: string | null, localName: string } {
+    if (!namespace) namespace = null
+    Utility.validateQName(qualifiedName)
+
+    let parts = qualifiedName.split(':')
+    let prefix = (parts.length === 2 ? parts[0] : null)
+    let localName = (parts.length === 2 ? parts[1] : qualifiedName)
+
+    if (prefix && !namespace)
+      throw DOMException.NamespaceError
+
+    if (prefix === "xml" && namespace !== DOMImplementation.Namespace.XML)
+      throw DOMException.NamespaceError
+
+    if (namespace !== DOMImplementation.Namespace.XMLNS &&
+      (prefix === "xmlns" || qualifiedName === "xmlns"))
+      throw DOMException.NamespaceError
+
+    if (namespace === DOMImplementation.Namespace.XMLNS &&
+      (prefix !== "xmlns" && qualifiedName !== "xmlns"))
+      throw DOMException.NamespaceError
+
+    return {
+      'namespace': namespace,
+      'prefix': prefix,
+      'localName': localName
+    }
   }
 }

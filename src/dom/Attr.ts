@@ -20,20 +20,22 @@ export class Attr extends Node {
   /**
    * Initializes a new instance of `Attr`.
    *
+   * @param localName - the local name of the element
    * @param namespaceURI - the namespace URI
    * @param prefix - the namespace prefix
-   * @param localName - the local name of the element
    */
-  public constructor(ownerElement: Element | null,
+  public constructor(ownerDocument: Document | null, 
+    ownerElement: Element | null, localName: string,
     namespaceURI: string | null, prefix: string | null,
-    localName: string, value: string) {
-    super(ownerElement ? ownerElement.ownerDocument : null)
+    value: string) {
+    super(ownerDocument)
 
-    this._namespaceURI = namespaceURI
-    this._prefix = prefix
-    this._localName = localName
-    this._value = localName
     this._ownerElement = ownerElement
+    
+    this._localName = localName
+    this._namespaceURI = namespaceURI || null
+    this._prefix = prefix || null
+    this._value = value
   }
 
 
@@ -96,8 +98,8 @@ export class Attr extends Node {
    */
   cloneNode(document: Document | boolean | null = null,
     deep: boolean = false): Node {
-    return new Attr(this.ownerElement,
-      this.namespaceURI, this.prefix, this.localName, this.value)
+    return new Attr(this.ownerDocument, this.ownerElement,
+      this.localName, this.namespaceURI, this.prefix, this.value)
   }
 
   /**

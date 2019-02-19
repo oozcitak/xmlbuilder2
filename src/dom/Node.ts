@@ -32,11 +32,6 @@ export abstract class Node {
   static readonly ContainedBy = 0x10
   static readonly ImplementationSpecific = 0x20
 
-  // namespaces
-  static readonly HTML = "http://www.w3.org/1999/xhtml"
-  static readonly XML = "http://www.w3.org/XML/1998/namespace"
-  static readonly XMLNS = "http://www.w3.org/2000/xmlns/"
-
   protected _parentNode: Node | null = null
   protected _ownerDocument: Document | null = null
   protected _childNodeList: NodeList = new NodeList()

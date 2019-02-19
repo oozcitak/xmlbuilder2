@@ -1,7 +1,7 @@
-import { DocType } from "./DocType"
+import { DocumentType } from "./DocumentType"
 import { DOMException } from "./DOMException"
 import { Document } from "./Document"
-import { XMLSpec } from "./XMLSpec"
+import { Utility } from "./Utility"
 
 /**
  * Represents an object providing methods which are not dependent on 
@@ -16,13 +16,11 @@ export class DOMImplementation {
    * @param publicId - the `PUBLIC` identifier
    * @param publicId - the `SYSTEM` identifier
    */
-  createDocumentType(qualifiedName: string, publicId: string, systemId: string): DocType {
-    if (!qualifiedName.match(XMLSpec.Name))
-      throw DOMException.InvalidCharacterError
-    if (!qualifiedName.match(XMLSpec.QName))
-      throw DOMException.NamespaceError
+  createDocumentType(qualifiedName: string,
+    publicId: string, systemId: string): DocumentType {
+    Utility.validateQName(qualifiedName)
 
-    return new DocType(null, qualifiedName, publicId, systemId)
+    return new DocumentType(null, qualifiedName, publicId, systemId)
   }
 
   /**
@@ -33,7 +31,7 @@ export class DOMImplementation {
    * @param doctype - a {@link DocType} to assign to this document
    */
   createDocument(namespace: string, qualifiedName: string,
-    doctype: DocType | null = null): Document {
+    doctype: DocumentType | null = null): Document {
     let document = new Document()
 
     if (doctype)
@@ -43,6 +41,14 @@ export class DOMImplementation {
       let element = document.createElementNS(namespace, qualifiedName)
       document.appendChild(element)
     }
+
+    // document’s content type is determined by namespace
+    if (namespace === DOMImplementation.Namespace.HTML)
+      document.contentType = 'application/xhtml+xml'
+    else if (namespace === DOMImplementation.Namespace.SVG)
+      document.contentType = 'image/svg+xml'
+    else
+      document.contentType = 'application/xml'
 
     return document
   }
@@ -63,4 +69,15 @@ export class DOMImplementation {
    * Obsolete, always returns true.
    */
   hasFeature(): boolean { return true }
+
+  // namespaces
+  static readonly Namespace =
+  {
+    HTML: "http://www.w3.org/1999/xhtml",
+    XML: "http://www.w3.org/XML/1998/namespace",
+    XMLNS: "http://www.w3.org/2000/xmlns/",
+    MathML: "http://www.w3.org/1998/Math/MathML",
+    SVG: "http://www.w3.org/2000/svg",
+    XLink: "http://www.w3.org/1999/xlink"
+  }
 }

@@ -1,7 +1,7 @@
 import { Node } from "./Node"
 import { Element } from "./Element"
 import { DOMImplementation } from "./DOMImplementation"
-import { DocType } from "./DocType"
+import { DocumentType } from "./DocumentType"
 import { DOMException } from "./DOMException"
 import { HTMLCollection } from "./HTMLCollection"
 import { Utility } from "./Utility"
@@ -12,6 +12,7 @@ import { Comment } from "./Comment"
 import { ProcessingInstruction } from "./ProcessingInstruction"
 import { NodeFilter } from "./NodeFilter"
 import { Attr } from "./Attr"
+import { CDATASection } from "./CDATASection"
 
 /**
  * Represents a document node.
@@ -55,10 +56,10 @@ export class Document extends Node {
   /** 
    * Returns the {@link DocType} or `null` if there is none.
    */
-  get doctype(): DocType | null {
+  get doctype(): DocumentType | null {
     for (let child of this.childNodes) {
       if (child.nodeType === Node.DocumentType)
-        return <DocType>child
+        return <DocumentType>child
     }
     return null
   }
@@ -135,7 +136,10 @@ export class Document extends Node {
    * @returns the new {@link Element}
    */
   createElement(localName: string): Element {
-    return new Element(this, '', '', localName)
+    if (!localName.match(XMLSpec.Name))
+      throw DOMException.InvalidCharacterError
+
+    return new Element(this, localName, null, null)
   }
 
   /**
@@ -148,30 +152,10 @@ export class Document extends Node {
    * @returns the new {@link Element}
    */
   createElementNS(namespace: string | null, qualifiedName: string): Element {
-    if (!qualifiedName.match(XMLSpec.Name))
-      throw DOMException.InvalidCharacterError
-    if (!qualifiedName.match(XMLSpec.QName))
-      throw DOMException.NamespaceError
+    let names = Utility.extractNames(namespace, qualifiedName)
 
-    let parts = qualifiedName.split(':')
-    let prefix = (parts.length === 2 ? parts[0] : null)
-    let localName = (parts.length === 2 ? parts[1] : qualifiedName)
-
-    if (prefix && !namespace)
-      throw DOMException.NamespaceError
-
-    if (prefix === "xml" && namespace !== Node.XML)
-      throw DOMException.NamespaceError
-
-    if (namespace !== Node.XMLNS &&
-      (prefix === "xmlns" || qualifiedName === "xmlns"))
-      throw DOMException.NamespaceError
-
-    if (namespace === Node.XMLNS &&
-      (prefix !== "xmlns" || qualifiedName !== "xmlns"))
-      throw DOMException.NamespaceError
-
-    return new Element(this, namespace, prefix || '', localName)
+    return new Element(this, names.localName, names.namespace,
+      names.prefix)
   }
 
   /**
@@ -192,6 +176,19 @@ export class Document extends Node {
    */
   createTextNode(data: string): Text {
     return new Text(this, data)
+  }
+
+  /**
+   * Returns a new {@link Text} with the given `data`.
+   * 
+   * @param data - text content
+   * 
+   * @returns the new {@link CDATASection}
+   */
+  createCDATASection(data: string): CDATASection {
+    if (data.includes(']]>'))
+      throw DOMException.InvalidCharacterError
+    return new CDATASection(this, data)
   }
 
   /**
@@ -217,7 +214,7 @@ export class Document extends Node {
   createProcessingInstruction(target: string, data: string): ProcessingInstruction {
     if (!target.match(XMLSpec.Name))
       throw DOMException.InvalidCharacterError
-    if (!data.includes("?>"))
+    if (data.includes("?>"))
       throw DOMException.InvalidCharacterError
 
     return new ProcessingInstruction(this, target, data)
@@ -253,9 +250,19 @@ export class Document extends Node {
     if (node.parentNode)
       node.parentNode.removeChild(node)
 
-    node.ownerDocument = this
-    Utility.forEachDescendant(node,
-      (child) => child.ownerDocument = this)
+    if (this !== oldDocument) {
+      node.ownerDocument = this
+      Utility.forEachDescendant(node,
+        (child) => {
+          child.ownerDocument = this
+          if (child.nodeType === Node.Element) {
+            let element = <Element>child
+            for (let att of element.attributes) {
+              att.ownerDocument = this
+            }
+          }
+        })
+    }
 
     return node
   }
@@ -271,7 +278,7 @@ export class Document extends Node {
     if (!localName.match(XMLSpec.Name))
       throw DOMException.InvalidCharacterError
 
-    return new Attr(null, null, '', localName, '')
+    return new Attr(this, null, localName, null, null, '')
   }
 
   /**
@@ -284,30 +291,10 @@ export class Document extends Node {
    * @returns the new {@link Attr}
    */
   createAttributeNS(namespace: string, qualifiedName: string): Attr {
-    if (!qualifiedName.match(XMLSpec.Name))
-      throw DOMException.InvalidCharacterError
-    if (!qualifiedName.match(XMLSpec.QName))
-      throw DOMException.NamespaceError
+    let names = Utility.extractNames(namespace, qualifiedName)
 
-    let parts = qualifiedName.split(':')
-    let prefix = (parts.length === 2 ? parts[0] : null)
-    let localName = (parts.length === 2 ? parts[1] : qualifiedName)
-
-    if (prefix && !namespace)
-      throw DOMException.NamespaceError
-
-    if (prefix === "xml" && namespace !== Node.XML)
-      throw DOMException.NamespaceError
-
-    if (namespace !== Node.XMLNS &&
-      (prefix === "xmlns" || qualifiedName === "xmlns"))
-      throw DOMException.NamespaceError
-
-    if (namespace === Node.XMLNS &&
-      (prefix !== "xmlns" || qualifiedName !== "xmlns"))
-      throw DOMException.NamespaceError
-
-    return new Attr(null, namespace, prefix || '', localName, '')
+    return new Attr(this, null, names.localName, names.namespace,
+      names.prefix, '')
   }
 
   /**

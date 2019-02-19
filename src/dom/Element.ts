@@ -22,17 +22,17 @@ export class Element extends Node {
    * Initializes a new instance of `Element`.
    *
    * @param ownerDocument - the owner document
+   * @param localName - the local name of the element
    * @param namespaceURI - the namespace URI
    * @param prefix - the namespace prefix
-   * @param localName - the local name of the element
    */
-  public constructor(ownerDocument: Document | null = null,
-    namespaceURI: string | null, prefix: string | null, localName: string) {
+  public constructor(ownerDocument: Document | null,
+    localName: string, namespaceURI: string | null, prefix: string | null = null) {
     super(ownerDocument)
 
-    this._namespaceURI = namespaceURI
-    this._prefix = prefix
     this._localName = localName
+    this._namespaceURI = namespaceURI
+    this._prefix = prefix || null
   }
 
   /** 
@@ -369,13 +369,13 @@ export class Element extends Node {
       document = this.ownerDocument
 
     let clonedSelf = new Element(document,
-      this.namespaceURI, this.prefix, this.localName)
+      this.localName, this.namespaceURI, this.prefix)
     clonedSelf._parentNode = null
 
     // clone attributes
-    for (let att of this.attributes) {
-      let clonedAtt = new Attr(clonedSelf,
-        att.namespaceURI, att.prefix, att.localName, att.value)
+    for (let attr of this.attributes) {
+      let clonedAtt = new Attr(attr.ownerDocument, clonedSelf,
+        attr.localName, attr.namespaceURI, attr.prefix, attr.value)
       clonedSelf.attributes.setNamedItem(clonedAtt)
     }
 
@@ -619,7 +619,7 @@ export class Element extends Node {
       return this.namespaceURI
 
     for (let attr of this.attributes) {
-      if (attr.namespaceURI === Node.XMLNS) {
+      if (attr.namespaceURI === Utility.Namespaces.XMLNS) {
         if ((attr.prefix === 'xmlns' && attr.localName === prefix) ||
           (!prefix && !attr.prefix && attr.localName == 'xmlns')) {
           return attr.value || null

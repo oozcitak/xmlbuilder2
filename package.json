@@ -24,17 +24,13 @@
   "dependencies": {},
   "devDependencies": {
     "typescript": "*",
-    "mocha": "*",
-    "chai": "*",
-    "ts-node": "*",
-    "@types/chai": "*",
-    "@types/mocha": "*",
-    "nyc": "*"
+    "jest": "*",
+    "@types/jest": "*",
+    "ts-jest": "*"
   },
   "scripts": {
     "prepublishOnly": "tsc",
-    "postpublish": "rm -rf lib",
-    "test": "mocha -r ts-node/register tests/**/*.test.ts",
-    "cover": "nyc -r lcov -e .ts -x \"tests/*.test.ts\" mocha -r ts-node/register tests/**/*.test.ts && nyc report"
+    "test": "jest",
+    "cover": "jest --coverage"
   }
 }

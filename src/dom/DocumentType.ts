@@ -5,14 +5,14 @@ import { Document } from "./Document"
  * Represents an object providing methods which are not dependent on 
  * any particular document
  */
-export class DocType extends Node {
+export class DocumentType extends Node {
 
   protected _nodeName: string
   protected _publicId: string
   protected _systemId: string
 
   /**
-   * Initializes a new instance of `DocType`.
+   * Initializes a new instance of `DocumentType`.
    *
    * @param ownerDocument - the owner document
    * @param name - the name of the node
@@ -74,7 +74,7 @@ export class DocType extends Node {
     if (!document)
       document = this.ownerDocument
 
-    let clonedSelf = new DocType(document, this.name,
+    let clonedSelf = new DocumentType(document, this.name,
       this.publicId, this.systemId)
     clonedSelf._parentNode = null
     return clonedSelf
@@ -89,32 +89,12 @@ export class DocType extends Node {
     if (!super.isEqualNode(node))
       return false
 
-    let other = <DocType>node
+    let other = <DocumentType>node
     if (!other || this.name !== other.name ||
       this.publicId !== other.publicId ||
       this.systemId !== other.systemId)
       return false
     else
       return true
-  }
-
-  /**
-   * Returns the prefix for a given namespace URI, if present, and 
-   * `null` if not.
-   * 
-   * @param namespace - the namespace to search
-   */
-  lookupPrefix(namespace: string | null): string | null {
-    return null
-  }
-
-  /**
-   * Returns the namespace URI for a given prefix if present, and `null`
-   * if not.
-   * 
-   * @param prefix - the prefix to search
-   */
-  lookupNamespaceURI(prefix: string | null): string | null {
-    return null
   }
 }

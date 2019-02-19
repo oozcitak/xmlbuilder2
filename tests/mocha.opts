@@ -1,3 +1,0 @@
- --require tests/common
- --ui tdd
- --reporter dot
