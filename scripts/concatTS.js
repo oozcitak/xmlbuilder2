@@ -8,15 +8,13 @@
  *      that end with *.tsx?).
  *   2. Sorts the files by their name in alphabetical order.
  *   3. Concatenates all files.
- *   4. Removes all internal import and export directives:
- *       - import { Node } from "Node"; -> entire line is removed
- *       - export * from './Node'; -> entire line is removed
- *       - export class .* -> export keyword is removed
- *   5. Saves the resulting string under `outFile`.
+ *   4. Removes all import directives:
+ *       - import { Node } from "./Node"; -> entire line is removed
+ *   5. Saves the resulting string under `outputFile`.
  */
 
+const path = require("path");
 const fs = require("fs");
-const readline = require('readline');
 const options = require('../package.json').concatTS;
 
 const ConcatTS = class ConcatTS {
@@ -25,41 +23,91 @@ const ConcatTS = class ConcatTS {
   }
 
   // Returns an array of input files in the `sourceDir` directory
-  getFiles(sourceDir) {
+  getFiles(sourceDir, options) {
     const files = fs.readdirSync(sourceDir).filter(name =>
       name.endsWith('.ts') ||
       name.endsWith('.tsx')
     );
 
-    files.sort();
+    files.sort(function (x, y) {
+      let ix = (options.order ? options.order.indexOf(x) : -1);
+      let iy = (options.order ? options.order.indexOf(y) : -1);
+
+      if (ix === -1 && iy === -1)
+        return x.localeCompare(y);
+      else if (ix === -1)
+        return 1;
+      else if (iy === -1)
+        return -1;
+      else
+        return (ix == iy ? 0 : ix < iy ? -1 : 1);
+    });
 
     return files;
   }
 
-  // Replaces the contents of a line of source
-  replaceContent(line, removeExports) {
-    // import { Node } from "Node"; -> entire line is removed
-    line = line.replace(
-      /^\s*import\s*{\s*(.*)\s*}\s*from\s*["'].*["'].*$/,
-      '// $&');
-    if (removeExports) {
-      // export * from './Node'; -> entire line is removed
-      line = line.replace(
-        /^\s*export\s*\*\s*from\s*["'].*["'].*$/,
-        '// $&');
-      // export class .* -> export keyword is removed
-      line = line.replace(
-        /^(\s*)(export)(\s*(abstract)?\s*class\s*.*)/,
-        '$1/* $2 */$3');
+  // Replaces the contents of source
+  replaceContent(source, options) {
+    if (options.removeImports) {
+      // import { Node } from "./Node"; -> entire line is removed
+      source = source.replace(
+        /import\s*{[^{}]*}\s*from\s*["']\..*["']\s*;?/g,
+        options.deleteText ? '' : '/* $& */');
     }
 
-    return line;
+    return source;
+  }
+
+  // Returns true if any of the source files were modified after the
+  // output file was last produced. Otherwise returns false.
+  checkModified(output, files) {
+    if (!fs.existsSync(output)) return true;
+
+    const outputTime = fs.statSync(output).mtimeMs;
+    for (const file of files) {
+      const sourceTime = fs.statSync(file).mtimeMs;
+      if (outputTime < sourceTime)
+        return true;
+    }
+
+    return false;
+  }
+
+  // Returs the current date string.
+  dateString()
+  {
+    const date = new Date();
+    const year = date.getFullYear().toString();
+    const month = this.padStr((date.getMonth() + 1).toString());
+    const day = this.padStr(date.getDate().toString());
+    return [ year, month, day].join('.');
+  }
+
+  // Returs the current time string.
+  timeString()
+  {
+    const date = new Date();
+    const hour = this.padStr(date.getHours().toString());
+    const minute = this.padStr(date.getMinutes().toString());
+    const second = this.padStr(date.getSeconds().toString());
+    return [hour, minute, second].join(':');
+  }
+
+  padStr(str)
+  {
+    const len = str.length
+    if(len == 0)
+      return '00';
+    else if (len == 1)
+      return '0' + str;
+    else
+      return str;
   }
 
   // Processes all input entries
   run() {
     for (let entry of this.options)
-      this.processDir(entry)
+      this.processDir(entry);
   }
 
   // Processes `entry`
@@ -71,33 +119,55 @@ const ConcatTS = class ConcatTS {
       throw new Error("Please specify an output filename in package.json.");
 
     // list all TypeScript files in the `sourceDir` directory
-    const files = this.getFiles(entry.sourceDir);
-
-    // process and output each file
-    const outFile = fs.createWriteStream(entry.outputFile);
-
-    for (const file of files) {
-      const rl = readline.createInterface({
-        input: fs.createReadStream(file),
-        output: outFile,
-        crlfDelay: Infinity
-      });
-
-      output.write('// ' + '-'.repeat(file.length));
-      output.write('// ' + file);
-      output.write('// ' + '-'.repeat(file.length));
-
-      rl.on('line', (line) => {
-        const newline = replaceContent(line, removeExports);
-        output.write(newline);
-      });
-
-      rl.on('end', () => {
-        rl.close();
-      });
+    const absSourceDir = path.resolve(__dirname, '..', entry.sourceDir);
+    const sourceFiles = this.getFiles(absSourceDir, entry);
+    const absSourceFiles = [];
+    for (const file of sourceFiles) {
+      const absSourceFile = path.resolve(absSourceDir, file);
+      absSourceFiles.push(absSourceFile);
     }
 
-    outFile.close();
+    // process and output each file
+    const absOutputFile = path.resolve(__dirname, '..', entry.outputFile);
+    const absOutputDir = path.dirname(absOutputFile);
+
+    // ensure that any of the source files are modified after the
+    // output file was last produced. otherwise exit.
+    if (!this.checkModified(absOutputFile, absSourceFiles))
+      return;
+
+    // create folder and open output stream
+    fs.mkdirSync(absOutputDir, { recursive: true });
+    const outputStream = fs.createWriteStream(absOutputFile);
+
+    const runStart = Date.now();
+
+    // process each file
+    for (let i = 0; i < sourceFiles.length; i++) {
+      const file = sourceFiles[i];
+      const absSourceFile = absSourceFiles[i];
+
+      // header
+      outputStream.write('\n\n');
+      outputStream.write('// ' + '-'.repeat(70) + '\n');
+      outputStream.write('// ' + file.toUpperCase() + '\n');
+      outputStream.write('// ' + '='.repeat(file.length) + '\n');
+      outputStream.write('// ' + absSourceFile + '\n');
+      outputStream.write('// ' + '-'.repeat(70) + '\n');
+      outputStream.write('\n\n');
+
+      // replace
+      const sourceStr = fs.readFileSync(absSourceFile).toString();
+      const outputStr = this.replaceContent(sourceStr, entry);
+      outputStream.write(outputStr);
+    }
+
+    const runEnd = Date.now();
+    outputStream.write('\n\n// Generated on ' + this.dateString() + 
+      ' at ' + this.timeString() + 
+      ' in ' + ((runEnd - runStart) / 1000).toFixed(2) + " seconds");
+
+    outputStream.close();
   }
 }
 

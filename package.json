@@ -28,15 +28,25 @@
     "@types/jest": "*",
     "ts-jest": "*"
   },
+  "jest": {
+    "transform": { "^.+\\.tsx?$": "ts-jest" },
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$"
+  },
   "concatTS": [
     {
-      "sourceDir": "./src",
+      "sourceDir": "./src/dom",
       "outputFile": "./lib/dom.ts",
-      "removeExports": true
+      "order": [
+        "Node.ts",
+        "CharacterData.ts",
+        "Text.ts"
+      ],
+      "removeImports": true,
+      "deleteText": true
     }
-  ],    
+  ],
   "scripts": {
-    "pretest": "node ./scripts/concatTS.js",
+    "pretest": "node ./scripts/concatTS.js && tsc",
     "prepublishOnly": "tsc",
     "test": "jest",
     "cover": "jest --coverage"

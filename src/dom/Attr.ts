@@ -96,7 +96,10 @@ export class Attr extends Node {
    */
   cloneNode(document: Document | boolean | null = null,
     deep: boolean = false): Node {
-    return new Attr(this.ownerDocument, this.ownerElement,
+    let ownerDocument = (typeof document === "boolean" ? null : document)
+    deep = (typeof document === "boolean" ? document : false)
+
+    return new Attr(ownerDocument, this.ownerElement,
       this.localName, this.namespaceURI, this.prefix, this.value)
   }
 

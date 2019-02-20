@@ -344,14 +344,6 @@ export class Document extends Node {
   cloneNode(document: Document | boolean | null = null,
     deep: boolean = false): Node {
 
-    if (typeof document === "boolean") {
-      deep = document
-      document = null
-    }
-
-    if (!document)
-      document = this.ownerDocument
-
     let clonedSelf = new Document()
     clonedSelf._parentNode = null
     return clonedSelf

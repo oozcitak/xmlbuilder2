@@ -1,4 +1,6 @@
-import dom = require('../../src/dom/index')
+import { DOMImplementation } from '../../lib/dom.js'
+
+const dom = new DOMImplementation()
 
 describe('DOMImplementation', function () {
   test('createDocumentType()', function () {

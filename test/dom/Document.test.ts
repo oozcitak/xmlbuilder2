@@ -1,5 +1,4 @@
-import { Document } from '../../src/dom/Document'
-import { Node } from '../../src/dom/Node'
+import { Document, Node } from '../../lib/dom.js'
 
 describe('Document', function () {
   test('constructor()', function () {

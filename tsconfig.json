@@ -7,11 +7,10 @@
 		"newLine": "lf",
         "sourceMap": true,
         "esModuleInterop": true,
-        "outDir": "lib",
-        "outFile": "index"
+        "outDir": "lib"
     },
     "include": [
-        "src/**/*"
+        "lib/**/*"
     ],
     "exclude": [
         "node_modules"

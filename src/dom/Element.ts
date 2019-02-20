@@ -355,22 +355,19 @@ export class Element extends Node {
   cloneNode(document: Document | boolean | null = null,
     deep: boolean = false): Node {
 
-    if (typeof document === "boolean") {
-      deep = document
-      document = null
-    }
+    let ownerDocument = (typeof document === "boolean" ? null : document)
+    deep = (typeof document === "boolean" ? document : false)
 
-    if (!document)
-      document = this.ownerDocument
+    if (!ownerDocument)
+      ownerDocument = this.ownerDocument
 
-    let clonedSelf = new Element(document,
+    let clonedSelf = new Element(ownerDocument,
       this.localName, this.namespaceURI, this.prefix)
     clonedSelf._parentNode = null
 
     // clone attributes
     for (let attr of this.attributes) {
-      let clonedAtt = new Attr(attr.ownerDocument, clonedSelf,
-        attr.localName, attr.namespaceURI, attr.prefix, attr.value)
+      let clonedAtt = <Attr>attr.cloneNode(ownerDocument, deep)
       clonedSelf.attributes.setNamedItem(clonedAtt)
     }
 

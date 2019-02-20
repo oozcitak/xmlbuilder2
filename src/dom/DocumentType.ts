@@ -65,15 +65,13 @@ export class DocumentType extends Node {
   cloneNode(document: Document | boolean | null = null,
     deep: boolean = false): Node {
 
-    if (typeof document === "boolean") {
-      deep = document
-      document = null
-    }
+    let ownerDocument = (typeof document === "boolean" ? null : document)
+    deep = (typeof document === "boolean" ? document : false)
 
-    if (!document)
-      document = this.ownerDocument
+    if (!ownerDocument)
+      ownerDocument = this.ownerDocument
 
-    let clonedSelf = new DocumentType(document, this.name,
+    let clonedSelf = new DocumentType(ownerDocument, this.name,
       this.publicId, this.systemId)
     clonedSelf._parentNode = null
     return clonedSelf
