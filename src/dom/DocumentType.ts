@@ -1,5 +1,4 @@
-import { Node } from "./Node"
-import { Document } from "./Document"
+import { Node, Document } from "./internal"
 
 /**
  * Represents an object providing methods which are not dependent on 

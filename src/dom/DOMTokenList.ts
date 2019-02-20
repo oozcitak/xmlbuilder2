@@ -1,5 +1,4 @@
-import { Element } from "./Element"
-import { DOMException } from "./DOMException"
+import { Element, DOMException } from "./internal"
 
 /**
  * Represents a token set.

@@ -1,18 +1,8 @@
-import { Node } from "./Node"
-import { Element } from "./Element"
-import { DOMImplementation } from "./DOMImplementation"
-import { DocumentType } from "./DocumentType"
-import { DOMException } from "./DOMException"
-import { HTMLCollection } from "./HTMLCollection"
-import { Utility } from "./Utility"
-import { XMLSpec } from "./XMLSpec"
-import { DocumentFragment } from "./DocumentFragment"
-import { Text } from "./Text"
-import { Comment } from "./Comment"
-import { ProcessingInstruction } from "./ProcessingInstruction"
-import { NodeFilter } from "./NodeFilter"
-import { Attr } from "./Attr"
-import { CDATASection } from "./CDATASection"
+import {
+  Node, Element, DOMImplementation, DocumentType, DOMException,
+  HTMLCollection, Utility, DocumentFragment, Text, Comment,
+  ProcessingInstruction, NodeFilter, Attr, CDATASection
+} from "./internal"
 
 /**
  * Represents a document node.
@@ -136,7 +126,7 @@ export class Document extends Node {
    * @returns the new {@link Element}
    */
   createElement(localName: string): Element {
-    if (!localName.match(XMLSpec.Name))
+    if (!localName.match(DOMImplementation.XMLSpec.Name))
       throw DOMException.InvalidCharacterError
 
     return new Element(this, localName, null, null)
@@ -212,7 +202,7 @@ export class Document extends Node {
    * @returns the new {@link ProcessingInstruction}
    */
   createProcessingInstruction(target: string, data: string): ProcessingInstruction {
-    if (!target.match(XMLSpec.Name))
+    if (!target.match(DOMImplementation.XMLSpec.Name))
       throw DOMException.InvalidCharacterError
     if (data.includes("?>"))
       throw DOMException.InvalidCharacterError
@@ -275,7 +265,7 @@ export class Document extends Node {
    * @returns the new {@link Attr}
    */
   createAttribute(localName: string): Attr {
-    if (!localName.match(XMLSpec.Name))
+    if (!localName.match(DOMImplementation.XMLSpec.Name))
       throw DOMException.InvalidCharacterError
 
     return new Attr(this, null, localName, null, null, '')

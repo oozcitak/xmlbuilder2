@@ -1,12 +1,7 @@
-import { Node } from "./Node"
-import { Document } from "./Document"
-import { Text } from "./Text"
-import { NamedNodeMap } from "./NamedNodeMap"
-import { DOMTokenList } from "./DOMTokenList"
-import { Attr } from "./Attr";
-import { HTMLCollection } from "./HTMLCollection";
-import { Utility } from "./Utility";
-import { DOMException } from "./DOMException";
+import { 
+  Node, Document, Text, NamedNodeMap, DOMTokenList, Attr,
+  HTMLCollection, Utility, DOMException, DOMImplementation
+} from "./internal"
 
 /**
  * Represents an element node.
@@ -619,7 +614,7 @@ export class Element extends Node {
       return this.namespaceURI
 
     for (let attr of this.attributes) {
-      if (attr.namespaceURI === Utility.Namespaces.XMLNS) {
+      if (attr.namespaceURI === DOMImplementation.Namespace.XMLNS) {
         if ((attr.prefix === 'xmlns' && attr.localName === prefix) ||
           (!prefix && !attr.prefix && attr.localName == 'xmlns')) {
           return attr.value || null

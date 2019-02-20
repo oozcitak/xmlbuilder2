@@ -1,5 +1,4 @@
-import { Node } from "./Node"
-import { Document } from "./Document"
+import { Node, Document } from "./internal"
 
 /**
  * Represents a generic text node.

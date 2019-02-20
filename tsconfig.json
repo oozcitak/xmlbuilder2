@@ -6,7 +6,9 @@
 		"strict": true,
 		"newLine": "lf",
         "sourceMap": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "outDir": "lib",
+        "outFile": "index"
     },
     "include": [
         "src/**/*"

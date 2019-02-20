@@ -1,7 +1,4 @@
-import { Node } from './Node'
-import { XMLSpec } from './XMLSpec'
-import { DOMException } from './DOMException'
-import { DOMImplementation } from './DOMImplementation'
+import { Node, DOMException, DOMImplementation } from './internal'
 
 export class Utility {
 
@@ -121,9 +118,9 @@ export class Utility {
    * @param qualifiedName - qualified name
    */
   static validateQName(qualifiedName: string): void {
-    if (!qualifiedName.match(XMLSpec.Name))
+    if (!qualifiedName.match(DOMImplementation.XMLSpec.Name))
       throw DOMException.InvalidCharacterError
-    if (!qualifiedName.match(XMLSpec.QName))
+    if (!qualifiedName.match(DOMImplementation.XMLSpec.QName))
       throw DOMException.InvalidCharacterError
   }
 

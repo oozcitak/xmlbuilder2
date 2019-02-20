@@ -28,7 +28,15 @@
     "@types/jest": "*",
     "ts-jest": "*"
   },
+  "concatTS": [
+    {
+      "sourceDir": "./src",
+      "outputFile": "./lib/dom.ts",
+      "removeExports": true
+    }
+  ],    
   "scripts": {
+    "pretest": "node ./scripts/concatTS.js",
     "prepublishOnly": "tsc",
     "test": "jest",
     "cover": "jest --coverage"
