@@ -64,6 +64,14 @@ const ConcatTS = class ConcatTS {
     if (!fs.existsSync(output)) return true;
 
     const outputTime = fs.statSync(output).mtimeMs;
+
+    // check package.json
+    const packageFile = path.resolve(__dirname, '..', 'package.json');
+    const packageTime = fs.statSync(packageFile).mtimeMs;
+    if (outputTime < packageTime)
+      return true;
+
+    // check files
     for (const file of files) {
       const sourceTime = fs.statSync(file).mtimeMs;
       if (outputTime < sourceTime)

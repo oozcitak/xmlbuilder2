@@ -5,6 +5,20 @@ import { DOMImplementation } from './DOMImplementation'
 export class Utility {
 
   /**
+   * Applies the given mixins into a class.
+   * 
+   * @param derivedCtor - the class to receive the mixins
+   * @param baseCtors - an array of mixin classes
+   */
+  static applyMixins(derivedCtor: any, baseCtors: any[]): void {
+    baseCtors.forEach(baseCtor => {
+      Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+        derivedCtor.prototype[name] = baseCtor.prototype[name]
+      })
+    })
+  }
+
+  /**
    * Applies the given function to all descendant nodes of the given
    * node.
    * 

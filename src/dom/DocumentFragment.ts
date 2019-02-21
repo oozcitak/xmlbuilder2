@@ -1,6 +1,9 @@
 import { Node } from "./Node"
 import { Document } from "./Document"
 import { Text } from "./Text"
+import { Utility } from "./Utility"
+import { Element } from "./Element"
+import { NonElementParentNode } from './NonElementParentNode'
 
 /**
  * Represents a document fragment in the XML tree.
@@ -103,4 +106,13 @@ export class DocumentFragment extends Node {
   lookupNamespaceURI(prefix: string | null): string | null {
     return null
   }
+
+  /**
+   * Returns an {@link Element}  who has an id attribute `elementId`.
+   * 
+   * @param elementId - the value of the `id` attribute to match
+   */
+  getElementById(elementId: string): Element | null { return null }
 }
+
+Utility.applyMixins(Document, [NonElementParentNode])

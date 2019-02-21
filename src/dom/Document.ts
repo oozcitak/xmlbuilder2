@@ -12,6 +12,7 @@ import { NodeFilter } from './NodeFilter'
 import { CDATASection } from './CDATASection'
 import { Text } from './Text'
 import { Attr } from './Attr'
+import { NonElementParentNode } from './NonElementParentNode'
 
 /**
  * Represents a document node.
@@ -79,17 +80,7 @@ export class Document extends Node {
    * 
    * @param elementId - the value of the `id` attribute to match
    */
-  getElementById(elementId: string): Element | null {
-    Utility.forEachDescendant(this, function (node: Node) {
-      if (node.nodeType === Node.Element) {
-        let ele = <Element>node
-        if (ele.id === elementId)
-          return ele
-      }
-    })
-
-    return null
-  }
+  getElementById(elementId: string): Element | null { return null }
 
   /**
    * Returns a {@link HTMLCollection} of all descendant elements 
@@ -408,3 +399,5 @@ export class Document extends Node {
     return null
   }
 }
+
+Utility.applyMixins(Document, [NonElementParentNode])

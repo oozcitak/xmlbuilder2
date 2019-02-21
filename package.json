@@ -42,7 +42,10 @@
       "order": [
         "Node.ts",
         "CharacterData.ts",
-        "Text.ts"
+        "Text.ts",
+        "Utility.ts",
+        "NonElementParentNode.ts",
+        "Document.ts"
       ],
       "removeImports": true,
       "deleteText": true
