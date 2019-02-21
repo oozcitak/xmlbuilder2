@@ -75,6 +75,23 @@ export class Document extends Node {
   }
 
   /**
+   * Returns an {@link Element}  who has an id attribute `elementId`.
+   * 
+   * @param elementId - the value of the `id` attribute to match
+   */
+  getElementById(elementId: string): Element | null {
+    Utility.forEachDescendant(this, function (node: Node) {
+      if (node.nodeType === Node.Element) {
+        let ele = <Element>node
+        if (ele.id === elementId)
+          return ele
+      }
+    })
+
+    return null
+  }
+
+  /**
    * Returns a {@link HTMLCollection} of all descendant elements 
    * whose qualified name is `qualifiedName`.
    * 
@@ -85,10 +102,11 @@ export class Document extends Node {
    * elements
    */
   getElementsByTagName(qualifiedName: string): HTMLCollection {
-    if (this.documentElement)
-      return this.documentElement.getElementsByTagName(qualifiedName)
-    else
-      return new HTMLCollection()
+    let tempEle = this.createElement('temp')
+    for (let child of this.childNodes) {
+      tempEle.childNodes.push(child)
+    }
+    return tempEle.getElementsByTagName(qualifiedName)
   }
 
   /**
@@ -104,10 +122,11 @@ export class Document extends Node {
    * elements
    */
   getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection {
-    if (this.documentElement)
-      return this.documentElement.getElementsByTagNameNS(namespace, localName)
-    else
-      return new HTMLCollection()
+    let tempEle = this.createElement('temp')
+    for (let child of this.childNodes) {
+      tempEle.childNodes.push(child)
+    }
+    return tempEle.getElementsByTagNameNS(namespace, localName)
   }
 
   /**
@@ -121,10 +140,11 @@ export class Document extends Node {
    * elements
    */
   getElementsByClassName(classNames: string): HTMLCollection {
-    if (this.documentElement)
-      return this.documentElement.getElementsByClassName(classNames)
-    else
-      return new HTMLCollection()
+    let tempEle = this.createElement('temp')
+    for (let child of this.childNodes) {
+      tempEle.childNodes.push(child)
+    }
+    return tempEle.getElementsByClassName(classNames)
   }
 
   /**
