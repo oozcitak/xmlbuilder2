@@ -1,4 +1,6 @@
-import { Node, Document, Text } from "./internal"
+import { Node } from "./Node"
+import { Document } from "./Document"
+import { Text } from "./Text"
 
 /**
  * Represents a document fragment in the XML tree.

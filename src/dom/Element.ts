@@ -1,7 +1,13 @@
-import { 
-  Node, Document, Text, NamedNodeMap, DOMTokenList, Attr,
-  HTMLCollection, Utility, DOMException, DOMImplementation
-} from "./internal"
+import { Node } from './Node'
+import { DOMImplementation } from './DOMImplementation'
+import { DOMException } from './DOMException'
+import { HTMLCollection } from './HTMLCollection'
+import { Utility } from './Utility'
+import { Attr } from './Attr'
+import { NamedNodeMap } from './NamedNodeMap'
+import { DOMTokenList } from './DOMTokenList'
+import { Document } from './Document'
+import { Text } from './Text'
 
 /**
  * Represents an element node.

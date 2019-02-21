@@ -1,4 +1,7 @@
-import { DocumentType, DOMException, Document, Utility } from "./internal"
+import { DocumentType } from "./DocumentType"
+import { DOMException } from "./DOMException"
+import { Document } from "./Document"
+import { Utility } from "./Utility"
 
 /**
  * Represents an object providing methods which are not dependent on 

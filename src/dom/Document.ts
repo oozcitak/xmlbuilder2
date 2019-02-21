@@ -1,8 +1,17 @@
-import {
-  Node, Element, DOMImplementation, DocumentType, DOMException,
-  HTMLCollection, Utility, DocumentFragment, Text, Comment,
-  ProcessingInstruction, NodeFilter, Attr, CDATASection
-} from "./internal"
+import { Node } from './Node'
+import { Element } from './Element'
+import { DOMImplementation } from './DOMImplementation'
+import { DocumentType } from './DocumentType'
+import { DOMException } from './DOMException'
+import { HTMLCollection } from './HTMLCollection'
+import { Utility } from './Utility'
+import { DocumentFragment } from './DocumentFragment'
+import { Comment } from './Comment'
+import { ProcessingInstruction } from './ProcessingInstruction'
+import { NodeFilter } from './NodeFilter'
+import { CDATASection } from './CDATASection'
+import { Text } from './Text'
+import { Attr } from './Attr'
 
 /**
  * Represents a document node.

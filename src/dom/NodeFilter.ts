@@ -1,4 +1,4 @@
-import { Node } from "./internal"
+import { Node } from "./Node"
 
 /**
  * Represents a node filter.

@@ -1,4 +1,6 @@
-import { Node, Text, Document } from "./internal"
+import { Node } from "./Node"
+import { Text } from "./Text"
+import { Document } from "./Document"
 
 /**
  * Represents a CDATA node.

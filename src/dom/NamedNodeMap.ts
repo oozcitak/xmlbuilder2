@@ -1,4 +1,5 @@
-import { Attr, DOMException } from "./internal"
+import { Attr } from "./Attr"
+import { DOMException } from "./DOMException"
 
 /**
  * Represents a collection of nodes.

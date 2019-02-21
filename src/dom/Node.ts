@@ -1,6 +1,10 @@
-import { 
-  DocumentFragment, Document, Text, NodeList, Element, Attr, Utility
-} from './internal'
+import { DocumentFragment } from './DocumentFragment'
+import { Document } from './Document'
+import { Text } from './Text'
+import { NodeList } from './NodeList'
+import { Element } from './Element'
+import { Attr } from './Attr'
+import { Utility } from './Utility'
 
 /**
  * Represents a generic XML node.

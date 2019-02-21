@@ -1,4 +1,6 @@
-import { Node, CharacterData, Document } from "./internal"
+import { Node } from "./Node"
+import { CharacterData } from "./CharacterData"
+import { Document } from "./Document"
 
 /**
  * Represents a text node.

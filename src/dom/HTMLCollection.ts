@@ -1,4 +1,4 @@
-import { Element } from "./internal"
+import { Element } from "./Element"
 
 /**
  * Represents a collection of elements.

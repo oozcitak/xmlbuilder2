@@ -1,4 +1,6 @@
-import { Node, Element, Document } from "./internal"
+import { Node } from "./Node"
+import { Element } from "./Element"
+import { Document } from "./Document"
 
 /**
  * Represents an attribute of an element node.

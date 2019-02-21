@@ -1,4 +1,6 @@
-import { Node, DOMException, DOMImplementation } from './internal'
+import { Node } from './Node'
+import { DOMException } from './DOMException'
+import { DOMImplementation } from './DOMImplementation'
 
 export class Utility {
 
