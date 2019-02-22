@@ -4,6 +4,50 @@ import { DOMImplementation } from './DOMImplementation'
 
 export class Utility {
 
+  static OrderedSet = class {
+    /**
+     * RegExp to split attribute values at ASCII whitespace
+     * https://infra.spec.whatwg.org/#ascii-whitespace
+     * U+0009 TAB, U+000A LF, U+000C FF, U+000D CR, or U+0020 SPACE
+     */
+    static WhiteSpace = /[\t\n\f\r ]/
+
+    /**
+     * Converts a whitespace separated string into an array of tokens.
+     * 
+     * @param value - a string of whitespace separated tokens
+     */
+    static parse(value: string): string[] {
+      let arr = value.split(Utility.OrderedSet.WhiteSpace)
+
+      // remove empty strings
+      let filtered: string[] = []
+      for (let str of arr)
+        if (str) filtered.push(str)
+  
+      return filtered
+    }
+
+    /**
+     * Converts an array of tokens into a space separated string.
+     * 
+     * @param tokens - an array of token strings
+     */
+    static serialize(tokens: string[]): string {
+      return tokens.join(' ')
+    }
+
+    /**
+     * Removes duplicate tokens and convert all whitespace characters
+     * to space.
+     * 
+     * @param value - a string of whitespace separated tokens
+     */
+    static sanitize(value: string): string {
+      return Utility.OrderedSet.serialize(Utility.OrderedSet.parse(value))
+    }
+  }
+
   /**
    * Applies the given mixins into a class.
    * 

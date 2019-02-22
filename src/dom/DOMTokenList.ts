@@ -1,17 +1,11 @@
 import { Element } from "./Element"
 import { DOMException } from "./DOMException"
+import { Utility } from "./Utility";
 
 /**
  * Represents a token set.
  */
 export class DOMTokenList {
-
-  /**
-   * RegExp to split attribute values at ASCII whitespace
-   * https://infra.spec.whatwg.org/#ascii-whitespace
-   * U+0009 TAB, U+000A LF, U+000C FF, U+000D CR, or U+0020 SPACE
-   */
-  static WhiteSpace = /[\t\n\f\r ]/
 
   protected _ownerElement: Element
   protected _localName: string
@@ -79,7 +73,7 @@ export class DOMTokenList {
     for (let token of tokens) {
       if (!token)
         throw DOMException.SyntaxError
-      else if (token.match(DOMTokenList.WhiteSpace))
+      else if (token.match(Utility.OrderedSet.WhiteSpace))
         throw DOMException.InvalidCharacterError
       else
         set.delete(token)
@@ -127,8 +121,8 @@ export class DOMTokenList {
   replace(token: string, newToken: string): boolean {
     if (!token || !newToken)
       throw DOMException.SyntaxError
-    else if (token.match(DOMTokenList.WhiteSpace) ||
-      newToken.match(DOMTokenList.WhiteSpace))
+    else if (token.match(Utility.OrderedSet.WhiteSpace) ||
+      newToken.match(Utility.OrderedSet.WhiteSpace))
       throw DOMException.InvalidCharacterError
 
     let set = this.valueAsSet
@@ -162,12 +156,11 @@ export class DOMTokenList {
   get value(): string {
     let set = this.valueAsSet
     let arr = Array.from(set)
-    return arr.join(' ')
+    return Utility.OrderedSet.serialize(Array.from(this.valueAsSet))
   }
   set value(value: string) {
-    let arr = DOMTokenList.TokenArrayFromString(value)
-    let attValue = arr.join(' ')
-    this._ownerElement.setAttribute(this._localName, attValue)
+    this._ownerElement.setAttribute(this._localName,
+      Utility.OrderedSet.sanitize(value))
   }
 
   /**
@@ -179,29 +172,12 @@ export class DOMTokenList {
   }
 
   /**
-   * Converts a string containg the space separated list of tokens
-   * to an array.
-   * 
-   * @param tokens - token list as a string
-   */
-  static TokenArrayFromString(tokens: string): string[] {
-    let arr = tokens.split(DOMTokenList.WhiteSpace)
-
-    // remove empty strings
-    let filtered: string[] = []
-    for (let str of arr)
-      if (str) filtered.push(str)
-
-    return filtered
-  }
-
-  /**
    * Gets or sets a set of strings created from the associated
    * attribute's value by splitting at ASCII whitespace characters.
    */
   get valueAsSet(): Set<string> {
     let attValue = this._ownerElement.getAttribute(this._localName) || ''
-    let arr = DOMTokenList.TokenArrayFromString(attValue)
+    let arr =Utility.OrderedSet.parse(attValue)
     return new Set(arr)
   }
   set valueAsSet(set: Set<string>) {
@@ -209,7 +185,7 @@ export class DOMTokenList {
       return
 
     let arr = Array.from(set)
-    let attValue = arr.join(' ')
+    let attValue = Utility.OrderedSet.serialize(arr)
     this._ownerElement.setAttribute(this._localName, attValue)
   }
 }

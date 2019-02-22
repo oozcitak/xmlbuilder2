@@ -500,7 +500,7 @@ export class Element extends Node {
   getElementsByClassName(classNames: string): HTMLCollection {
     let list = new HTMLCollection()
 
-    let arr = DOMTokenList.TokenArrayFromString(classNames)
+    let arr = Utility.OrderedSet.parse(classNames)
     Utility.forEachDescendant(this, function (node: Node) {
       if (node.nodeType === Node.Element) {
         let ele = <Element>node
