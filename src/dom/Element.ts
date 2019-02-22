@@ -147,8 +147,15 @@ export class Element extends Node {
    * @param value - attribute value to set
    */
   setAttribute(qualifiedName: string, value: string): void {
-    let att = this.attributes.getNamedItem(qualifiedName)
-    if (att) att.value = value
+    let attr = this.attributes.getNamedItem(qualifiedName)
+
+    if (attr) {
+      attr.value = value
+    } else {
+      attr = new Attr(this.ownerDocument, this, qualifiedName, 
+        null, null, value)
+      this.attributes.setNamedItem(attr)
+    }
   }
 
   /**
@@ -156,12 +163,20 @@ export class Element extends Node {
    * `qualifiedName`.
    * 
    * @param namespace - namespace to search for
-   * @param localName - local name to search for
+   * @param qualifiedName - qualified name to search for
    * @param value - attribute value to set
    */
-  setAttributeNS(namespace: string, localName: string, value: string): void {
-    let att = this.attributes.getNamedItemNS(namespace, localName)
-    if (att) att.value = value
+  setAttributeNS(namespace: string, qualifiedName: string, value: string): void {
+    let names = Utility.extractNames(namespace, qualifiedName)
+    let attr = this.attributes.getNamedItemNS(namespace, names.localName)
+
+    if (attr) {
+      attr.value = value
+    } else {
+      attr = new Attr(this.ownerDocument, this, names.localName, 
+        namespace, names.prefix, value)
+      this.attributes.setNamedItemNS(attr)
+    }
   }
 
   /**

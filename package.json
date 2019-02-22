@@ -45,6 +45,9 @@
         "Text.ts",
         "Utility.ts",
         "NonElementParentNode.ts",
+        "DocumentOrShadowRoot.ts",
+        "HTMLCollection.ts",
+        "ParentNode.ts",
         "Document.ts"
       ],
       "removeImports": true,

@@ -6,17 +6,16 @@ export class NonElementParentNode {
   /**
    * Returns an {@link Element}  who has an id attribute `elementId`.
    * 
-   * @param elementId - the value of the `id` attribute to match
+   * @param id - the value of the `id` attribute to match
    */
-  getElementById(elementId: string): Element | null {
-    Utility.forEachDescendant(<Node><unknown>this, function (node: Node) {
-      if (node.nodeType === Node.Element) {
-        let ele = <Element>node
-        if (ele.id === elementId)
-          return ele
+  getElementById(id: string): Element | null {
+    let nodeFound = Utility.forEachDescendant(<Node><unknown>this, 
+      function (node: Node) {
+      if (node.nodeType === Node.Element && (<Element>node).id === id) {
+          return node
       }
     })
 
-    return null
+    return nodeFound
   }
 }

@@ -13,6 +13,8 @@ import { CDATASection } from './CDATASection'
 import { Text } from './Text'
 import { Attr } from './Attr'
 import { NonElementParentNode } from './NonElementParentNode'
+import { DocumentOrShadowRoot } from './DocumentOrShadowRoot'
+import { ParentNode } from './ParentNode'
 
 /**
  * Represents a document node.
@@ -398,6 +400,72 @@ export class Document extends Node {
 
     return null
   }
+
+  /**
+   * Returns the child elements.
+   */
+  get children(): HTMLCollection { throw "" }
+  
+  /**
+   * Returns the first child that is an element, and `null` otherwise.
+   */
+  get firstElementChild(): Element | null  { throw "" }
+
+  /**
+   * Returns the last child that is an element, and `null` otherwise.
+   */
+  get lastElementChild(): Element | null  { throw "" }
+
+  /**
+   * Returns the number of children that are elements.
+   */
+  get childElementCount(): number  { throw "" }
+
+  /**
+   * Prepends the list of nodes or strings before the first child node.
+   * Strings are converted into {@link Text} nodes.
+   * 
+   * @param nodes - the array of nodes or strings
+   */
+  prepend(nodes: [Node | string]): void  { throw "" }
+
+  /**
+   * Appends the list of nodes or strings after the last child node.
+   * Strings are converted into {@link Text} nodes.
+   * 
+   * @param nodes - the array of nodes or strings
+   */
+  append(nodes: [Node | string]): void  { throw "" }
+
+  /**
+   * Returns the first element that is a descendant of node that
+   * matches selectors.
+   * 
+   * This method is not supported by this module and will throw an
+   * exception.
+   * 
+   * @param selectors - a selectors string
+   */
+  querySelector(selectors: string): Element | null  { throw "" }
+
+  /**
+   * Returns all element descendants of node that match selectors.
+   * 
+   * This method is not supported by this module and will throw an
+   * exception.
+   * 
+   * @param selectors - a selectors string
+   */
+  querySelectorAll(selectors: string): NodeList  { throw "" }
+
+  /**
+   * Converts the given nodes or strings into a node (if there `nodes`
+   * has only one element) or a document fragment.
+   * 
+   * @param nodes - the array of nodes or strings
+   */
+  protected convertNodesIntoNode(nodes: [Node | string], document: Document): Node { throw "" }
 }
 
-Utility.applyMixins(Document, [NonElementParentNode])
+Utility.applyMixins(Document, 
+  [NonElementParentNode, DocumentOrShadowRoot, ParentNode])

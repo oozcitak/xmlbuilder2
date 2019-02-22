@@ -30,7 +30,7 @@ export class Utility {
    * 
    * @returns the value returned from `func`
    */
-  static forEachDescendant(node: Node, func: (node: Node) => any): any {
+  static forEachDescendant(node: Node, func: (childNode: Node) => any): any {
     for (let child of node.childNodes) {
       let res = func(child)
       if (res) {
