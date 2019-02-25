@@ -1,21 +1,23 @@
 import { Element } from "./Element"
-import { NodeList } from "./NodeList"
 import { Node } from "./Node"
 
 /**
  * Represents a collection of elements.
  */
 export class HTMLCollection {
-
-  protected _nodes: NodeList
-
+  protected _parent: Node
+  protected _filter: (element: Element) => any
+    
   /**
    * Initializes a new instance of `HTMLCollection`.
    *
    * @param nodes - the associated {@link NodeList}.
    */
-  public constructor(nodes: NodeList) {
-    this._nodes = nodes
+  public constructor(parent: Node, filter?: (element: Element) => any) {
+    this._parent = parent
+    this._filter = filter || function(element: Element) { return true }
+
+    return new Proxy(this, this)
   }
 
   /** 
@@ -23,11 +25,8 @@ export class HTMLCollection {
    */
   get length(): number {
     let count = 0
-    let node: Node
-    for (node of this._nodes) {
-      if (node.nodeType === Node.Element) {
-          count++
-      }
+    for (let node of this) {
+        count++
     }
     return count
   }
@@ -39,14 +38,11 @@ export class HTMLCollection {
    */
   item(index: number): Element | null {
     let i = 0
-    let node: Node
-    for (node of this._nodes) {
-      if (node.nodeType === Node.Element) {
-        if (i === index)
-          return <Element>node
-        else
-          i++
-      }
+    for (let node of this) {
+      if (i === index)
+        return node
+      else
+        i++
     }
 
     return null
@@ -62,18 +58,45 @@ export class HTMLCollection {
     if (!name) return null
 
     let i = 0
-    let node: Node
-    for (node of this._nodes) {
-      if (node.nodeType === Node.Element) {
-        let ele = <Element>node
-        if (ele.id === name)
-          return ele
-        if (ele.getAttribute('name') === name)
-          return ele
-      }
+    for (let node of this) {
+      if (node.id === name || node.getAttribute('name') === name)
+        return node
     }
 
     return null
+  }
+
+  /**
+   * Returns an iterator for nodes.
+   */
+  [Symbol.iterator](): any {
+    let node = this._parent.firstChild
+    let filter = this._filter
+
+    return {
+      next: function () {
+        if (node) {
+          while (node && (node.nodeType !== Node.Element || !filter(<Element>node))) {
+            node = node.nextSibling
+          }
+          if (node)
+            return { done: false, value: <Element>node }
+          else
+            return { done: true }
+        } else {
+            return { done: true }
+        }
+      }
+    }
+  }
+
+  get(target: HTMLCollection, propertyKey: string | number | symbol, receiver: any): Element | null {
+    if (typeof propertyKey === 'number')
+      return target.item(propertyKey)
+    else if (typeof propertyKey === 'string')
+      return target.namedItem(propertyKey)
+    else
+      return Reflect.get(target, propertyKey, receiver)
   }
 
   /**
@@ -86,3 +109,4 @@ export class HTMLCollection {
    *   collection.
    */
 }
+

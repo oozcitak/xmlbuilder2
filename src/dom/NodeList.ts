@@ -3,7 +3,7 @@ import { Node } from "./Node"
 /**
  * Represents an ordered list of nodes.
  */
-export class NodeList {
+export class NodeList implements Iterable<Node> {
 
   _length = 0
   _parentNode: Node
@@ -119,7 +119,7 @@ export class NodeList {
    * Returns an iterator for the node list.
    */
   [Symbol.iterator]() {
-    return this.values()
+    return new NodeList.NodeListIterator(this._parentNode.firstChild)
   }
 
   /**
@@ -136,6 +136,31 @@ export class NodeList {
     thisArg: any): void {
     for (let item of this.entries()) {
       callback.call(thisArg, item[1], item[0], this)
+    }
+  }
+
+  /**
+   * Defines an iterator for the {@link NodeList}.
+   */
+  static NodeListIterator = class implements IterableIterator<Node> {
+    _currentNode: Node | null
+
+    constructor(startNode: Node | null) {
+      this._currentNode = startNode
+    }
+
+    next(): IteratorResult<Node> {
+      if (this._currentNode) {
+        let node = this._currentNode
+        this._currentNode = this._currentNode.nextSibling
+        return { done: false, value: node}
+      } else {
+        return { done: true, value: null} as any as IteratorResult<Node>
+      }
+    }
+
+    [Symbol.iterator](): IterableIterator<Node> {
+      return this;
     }
   }
 }

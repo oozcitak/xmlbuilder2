@@ -760,6 +760,9 @@ export class Utility {
         if (referenceChild === node) referenceChild = node.nextSibling
         let previousSibling = child.previousSibling
 
+        if(!parent.ownerDocument)
+          throw DOMException.HierarchyRequestError
+
         Utility.Tree.Mutation.adoptNode(node, parent.ownerDocument)
 
         let removedNodes: Node[] = []
@@ -797,9 +800,12 @@ export class Utility {
        * @param parent - parent node to receive node
        */
       static replaceAllNode(node: Node | null, parent: Node): void {
-        if (node)
-          Utility.Tree.Mutation.adoptNode(node, parent.ownerDocument)
+        if (node) {
+          if(!parent.ownerDocument)
+            throw DOMException.HierarchyRequestError
 
+          Utility.Tree.Mutation.adoptNode(node, parent.ownerDocument)
+        }
 
         let removedNodes: Node[] = []
         for (let childNode of parent.childNodes) {

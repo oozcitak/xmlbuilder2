@@ -96,11 +96,9 @@ export class Document extends Node {
    * elements
    */
   getElementsByTagName(qualifiedName: string): HTMLCollection {
-    let tempEle = this.createElement('temp')
-    for (let child of this.childNodes) {
-      Utility.Tree.Mutation.appendNode(child, tempEle)
-    }
-    return tempEle.getElementsByTagName(qualifiedName)
+    return new HTMLCollection(this, function(ele: Element) {
+      return (qualifiedName === '*' || ele.tagName === qualifiedName)
+    })
   }
 
   /**
@@ -116,11 +114,10 @@ export class Document extends Node {
    * elements
    */
   getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection {
-    let tempEle = this.createElement('temp')
-    for (let child of this.childNodes) {
-      Utility.Tree.Mutation.appendNode(child, tempEle)
-    }
-    return tempEle.getElementsByTagNameNS(namespace, localName)
+    return new HTMLCollection(this, function(ele: Element) {
+      return ((localName === '*' || ele.localName === localName) &&
+        (namespace === '*' || ele.namespaceURI === namespace))
+    })
   }
 
   /**
@@ -134,11 +131,18 @@ export class Document extends Node {
    * elements
    */
   getElementsByClassName(classNames: string): HTMLCollection {
-    let tempEle = this.createElement('temp')
-    for (let child of this.childNodes) {
-      Utility.Tree.Mutation.appendNode(child, tempEle)
-    }
-    return tempEle.getElementsByClassName(classNames)
+    let arr = Utility.OrderedSet.parse(classNames)
+    return new HTMLCollection(this, function(ele: Element) {
+      let classes = ele.classList
+      let allClassesFound = true
+      for (let className of arr) {
+        if (!classes.contains(className)) {
+          allClassesFound = false
+          break
+        }
+      }
+      return allClassesFound
+    })
   }
 
   /**
@@ -394,22 +398,22 @@ export class Document extends Node {
   /**
    * Returns the child elements.
    */
-  get children(): HTMLCollection { throw "" }
+  children(): HTMLCollection { throw "" }
   
   /**
    * Returns the first child that is an element, and `null` otherwise.
    */
-  get firstElementChild(): Element | null  { throw "" }
+  firstElementChild(): Element | null  { throw "" }
 
   /**
    * Returns the last child that is an element, and `null` otherwise.
    */
-  get lastElementChild(): Element | null  { throw "" }
+  lastElementChild(): Element | null  { throw "" }
 
   /**
    * Returns the number of children that are elements.
    */
-  get childElementCount(): number  { throw "" }
+  childElementCount(): number  { throw "" }
 
   /**
    * Prepends the list of nodes or strings before the first child node.

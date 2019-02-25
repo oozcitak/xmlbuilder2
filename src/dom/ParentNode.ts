@@ -15,8 +15,7 @@ export class ParentNode {
    * Returns the child elements.
    */
   get children(): HTMLCollection {
-    let nodes = <NodeList>(<Node><unknown>this).childNodes
-    return new HTMLCollection(nodes)
+    return new HTMLCollection(<Node><unknown>this)
   }
 
   /**

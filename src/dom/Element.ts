@@ -437,21 +437,9 @@ export class Element extends Node {
    * elements
    */
   getElementsByTagName(qualifiedName: string): HTMLCollection {
-    let matchAll = (qualifiedName == '*')
-
-    let list = new HTMLCollection()
-
-    Utility.Tree.forEachDescendant(this, { self: false, shadow: false },
-      function (node: Node) {
-        if (node.nodeType === Node.Element) {
-          let ele = <Element>node
-          if (matchAll || ele.tagName === qualifiedName)
-            list.push(ele)
-        }
-      }
-    )
-
-    return list
+    return new HTMLCollection(this, function(ele: Element) {
+      return (qualifiedName === '*' || ele.tagName === qualifiedName)
+    })
   }
 
   /**
@@ -467,23 +455,10 @@ export class Element extends Node {
    * elements
    */
   getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection {
-    let matchAllNamespace = (namespace == '*')
-    let matchAllLocalName = (localName == '*')
-
-    let list = new HTMLCollection()
-
-    Utility.Tree.forEachDescendant(this, { self: false, shadow: false },
-      function (node: Node) {
-        if (node.nodeType === Node.Element) {
-          let ele = <Element>node
-          if ((matchAllLocalName || ele.localName === localName) &&
-            (matchAllNamespace || ele.namespaceURI === namespace))
-            list.push(ele)
-        }
-      }
-    )
-
-    return list
+    return new HTMLCollection(this, function(ele: Element) {
+      return ((localName === '*' || ele.localName === localName) &&
+        (namespace === '*' || ele.namespaceURI === namespace))
+    })
   }
 
   /**
@@ -497,28 +472,18 @@ export class Element extends Node {
    * elements
    */
   getElementsByClassName(classNames: string): HTMLCollection {
-    let list = new HTMLCollection()
-
     let arr = Utility.OrderedSet.parse(classNames)
-    Utility.Tree.forEachDescendant(this, { self: false, shadow: false },
-      function (node: Node) {
-        if (node.nodeType === Node.Element) {
-          let ele = <Element>node
-          let classes = ele.classList
-          let allClassesFound = true
-          for (let className of arr) {
-            if (!classes.contains(className)) {
-              allClassesFound = false
-              break
-            }
-          }
-          if (allClassesFound)
-            list.push(ele)
+    return new HTMLCollection(this, function(ele: Element) {
+      let classes = ele.classList
+      let allClassesFound = true
+      for (let className of arr) {
+        if (!classes.contains(className)) {
+          allClassesFound = false
+          break
         }
       }
-    )
-
-    return list
+      return allClassesFound
+    })
   }
 
   /**
