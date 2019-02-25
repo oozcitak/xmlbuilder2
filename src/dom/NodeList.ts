@@ -3,10 +3,11 @@ import { Node } from "./Node"
 /**
  * Represents an ordered list of nodes.
  */
-export class NodeList implements Iterable<Node> {
+export class NodeList implements IterableIterator<Node> {
 
   _length = 0
   _parentNode: Node
+  _currentIterationNode: Node | null = null
 
   /**
    * Initializes a new instance of `NodeList`.
@@ -21,7 +22,7 @@ export class NodeList implements Iterable<Node> {
   get length(): number {
     return this._length
   }
-  
+
   /** 
    * Returns the node with index `index` from the collection.
    * 
@@ -53,73 +54,83 @@ export class NodeList implements Iterable<Node> {
   /**
    * Returns an iterator for node indices.
    */
-  keys(): any {
-    let list = this
-
+  keys(): IterableIterator<number> {
     return {
       _index: 0,
+      _node: this._parentNode.firstChild,
 
-      next: function () {
-        if (this._index < list.length) {
+      next(): IteratorResult<number> {
+        if (this._node ) {
+          this._node = this._node.nextSibling
           let item = this._index
           this._index++
           return { value: item, done: false }
         } else {
-          return { done: true }
+          return { done: true } as any as IteratorResult<number>
         }
       }
-    }
+    } as any as IterableIterator<number>
   }
 
   /**
    * Returns an iterator for nodes.
    */
-  values(): any {
-    let list = this
-
+  values(): IterableIterator<Node> {
     return {
       _node: this._parentNode.firstChild,
 
-      next: function () {
-        if (this._node !== null) {
+      next(): IteratorResult<Node> {
+        if (this._node) {
           let item = this._node
           this._node = this._node.nextSibling
           return { value: item, done: false }
         } else {
-          return { done: true }
+          return { done: true }as any as IteratorResult<Node>
         }
       }
-    }
+    } as any as IterableIterator<Node>
   }
 
   /**
    * Returns an iterator for indices and nodes.
    */
-  entries(): any {
-    let list = this
-
+  entries(): IterableIterator<[number, Node]> {
     return {
       _index: 0,
       _node: this._parentNode.firstChild,
 
-      next: function () {
-        if (this._node !== null) {
+      next(): IteratorResult<[number, Node]> {
+        if (this._node) {
           let item = [this._index, this._node]
           this._index++
           this._node = this._node.nextSibling
-          return { value: item, done: false }
+          return { value: item, done: false } as any as IteratorResult<[number, Node]>
         } else {
-          return { done: true }
+          return { done: true } as any as IteratorResult<[number, Node]>
         }
       }
-    }
+    } as any as IterableIterator<[number, Node]>
   }
 
   /**
    * Returns an iterator for the node list.
    */
-  [Symbol.iterator]() {
-    return new NodeList.NodeListIterator(this._parentNode.firstChild)
+  [Symbol.iterator](): IterableIterator<Node> {
+    this._currentIterationNode = this._parentNode.firstChild
+    return this
+  }
+
+  /**
+   * Iterates through child nodes.
+   */
+  next(): IteratorResult<Node> {
+    if (this._currentIterationNode) {
+      let node = this._currentIterationNode
+      this._currentIterationNode = this._currentIterationNode.nextSibling
+      return { done: false, value: node }
+    } else {
+      return { done: true, value: null } as any as IteratorResult<Node>
+    }
   }
 
   /**
@@ -132,35 +143,10 @@ export class NodeList implements Iterable<Node> {
    * @param callback - function to execute for each node 
    * @param thisArg - value to use as `this` when executing callback 
    */
-  forEach(callback: (node: string, index: number, list: NodeList) => any,
+  forEach(callback: (node: Node, index: number, list: NodeList) => any,
     thisArg: any): void {
     for (let item of this.entries()) {
       callback.call(thisArg, item[1], item[0], this)
-    }
-  }
-
-  /**
-   * Defines an iterator for the {@link NodeList}.
-   */
-  static NodeListIterator = class implements IterableIterator<Node> {
-    _currentNode: Node | null
-
-    constructor(startNode: Node | null) {
-      this._currentNode = startNode
-    }
-
-    next(): IteratorResult<Node> {
-      if (this._currentNode) {
-        let node = this._currentNode
-        this._currentNode = this._currentNode.nextSibling
-        return { done: false, value: node}
-      } else {
-        return { done: true, value: null} as any as IteratorResult<Node>
-      }
-    }
-
-    [Symbol.iterator](): IterableIterator<Node> {
-      return this;
     }
   }
 }
