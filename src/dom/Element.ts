@@ -8,6 +8,7 @@ import { NamedNodeMap } from './NamedNodeMap'
 import { DOMTokenList } from './DOMTokenList'
 import { Document } from './Document'
 import { Text } from './Text'
+import { ShadowRoot } from './ShadowRoot'
 
 /**
  * Represents an element node.
@@ -167,7 +168,7 @@ export class Element extends Node {
    * @param value - attribute value to set
    */
   setAttributeNS(namespace: string, qualifiedName: string, value: string): void {
-    let names = Utility.extractNames(namespace, qualifiedName)
+    let names = Utility.Namespace.extractNames(namespace, qualifiedName)
     let attr = this.attributes.getNamedItemNS(namespace, names.localName)
 
     if (attr) {
@@ -295,7 +296,7 @@ export class Element extends Node {
    * 
    * @param init - A ShadowRootInit dictionary.
    */
-  attachShadow(init: object): never {
+  attachShadow(init: object): ShadowRoot {
     throw DOMException.NotImplementedError
   }
 
@@ -306,7 +307,7 @@ export class Element extends Node {
    * This method is not supported by this module and will throw an
    * exception.
    */
-  get shadowRoot(): never {
+  get shadowRoot(): ShadowRoot | null {
     throw DOMException.NotImplementedError
   }
 
@@ -354,13 +355,7 @@ export class Element extends Node {
     if (value)
       node = new Text(this.ownerDocument, value)
 
-    if (node && this.ownerDocument)
-      this.ownerDocument.adoptNode(node)
-
-    this.childNodes.length = 0
-
-    if (node)
-      node.appendChild(node)
+    Utility.Tree.Mutation.replaceAllNode(node, this)
   }
 
   /**
@@ -446,13 +441,15 @@ export class Element extends Node {
 
     let list = new HTMLCollection()
 
-    Utility.forEachDescendant(this, function (node: Node) {
-      if (node.nodeType === Node.Element) {
-        let ele = <Element>node
-        if (matchAll || ele.tagName === qualifiedName)
-          list.push(ele)
+    Utility.Tree.forEachDescendant(this, { self: false, shadow: false },
+      function (node: Node) {
+        if (node.nodeType === Node.Element) {
+          let ele = <Element>node
+          if (matchAll || ele.tagName === qualifiedName)
+            list.push(ele)
+        }
       }
-    })
+    )
 
     return list
   }
@@ -475,14 +472,16 @@ export class Element extends Node {
 
     let list = new HTMLCollection()
 
-    Utility.forEachDescendant(this, function (node: Node) {
-      if (node.nodeType === Node.Element) {
-        let ele = <Element>node
-        if ((matchAllLocalName || ele.localName === localName) &&
-          (matchAllNamespace || ele.namespaceURI === namespace))
-          list.push(ele)
+    Utility.Tree.forEachDescendant(this, { self: false, shadow: false },
+      function (node: Node) {
+        if (node.nodeType === Node.Element) {
+          let ele = <Element>node
+          if ((matchAllLocalName || ele.localName === localName) &&
+            (matchAllNamespace || ele.namespaceURI === namespace))
+            list.push(ele)
+        }
       }
-    })
+    )
 
     return list
   }
@@ -501,21 +500,23 @@ export class Element extends Node {
     let list = new HTMLCollection()
 
     let arr = Utility.OrderedSet.parse(classNames)
-    Utility.forEachDescendant(this, function (node: Node) {
-      if (node.nodeType === Node.Element) {
-        let ele = <Element>node
-        let classes = ele.classList
-        let allClassesFound = true
-        for (let className of arr) {
-          if (!classes.contains(className)) {
-            allClassesFound = false
-            break
+    Utility.Tree.forEachDescendant(this, { self: false, shadow: false },
+      function (node: Node) {
+        if (node.nodeType === Node.Element) {
+          let ele = <Element>node
+          let classes = ele.classList
+          let allClassesFound = true
+          for (let className of arr) {
+            if (!classes.contains(className)) {
+              allClassesFound = false
+              break
+            }
           }
+          if (allClassesFound)
+            list.push(ele)
         }
-        if (allClassesFound)
-          list.push(ele)
       }
-    })
+    )
 
     return list
   }
@@ -632,7 +633,7 @@ export class Element extends Node {
       return this.namespaceURI
 
     for (let attr of this.attributes) {
-      if (attr.namespaceURI === DOMImplementation.Namespace.XMLNS) {
+      if (attr.namespaceURI === Utility.Namespace.XMLNS) {
         if ((attr.prefix === 'xmlns' && attr.localName === prefix) ||
           (!prefix && !attr.prefix && attr.localName == 'xmlns')) {
           return attr.value || null

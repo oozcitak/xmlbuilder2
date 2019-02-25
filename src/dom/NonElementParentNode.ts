@@ -9,7 +9,7 @@ export class NonElementParentNode {
    * @param id - the value of the `id` attribute to match
    */
   getElementById(id: string): Element | null {
-    let nodeFound = Utility.forEachDescendant(<Node><unknown>this, 
+    let nodeFound = Utility.Tree.forEachDescendant(<Node><unknown>this, {},
       function (node: Node) {
       if (node.nodeType === Node.Element && (<Element>node).id === id) {
           return node

@@ -15,6 +15,7 @@ import { Attr } from './Attr'
 import { NonElementParentNode } from './NonElementParentNode'
 import { DocumentOrShadowRoot } from './DocumentOrShadowRoot'
 import { ParentNode } from './ParentNode'
+import { ShadowRoot } from './ShadowRoot';
 
 /**
  * Represents a document node.
@@ -97,7 +98,7 @@ export class Document extends Node {
   getElementsByTagName(qualifiedName: string): HTMLCollection {
     let tempEle = this.createElement('temp')
     for (let child of this.childNodes) {
-      tempEle.childNodes.push(child)
+      Utility.Tree.Mutation.appendNode(child, tempEle)
     }
     return tempEle.getElementsByTagName(qualifiedName)
   }
@@ -117,7 +118,7 @@ export class Document extends Node {
   getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection {
     let tempEle = this.createElement('temp')
     for (let child of this.childNodes) {
-      tempEle.childNodes.push(child)
+      Utility.Tree.Mutation.appendNode(child, tempEle)
     }
     return tempEle.getElementsByTagNameNS(namespace, localName)
   }
@@ -135,7 +136,7 @@ export class Document extends Node {
   getElementsByClassName(classNames: string): HTMLCollection {
     let tempEle = this.createElement('temp')
     for (let child of this.childNodes) {
-      tempEle.childNodes.push(child)
+      Utility.Tree.Mutation.appendNode(child, tempEle)
     }
     return tempEle.getElementsByClassName(classNames)
   }
@@ -148,7 +149,7 @@ export class Document extends Node {
    * @returns the new {@link Element}
    */
   createElement(localName: string): Element {
-    if (!localName.match(DOMImplementation.XMLSpec.Name))
+    if (!localName.match(Utility.XMLSpec.Name))
       throw DOMException.InvalidCharacterError
 
     return new Element(this, localName, null, null)
@@ -164,7 +165,7 @@ export class Document extends Node {
    * @returns the new {@link Element}
    */
   createElementNS(namespace: string | null, qualifiedName: string): Element {
-    let names = Utility.extractNames(namespace, qualifiedName)
+    let names = Utility.Namespace.extractNames(namespace, qualifiedName)
 
     return new Element(this, names.localName, names.namespace,
       names.prefix)
@@ -224,7 +225,7 @@ export class Document extends Node {
    * @returns the new {@link ProcessingInstruction}
    */
   createProcessingInstruction(target: string, data: string): ProcessingInstruction {
-    if (!target.match(DOMImplementation.XMLSpec.Name))
+    if (!target.match(Utility.XMLSpec.Name))
       throw DOMException.InvalidCharacterError
     if (data.includes("?>"))
       throw DOMException.InvalidCharacterError
@@ -243,6 +244,9 @@ export class Document extends Node {
     if (node.nodeType === Node.Document)
       throw DOMException.NotSupportedError
 
+    if(node instanceof ShadowRoot)
+      throw DOMException.NotSupportedError
+
     return node.cloneNode(this, deep)
   }
 
@@ -257,24 +261,10 @@ export class Document extends Node {
     if (node.nodeType === Node.Document)
       throw DOMException.NotSupportedError
 
-    let oldDocument = node.ownerDocument
+    if(node instanceof ShadowRoot)
+      throw DOMException.HierarchyRequestError
 
-    if (node.parentNode)
-      node.parentNode.removeChild(node)
-
-    if (this !== oldDocument) {
-      node.ownerDocument = this
-      Utility.forEachDescendant(node,
-        (child) => {
-          child.ownerDocument = this
-          if (child.nodeType === Node.Element) {
-            let element = <Element>child
-            for (let att of element.attributes) {
-              att.ownerDocument = this
-            }
-          }
-        })
-    }
+    Utility.Tree.Mutation.adoptNode(node, this)
 
     return node
   }
@@ -287,7 +277,7 @@ export class Document extends Node {
    * @returns the new {@link Attr}
    */
   createAttribute(localName: string): Attr {
-    if (!localName.match(DOMImplementation.XMLSpec.Name))
+    if (!localName.match(Utility.XMLSpec.Name))
       throw DOMException.InvalidCharacterError
 
     return new Attr(this, null, localName, null, null, '')
@@ -303,7 +293,7 @@ export class Document extends Node {
    * @returns the new {@link Attr}
    */
   createAttributeNS(namespace: string, qualifiedName: string): Attr {
-    let names = Utility.extractNames(namespace, qualifiedName)
+    let names = Utility.Namespace.extractNames(namespace, qualifiedName)
 
     return new Attr(this, null, names.localName, names.namespace,
       names.prefix, '')
@@ -467,5 +457,5 @@ export class Document extends Node {
   protected convertNodesIntoNode(nodes: [Node | string], document: Document): Node { throw "" }
 }
 
-Utility.applyMixins(Document, 
+Utility.Internal.applyMixins(Document, 
   [NonElementParentNode, DocumentOrShadowRoot, ParentNode])

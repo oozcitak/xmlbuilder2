@@ -39,4 +39,4 @@ export class ShadowRoot extends DocumentFragment {
   get host(): Element { throw DOMException.NotSupportedError }
 }
 
-Utility.applyMixins(ShadowRoot, [DocumentOrShadowRoot])
+Utility.Internal.applyMixins(ShadowRoot, [DocumentOrShadowRoot])

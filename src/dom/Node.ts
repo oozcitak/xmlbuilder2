@@ -32,9 +32,13 @@ export abstract class Node {
   static readonly ContainedBy = 0x10
   static readonly ImplementationSpecific = 0x20
 
-  protected _parentNode: Node | null = null
-  protected _ownerDocument: Document | null = null
-  protected _childNodeList: NodeList = new NodeList()
+  _parentNode: Node | null = null
+  _firstChild: Node | null = null
+  _lastChild: Node | null = null
+  _previousSibling: Node | null = null
+  _nextSibling: Node | null = null
+  _ownerDocument: Document | null = null
+  protected _childNodeList: NodeList
 
   baseURI: string | undefined
 
@@ -45,6 +49,7 @@ export abstract class Node {
    */
   protected constructor(ownerDocument: Document | null = null) {
     this._ownerDocument = ownerDocument
+    this._childNodeList = new NodeList(this)
   }
 
   /** 
@@ -74,9 +79,6 @@ export abstract class Node {
   get ownerDocument(): Document | null {
     return this._ownerDocument
   }
-  set ownerDocument(value: Document | null) {
-    this._ownerDocument = value
-  }
 
   /**
    * Returns the root node.
@@ -86,12 +88,7 @@ export abstract class Node {
    * the node's root node.
    */
   getRootNode(options: object = { composed: false }): Node | null {
-    let root = <Node>this
-    let node = this.parentNode
-    while (node) {
-      [root, node] = [node, node.parentNode]
-    }
-    return root
+    return Utility.Tree.rootNode(this)
   }
 
   /** 
@@ -113,7 +110,7 @@ export abstract class Node {
    * Determines whether a node has any children.
    */
   hasChildNodes(): boolean {
-    return (this._childNodeList.length !== 0)
+    return (this.firstChild !== null)
   }
 
   /** 
@@ -125,30 +122,28 @@ export abstract class Node {
    * Returns the first child node. 
    */
   get firstChild(): Node | null {
-    return this._childNodeList[0] || null
+    return this._firstChild
   }
 
   /** 
    * Returns the last child node. 
    */
   get lastChild(): Node | null {
-    return this._childNodeList[this._childNodeList.length - 1] || null
+    return this._lastChild
   }
 
   /** 
    * Returns the previous sibling node. 
    */
   get previousSibling(): Node | null {
-    let index = this._childNodeList.indexOf(this)
-    return this._childNodeList[index - 1] || null
+    return this._previousSibling
   }
 
   /** 
    * Returns the next sibling node. 
    */
   get nextSibling(): Node | null {
-    let index = this._childNodeList.indexOf(this)
-    return this._childNodeList[index + 1] || null
+    return this._nextSibling
   }
 
   /** 
@@ -229,10 +224,14 @@ export abstract class Node {
       this.childNodes.length !== node.childNodes.length) {
       return false
     } else {
-      for (let i = 0; i < this.childNodes.length; i++) {
-        if (this.childNodes[i].isEqualNode(node.childNodes[i])) {
+      let n1 = this.firstChild
+      let n2 = node.firstChild
+      while (n1 && n2) {
+        if (!n1.isEqualNode(n2)) {
           return false
         }
+        n1 = n1.nextSibling
+        n2 = n2.nextSibling
       }
 
       return true
@@ -288,17 +287,17 @@ export abstract class Node {
       // Use a cached Math.random() value
     }
 
-    if ((!attr1 && Utility.isAncestorOf(node2, node1)) ||
+    if ((!attr1 && Utility.Tree.isAncestorOf(node2, node1)) ||
       (attr2 && (node1 === node2))) {
       return Node.Contains | Node.Preceding
     }
 
-    if ((!attr2 && Utility.isDescendantOf(node2, node1)) ||
+    if ((!attr2 && Utility.Tree.isDescendantOf(node2, node1)) ||
       (attr1 && (node1 === node2))) {
       return Node.ContainedBy | Node.Following
     }
 
-    if (Utility.isPreceding(node2, node1))
+    if (Utility.Tree.isPreceding(node2, node1))
       return Node.Preceding
 
     return Node.Following
@@ -312,7 +311,7 @@ export abstract class Node {
    */
   contains(node: Node | null): boolean {
     if (!node) return false
-    return ((node === this) || Utility.isDescendantOf(this, node))
+    return ((node === this) || Utility.Tree.isDescendantOf(this, node))
   }
 
   /**
@@ -377,36 +376,7 @@ export abstract class Node {
    */
   insertBefore(newChild: Node | DocumentFragment,
     refChild: Node | null): Node | null {
-    if (newChild.nodeType === Node.DocumentFragment) {
-      let lastInsertedNode = null
-
-      for (let childNode of newChild.childNodes)
-        lastInsertedNode = this.insertBefore(childNode, refChild)
-
-      return lastInsertedNode
-    }
-    else if (refChild) {
-      // remove newChild if it is already in the tree
-      let index = this.childNodes.indexOf(newChild)
-      if (index !== -1)
-        this.childNodes.splice(index, 1)
-      else
-        (<Node>newChild)._parentNode = this
-
-      // temporarily remove children starting *with* refChild
-      index = this.childNodes.indexOf(refChild)
-      let removed = this.childNodes.splice(index)
-
-      // add the new child
-      this.childNodes.push(newChild)
-
-      // add back removed children after new child
-      Array.prototype.push.apply(this.childNodes, removed)
-    }
-    else
-      this.childNodes.push(newChild)
-
-    return newChild
+    return Utility.Tree.Mutation.preInsert(newChild, this, refChild)
   }
 
   /**
@@ -423,27 +393,7 @@ export abstract class Node {
    * @returns the newly inserted child node
    */
   appendChild(newChild: Node): Node | null {
-    if (newChild.nodeType === Node.DocumentFragment) {
-      let lastInsertedNode = null
-
-      for (let childNode of newChild.childNodes)
-        lastInsertedNode = this.appendChild(childNode)
-
-      return lastInsertedNode
-    }
-    else {
-      // remove newChild if it is already in the tree
-      let index = this.childNodes.indexOf(newChild)
-      if (index !== -1)
-        this.childNodes.splice(index, 1)
-      else
-        newChild._parentNode = this
-
-      // add newChild
-      this.childNodes.push(newChild)
-
-      return newChild
-    }
+    return Utility.Tree.Mutation.appendNode(newChild, this)
   }
 
   /**
@@ -457,19 +407,7 @@ export abstract class Node {
    * @returns the removed child node
    */
   replaceChild(newChild: Node, oldChild: Node): Node {
-    // remove newChild if it is already in the tree
-    let index = this.childNodes.indexOf(newChild)
-    if (index !== -1)
-      this.childNodes.splice(index, 1)
-    else
-      newChild._parentNode = this
-
-    // find and replace oldChild
-    index = this.childNodes.indexOf(oldChild)
-    if (index !== -1)
-      this.childNodes[index] = newChild
-
-    return oldChild
+    return Utility.Tree.Mutation.replaceNode(newChild, oldChild, this)
   }
 
   /**
@@ -481,11 +419,7 @@ export abstract class Node {
   * @returns the removed child node
   */
   removeChild(oldChild: Node): Node {
-    let index = this.childNodes.indexOf(oldChild)
-    if (index !== -1)
-      this.childNodes.splice(index, 1)
-
-    return oldChild
+    return Utility.Tree.Mutation.preRemoveNode(oldChild, this)
   }
 
   /**

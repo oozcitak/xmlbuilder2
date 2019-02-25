@@ -47,13 +47,7 @@ export class DocumentFragment extends Node {
     if (value)
       node = new Text(this.ownerDocument, value)
 
-    if (node && this.ownerDocument)
-      this.ownerDocument.adoptNode(node)
-
-    this.childNodes.length = 0
-
-    if (node)
-      node.appendChild(node)
+    Utility.Tree.Mutation.replaceAllNode(node, this)
   }
 
   /**
@@ -115,4 +109,4 @@ export class DocumentFragment extends Node {
   getElementById(elementId: string): Element | null { return null }
 }
 
-Utility.applyMixins(Document, [NonElementParentNode])
+Utility.Internal.applyMixins(Document, [NonElementParentNode])

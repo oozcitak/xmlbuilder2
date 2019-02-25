@@ -15,27 +15,21 @@ export class ParentNode {
    * Returns the child elements.
    */
   get children(): HTMLCollection {
-    let items = new HTMLCollection()
     let nodes = <NodeList>(<Node><unknown>this).childNodes
-
-    for (let child of nodes) {
-      if (child.nodeType === Node.Element) {
-        items.push(<Element>child)
-      }
-    }
-    return items
+    return new HTMLCollection(nodes)
   }
 
   /**
    * Returns the first child that is an element, and `null` otherwise.
    */
   get firstElementChild(): Element | null {
-    let nodes = (<Node><unknown>this).childNodes
+    let node = (<Node><unknown>this).firstChild
 
-    for (let child of nodes) {
-      if (child.nodeType === Node.Element) {
-        return <Element>child
-      }
+    while (node) {
+      if (node.nodeType === Node.Element)
+        return <Element>node
+      else
+        node = node.nextSibling
     }
     return null
   }
@@ -44,16 +38,14 @@ export class ParentNode {
    * Returns the last child that is an element, and `null` otherwise.
    */
   get lastElementChild(): Element | null {
-    let nodes = (<Node><unknown>this).childNodes
-    let length = nodes.length
-    
-    for (let i = length - 1; i > 0; i--) {
-      let child = nodes[i]
-      if (child.nodeType === Node.Element) {
-        return <Element>child
-      }
-    }
+    let node = (<Node><unknown>this).lastChild
 
+    while (node) {
+      if (node.nodeType === Node.Element)
+        return <Element>node
+      else
+        node = node.previousSibling
+    }
     return null
   }
 
@@ -129,7 +121,7 @@ export class ParentNode {
   }
 
   /**
-   * Converts the given nodes or strings into a node (if there `nodes`
+   * Converts the given nodes or strings into a node (if `nodes`
    * has only one element) or a document fragment.
    * 
    * @param nodes - the array of nodes or strings
