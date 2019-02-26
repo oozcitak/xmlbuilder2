@@ -7,7 +7,7 @@ export class NodeList implements IterableIterator<Node> {
 
   _length = 0
   _parentNode: Node
-  _currentIterationNode: Node | null = null
+  private _currentIterationNode: Node | null = null
 
   /**
    * Initializes a new instance of `NodeList`.

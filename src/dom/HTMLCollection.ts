@@ -4,10 +4,12 @@ import { Node } from "./Node"
 /**
  * Represents a collection of elements.
  */
-export class HTMLCollection {
+export class HTMLCollection implements IterableIterator<Element> {
+
   protected _parent: Node
   protected _filter: (element: Element) => any
-    
+  private _currentIterationNode: Node | null = null
+
   /**
    * Initializes a new instance of `HTMLCollection`.
    *
@@ -69,24 +71,27 @@ export class HTMLCollection {
   /**
    * Returns an iterator for nodes.
    */
-  [Symbol.iterator](): any {
-    let node = this._parent.firstChild
-    let filter = this._filter
+  [Symbol.iterator](): IterableIterator<Element> {
+    this._currentIterationNode = this._parent.firstChild
+    return this
+  }
 
-    return {
-      next: function () {
-        if (node) {
-          while (node && (node.nodeType !== Node.Element || !filter(<Element>node))) {
-            node = node.nextSibling
-          }
-          if (node)
-            return { done: false, value: <Element>node }
-          else
-            return { done: true }
-        } else {
-            return { done: true }
-        }
+  /**
+   * Iterates through child nodes.
+   */
+  next(): IteratorResult<Element> {
+    let ele = this._currentIterationNode
+    if (this._currentIterationNode) {
+      while (ele && (ele.nodeType !== Node.Element || !this._filter(<Element>ele))) {
+        this._currentIterationNode = this._currentIterationNode.nextSibling
+        ele = this._currentIterationNode
       }
+      if (ele)
+        return { done: false, value: <Element>ele }
+      else
+        return { done: true } as any as IteratorResult<Element>
+    } else {
+      return { done: true } as any as IteratorResult<Element>
     }
   }
 
