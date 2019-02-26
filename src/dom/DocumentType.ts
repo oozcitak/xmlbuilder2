@@ -1,6 +1,8 @@
 import { Node } from "./Node"
 import { Document } from "./Document"
 
+const inspect = Symbol.for('nodejs.util.inspect.custom')
+
 /**
  * Represents an object providing methods which are not dependent on 
  * any particular document
@@ -26,6 +28,10 @@ export class DocumentType extends Node {
     this._nodeName = name
     this._publicId = publicId
     this._systemId = systemId
+  }
+
+  [inspect](): string {
+    return `!DOCTYPE ${this.name} pubId: ${this.publicId} sysId: ${this.systemId}`
   }
 
   /** 

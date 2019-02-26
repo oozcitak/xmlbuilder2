@@ -80,14 +80,12 @@ export class HTMLCollection implements IterableIterator<Element> {
    * Iterates through child nodes.
    */
   next(): IteratorResult<Element> {
-    let ele = this._currentIterationNode
     if (this._currentIterationNode) {
-      while (ele && (ele.nodeType !== Node.Element || !this._filter(<Element>ele))) {
+      while (this._currentIterationNode && (this._currentIterationNode.nodeType !== Node.Element || !this._filter(<Element>this._currentIterationNode))) {
         this._currentIterationNode = this._currentIterationNode.nextSibling
-        ele = this._currentIterationNode
       }
-      if (ele)
-        return { done: false, value: <Element>ele }
+      if (this._currentIterationNode)
+        return { done: false, value: <Element>this._currentIterationNode }
       else
         return { done: true } as any as IteratorResult<Element>
     } else {

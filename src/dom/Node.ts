@@ -77,7 +77,10 @@ export abstract class Node {
    * Returns the parent document. 
    */
   get ownerDocument(): Document | null {
-    return this._ownerDocument
+    if (this.nodeType === Node.Document)
+      return <Document><unknown>this
+    else
+      return this._ownerDocument
   }
 
   /**

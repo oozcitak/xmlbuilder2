@@ -109,4 +109,4 @@ export class DocumentFragment extends Node {
   getElementById(elementId: string): Element | null { return null }
 }
 
-Utility.Internal.applyMixins(Document, [NonElementParentNode])
+//Utility.Internal.applyMixins(Document, [NonElementParentNode])

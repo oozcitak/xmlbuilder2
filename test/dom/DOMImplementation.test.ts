@@ -19,7 +19,7 @@ describe('DOMImplementation', function () {
     expect(doc.documentElement).toBeDefined()
     if (doc.documentElement)
       expect(doc.documentElement.namespaceURI).toBe('myns')
-    expect(doc.doctype).toBeDefined()
+    expect(doc.doctype).not.toBeNull()
     expect(doc.contentType).toBe('application/xml')
     if (doc.doctype) {
       expect(doc.doctype.nodeName).toBe('qname')

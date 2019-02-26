@@ -461,5 +461,5 @@ export class Document extends Node {
   protected convertNodesIntoNode(nodes: [Node | string], document: Document): Node { throw "" }
 }
 
-Utility.Internal.applyMixins(Document, 
-  [NonElementParentNode, DocumentOrShadowRoot, ParentNode])
+//Utility.Internal.applyMixins(Document, 
+//  [NonElementParentNode, DocumentOrShadowRoot, ParentNode])

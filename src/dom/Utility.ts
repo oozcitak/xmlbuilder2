@@ -521,7 +521,7 @@ export class Utility {
        * @param child - child node to insert node before
        */
       static preInsert(node: Node, parent: Node, child: Node | null): Node {
-        Utility.Tree.Mutation.ensurePreInsertionValidity(parent, node, child)
+        Utility.Tree.Mutation.ensurePreInsertionValidity(node, parent, child)
         if (!parent.ownerDocument)
           throw DOMException.HierarchyRequestError
 

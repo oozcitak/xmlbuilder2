@@ -9,6 +9,7 @@ describe('Document', function () {
 
     expect(doc.nodeType).toBe(Node.Document)
     expect(doc.nodeName).toBe('#document')
+    expect(doc.documentElement).not.toBeNull()
     if (doc.documentElement) {
       expect(doc.documentElement.nodeType).toBe(Node.Element)
       expect(doc.documentElement.nodeName).toBe('node_with_id')
