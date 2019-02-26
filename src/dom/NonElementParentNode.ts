@@ -10,9 +10,9 @@ export class NonElementParentNode {
    */
   getElementById(id: string): Element | null {
     let nodeFound = Utility.Tree.forEachDescendant(<Node><unknown>this, {},
-      function (node: Node) {
-      if (node.nodeType === Node.Element && (<Element>node).id === id) {
-          return node
+      function (node: Node): Element | undefined {
+        if (node.nodeType === Node.Element && (<Element>node).id === id) {
+          return <Element>node
       }
     })
 
