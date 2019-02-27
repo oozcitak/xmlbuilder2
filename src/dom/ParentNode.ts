@@ -1,11 +1,10 @@
 import { Node } from './Node'
 import { HTMLCollection } from './HTMLCollection'
 import { Element } from './Element'
-import { Text } from './Text'
 import { DocumentFragment } from './DocumentFragment'
-import { Document } from './Document';
-import { DOMException } from './DOMException';
-import { NodeList } from './NodeList';
+import { Document } from './Document'
+import { DOMException } from './DOMException'
+import { NodeList } from './NodeList'
 import { Utility } from './Utility'
 
 /**
@@ -78,7 +77,7 @@ class ParentNode {
     let node = <Node><unknown>this
 
     if(node.ownerDocument) {
-      let childNode = this.convertNodesIntoNode(nodes, node.ownerDocument)
+      let childNode = Utility.Tree.Mutation.convertNodesIntoNode(nodes, node.ownerDocument)
       node.insertBefore(childNode, node.firstChild)
     }
   }
@@ -93,7 +92,7 @@ class ParentNode {
     let node = <Node><unknown>this
 
     if(node.ownerDocument) {
-      let childNode = this.convertNodesIntoNode(nodes, node.ownerDocument)
+      let childNode = Utility.Tree.Mutation.convertNodesIntoNode(nodes, node.ownerDocument)
       node.appendChild(childNode)
     }
   }
@@ -121,36 +120,6 @@ class ParentNode {
    */
   querySelectorAll(selectors: string): NodeList {
     throw DOMException.NotSupportedError
-  }
-
-  /**
-   * Converts the given nodes or strings into a node (if `nodes`
-   * has only one element) or a document fragment.
-   * 
-   * @param nodes - the array of nodes or strings
-   */
-  protected convertNodesIntoNode(nodes: [Node | string], document: Document): Node {
-    let node = <Node><unknown>this
-    if (nodes.length === 1)
-    {
-      if (typeof nodes[0] === 'string')
-        return new Text(node.ownerDocument, nodes[0])
-      else
-        return <Node>nodes[0]
-    }
-    else
-    {
-      let fragment = new DocumentFragment(node.ownerDocument)
-
-      for(let child of nodes) {
-        if (typeof child === 'string')
-          fragment.appendChild(new Text(node.ownerDocument, child))
-        else
-          fragment.appendChild(node)
-      }
-
-      return fragment
-    }
   }
 }
 

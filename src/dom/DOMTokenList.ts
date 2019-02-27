@@ -1,6 +1,6 @@
 import { Element } from "./Element"
 import { DOMException } from "./DOMException"
-import { Utility } from "./Utility";
+import { Utility } from "./Utility"
 
 /**
  * Represents a token set.

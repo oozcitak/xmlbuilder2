@@ -5,7 +5,7 @@ describe('Document', function () {
     let doc = new Document()
     let ele = doc.createElement('node_with_id')
     ele.id = 'uniq'
-    doc.appendChild(ele);
+    doc.appendChild(ele)
 
     expect(doc.nodeType).toBe(Node.Document)
     expect(doc.nodeName).toBe('#document')

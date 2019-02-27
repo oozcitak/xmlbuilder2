@@ -49,9 +49,11 @@
         "DocumentFragment.ts",
         "ShadowRoot.ts",
         "Element.ts",
+        "DocumentType.ts",
         "NonElementParentNode.ts",
         "DocumentOrShadowRoot.ts",
-        "ParentNode.ts"
+        "ParentNode.ts",
+        "ChildNode.ts"
       ],
       "removeImports": true,
       "deleteText": true

@@ -1,9 +1,11 @@
 import { Node } from './Node'
 import { DOMException } from './DOMException'
 import { CharacterData } from './CharacterData'
-import { ShadowRoot } from './ShadowRoot';
-import { Document } from './Document';
-import { Element } from './Element';
+import { ShadowRoot } from './ShadowRoot'
+import { Document } from './Document'
+import { DocumentFragment } from './DocumentFragment'
+import { Text } from './Text'
+import { Element } from './Element'
 
 export class Utility {
 
@@ -928,6 +930,35 @@ export class Utility {
          * If node is a Text node, then run the child text content 
          * change steps for parent.
          */
+      }
+
+      /**
+       * Converts the given nodes or strings into a node (if `nodes` has
+       * only one element) or a document fragment.
+       * 
+       * @param nodes - the array of nodes or strings
+       */
+      static convertNodesIntoNode(nodes: [Node | string], document: Document): Node {
+        if (nodes.length === 1)
+        {
+          if (typeof nodes[0] === 'string')
+            return new Text(document, nodes[0])
+          else
+            return <Node>nodes[0]
+        }
+        else
+        {
+          let fragment = new DocumentFragment(document)
+    
+          for(let child of nodes) {
+            if (typeof child === 'string')
+              fragment.appendChild(new Text(document, child))
+            else
+              fragment.appendChild(child)
+          }
+    
+          return fragment
+        }
       }
     }
   }

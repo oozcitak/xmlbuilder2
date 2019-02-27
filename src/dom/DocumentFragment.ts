@@ -3,7 +3,6 @@ import { Document } from "./Document"
 import { Text } from "./Text"
 import { Utility } from "./Utility"
 import { Element } from "./Element"
-import { NonElementParentNode } from './NonElementParentNode'
 
 /**
  * Represents a document fragment in the XML tree.
@@ -108,5 +107,3 @@ export class DocumentFragment extends Node {
    */
   getElementById(elementId: string): Element | null { return null }
 }
-
-//Utility.Internal.applyMixins(Document, [NonElementParentNode])

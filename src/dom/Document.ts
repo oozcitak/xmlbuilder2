@@ -12,9 +12,6 @@ import { NodeFilter } from './NodeFilter'
 import { CDATASection } from './CDATASection'
 import { Text } from './Text'
 import { Attr } from './Attr'
-import { NonElementParentNode } from './NonElementParentNode'
-import { DocumentOrShadowRoot } from './DocumentOrShadowRoot'
-import { ParentNode } from './ParentNode'
 import { ShadowRoot } from './ShadowRoot';
 
 /**
@@ -460,6 +457,3 @@ export class Document extends Node {
    */
   protected convertNodesIntoNode(nodes: [Node | string], document: Document): Node { throw "" }
 }
-
-//Utility.Internal.applyMixins(Document, 
-//  [NonElementParentNode, DocumentOrShadowRoot, ParentNode])
