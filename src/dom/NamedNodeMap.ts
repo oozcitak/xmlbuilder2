@@ -4,14 +4,26 @@ import { DOMException } from "./DOMException"
 /**
  * Represents a collection of nodes.
  */
-export class NamedNodeMap extends Array<Attr> {
+export class NamedNodeMap implements IterableIterator<Attr> {
+
+  protected _items: Array<Attr>
+  private _currentIterationIndex = 0
+
+  constructor() {
+    this._items = new Array<Attr>()
+  }
+
+  /** 
+   * Returns the number of attribute in the collection.
+   */
+  get length(): number { return this._items.length }
 
   /** 
    * Returns the attribute with index `index` from the collection.
    * 
    * @param index - the zero-based index of the attribute to return
    */
-  item(index: number): Attr | null { return this[index] || null }
+  item(index: number): Attr | null { return this._items[index] || null }
 
   /**
    * Returns the attribute with the given `qualifiedName`.
@@ -19,7 +31,7 @@ export class NamedNodeMap extends Array<Attr> {
    * @param qualifiedName - qualified name to search for
    */
   getNamedItem(qualifiedName: string): Attr | null {
-    for (let att of this) {
+    for (let att of this._items) {
       if (att.name === qualifiedName) return att
     }
     return null
@@ -33,7 +45,7 @@ export class NamedNodeMap extends Array<Attr> {
    * @param localName - local name to search for
    */
   getNamedItemNS(namespace: string, localName: string): Attr | null {
-    for (let att of this) {
+    for (let att of this._items) {
       if (att.namespaceURI === namespace && att.localName === localName)
         return att
     }
@@ -52,10 +64,10 @@ export class NamedNodeMap extends Array<Attr> {
     let oldAttr = this.getNamedItemNS(attr.namespaceURI || '', attr.localName)
     if (oldAttr === attr) return attr
     if (oldAttr) {
-      let index = this.indexOf(oldAttr)
-      this[index] = attr
+      let index = this._items.indexOf(oldAttr)
+      this._items[index] = attr
     } else {
-      this.push(attr)
+      this._items.push(attr)
     }
 
     return oldAttr
@@ -78,7 +90,7 @@ export class NamedNodeMap extends Array<Attr> {
   removeNamedItem(qualifiedName: string): Attr {
     let index = -1
     for (let i = 0; i < this.length; i++) {
-      let att = this[i]
+      let att = this._items[i]
       if (att.name === qualifiedName) {
         index = i
         break
@@ -88,8 +100,8 @@ export class NamedNodeMap extends Array<Attr> {
     if (index === -1)
       throw DOMException.NotFoundError
 
-    let removed = this[index]
-    this.splice(index, 1)
+    let removed = this._items[index]
+    this._items.splice(index, 1)
     return removed
   }
 
@@ -103,7 +115,7 @@ export class NamedNodeMap extends Array<Attr> {
   removeNamedItemNS(namespace: string, localName: string): Attr {
     let index = -1
     for (let i = 0; i < this.length; i++) {
-      let att = this[i]
+      let att = this._items[i]
       if (att.namespaceURI === namespace && att.localName === localName) {
         index = i
         break
@@ -113,8 +125,29 @@ export class NamedNodeMap extends Array<Attr> {
     if (index === -1)
       throw DOMException.NotFoundError
 
-    let removed = this[index]
-    this.splice(index, 1)
+    let removed = this._items[index]
+    this._items.splice(index, 1)
     return removed
+  }
+
+  /**
+   * Returns an iterator for nodes.
+   */
+  [Symbol.iterator](): IterableIterator<Attr> {
+    this._currentIterationIndex = 0
+    return this
+  }
+
+  /**
+   * Iterates through child nodes.
+   */
+  next(): IteratorResult<Attr> {
+    if (this._currentIterationIndex < this._items.length) {
+        let item = this._items[this._currentIterationIndex]
+        this._currentIterationIndex++
+        return { done: false, value: item }
+    } else {
+      return { done: true } as any as IteratorResult<Attr>
+    }
   }
 }

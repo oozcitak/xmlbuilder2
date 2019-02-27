@@ -413,11 +413,12 @@ export class Element extends Node {
       return false
     } else {
       for (let i = 0; i < this.attributes.length; i++) {
-        let att1 = this.attributes[i]
-        let att2 = other.attributes[i]
-        if (att1.namespaceURI !== att2.namespaceURI ||
+        let att1 = this.attributes.item(i)
+        let att2 = other.attributes.item(i)
+        if (att1 && att2 && (
+          att1.namespaceURI !== att2.namespaceURI ||
           att1.localName !== att2.localName ||
-          att1.value !== att2.value) {
+          att1.value !== att2.value)) {
           return false
         }
       }

@@ -15,7 +15,7 @@ class ChildNode {
    * Inserts nodes just before this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  before(nodes: [Node | string]): void {
+  before(nodes: Array<Node | string>): void {
     let context = <Node><unknown>this
 
     let parent = context.parentNode
@@ -51,7 +51,7 @@ class ChildNode {
    * Inserts nodes just after this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  after(nodes: [Node | string]): void {
+  after(nodes: Array<Node | string>): void {
     let context = <Node><unknown>this
 
     let parent = context.parentNode
@@ -82,7 +82,7 @@ class ChildNode {
    * Replaces nodes with this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  replaceWith(nodes: [Node | string]): void {
+  replaceWith(nodes: Array<Node | string>): void {
     let context = <Node><unknown>this
 
     let parent = context.parentNode

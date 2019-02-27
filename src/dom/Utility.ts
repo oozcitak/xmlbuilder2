@@ -558,8 +558,9 @@ export class Utility {
             if (inclusiveDescendant.nodeType === Node.Element) {
               let ele = <Element>node
               for (let i = 0; i < ele.attributes.length; i++) {
-                let attr = ele.attributes[i]
-                attr._ownerDocument = document
+                let attr = ele.attributes.item(i)
+                if(attr)
+                  attr._ownerDocument = document
               }
             }
 
@@ -938,11 +939,11 @@ export class Utility {
        * 
        * @param nodes - the array of nodes or strings
        */
-      static convertNodesIntoNode(nodes: [Node | string], document: Document): Node {
+      static convertNodesIntoNode(nodes: Array<Node | string>, document: Document): Node {
         if (nodes.length === 1)
         {
           if (typeof nodes[0] === 'string')
-            return new Text(document, nodes[0])
+            return new Text(document, <string>nodes[0])
           else
             return <Node>nodes[0]
         }
