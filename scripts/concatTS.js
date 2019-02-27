@@ -128,6 +128,9 @@ const ConcatTS = class ConcatTS {
 
     // list all TypeScript files in the `sourceDir` directory
     const absSourceDir = path.resolve(__dirname, '..', entry.sourceDir);
+    if (!fs.existsSync(absSourceDir))
+      throw new Error(`Source directory ${entry.sourceDir} (${absSourceDir}) does not exist.`);
+
     const sourceFiles = this.getFiles(absSourceDir, entry);
     const absSourceFiles = [];
     for (const file of sourceFiles) {
@@ -154,6 +157,8 @@ const ConcatTS = class ConcatTS {
     for (let i = 0; i < sourceFiles.length; i++) {
       const file = sourceFiles[i];
       const absSourceFile = absSourceFiles[i];
+      if (!fs.existsSync(absSourceFile))
+        throw new Error(`Source file ${file} (${absSourceFile}) does not exist.`);
 
       // header
       outputStream.write('\n\n');

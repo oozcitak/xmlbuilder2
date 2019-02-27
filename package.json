@@ -40,6 +40,7 @@
       "sourceDir": "./src/dom",
       "outputFile": "./lib/dom.ts",
       "order": [
+        "DOMException.ts",
         "Node.ts",
         "CharacterData.ts",
         "Text.ts",
@@ -53,7 +54,8 @@
         "NonElementParentNode.ts",
         "DocumentOrShadowRoot.ts",
         "ParentNode.ts",
-        "ChildNode.ts"
+        "ChildNode.ts",
+        "Slotable.ts"
       ],
       "removeImports": true,
       "deleteText": true

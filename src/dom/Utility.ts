@@ -1133,7 +1133,7 @@ export class Utility {
      * Applies the given mixin classes to a base class.
      * 
      * @param derivedCtor - base class constructor
-     * @param baseCtors - mixin constructor
+     * @param baseCtor - mixin constructor
      */
     static applyMixin(derivedCtor: any, baseCtor: any): void {
       Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
