@@ -1,7 +1,9 @@
 import { DocumentType } from "./DocumentType"
-import { DOMException } from "./DOMException"
+import { Element } from "./Element"
 import { Document } from "./Document"
+import { XMLDocument } from "./XMLDocument"
 import { Utility } from "./Utility"
+import { Text } from "./Text"
 
 /**
  * Represents an object providing methods which are not dependent on 
@@ -24,15 +26,15 @@ export class DOMImplementation {
   }
 
   /**
-   * Creates and returns a {@link Document}.
+   * Creates and returns an {@link XMLDocument}.
    * 
    * @param namespace - the namespace of the document element
    * @param qualifiedName - the qualified name of the document element
    * @param doctype - a {@link DocType} to assign to this document
    */
   createDocument(namespace: string, qualifiedName: string,
-    doctype: DocumentType | null = null): Document {
-    let document = new Document()
+    doctype: DocumentType | null = null): XMLDocument {
+    let document = new XMLDocument()
 
     if (doctype)
       document.appendChild(doctype)
@@ -56,13 +58,35 @@ export class DOMImplementation {
   /**
    * Creates and returns a HTML document.
    * 
-   * This method is not supported by this module and will throw an
-   * exception.
-   * 
    * @param title - document title
    */
-  createHTMLDocument(title: string = ''): never {
-    throw DOMException.NotImplementedError
+  createHTMLDocument(title: string | undefined = undefined): Document {
+    let document = new Document()
+    document.contentType = 'text/html'
+  
+    let doctype = new DocumentType(document, 'html')
+    document.appendChild(doctype)
+  
+    let htmlElement = new Element(document, 'html', Utility.Namespace.HTML)
+    document.appendChild(htmlElement)
+
+    let headElement = new Element(document, 'head', Utility.Namespace.HTML)
+    htmlElement.appendChild(headElement)
+
+    if(title !== undefined) {
+      let titleElement = new Element(document, 'title', Utility.Namespace.HTML)
+      headElement.appendChild(titleElement)
+      let textElement = new Text(document, title)
+      titleElement.appendChild(textElement)
+    }
+
+    let bodyElement = new Element(document, 'body', Utility.Namespace.HTML)
+    htmlElement.appendChild(bodyElement)
+
+    // document’s content type is determined by namespace
+    document.contentType = 'application/xhtml+xml'
+
+    return document
   }
 
   /**

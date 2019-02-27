@@ -47,6 +47,7 @@
         "Utility.ts",
         "HTMLCollection.ts",
         "Document.ts",
+        "XMLDocument.ts",
         "DocumentFragment.ts",
         "ShadowRoot.ts",
         "Element.ts",
