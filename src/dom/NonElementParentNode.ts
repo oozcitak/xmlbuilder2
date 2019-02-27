@@ -1,8 +1,14 @@
 import { Utility } from './Utility'
 import { Node } from './Node'
 import { Element } from './Element'
+import { Document } from './Document'
+import { DocumentFragment } from './DocumentFragment'
 
-export class NonElementParentNode {
+/**
+ * Represents a mixin that extends non-element parent nodes. This mixin
+ * is imlpemented by {@link Document} and {@link DocumentFragment}.
+ */
+class NonElementParentNode {
   /**
    * Returns an {@link Element}  who has an id attribute `elementId`.
    * 
@@ -19,3 +25,7 @@ export class NonElementParentNode {
     return nodeFound
   }
 }
+
+// Apply mixins
+Utility.Internal.applyMixin(Document, NonElementParentNode)
+Utility.Internal.applyMixin(DocumentFragment, NonElementParentNode)

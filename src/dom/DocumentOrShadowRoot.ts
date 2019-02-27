@@ -1,7 +1,16 @@
+import { Utility } from './Utility'
+import { Document } from './Document'
+import { ShadowRoot } from './ShadowRoot'
+
 /**
- * Represents an interface to be used to share APIs between documents 
- * and shadow roots.
+ * Represents a mixin for an interface to be used to share APIs between
+ * documents and shadow roots. This mixin is implemented by
+ * {@link Document} and {@link ShadowRoot}.
  */
-export class DocumentOrShadowRoot {
+class DocumentOrShadowRoot {
 
 }
+
+// Apply mixins
+Utility.Internal.applyMixin(Document, DocumentOrShadowRoot)
+Utility.Internal.applyMixin(ShadowRoot, DocumentOrShadowRoot)

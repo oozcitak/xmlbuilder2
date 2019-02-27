@@ -6,11 +6,14 @@ import { DocumentFragment } from './DocumentFragment'
 import { Document } from './Document';
 import { DOMException } from './DOMException';
 import { NodeList } from './NodeList';
+import { Utility } from './Utility'
 
 /**
- * Represents a node that can have children.
+ * Represents a mixin that extends parent nodes that can have children.
+ * This mixin is implemented by {@link Element}, {@link Document} and
+ * {@link DocumentFragment}.
  */
-export class ParentNode {
+class ParentNode {
   /**
    * Returns the child elements.
    */
@@ -52,13 +55,14 @@ export class ParentNode {
    * Returns the number of children that are elements.
    */
   get childElementCount(): number {
-    let nodes = (<Node><unknown>this).childNodes
+    let node = (<Node><unknown>this).firstChild
     let count = 0
 
-    for (let child of nodes) {
-      if (child.nodeType === Node.Element) {
+    while (node) {
+      if (node.nodeType === Node.Element)
         count++
-      }
+      
+      node = node.nextSibling
     }
   
     return count
@@ -149,3 +153,8 @@ export class ParentNode {
     }
   }
 }
+
+// Apply mixins
+Utility.Internal.applyMixin(Document, ParentNode)
+Utility.Internal.applyMixin(DocumentFragment, ParentNode)
+Utility.Internal.applyMixin(Element, ParentNode)

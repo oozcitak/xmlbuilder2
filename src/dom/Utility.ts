@@ -1093,4 +1093,21 @@ export class Utility {
       }
     }
   }
+
+  /**
+   * Contains internal functions used by the module.
+   */
+  static Internal = class {
+    /**
+     * Applies the given mixin classes to a base class.
+     * 
+     * @param derivedCtor - base class constructor
+     * @param baseCtors - mixin constructor
+     */
+    static applyMixin(derivedCtor: any, baseCtor: any): void {
+      Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+        derivedCtor.prototype[name] = baseCtor.prototype[name]
+      })
+    }
+  }
 }

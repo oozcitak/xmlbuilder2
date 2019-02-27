@@ -44,11 +44,14 @@
         "CharacterData.ts",
         "Text.ts",
         "Utility.ts",
+        "HTMLCollection.ts",
+        "Document.ts",
+        "DocumentFragment.ts",
+        "ShadowRoot.ts",
+        "Element.ts",
         "NonElementParentNode.ts",
         "DocumentOrShadowRoot.ts",
-        "HTMLCollection.ts",
-        "ParentNode.ts",
-        "Document.ts"
+        "ParentNode.ts"
       ],
       "removeImports": true,
       "deleteText": true
