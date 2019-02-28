@@ -424,23 +424,4 @@ export abstract class Node {
   removeChild(oldChild: Node): Node {
     return Utility.Tree.Mutation.preRemoveNode(oldChild, this)
   }
-
-  /**
-   * Returns the debug string for this node
-   *
-   * @param name - optional node name
-   */
-  debugInfo(name?: string): string {
-    name = name || this.nodeName
-    let parentName = this.parentNode ? this.parentNode.nodeName : ''
-
-    if (!name && !parentName)
-      return ''
-    else if (!name)
-      return `parent: <${parentName}>`
-    else if (!parentName)
-      return `node: <${name}>`
-    else
-      return `node: <${name}>, parent: <${parentName}>`
-  }
 }
