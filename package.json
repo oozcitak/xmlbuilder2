@@ -25,16 +25,17 @@
   "devDependencies": {
     "typescript": "*",
     "jest": "*",
+    "ts-jest": "*",
+    "dedent": "*",
     "@types/jest": "*",
-    "ts-jest": "*"
+    "@types/dedent": "*"
   },
   "jest": {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "/test/.*\\.test\\.(jsx?|tsx?)$",
-    "testEnvironment": "node",
-    "setupFiles": [ "<rootDir>/test/globals.ts" ]
+    "testEnvironment": "node"
   },
   "concatTS": [
     {
