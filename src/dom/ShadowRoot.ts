@@ -2,8 +2,6 @@ import { Element } from "./Element"
 import { Document } from "./Document"
 import { DocumentFragment } from "./DocumentFragment"
 import { DOMException } from "./DOMException"
-import { Utility } from './Utility'
-import { DocumentOrShadowRoot } from './DocumentOrShadowRoot'
 
 /**
  * Represents a shadow root.

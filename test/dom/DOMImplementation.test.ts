@@ -1,7 +1,7 @@
 import $$ from '../TestHelpers'
 
 describe('DOMImplementation', function () {
-  test('new DOMImplementation()', function () {
+  test('hasFeature()', function () {
     expect($$.dom.hasFeature()).toBe(true)
   })
 

@@ -5,8 +5,8 @@ import { Node } from "./Node"
  */
 export class NodeList implements IterableIterator<Node> {
 
-  _length = 0
-  _parentNode: Node
+  _length = 0 // internal
+  protected _parentNode: Node
   private _currentIterationNode: Node | null = null
 
   /**

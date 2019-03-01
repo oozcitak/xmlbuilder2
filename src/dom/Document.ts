@@ -19,21 +19,38 @@ import { ShadowRoot } from './ShadowRoot';
  */
 export class Document extends Node {
 
-  URL: string | undefined
-  documentURI: string | undefined
-  origin: string | undefined
-  compatMode: string | undefined
-  characterSet: string | undefined
-  charset: string | undefined
-  inputEncoding: string | undefined
-  contentType: string | undefined
-
   /**
    * Initializes a new instance of `Document`.
    */
   public constructor() {
     super(null)
   }
+
+  /**
+   * Gets or sets the document's URL.
+   */
+  URL: string = 'about:blank'
+
+  /**
+   * Gets or sets the document's origin.
+   */
+  origin: string = ''
+
+  /**
+   * Gets or sets whether the document is rendered in Quirks mode or
+   * Standards mode.
+   */
+  compatMode: string = 'CSS1Compat'
+
+  /**
+   * Gets or sets the character set.
+   */
+  characterSet: string = 'UTF-8'
+
+  /**
+   * Gets or sets the MIME type of the document.
+   */
+  contentType: string = 'application/xml'
 
   /** 
    * Returns the type of node. 
@@ -52,6 +69,24 @@ export class Document extends Node {
   get implementation(): DOMImplementation {
     return new DOMImplementation()
   }
+
+  /**
+   * Gets or sets the document's URL.
+   */
+  get documentURI(): string { return this.URL }
+  set documentURI(value: string) { this.URL = value }
+
+  /**
+   * Gets or sets the character set.
+   */
+  get charset(): string { return this.characterSet }
+  set charset(value: string) { this.characterSet = value }
+
+  /**
+   * Returns the character set.
+   */
+  get inputEncoding(): string { return this.characterSet }
+  set inputEncoding(value: string) { this.characterSet = value }
 
   /** 
    * Returns the {@link DocType} or `null` if there is none.

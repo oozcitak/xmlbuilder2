@@ -40,8 +40,6 @@ export abstract class Node {
   _ownerDocument: Document | null = null
   protected _childNodeList: NodeList
 
-  baseURI: string | undefined
-
   /**
    * Initializes a new instance of `Node`.
    *
@@ -61,6 +59,11 @@ export abstract class Node {
    * Returns a string appropriate for the type of node. 
    */
   abstract get nodeName(): string
+
+  /**
+   * Gets or sets the absolute base URL of the node.
+   */
+  baseURI: string = ''
 
   /** 
    * Returns whether the node is rooted to a document node. 

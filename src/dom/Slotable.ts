@@ -1,4 +1,3 @@
-import { DOMException } from './DOMException'
 import { Text } from './Text'
 import { Element } from './Element'
 import { Utility } from './Utility'
