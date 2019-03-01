@@ -566,7 +566,7 @@ export class Utility {
 
             /**
              * TODO:
-             * For each inclusiveDescendant in node’s shadow - including 
+             * For each inclusiveDescendant in node's shadow - including 
              * inclusive descendants that is custom, enqueue a custom
              * element callback reaction with inclusiveDescendant, 
              * callback name "adoptedCallback", and an argument list 
@@ -593,10 +593,10 @@ export class Utility {
          * TODO:
          * 1. If child is non-null, then:
          *    For each live range whose start node is parent and start 
-         *    offset is greater than child’s index, increase its start 
+         *    offset is greater than child's index, increase its start 
          *    offset by count.
          * 2. For each live range whose end node is parent and end 
-         *    offset is greater than child’s index, increase its end 
+         *    offset is greater than child's index, increase its end 
          *    offset by count.
          */
 
@@ -613,7 +613,7 @@ export class Utility {
         /**
          * TODO:
          * If node is a DocumentFragment node, then queue a tree 
-         * mutation record for node with « », nodes, null, and null.
+         * mutation record for node with [ ], nodes, null, and null.
          */
 
         let previousSibling = (child ? child.previousSibling : parent.lastChild)
@@ -631,11 +631,11 @@ export class Utility {
            * If node is a Text node, run the child text content change 
            * steps for parent.
            * 
-           * If parent’s root is a shadow root, and parent is a slot 
+           * If parent's root is a shadow root, and parent is a slot 
            * whose assigned nodes is the empty list, then run signal
            * a slot change for parent.
            * 
-           * Run assign slotables for a tree with node’s root.
+           * Run assign slotables for a tree with node's root.
            * 
            * For each shadow-including inclusive descendant 
            * inclusiveDescendant of node, in shadow-including tree
@@ -654,7 +654,7 @@ export class Utility {
         /**
          * TODO:
          * If suppress observers flag is unset, then queue a tree 
-         * mutation record for parent with nodes, « », previousSibling,
+         * mutation record for parent with nodes, [ ], previousSibling,
          * and child.
          */
       }
@@ -825,7 +825,7 @@ export class Utility {
         }
 
         for (let childNode of removedNodes) {
-          // TODO: Remove all parent’s children, in tree order, 
+          // TODO: Remove all parent's children, in tree order, 
           // with the suppress observers flag set.
           Utility.Tree.Mutation.removeNode(childNode, parent)
         }
@@ -865,7 +865,7 @@ export class Utility {
       static removeNode(node: Node, parent: Node): void {
         /**
          * TODO:
-         * Let index be node’s index.
+         * Let index be node's index.
          * 
          * For each live range whose start node is an inclusive
          * descendant of node, set its start to (parent, index).
@@ -879,28 +879,28 @@ export class Utility {
          * For each live range whose end node is parent and end offset 
          * is greater than index, decrease its end offset by 1.
          * 
-         * For each NodeIterator object iterator whose root’s node 
-         * document is node’s node document, run the NodeIterator 
+         * For each NodeIterator object iterator whose root's node 
+         * document is node's node document, run the NodeIterator 
          * pre-removing steps given node and iterator.
          * 
-         * Let oldPreviousSibling be node’s previous sibling.
+         * Let oldPreviousSibling be node's previous sibling.
          * 
-         * Let oldNextSibling be node’s next sibling.
+         * Let oldNextSibling be node's next sibling.
          */
 
         Utility.NodeList.remove(node, parent)
 
         /**
          * TODO:
-         * If node is assigned, then run assign slotables for node’s 
+         * If node is assigned, then run assign slotables for node's 
          * assigned slot.
          *
-         * If parent’s root is a shadow root, and parent is a slot whose
+         * If parent's root is a shadow root, and parent is a slot whose
          * assigned nodes is the empty list, then run signal a slot 
          * change for parent.
          * 
          * If node has an inclusive descendant that is a slot, then:
-         *   1. Run assign slotables for a tree with parent’s root.
+         *   1. Run assign slotables for a tree with parent's root.
          *   2. Run assign slotables for a tree with node.
          * 
          * Run the removing steps with node and parent.
@@ -917,16 +917,16 @@ export class Utility {
          *      "disconnectedCallback", and an empty argument list.
          * 
          * For each inclusive ancestor inclusiveAncestor of parent, and 
-         * then for each registered of inclusiveAncestor’s registered 
-         * observer list, if registered’s options’s subtree is true, 
+         * then for each registered of inclusiveAncestor's registered 
+         * observer list, if registered's options's subtree is true, 
          * then append a new transient registered observer whose 
-         * observer is registered’s observer, options is registered’s 
-         * options, and source is registered to node’s registered
+         * observer is registered's observer, options is registered's 
+         * options, and source is registered to node's registered
          * observer list.
          * 
          * If suppress observers flag is unset, then queue a tree 
          * mutation record for parent with 
-         * « », « node », oldPreviousSibling, and oldNextSibling.
+         * [ ], [ node ], oldPreviousSibling, and oldNextSibling.
          * 
          * If node is a Text node, then run the child text content 
          * change steps for parent.

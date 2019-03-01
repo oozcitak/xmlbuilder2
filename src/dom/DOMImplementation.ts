@@ -44,7 +44,7 @@ export class DOMImplementation {
       document.appendChild(element)
     }
 
-    // document’s content type is determined by namespace
+    // document's content type is determined by namespace
     if (namespace === Utility.Namespace.HTML)
       document.contentType = 'application/xhtml+xml'
     else if (namespace === Utility.Namespace.SVG)
@@ -83,7 +83,7 @@ export class DOMImplementation {
     let bodyElement = new Element(document, 'body', Utility.Namespace.HTML)
     htmlElement.appendChild(bodyElement)
 
-    // document’s content type is determined by namespace
+    // document's content type is determined by namespace
     document.contentType = 'application/xhtml+xml'
 
     return document

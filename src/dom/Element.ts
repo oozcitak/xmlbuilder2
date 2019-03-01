@@ -301,7 +301,7 @@ export class Element extends Node {
   }
 
   /**
-   * Returns element’s shadow root, if any, and if shadow root’s mode
+   * Returns element's shadow root, if any, and if shadow root's mode
    * is "open", and null otherwise.
    * 
    * This method is not supported by this module and will throw an
@@ -325,7 +325,7 @@ export class Element extends Node {
   }
 
   /**
-   * Returns `true` if matching selectors against element’s root yields 
+   * Returns `true` if matching selectors against element's root yields 
    * element, and `false` otherwise.
    * 
    * This method is not supported by this module and will throw an
