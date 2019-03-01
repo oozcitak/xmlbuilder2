@@ -35,21 +35,15 @@ describe('DOMImplementation', function () {
 
   test('createHTMLDocument()', function () {
     let doc = dom.createHTMLDocument('htmldoc')
-
     expect(doc.contentType).toBe('application/xhtml+xml')
-    expect(doc.doctype && doc.doctype.nodeName).toBe('html')
-    expect(doc.documentElement && doc.documentElement.tagName).toBe('html')
-    expect(doc.documentElement && doc.documentElement.firstChild &&
-      doc.documentElement.firstChild.nodeName).toBe('head')
-    expect(doc.documentElement && doc.documentElement.firstChild &&
-      doc.documentElement.firstChild.firstChild && 
-      doc.documentElement.firstChild.firstChild.nodeName).toBe('title')
-    expect(doc.documentElement && doc.documentElement.firstChild &&
-      doc.documentElement.firstChild.firstChild && 
-      doc.documentElement.firstChild.firstChild.firstChild &&
-      doc.documentElement.firstChild.firstChild.firstChild.nodeValue).toBe('htmldoc')
-    expect(doc.documentElement && doc.documentElement.firstChild &&
-      doc.documentElement.firstChild.nextSibling && 
-      doc.documentElement.firstChild.nextSibling.nodeName).toBe('body')
-    })
+    expect(_printTree(doc)).toBe(
+      `!DOCTYPE html
+      html
+        head
+          title
+            # htmldoc
+        body
+      `
+    )
+  })
 })

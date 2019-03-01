@@ -32,8 +32,9 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "testEnvironment": "node"
+    "testRegex": "/test/.*\\.test\\.(jsx?|tsx?)$",
+    "testEnvironment": "node",
+    "setupFiles": [ "<rootDir>/test/globals.ts" ]
   },
   "concatTS": [
     {
