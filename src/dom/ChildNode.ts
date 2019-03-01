@@ -25,9 +25,8 @@ class ChildNode {
     let flag = true
     while (flag && viablePreviousSibling) {
       flag = false
-      for(let child of nodes) {
-        if (child === viablePreviousSibling)
-        {
+      for (let child of nodes) {
+        if (child === viablePreviousSibling) {
           viablePreviousSibling = viablePreviousSibling.previousSibling
           flag = true
           break
@@ -35,7 +34,7 @@ class ChildNode {
       }
     }
 
-    if(context.ownerDocument) {
+    if (context.ownerDocument) {
       let node = Utility.Tree.Mutation.convertNodesIntoNode(nodes, context.ownerDocument)
 
       if (!viablePreviousSibling)
@@ -61,9 +60,8 @@ class ChildNode {
     let flag = true
     while (flag && viableNextSibling) {
       flag = false
-      for(let child of nodes) {
-        if (child === viableNextSibling)
-        {
+      for (let child of nodes) {
+        if (child === viableNextSibling) {
           viableNextSibling = viableNextSibling.nextSibling
           flag = true
           break
@@ -71,7 +69,7 @@ class ChildNode {
       }
     }
 
-    if(context.ownerDocument) {
+    if (context.ownerDocument) {
       let node = Utility.Tree.Mutation.convertNodesIntoNode(nodes, context.ownerDocument)
 
       Utility.Tree.Mutation.preInsert(node, parent, viableNextSibling)
@@ -92,9 +90,8 @@ class ChildNode {
     let flag = true
     while (flag && viableNextSibling) {
       flag = false
-      for(let child of nodes) {
-        if (child === viableNextSibling)
-        {
+      for (let child of nodes) {
+        if (child === viableNextSibling) {
           viableNextSibling = viableNextSibling.nextSibling
           flag = true
           break
@@ -102,11 +99,11 @@ class ChildNode {
       }
     }
 
-    if(context.ownerDocument) {
+    if (context.ownerDocument) {
       let node = Utility.Tree.Mutation.convertNodesIntoNode(nodes, context.ownerDocument)
 
-    // Note: Context object could have been inserted into node.
-    if (context.parentNode === parent)
+      // Note: Context object could have been inserted into node.
+      if (context.parentNode === parent)
         Utility.Tree.Mutation.replaceNode(context, node, parent)
       else
         Utility.Tree.Mutation.preInsert(node, parent, viableNextSibling)

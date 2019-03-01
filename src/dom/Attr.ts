@@ -24,14 +24,14 @@ export class Attr extends Node {
    * @param namespaceURI - the namespace URI
    * @param prefix - the namespace prefix
    */
-  public constructor(ownerDocument: Document | null, 
+  public constructor(ownerDocument: Document | null,
     ownerElement: Element | null, localName: string,
     namespaceURI: string | null, prefix: string | null,
     value: string) {
     super(ownerDocument)
 
     this._ownerElement = ownerElement
-    
+
     this._localName = localName
     this._namespaceURI = namespaceURI || null
     this._prefix = prefix || null

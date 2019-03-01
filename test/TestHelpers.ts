@@ -1,7 +1,7 @@
 import { DOMImplementation } from '../lib/dom'
 import dedent from "dedent"
 
-export default class TestHelpers{
+export default class TestHelpers {
   /**
    * Returns the dom implemention.
    */
@@ -23,7 +23,7 @@ export default class TestHelpers{
     level = level || 0
     const indent = '  '.repeat(level)
     let str = ''
-    switch(node.nodeType) {
+    switch (node.nodeType) {
       case 1: // Element
         str = `${indent}${node.tagName}`
         for (let attr of node.attributes) {
@@ -49,7 +49,7 @@ export default class TestHelpers{
         break
       case 10: // DocumentType
         str = `${indent}!DOCTYPE ${node.name}`
-        if (node.publicId) 
+        if (node.publicId)
           str += ` PUBLIC ${node.publicId}`
         if (node.systemId)
           str += ` SYSTEM ${node.systemId}`
@@ -61,7 +61,7 @@ export default class TestHelpers{
     for (let child of node.childNodes) {
       str += TestHelpers.printTree(child, level + 1)
     }
-  
+
     // remove last newline
     if (removeLastNewline)
       str = str.slice(0, -1)

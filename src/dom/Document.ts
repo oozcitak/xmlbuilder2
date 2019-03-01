@@ -128,7 +128,7 @@ export class Document extends Node {
    * elements
    */
   getElementsByTagName(qualifiedName: string): HTMLCollection {
-    return new HTMLCollection(this, function(ele: Element) {
+    return new HTMLCollection(this, function (ele: Element) {
       return (qualifiedName === '*' || ele.tagName === qualifiedName)
     })
   }
@@ -146,7 +146,7 @@ export class Document extends Node {
    * elements
    */
   getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection {
-    return new HTMLCollection(this, function(ele: Element) {
+    return new HTMLCollection(this, function (ele: Element) {
       return ((localName === '*' || ele.localName === localName) &&
         (namespace === '*' || ele.namespaceURI === namespace))
     })
@@ -164,7 +164,7 @@ export class Document extends Node {
    */
   getElementsByClassName(classNames: string): HTMLCollection {
     let arr = Utility.OrderedSet.parse(classNames)
-    return new HTMLCollection(this, function(ele: Element) {
+    return new HTMLCollection(this, function (ele: Element) {
       let classes = ele.classList
       let allClassesFound = true
       for (let className of arr) {
@@ -280,7 +280,7 @@ export class Document extends Node {
     if (node.nodeType === Node.Document)
       throw DOMException.NotSupportedError
 
-    if(node instanceof ShadowRoot)
+    if (node instanceof ShadowRoot)
       throw DOMException.NotSupportedError
 
     return node.cloneNode(this, deep)
@@ -297,7 +297,7 @@ export class Document extends Node {
     if (node.nodeType === Node.Document)
       throw DOMException.NotSupportedError
 
-    if(node instanceof ShadowRoot)
+    if (node instanceof ShadowRoot)
       throw DOMException.HierarchyRequestError
 
     Utility.Tree.Mutation.adoptNode(node, this)
@@ -431,21 +431,21 @@ export class Document extends Node {
    * Returns the child elements.
    */
   children(): HTMLCollection { throw "" }
-  
+
   /**
    * Returns the first child that is an element, and `null` otherwise.
    */
-  firstElementChild(): Element | null  { throw "" }
+  firstElementChild(): Element | null { throw "" }
 
   /**
    * Returns the last child that is an element, and `null` otherwise.
    */
-  lastElementChild(): Element | null  { throw "" }
+  lastElementChild(): Element | null { throw "" }
 
   /**
    * Returns the number of children that are elements.
    */
-  childElementCount(): number  { throw "" }
+  childElementCount(): number { throw "" }
 
   /**
    * Prepends the list of nodes or strings before the first child node.
@@ -453,7 +453,7 @@ export class Document extends Node {
    * 
    * @param nodes - the array of nodes or strings
    */
-  prepend(nodes: [Node | string]): void  { throw "" }
+  prepend(nodes: [Node | string]): void { throw "" }
 
   /**
    * Appends the list of nodes or strings after the last child node.
@@ -461,7 +461,7 @@ export class Document extends Node {
    * 
    * @param nodes - the array of nodes or strings
    */
-  append(nodes: [Node | string]): void  { throw "" }
+  append(nodes: [Node | string]): void { throw "" }
 
   /**
    * Returns the first element that is a descendant of node that
@@ -472,7 +472,7 @@ export class Document extends Node {
    * 
    * @param selectors - a selectors string
    */
-  querySelector(selectors: string): Element | null  { throw "" }
+  querySelector(selectors: string): Element | null { throw "" }
 
   /**
    * Returns all element descendants of node that match selectors.
@@ -482,7 +482,7 @@ export class Document extends Node {
    * 
    * @param selectors - a selectors string
    */
-  querySelectorAll(selectors: string): NodeList  { throw "" }
+  querySelectorAll(selectors: string): NodeList { throw "" }
 
   /**
    * Converts the given nodes or strings into a node (if there `nodes`
