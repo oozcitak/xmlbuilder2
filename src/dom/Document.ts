@@ -19,6 +19,12 @@ import { ShadowRoot } from './ShadowRoot';
  */
 export class Document extends Node {
 
+  _URL: string = 'about:blank'
+  _origin: string = ''
+  _compatMode: string = 'CSS1Compat'
+  _characterSet: string = 'UTF-8'
+  _contentType: string = 'application/xml'
+
   /**
    * Initializes a new instance of `Document`.
    */
@@ -27,30 +33,30 @@ export class Document extends Node {
   }
 
   /**
-   * Gets or sets the document's URL.
+   * Returns the document's URL.
    */
-  URL: string = 'about:blank'
+  get URL(): string { return this._URL }
 
   /**
-   * Gets or sets the document's origin.
+   * Returns sets the document's origin.
    */
-  origin: string = ''
+  get origin(): string { return this._origin }
 
   /**
-   * Gets or sets whether the document is rendered in Quirks mode or
+   * Returns whether the document is rendered in Quirks mode or
    * Standards mode.
    */
-  compatMode: string = 'CSS1Compat'
+  get compatMode(): string { return this._compatMode }
 
   /**
-   * Gets or sets the character set.
+   * Returns the character set.
    */
-  characterSet: string = 'UTF-8'
+  get characterSet(): string { return this._characterSet }
 
   /**
-   * Gets or sets the MIME type of the document.
+   * Returns the MIME type of the document.
    */
-  contentType: string = 'application/xml'
+  get contentType(): string { return this._contentType }
 
   /** 
    * Returns the type of node. 
@@ -67,26 +73,23 @@ export class Document extends Node {
    * with the document.
    */
   get implementation(): DOMImplementation {
-    return new DOMImplementation()
+    return DOMImplementation.Instance
   }
 
   /**
    * Gets or sets the document's URL.
    */
   get documentURI(): string { return this.URL }
-  set documentURI(value: string) { this.URL = value }
 
   /**
    * Gets or sets the character set.
    */
   get charset(): string { return this.characterSet }
-  set charset(value: string) { this.characterSet = value }
 
   /**
    * Returns the character set.
    */
   get inputEncoding(): string { return this.characterSet }
-  set inputEncoding(value: string) { this.characterSet = value }
 
   /** 
    * Returns the {@link DocType} or `null` if there is none.
@@ -228,7 +231,7 @@ export class Document extends Node {
   }
 
   /**
-   * Returns a new {@link Text} with the given `data`.
+   * Returns a new {@link CDATASection} with the given `data`.
    * 
    * @param data - text content
    * 
@@ -272,9 +275,9 @@ export class Document extends Node {
   /**
    * Returns a copy of `node`.
    * 
-   * @param deep - true to includes descendant nodes.
+   * @param deep - true to include descendant nodes.
    * 
-   * @returns the clone
+   * @returns the clone node
    */
   importNode(node: Node, deep: boolean = false): Node {
     if (node.nodeType === Node.Document)
@@ -287,7 +290,8 @@ export class Document extends Node {
   }
 
   /**
-   * Moves `node` from another document and returns it.
+   * Moves `node` from another document into this document and returns
+   * it.
    * 
    * @param node - node to move.
    * 

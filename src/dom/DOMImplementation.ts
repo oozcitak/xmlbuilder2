@@ -11,6 +11,19 @@ import { Text } from "./Text"
  */
 export class DOMImplementation {
 
+  private static _instance: DOMImplementation
+
+  private constructor() { }
+
+  /**
+   * Gets the instance of dom implementation.
+   */
+  static get Instance(): DOMImplementation {
+    if(!DOMImplementation._instance)
+      DOMImplementation._instance = new DOMImplementation()
+
+    return DOMImplementation._instance
+  }
   /**
    * Creates and returns a {@link DocType}.
    * 
@@ -46,11 +59,11 @@ export class DOMImplementation {
 
     // document's content type is determined by namespace
     if (namespace === Utility.Namespace.HTML)
-      document.contentType = 'application/xhtml+xml'
+      document._contentType = 'application/xhtml+xml'
     else if (namespace === Utility.Namespace.SVG)
-      document.contentType = 'image/svg+xml'
+      document._contentType = 'image/svg+xml'
     else
-      document.contentType = 'application/xml'
+      document._contentType = 'application/xml'
 
     return document
   }
@@ -62,7 +75,7 @@ export class DOMImplementation {
    */
   createHTMLDocument(title: string | undefined = undefined): Document {
     let document = new Document()
-    document.contentType = 'text/html'
+    document._contentType = 'text/html'
   
     let doctype = new DocumentType(document, 'html')
     document.appendChild(doctype)
@@ -84,7 +97,7 @@ export class DOMImplementation {
     htmlElement.appendChild(bodyElement)
 
     // document's content type is determined by namespace
-    document.contentType = 'application/xhtml+xml'
+    document._contentType = 'application/xhtml+xml'
 
     return document
   }
