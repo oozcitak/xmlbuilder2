@@ -5,7 +5,7 @@ export default class TestHelpers {
   /**
    * Returns the dom implemention.
    */
-  static dom: DOMImplementation = new DOMImplementation()
+  static dom: DOMImplementation = DOMImplementation.Instance
 
   /**
    * De-indents template literals.
