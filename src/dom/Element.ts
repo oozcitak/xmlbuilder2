@@ -153,7 +153,7 @@ export class Element extends Node {
     if (attr) {
       attr.value = value
     } else {
-      attr = new Attr(this.ownerDocument, this, qualifiedName, 
+      attr = new Attr(this.ownerDocument, this, qualifiedName,
         null, null, value)
       this.attributes.setNamedItem(attr)
     }
@@ -174,7 +174,7 @@ export class Element extends Node {
     if (attr) {
       attr.value = value
     } else {
-      attr = new Attr(this.ownerDocument, this, names.localName, 
+      attr = new Attr(this.ownerDocument, this, names.localName,
         namespace, names.prefix, value)
       this.attributes.setNamedItemNS(attr)
     }
@@ -344,7 +344,7 @@ export class Element extends Node {
    */
   get textContent(): string | null {
     let str = ''
-    for (let child of this._childNodeList) {
+    for (let child of this._childNodes) {
       let childContent = child.textContent
       if (childContent) str += childContent
     }
@@ -438,7 +438,7 @@ export class Element extends Node {
    * elements
    */
   getElementsByTagName(qualifiedName: string): HTMLCollection {
-    return new HTMLCollection(this, function(ele: Element) {
+    return new HTMLCollection(this, function (ele: Element) {
       return (qualifiedName === '*' || ele.tagName === qualifiedName)
     })
   }
@@ -456,7 +456,7 @@ export class Element extends Node {
    * elements
    */
   getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection {
-    return new HTMLCollection(this, function(ele: Element) {
+    return new HTMLCollection(this, function (ele: Element) {
       return ((localName === '*' || ele.localName === localName) &&
         (namespace === '*' || ele.namespaceURI === namespace))
     })
@@ -474,7 +474,7 @@ export class Element extends Node {
    */
   getElementsByClassName(classNames: string): HTMLCollection {
     let arr = Utility.OrderedSet.parse(classNames)
-    return new HTMLCollection(this, function(ele: Element) {
+    return new HTMLCollection(this, function (ele: Element) {
       let classes = ele.classList
       let allClassesFound = true
       for (let className of arr) {

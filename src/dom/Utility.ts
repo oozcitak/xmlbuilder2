@@ -559,7 +559,7 @@ export class Utility {
               let ele = <Element>node
               for (let i = 0; i < ele.attributes.length; i++) {
                 let attr = ele.attributes.item(i)
-                if(attr)
+                if (attr)
                   attr._ownerDocument = document
               }
             }
@@ -763,7 +763,7 @@ export class Utility {
         if (referenceChild === node) referenceChild = node.nextSibling
         let previousSibling = child.previousSibling
 
-        if(!parent.ownerDocument)
+        if (!parent.ownerDocument)
           throw DOMException.HierarchyRequestError
 
         Utility.Tree.Mutation.adoptNode(node, parent.ownerDocument)
@@ -804,7 +804,7 @@ export class Utility {
        */
       static replaceAllNode(node: Node | null, parent: Node): void {
         if (node) {
-          if(!parent.ownerDocument)
+          if (!parent.ownerDocument)
             throw DOMException.HierarchyRequestError
 
           Utility.Tree.Mutation.adoptNode(node, parent.ownerDocument)
@@ -940,24 +940,22 @@ export class Utility {
        * @param nodes - the array of nodes or strings
        */
       static convertNodesIntoNode(nodes: Array<Node | string>, document: Document): Node {
-        if (nodes.length === 1)
-        {
+        if (nodes.length === 1) {
           if (typeof nodes[0] === 'string')
             return new Text(document, <string>nodes[0])
           else
             return <Node>nodes[0]
         }
-        else
-        {
+        else {
           let fragment = new DocumentFragment(document)
-    
-          for(let child of nodes) {
+
+          for (let child of nodes) {
             if (typeof child === 'string')
               fragment.appendChild(new Text(document, child))
             else
               fragment.appendChild(child)
           }
-    
+
           return fragment
         }
       }

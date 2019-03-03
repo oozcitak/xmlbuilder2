@@ -1,14 +1,16 @@
 import { Element } from "./Element"
 import { Node } from "./Node"
+import { Utility } from "./Utility"
 
 /**
  * Represents a collection of elements.
  */
-export class HTMLCollection implements IterableIterator<Element> {
+export class HTMLCollection implements Iterable<Element> {
+
+  protected static reservedNames = ['_parent', '_filter', 'length', 'item', 'namedItem', 'get']
 
   protected _parent: Node
   protected _filter: (element: Element) => any
-  private _currentIterationNode: Node | null = null
 
   /**
    * Initializes a new instance of `HTMLCollection`.
@@ -17,7 +19,7 @@ export class HTMLCollection implements IterableIterator<Element> {
    */
   public constructor(parent: Node, filter?: (element: Element) => any) {
     this._parent = parent
-    this._filter = filter || function(element: Element) { return true }
+    this._filter = filter || function (element: Element) { return true }
 
     return new Proxy(this, this)
   }
@@ -28,7 +30,7 @@ export class HTMLCollection implements IterableIterator<Element> {
   get length(): number {
     let count = 0
     for (let node of this) {
-        count++
+      count++
     }
     return count
   }
@@ -59,7 +61,6 @@ export class HTMLCollection implements IterableIterator<Element> {
   namedItem(name: string): Element | null {
     if (!name) return null
 
-    let i = 0
     for (let node of this) {
       if (node.id === name || node.getAttribute('name') === name)
         return node
@@ -71,45 +72,47 @@ export class HTMLCollection implements IterableIterator<Element> {
   /**
    * Returns an iterator for nodes.
    */
-  [Symbol.iterator](): IterableIterator<Element> {
-    this._currentIterationNode = this._parent.firstChild
-    return this
-  }
+  *[Symbol.iterator](): IterableIterator<Element> {
+    let list: Array<Element> = []
 
-  /**
-   * Iterates through child nodes.
-   */
-  next(): IteratorResult<Element> {
-    if (this._currentIterationNode) {
-      while (this._currentIterationNode && (this._currentIterationNode.nodeType !== Node.Element || !this._filter(<Element>this._currentIterationNode))) {
-        this._currentIterationNode = this._currentIterationNode.nextSibling
-      }
-      if (this._currentIterationNode)
-        return { done: false, value: <Element>this._currentIterationNode }
-      else
-        return { done: true } as any as IteratorResult<Element>
-    } else {
-      return { done: true } as any as IteratorResult<Element>
+    Utility.Tree.forEachDescendant(this._parent,
+      { self: false, shadow: false }, (node: Node) => {
+        if (node.nodeType === Node.Element) {
+          const ele = <Element>node
+          if (this._filter(ele))
+            list.push(ele)
+        }
+      })
+
+    for (const ele of list) {
+      yield ele
     }
   }
 
-  get(target: HTMLCollection, propertyKey: string | number | symbol, receiver: any): Element | null {
-    if (typeof propertyKey === 'number')
-      return target.item(propertyKey)
-    else if (typeof propertyKey === 'string')
-      return target.namedItem(propertyKey)
-    else
-      return Reflect.get(target, propertyKey, receiver)
-  }
+  /**
+   * Returns the element with index index from the collection. The 
+   * elements are sorted in tree order.
+   */
+  [index: number]: any
+
+  /*
+   * Returns the first element with ID or name name from the 
+   * collection.
+   */
+  [key: string]: any
 
   /**
-   * TODO:
-   * element = collection[index]
-   *   Returns the element with index index from the collection. The 
-   *   elements are sorted in tree order.
-   * element = collection[name]
-   *   Returns the first element with ID or name name from the 
-   *   collection.
+   * Implements a proxy get trap to provide array-like access.
    */
+  get(target: HTMLCollection, key: string | symbol, receiver: any): Element | null {
+    if (typeof key === 'string' && HTMLCollection.reservedNames.indexOf(key) === -1) {
+      const index = Number(key)
+      if (isNaN(Number(index)))
+        return target.namedItem(key)
+      else
+        return target.item(index)
+    } else {
+      return Reflect.get(target, key, receiver)
+    }
+  }
 }
-

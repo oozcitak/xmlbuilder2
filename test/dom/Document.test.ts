@@ -6,14 +6,23 @@ describe('Document', function () {
   const doc = $$.dom.createDocument('myns', 'root', doctype)
   const ele = doc.createElement('node_with_id')
   ele.id = 'uniq'
-  if (doc.documentElement)
+  const tele1 = doc.createElement('tagged')
+  tele1.id = 'tele1'
+  const tele2 = doc.createElement('tagged')
+  tele2.id = 'tele2'
+  if (doc.documentElement) {
+    doc.documentElement.appendChild(tele1)
     doc.documentElement.appendChild(ele)
+    doc.documentElement.appendChild(tele2)
+  }
 
   test('constructor()', function () {
     expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE qname PUBLIC pubid SYSTEM sysid
       root
+        tagged id="tele1"
         node_with_id id="uniq"
+        tagged id="tele2"
       `)
     expect(doc.URL).toBe('about:blank')
     expect(doc.documentURI).toBe('about:blank')
@@ -33,4 +42,12 @@ describe('Document', function () {
   test('getElementById()', function () {
     expect(doc.getElementById('uniq')).toBe(ele)
   })
+
+  test('getElementsByTagName()', function () {
+    const list = doc.getElementsByTagName('tagged')
+    expect(list.length).toBe(2)
+    expect(list.item(0)).toBe(tele1)
+    expect(list.item(1)).toBe(tele2)
+  })
+
 })

@@ -38,7 +38,8 @@ export abstract class Node {
   _previousSibling: Node | null = null
   _nextSibling: Node | null = null
   _ownerDocument: Document | null = null
-  protected _childNodeList: NodeList
+  _baseURI = ''
+  protected _childNodes: NodeList
 
   /**
    * Initializes a new instance of `Node`.
@@ -47,7 +48,7 @@ export abstract class Node {
    */
   protected constructor(ownerDocument: Document | null = null) {
     this._ownerDocument = ownerDocument
-    this._childNodeList = new NodeList(this)
+    this._childNodes = new NodeList(this)
   }
 
   /** 
@@ -61,9 +62,9 @@ export abstract class Node {
   abstract get nodeName(): string
 
   /**
-   * Gets or sets the absolute base URL of the node.
+   * Gets the absolute base URL of the node.
    */
-  baseURI: string = ''
+  get baseURI(): string { return this._baseURI }
 
   /** 
    * Returns whether the node is rooted to a document node. 
@@ -122,7 +123,7 @@ export abstract class Node {
   /** 
    * Returns a {@link NodeList} of child nodes. 
    */
-  get childNodes(): NodeList { return this._childNodeList }
+  get childNodes(): NodeList { return this._childNodes }
 
   /** 
    * Returns the first child node. 

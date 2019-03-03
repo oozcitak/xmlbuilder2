@@ -35,7 +35,7 @@ export class DocumentFragment extends Node {
    */
   get textContent(): string | null {
     let str = ''
-    for (let child of this._childNodeList) {
+    for (let child of this._childNodes) {
       let childContent = child.textContent
       if (childContent) str += childContent
     }
