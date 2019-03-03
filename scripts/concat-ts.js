@@ -4,8 +4,7 @@
  * 
  * The script applies the following steps:
  * 
- *   1. Lists all TypeScript files in the `sourceDir` directory (files
- *      that end with *.tsx?).
+ *   1. Lists all files matching each item of `inputFiles`
  *   2. Sorts the files by their name in alphabetical order.
  *   3. Concatenates all files.
  *   4. Removes all import directives:
@@ -15,35 +14,36 @@
 
 const path = require("path");
 const fs = require("fs");
-const options = require('../package.json').concatTS;
+const glob = require("glob");
+const options = require('../package.json')['concat-ts'];
 
 const ConcatTS = class ConcatTS {
   constructor(options) {
     this.options = options;
   }
 
-  // Returns an array of input files in the `sourceDir` directory
-  getFiles(sourceDir, options) {
-    const files = fs.readdirSync(sourceDir).filter(name =>
-      name.endsWith('.ts') ||
-      name.endsWith('.tsx')
-    );
+  // Returns an array of all input files
+  getFiles(inputFiles) {
+    let allFiles = [];
+    for (const pattern of inputFiles) {
+      const files = this.getFilesForPattern(pattern);
+      allFiles = allFiles.concat(files);
+    }
+    return Array.from(new Set(allFiles));
+  }
 
-    files.sort(function (x, y) {
-      let ix = (options.order ? options.order.indexOf(x) : -1);
-      let iy = (options.order ? options.order.indexOf(y) : -1);
-
-      if (ix === -1 && iy === -1)
+  // Returns an array of input files matching `filenamePattern`
+  getFilesForPattern(filenamePattern) {
+    const filename = filenamePattern;
+    if (fs.existsSync(filename)) {
+      return [filename];
+    } else {
+      let list = glob.sync(filenamePattern);
+      list.sort(function (x, y) {
         return x.localeCompare(y);
-      else if (ix === -1)
-        return 1;
-      else if (iy === -1)
-        return -1;
-      else
-        return (ix == iy ? 0 : ix < iy ? -1 : 1);
-    });
-
-    return files;
+      });
+      return list;
+    }
   }
 
   // Replaces the contents of source
@@ -66,7 +66,7 @@ const ConcatTS = class ConcatTS {
     const outputTime = fs.statSync(output).mtimeMs;
 
     // check package.json
-    const packageFile = path.resolve(__dirname, '..', 'package.json');
+    const packageFile = 'package.json';
     const packageTime = fs.statSync(packageFile).mtimeMs;
     if (outputTime < packageTime)
       return true;
@@ -81,19 +81,17 @@ const ConcatTS = class ConcatTS {
     return false;
   }
 
-  // Returs the current date string.
-  dateString()
-  {
+  // Returns the current date string.
+  dateString() {
     const date = new Date();
     const year = date.getFullYear().toString();
     const month = this.padStr((date.getMonth() + 1).toString());
     const day = this.padStr(date.getDate().toString());
-    return [ year, month, day].join('.');
+    return [year, month, day].join('.');
   }
 
-  // Returs the current time string.
-  timeString()
-  {
+  // Returns the current time string.
+  timeString() {
     const date = new Date();
     const hour = this.padStr(date.getHours().toString());
     const minute = this.padStr(date.getMinutes().toString());
@@ -101,10 +99,9 @@ const ConcatTS = class ConcatTS {
     return [hour, minute, second].join(':');
   }
 
-  padStr(str)
-  {
+  padStr(str) {
     const len = str.length
-    if(len == 0)
+    if (len == 0)
       return '00';
     else if (len == 1)
       return '0' + str;
@@ -114,32 +111,26 @@ const ConcatTS = class ConcatTS {
 
   // Processes all input entries
   run() {
+    const cwd = process.cwd();
+    process.chdir(path.resolve(__dirname, '..'));
     for (let entry of this.options)
-      this.processDir(entry);
+      this.processEntry(entry);
+    process.chdir(cwd);
   }
 
   // Processes `entry`
-  processDir(entry) {
-    if (!entry || !entry.sourceDir)
-      throw new Error("Please specify source directory in package.json.");
+  processEntry(entry) {
+    if (!entry || !entry.inputFiles)
+      throw new Error("Please specify input files in package.json.");
 
     if (!entry || !entry.outputFile)
       throw new Error("Please specify an output filename in package.json.");
 
     // list all TypeScript files in the `sourceDir` directory
-    const absSourceDir = path.resolve(__dirname, '..', entry.sourceDir);
-    if (!fs.existsSync(absSourceDir))
-      throw new Error(`Source directory ${entry.sourceDir} (${absSourceDir}) does not exist.`);
-
-    const sourceFiles = this.getFiles(absSourceDir, entry);
-    const absSourceFiles = [];
-    for (const file of sourceFiles) {
-      const absSourceFile = path.resolve(absSourceDir, file);
-      absSourceFiles.push(absSourceFile);
-    }
+    const absSourceFiles = this.getFiles(entry.inputFiles);
 
     // process and output each file
-    const absOutputFile = path.resolve(__dirname, '..', entry.outputFile);
+    const absOutputFile = entry.outputFile;
     const absOutputDir = path.dirname(absOutputFile);
 
     // ensure that any of the source files are modified after the
@@ -154,8 +145,8 @@ const ConcatTS = class ConcatTS {
     const runStart = Date.now();
 
     // process each file
-    for (let i = 0; i < sourceFiles.length; i++) {
-      const file = sourceFiles[i];
+    for (let i = 0; i < absSourceFiles.length; i++) {
+      const file = path.basename(absSourceFiles[i]);
       const absSourceFile = absSourceFiles[i];
       if (!fs.existsSync(absSourceFile))
         throw new Error(`Source file ${file} (${absSourceFile}) does not exist.`);
@@ -176,8 +167,8 @@ const ConcatTS = class ConcatTS {
     }
 
     const runEnd = Date.now();
-    outputStream.write('\n\n// Generated on ' + this.dateString() + 
-      ' at ' + this.timeString() + 
+    outputStream.write('\n\n// Generated on ' + this.dateString() +
+      ' at ' + this.timeString() +
       ' in ' + ((runEnd - runStart) / 1000).toFixed(2) + " seconds");
 
     outputStream.close();

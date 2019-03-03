@@ -27,6 +27,7 @@
     "jest": "*",
     "ts-jest": "*",
     "dedent": "*",
+    "glob": "*",
     "@types/jest": "*",
     "@types/dedent": "*"
   },
@@ -34,38 +35,38 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "testRegex": "/test/.*\\.test\\.(jsx?|tsx?)$",
+    "testRegex": "/test/.*\\.test\\.tsx?$",
     "testEnvironment": "node"
   },
-  "concatTS": [
+  "concat-ts": [
     {
-      "sourceDir": "./src/dom",
-      "outputFile": "./lib/dom.ts",
-      "order": [
-        "DOMException.ts",
-        "Node.ts",
-        "CharacterData.ts",
-        "Text.ts",
-        "Utility.ts",
-        "HTMLCollection.ts",
-        "Document.ts",
-        "XMLDocument.ts",
-        "DocumentFragment.ts",
-        "ShadowRoot.ts",
-        "Element.ts",
-        "DocumentType.ts",
-        "NonElementParentNode.ts",
-        "DocumentOrShadowRoot.ts",
-        "ParentNode.ts",
-        "ChildNode.ts",
-        "Slotable.ts"
+      "inputFiles": [
+        "./src/dom/DOMException.ts",
+        "./src/dom/Node.ts",
+        "./src/dom/CharacterData.ts",
+        "./src/dom/Text.ts",
+        "./src/dom/Utility.ts",
+        "./src/dom/HTMLCollection.ts",
+        "./src/dom/Document.ts",
+        "./src/dom/XMLDocument.ts",
+        "./src/dom/DocumentFragment.ts",
+        "./src/dom/ShadowRoot.ts",
+        "./src/dom/Element.ts",
+        "./src/dom/DocumentType.ts",
+        "./src/dom/NonElementParentNode.ts",
+        "./src/dom/DocumentOrShadowRoot.ts",
+        "./src/dom/ParentNode.ts",
+        "./src/dom/ChildNode.ts",
+        "./src/dom/Slotable.ts",
+        "./src/dom/*.ts"
       ],
+      "outputFile": "./lib/dom.ts",
       "removeImports": true,
       "deleteText": true
     }
   ],
   "scripts": {
-    "pretest": "node ./scripts/concatTS.js && tsc",
+    "pretest": "node ./scripts/concat-ts.js && tsc",
     "prepublishOnly": "tsc",
     "test": "jest",
     "cover": "jest --coverage"
