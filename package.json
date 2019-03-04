@@ -36,7 +36,8 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "/test/.*\\.test\\.tsx?$",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFiles": [ "./test/TestHelpers.ts" ]
   },
   "concat-ts": [
     {
@@ -66,7 +67,7 @@
     }
   ],
   "scripts": {
-    "pretest": "node ./scripts/concat-ts.js && tsc",
+    "pretest": "node ./scripts/concat-ts.js",
     "prepublishOnly": "tsc",
     "test": "jest",
     "cover": "jest --coverage"
