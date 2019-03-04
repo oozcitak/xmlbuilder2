@@ -54,26 +54,16 @@ export class DocumentFragment extends Node {
    * constructor for nodes. The duplicate node has no parent 
    * ({@link parentNode} returns `null`).
    *
-   * @param document - new owner document
    * @param deep - if `true`, recursively clone the subtree under the 
    * specified node; if `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
-  cloneNode(document: Document | boolean | null = null,
-    deep: boolean = false): Node {
-
-    let ownerDocument = (typeof document === "boolean" ? null : document)
-    deep = (typeof document === "boolean" ? document : false)
-
-    if (!ownerDocument)
-      ownerDocument = this.ownerDocument
-
-    let clonedSelf = new DocumentFragment(ownerDocument)
-    clonedSelf._parentNode = null
+  cloneNode(deep: boolean = false): Node {
+    let clonedSelf = new DocumentFragment(this.ownerDocument)
 
     // clone child nodes
     for (let child of this.childNodes) {
-      let clonedChild = child.cloneNode(document, deep)
+      let clonedChild = child.cloneNode(deep)
       clonedSelf.appendChild(clonedChild)
     }
 

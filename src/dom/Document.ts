@@ -277,7 +277,7 @@ export class Document extends Node {
    * 
    * @param deep - true to include descendant nodes.
    * 
-   * @returns the clone node
+   * @returns clone of node
    */
   importNode(node: Node, deep: boolean = false): Node {
     if (node.nodeType === Node.Document)
@@ -286,7 +286,19 @@ export class Document extends Node {
     if (node instanceof ShadowRoot)
       throw DOMException.NotSupportedError
 
-    return node.cloneNode(this, deep)
+    const clonedNode = node.cloneNode(deep)
+
+    Utility.Tree.forEachDescendant(clonedNode, { self: true, shadow: false}, (child) => {
+      child._ownerDocument = this
+      if (child.nodeType === Node.Element) {
+        const ele = <Element>child
+        for(const attr of ele.attributes) {
+          attr._ownerDocument = this
+        }
+      }
+    })
+
+    return clonedNode
   }
 
   /**
@@ -345,9 +357,10 @@ export class Document extends Node {
    * This method is not supported by this module and will throw an
    * exception.
    * 
-   * @param type - a string representing the type of event to be created
+   * @param eventInterface - a string representing the type of event 
+   * to be created
    */
-  createEvent(type: any): never {
+  createEvent(eventInterface: string): never {
     throw DOMException.NotSupportedError
   }
 
@@ -388,16 +401,19 @@ export class Document extends Node {
    * constructor for nodes. The duplicate node has no parent 
    * ({@link parentNode} returns `null`).
    *
-   * @param document - new owner document
    * @param deep - if `true`, recursively clone the subtree under the 
    * specified node; if `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
-  cloneNode(document: Document | boolean | null = null,
-    deep: boolean = false): Node {
-
+  cloneNode(deep: boolean = false): Node {
     let clonedSelf = new Document()
-    clonedSelf._parentNode = null
+
+    // clone child nodes
+    for (let child of this.childNodes) {
+      let clonedChild = child.cloneNode(deep)
+      clonedSelf.appendChild(clonedChild)
+    }
+    
     return clonedSelf
   }
 

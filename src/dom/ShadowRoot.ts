@@ -1,23 +1,29 @@
 import { Element } from "./Element"
 import { Document } from "./Document"
 import { DocumentFragment } from "./DocumentFragment"
-import { DOMException } from "./DOMException"
 
 /**
  * Represents a shadow root.
  */
 export class ShadowRoot extends DocumentFragment {
-  // ShadowRootMode
+  // mode
   static readonly Open = "open"
   static readonly Closed = "closed"
 
+  protected _host: Element
+  protected _mode: string
+  
   /**
    * Initializes a new instance of `ShadowRoot`.
    *
    * @param ownerDocument - the owner document
    */
-  protected constructor(ownerDocument: Document | null = null) {
+  protected constructor(ownerDocument: Document | null = null,
+    host: Element, mode: string) {
     super(ownerDocument)
+
+    this._host = host
+    this._mode = mode
   }
 
   /** 
@@ -26,7 +32,7 @@ export class ShadowRoot extends DocumentFragment {
    * This method is not supported by this module and will throw an
    * exception.
    */
-  get mode(): string { throw DOMException.NotSupportedError }
+  get mode(): string { return this._mode }
 
   /** 
    * Gets the shadow root's host.
@@ -34,5 +40,5 @@ export class ShadowRoot extends DocumentFragment {
    * This method is not supported by this module and will throw an
    * exception.
    */
-  get host(): Element { throw DOMException.NotSupportedError }
+  get host(): Element { return this._host }
 }

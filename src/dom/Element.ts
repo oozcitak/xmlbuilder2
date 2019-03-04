@@ -1,5 +1,4 @@
 import { Node } from './Node'
-import { DOMImplementation } from './DOMImplementation'
 import { DOMException } from './DOMException'
 import { HTMLCollection } from './HTMLCollection'
 import { Utility } from './Utility'
@@ -19,7 +18,8 @@ export class Element extends Node {
   protected _prefix: string | null
   protected _localName: string
   protected _attributes: NamedNodeMap = new NamedNodeMap()
-
+  protected _shadowRoot: ShadowRoot | null = null
+  
   /**
    * Initializes a new instance of `Element`.
    *
@@ -308,7 +308,10 @@ export class Element extends Node {
    * exception.
    */
   get shadowRoot(): ShadowRoot | null {
-    throw DOMException.NotImplementedError
+    if (!this._shadowRoot || this._shadowRoot.mode === ShadowRoot.Closed)
+      return null
+    else
+      return this._shadowRoot
   }
 
   /**
@@ -363,33 +366,23 @@ export class Element extends Node {
    * constructor for nodes. The duplicate node has no parent 
    * ({@link parentNode} returns `null`).
    *
-   * @param document - new owner document
    * @param deep - if `true`, recursively clone the subtree under the 
    * specified node; if `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
-  cloneNode(document: Document | boolean | null = null,
-    deep: boolean = false): Node {
-
-    let ownerDocument = (typeof document === "boolean" ? null : document)
-    deep = (typeof document === "boolean" ? document : false)
-
-    if (!ownerDocument)
-      ownerDocument = this.ownerDocument
-
-    let clonedSelf = new Element(ownerDocument,
+  cloneNode(deep: boolean = false): Node {
+    let clonedSelf = new Element(this.ownerDocument,
       this.localName, this.namespaceURI, this.prefix)
-    clonedSelf._parentNode = null
 
     // clone attributes
     for (let attr of this.attributes) {
-      let clonedAtt = <Attr>attr.cloneNode(ownerDocument, deep)
+      let clonedAtt = <Attr>attr.cloneNode(deep)
       clonedSelf.attributes.setNamedItem(clonedAtt)
     }
 
     // clone child nodes
     for (let child of this.childNodes) {
-      let clonedChild = child.cloneNode(document, deep)
+      let clonedChild = child.cloneNode(deep)
       clonedSelf.appendChild(clonedChild)
     }
 
@@ -401,8 +394,8 @@ export class Element extends Node {
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node | null): boolean {
-    if (!super.isEqualNode(node))
+  isEqualNode(node?: Node): boolean {
+    if (!node || !super.isEqualNode(node))
       return false
 
     let other = <Element>node

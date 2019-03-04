@@ -26,14 +26,11 @@ export abstract class CharacterData extends Node {
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node | null): boolean {
-    if (!super.isEqualNode(node))
+  isEqualNode(node?: Node): boolean {
+    if (!node || !super.isEqualNode(node))
       return false
 
-    if (!node || this.data !== (<CharacterData>node).data)
-      return false
-    else
-      return true
+    return (this.data === (<CharacterData>node).data)
   }
 
   /** 

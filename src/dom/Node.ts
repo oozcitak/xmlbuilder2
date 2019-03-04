@@ -213,20 +213,18 @@ export abstract class Node {
    * constructor for nodes. The duplicate node has no parent 
    * ({@link parentNode} returns `null`).
    *
-   * @param document - new owner document
    * @param deep - if `true`, recursively clone the subtree under the 
    * specified node; if `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
-  abstract cloneNode(document: Document | boolean | null,
-    deep: boolean): Node
+  abstract cloneNode(deep?: boolean): Node
 
   /**
    * Determines if the given node is equal to this one.
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node | null): boolean {
+  isEqualNode(node?: Node): boolean {
     if (!node || this.nodeType !== node.nodeType ||
       this.childNodes.length !== node.childNodes.length) {
       return false
@@ -250,8 +248,8 @@ export abstract class Node {
    * 
    * @param node - the node to compare with
    */
-  isSameNode(node?: Node | null): boolean {
-    return (node === this)
+  isSameNode(node?: Node): boolean {
+    return (!!node && node === this)
   }
 
   /**

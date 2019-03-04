@@ -64,23 +64,13 @@ export class DocumentType extends Node {
    * constructor for nodes. The duplicate node has no parent 
    * ({@link parentNode} returns `null`).
    *
-   * @param document - new owner document
    * @param deep - if `true`, recursively clone the subtree under the 
    * specified node; if `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
-  cloneNode(document: Document | boolean | null = null,
-    deep: boolean = false): Node {
-
-    let ownerDocument = (typeof document === "boolean" ? null : document)
-    deep = (typeof document === "boolean" ? document : false)
-
-    if (!ownerDocument)
-      ownerDocument = this.ownerDocument
-
-    let clonedSelf = new DocumentType(ownerDocument, this.name,
+  cloneNode(deep: boolean = false): Node {
+    let clonedSelf = new DocumentType(this.ownerDocument, this.name,
       this.publicId, this.systemId)
-    clonedSelf._parentNode = null
     return clonedSelf
   }
 
@@ -89,8 +79,8 @@ export class DocumentType extends Node {
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node | null): boolean {
-    if (!super.isEqualNode(node))
+  isEqualNode(node?: Node): boolean {
+    if (!node || !super.isEqualNode(node))
       return false
 
     let other = <DocumentType>node

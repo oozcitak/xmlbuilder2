@@ -556,11 +556,9 @@ export class Utility {
             inclusiveDescendant._ownerDocument = document
 
             if (inclusiveDescendant.nodeType === Node.Element) {
-              let ele = <Element>node
-              for (let i = 0; i < ele.attributes.length; i++) {
-                let attr = ele.attributes.item(i)
-                if (attr)
-                  attr._ownerDocument = document
+              let ele = <Element>inclusiveDescendant
+              for (const attr of ele.attributes) {
+                attr._ownerDocument = document
               }
             }
 
@@ -572,8 +570,6 @@ export class Utility {
              * callback name "adoptedCallback", and an argument list 
              * containing oldDocument and document.
              */
-
-            Utility.Tree.Mutation.adoptNode(inclusiveDescendant, document)
           })
         }
       }

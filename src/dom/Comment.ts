@@ -33,22 +33,12 @@ export class Comment extends CharacterData {
    * constructor for nodes. The duplicate node has no parent 
    * ({@link parentNode} returns `null`).
    *
-   * @param document - new owner document
    * @param deep - if `true`, recursively clone the subtree under the 
    * specified node; if `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
-  cloneNode(document: Document | boolean | null = null,
-    deep: boolean = false): Node {
-
-    let ownerDocument = (typeof document === "boolean" ? null : document)
-    deep = (typeof document === "boolean" ? document : false)
-
-    if (!ownerDocument)
-      ownerDocument = this.ownerDocument
-
-    let clonedSelf = new Comment(ownerDocument, this.data)
-    clonedSelf._parentNode = null
+  cloneNode(deep: boolean = false): Node {
+    let clonedSelf = new Comment(this.ownerDocument, this.data)
     return clonedSelf
   }
 }
