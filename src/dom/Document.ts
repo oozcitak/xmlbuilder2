@@ -409,9 +409,11 @@ export class Document extends Node {
     let clonedSelf = new Document()
 
     // clone child nodes
-    for (let child of this.childNodes) {
-      let clonedChild = child.cloneNode(deep)
-      clonedSelf.appendChild(clonedChild)
+    if (deep) {
+      for (let child of this.childNodes) {
+        let clonedChild = child.cloneNode(deep)
+        clonedSelf.appendChild(clonedChild)
+      }
     }
     
     return clonedSelf

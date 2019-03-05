@@ -29,23 +29,23 @@ export class DocumentFragment extends Node {
   get nodeName(): string { return '#document-fragment' }
 
   /** 
-   * Returns the concatenation of data of all the {@link CharacterData}
+   * Gets or sets the concatenation of data of all the {@link Text}
    * node descendants in tree order. When set, replaces the text 
    * contents of the node with the given value. 
    */
   get textContent(): string | null {
     let str = ''
-    for (let child of this._childNodes) {
-      let childContent = child.textContent
-      if (childContent) str += childContent
+    for (const child of this._childNodes) {
+      if (child.nodeType !== Node.Comment && child.nodeType !== Node.ProcessingInstruction) {
+        const childContent = child.textContent
+        if (childContent)
+          str += childContent
+      }
     }
     return str
   }
   set textContent(value: string | null) {
-    let node: Node | null = null
-    if (value)
-      node = new Text(this.ownerDocument, value)
-
+    const node = new Text(this.ownerDocument, value || '')
     Utility.Tree.Mutation.replaceAllNode(node, this)
   }
 
@@ -62,9 +62,11 @@ export class DocumentFragment extends Node {
     let clonedSelf = new DocumentFragment(this.ownerDocument)
 
     // clone child nodes
-    for (let child of this.childNodes) {
-      let clonedChild = child.cloneNode(deep)
-      clonedSelf.appendChild(clonedChild)
+    if (deep) {
+      for (let child of this.childNodes) {
+        let clonedChild = child.cloneNode(deep)
+        clonedSelf.appendChild(clonedChild)
+      }
     }
 
     return clonedSelf

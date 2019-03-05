@@ -44,7 +44,6 @@ describe('Document', function () {
     expect(doc.nodeName).toBe('#document')
     expect(doc.doctype).toBe(doctype)
     expect(doc.documentElement && doc.documentElement.tagName).toBe('n:root')
-
   })
 
   test('getElementById()', function () {
@@ -179,8 +178,25 @@ describe('Document', function () {
     expect(clonedDoc.contentType).toBe('application/xml')
     expect(clonedDoc.nodeType).toBe(9)
     expect(clonedDoc.nodeName).toBe('#document')
+    expect(clonedDoc.doctype).toBeNull()
+    expect(clonedDoc.documentElement).toBeNull()
+  })
+
+  test('cloneNode(deep: true)', function () {
+    const clonedDoc = <any>doc.cloneNode(true)
+    expect(clonedDoc).not.toBe(doc)
+    expect(clonedDoc.URL).toBe('about:blank')
+    expect(clonedDoc.documentURI).toBe('about:blank')
+    expect(clonedDoc.origin).toBe('')
+    expect(clonedDoc.compatMode).toBe('CSS1Compat')
+    expect(clonedDoc.characterSet).toBe('UTF-8')
+    expect(clonedDoc.charset).toBe('UTF-8')
+    expect(clonedDoc.inputEncoding).toBe('UTF-8')
+    expect(clonedDoc.contentType).toBe('application/xml')
+    expect(clonedDoc.nodeType).toBe(9)
+    expect(clonedDoc.nodeName).toBe('#document')
     expect(clonedDoc.doctype.name).toBe('qname')
-    expect(clonedDoc.documentElement && clonedDoc.documentElement.tagName).toBe('n:root')
+    expect(clonedDoc.documentElement.tagName).toBe('n:root')
   })
 
   test('lookupPrefix()', function () {
