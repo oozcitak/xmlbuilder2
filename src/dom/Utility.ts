@@ -470,6 +470,7 @@ export class Utility {
           node.nodeType !== Node.Element &&
           node.nodeType !== Node.Text &&
           node.nodeType !== Node.ProcessingInstruction &&
+          node.nodeType !== Node.CData &&
           node.nodeType !== Node.Comment)
           throw DOMException.HierarchyRequestError
 
