@@ -1,6 +1,7 @@
 import { Node } from "./Node"
 import { CharacterData } from "./CharacterData"
 import { Document } from "./Document"
+import { DOMException } from "./DOMException"
 
 /**
  * Represents a text node.
@@ -58,6 +59,9 @@ export class Text extends CharacterData {
    * @param offset - the offset at which to split nodes.
    */
   splitText(offset: number): Text {
+    if (offset < 0 || offset > this.data.length)
+      throw DOMException.IndexSizeError
+      
     let newData = this.data.slice(offset)
     this.data = this.data.slice(0, offset)
 
