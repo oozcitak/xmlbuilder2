@@ -1,6 +1,6 @@
 import $$ from '../TestHelpers'
 
-describe('CharacterData.test', function () {
+describe('CharacterData', function () {
 
   const doc = $$.dom.createDocument('myns', 'root')
   const node1 = doc.createTextNode('data')
