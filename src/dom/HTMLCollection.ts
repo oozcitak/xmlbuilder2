@@ -73,20 +73,15 @@ export class HTMLCollection implements Iterable<Element> {
    * Returns an iterator for nodes.
    */
   *[Symbol.iterator](): IterableIterator<Element> {
-    let list: Array<Element> = []
-
-    Utility.Tree.forEachDescendant(this._parent,
-      { self: false, shadow: false }, (node: Node) => {
+    yield* Utility.Tree.getDescendants<Element>(this._parent, false, false,
+      (node: Node) => {
         if (node.nodeType === Node.Element) {
           const ele = <Element>node
-          if (this._filter(ele))
-            list.push(ele)
+          if (this._filter(ele)) return true
         }
-      })
-
-    for (const ele of list) {
-      yield ele
-    }
+        return false
+      }
+    )
   }
 
   /**

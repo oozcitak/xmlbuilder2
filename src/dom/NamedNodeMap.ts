@@ -4,10 +4,9 @@ import { DOMException } from "./DOMException"
 /**
  * Represents a collection of nodes.
  */
-export class NamedNodeMap implements IterableIterator<Attr> {
+export class NamedNodeMap implements Iterable<Attr> {
 
   protected _items: Array<Attr>
-  private _currentIterationIndex = 0
 
   constructor() {
     this._items = new Array<Attr>()
@@ -133,21 +132,7 @@ export class NamedNodeMap implements IterableIterator<Attr> {
   /**
    * Returns an iterator for nodes.
    */
-  [Symbol.iterator](): IterableIterator<Attr> {
-    this._currentIterationIndex = 0
-    return this
-  }
-
-  /**
-   * Iterates through child nodes.
-   */
-  next(): IteratorResult<Attr> {
-    if (this._currentIterationIndex < this._items.length) {
-        let item = this._items[this._currentIterationIndex]
-        this._currentIterationIndex++
-        return { done: false, value: item }
-    } else {
-      return { done: true } as any as IteratorResult<Attr>
-    }
+  *[Symbol.iterator](): IterableIterator<Attr> {
+    yield* this._items
   }
 }

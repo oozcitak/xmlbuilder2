@@ -61,6 +61,42 @@ export class Utility {
    * A tree is a finite hierarchical tree structure.
    */
   static Tree = class {
+
+    /**
+     * Traverses through all descendant nodes of the tree rooted at
+     * `node` in depth-first preorder.
+     * 
+     * @param node - root node of the tree
+     * @param self - whether to include `node` in traversal
+     * @param shadow - whether to visit shadow tree nodes
+     * @param filter - a function to filter nodes
+     */
+    static *getDescendants<T>(node: Node, self: boolean = false,
+      shadow: boolean = false, filter?: (childNode: Node) => any): IterableIterator<T> {
+
+      if (self && (!filter || filter(node)))
+        yield <T><unknown>node
+
+      // traverse shadow tree
+      if (shadow && node.nodeType === Node.Element) {
+        let ele = <Element>node
+        if (ele.shadowRoot) {
+          let child = ele.shadowRoot.firstChild
+          while (child) {
+            yield* Utility.Tree.getDescendants<T>(child, true, shadow, filter)
+            child = child.nextSibling
+          }
+        }
+      }
+
+      // traverse child nodes
+      let child = node.firstChild
+      while (child) {
+        yield* Utility.Tree.getDescendants<T>(child, true, shadow, filter)
+        child = child.nextSibling
+      }
+    }
+
     /**
      * Applies the given function to all descendant nodes of the given
      * node, optionaly including shadow trees. In tree order is 
