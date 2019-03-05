@@ -1,0 +1,49 @@
+import $$ from '../TestHelpers'
+
+describe('Text', function () {
+
+  const doc = $$.dom.createDocument('myns', 'root')
+  const node = doc.createTextNode('peaceathome')
+  const comment = doc.createComment('++++')
+  const node1 = doc.createTextNode('peace')
+  const node2 = doc.createTextNode('in')
+  const node3 = doc.createTextNode('the')
+  const node4 = doc.createTextNode('world')
+  if (doc.documentElement) {
+    doc.documentElement.appendChild(node)
+    doc.documentElement.appendChild(comment)
+    doc.documentElement.appendChild(node1)
+    doc.documentElement.appendChild(node2)
+    doc.documentElement.appendChild(node3)
+    doc.documentElement.appendChild(node4)
+  }
+
+  test('constructor()', function () {
+    expect(node1.nodeType).toBe(3)
+    expect(node1.nodeName).toBe('#text')
+    expect(node1.data).toBe('peace')
+  })
+
+  test('wholeText', function () {
+    expect(node1.wholeText).toBe('peaceintheworld')
+    expect(node2.wholeText).toBe('peaceintheworld')
+    expect(node3.wholeText).toBe('peaceintheworld')
+    expect(node4.wholeText).toBe('peaceintheworld')
+    expect(node.wholeText).toBe('peaceathome')
+  })
+
+  test('splitText()', function () {
+    const node5 = node.splitText(5)
+    const node6 = node5.splitText(2)
+    expect(node.wholeText).toBe('peaceathome')
+  })
+
+  test('cloneNode()', function () {
+    const clonedNode = <any>node1.cloneNode()
+    expect(clonedNode).not.toBe(node)
+    expect(clonedNode.nodeType).toBe(3)
+    expect(clonedNode.nodeName).toBe('#text')
+    expect(clonedNode.data).toBe('peace')
+  })
+
+})

@@ -32,17 +32,23 @@ export class Text extends CharacterData {
    * Returns the combined data of all direct text node siblings.
    */
   get wholeText(): string {
+    let text = ''
+
     let prev = this.previousSibling
-    let prevText = ''
-    if (prev && prev.nodeType === Node.Text)
-      prevText = (<Text>prev).wholeText
+    while (prev && prev.nodeType === Node.Text) {
+      text = (<Text>prev).data + text
+      prev = prev.previousSibling
+    }
+
+    text += this.data
 
     let next = this.nextSibling
-    let nextText = ''
-    if (next && next.nodeType === Node.Text)
-      nextText = (<Text>next).wholeText
+    while (next && next.nodeType === Node.Text) {
+      text += (<Text>next).data
+      next = next.nextSibling
+    }
 
-    return prevText + this.data + nextText
+    return text
   }
 
   /**
@@ -58,7 +64,7 @@ export class Text extends CharacterData {
     let newNode = new Text(this.ownerDocument, newData)
 
     if (this.parentNode)
-      this.parentNode.insertBefore(newNode, this)
+      this.parentNode.insertBefore(newNode, this.nextSibling)
 
     return newNode
   }
