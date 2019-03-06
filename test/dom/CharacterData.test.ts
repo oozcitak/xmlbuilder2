@@ -3,12 +3,14 @@ import $$ from '../TestHelpers'
 describe('CharacterData', function () {
 
   const doc = $$.dom.createDocument('myns', 'root')
+
+  if (!doc.documentElement)
+    throw new Error("documentElement is null")
+
   const node1 = doc.createTextNode('data')
   const node2 = doc.createTextNode('data')
-  if (doc.documentElement) {
-    doc.documentElement.appendChild(node1)
-    doc.documentElement.appendChild(node2)
-  }
+  doc.documentElement.appendChild(node1)
+  doc.documentElement.appendChild(node2)
 
   test('constructor()', function () {
     expect(node1.data).toBe('data')

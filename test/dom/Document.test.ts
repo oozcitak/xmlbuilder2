@@ -4,23 +4,25 @@ describe('Document', function () {
 
   const doctype = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
   const doc = $$.dom.createDocument('myns', 'n:root', doctype)
+
+  if (!doc.documentElement)
+    throw new Error("documentElement is null")
+
   const tele = doc.createElement('node_with_id')
   const tele1 = doc.createElement('tagged')
   const tele2 = doc.createElement('tagged')
   const nele1 = doc.createElementNS('http://www.w3.org/1999/xhtml', 'div')
   const text1 = doc.createTextNode('contents')
-  if (doc.documentElement) {
-    doc.documentElement.appendChild(tele1)
-    tele1.id = 'tele1'
-    doc.documentElement.appendChild(tele)
-    tele.id = 'uniq'
-    doc.documentElement.appendChild(tele2)
-    tele2.id = 'tele2'
-    doc.documentElement.appendChild(nele1)
-    nele1.id = 'div1'
-    nele1.setAttribute('class', 'para')
-    nele1.appendChild(text1)
-  }
+  doc.documentElement.appendChild(tele1)
+  tele1.id = 'tele1'
+  doc.documentElement.appendChild(tele)
+  tele.id = 'uniq'
+  doc.documentElement.appendChild(tele2)
+  tele2.id = 'tele2'
+  doc.documentElement.appendChild(nele1)
+  nele1.id = 'div1'
+  nele1.setAttribute('class', 'para')
+  nele1.appendChild(text1)
 
   test('constructor()', function () {
     expect($$.printTree(doc)).toBe($$.t`

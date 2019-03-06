@@ -3,20 +3,22 @@ import $$ from '../TestHelpers'
 describe('Text', function () {
 
   const doc = $$.dom.createDocument('myns', 'root')
+
+  if (!doc.documentElement)
+    throw new Error("documentElement is null")
+
   const node = doc.createTextNode('peaceathome')
   const comment = doc.createComment('++++')
   const node1 = doc.createTextNode('peace')
   const node2 = doc.createTextNode('in')
   const node3 = doc.createTextNode('the')
   const node4 = doc.createTextNode('world')
-  if (doc.documentElement) {
-    doc.documentElement.appendChild(node)
-    doc.documentElement.appendChild(comment)
-    doc.documentElement.appendChild(node1)
-    doc.documentElement.appendChild(node2)
-    doc.documentElement.appendChild(node3)
-    doc.documentElement.appendChild(node4)
-  }
+  doc.documentElement.appendChild(node)
+  doc.documentElement.appendChild(comment)
+  doc.documentElement.appendChild(node1)
+  doc.documentElement.appendChild(node2)
+  doc.documentElement.appendChild(node3)
+  doc.documentElement.appendChild(node4)
 
   test('constructor()', function () {
     expect(node1.nodeType).toBe(3)

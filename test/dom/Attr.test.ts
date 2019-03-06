@@ -3,12 +3,14 @@ import $$ from '../TestHelpers'
 describe('Attr', function () {
 
   const doc = $$.dom.createDocument('myns', 'root')
+
+  if (!doc.documentElement)
+    throw new Error("documentElement is null")
+
   const ele = doc.createElementNS('myns', 'n:root')
-  if (doc.documentElement) {
-    doc.documentElement.appendChild(ele)
-    ele.id = 'uniq'
-    ele.setAttributeNS('http://www.w3.org/1999/xhtml', 'ns:name', 'value')
-  }
+  doc.documentElement.appendChild(ele)
+  ele.id = 'uniq'
+  ele.setAttributeNS('http://www.w3.org/1999/xhtml', 'ns:name', 'value')
   const attr = <any>ele.getAttributeNode('ns:name')
 
   test('constructor()', function () {

@@ -3,14 +3,16 @@ import $$ from '../TestHelpers'
 describe('DocumentFragment', function () {
 
   const doc = $$.dom.createDocument('myns', 'root')
+
+  if (!doc.documentElement)
+    throw new Error("documentElement is null")
+
   const node = doc.createDocumentFragment()
-  if (doc.documentElement) {
-    doc.documentElement.appendChild(node)
-    node.appendChild(doc.createTextNode('this'))
-    node.appendChild(doc.createCDATASection('is'))
-    node.appendChild(doc.createTextNode('a'))
-    node.appendChild(doc.createTextNode('test'))
-  }
+  doc.documentElement.appendChild(node)
+  node.appendChild(doc.createTextNode('this'))
+  node.appendChild(doc.createCDATASection('is'))
+  node.appendChild(doc.createTextNode('a'))
+  node.appendChild(doc.createTextNode('test'))
 
   test('constructor()', function () {
     expect(node.nodeType).toBe(11)

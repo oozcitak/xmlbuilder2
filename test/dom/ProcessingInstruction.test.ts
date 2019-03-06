@@ -3,10 +3,12 @@ import $$ from '../TestHelpers'
 describe('ProcessingInstruction', function () {
 
   const doc = $$.dom.createDocument('myns', 'root')
+
+  if (!doc.documentElement)
+    throw new Error("documentElement is null")
+
   const node = doc.createProcessingInstruction('program', 'instruction')
-  if (doc.documentElement) {
-    doc.documentElement.appendChild(node)
-  }
+  doc.documentElement.appendChild(node)
 
   test('constructor()', function () {
     expect(node.nodeType).toBe(7)

@@ -3,17 +3,19 @@ import $$ from '../TestHelpers'
 describe('HTMLCollection', function () {
 
   const doc = $$.dom.createDocument('myns', 'root')
+
+  if (!doc.documentElement)
+    throw new Error("documentElement is null")
+
   const ele1 = doc.createElement('tagged')
   ele1.id = 'ele1'
   const ele2 = doc.createElement('tagged')
   ele2.id = 'ele2'
   const ele3 = doc.createElement('tagged')
   ele3.id = 'ele3'
-  if (doc.documentElement) {
-    doc.documentElement.appendChild(ele1)
-    doc.documentElement.appendChild(ele2)
-    ele1.appendChild(ele3)
-  }
+  doc.documentElement.appendChild(ele1)
+  doc.documentElement.appendChild(ele2)
+  ele1.appendChild(ele3)
   const list = doc.getElementsByTagName('tagged')
 
   test('length', function () {

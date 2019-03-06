@@ -3,11 +3,13 @@ import $$ from '../TestHelpers'
 describe('DOMTokenList', function () {
 
   const doc = $$.dom.createDocument('myns', 'root')
+
+  if (!doc.documentElement)
+    throw new Error("documentElement is null")
+
   const ele = doc.createElement('tagged')
-  if (doc.documentElement) {
-    doc.documentElement.appendChild(ele)
-    ele.setAttribute('class', 'one two three')
-  }
+  doc.documentElement.appendChild(ele)
+  ele.setAttribute('class', 'one two three')
   const list = ele.classList
 
   test('length', function () {

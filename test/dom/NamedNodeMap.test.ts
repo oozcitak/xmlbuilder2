@@ -3,12 +3,14 @@ import $$ from '../TestHelpers'
 describe('NamedNodeMap', function () {
 
   const doc = $$.dom.createDocument('myns', 'root')
+
+  if (!doc.documentElement)
+    throw new Error("documentElement is null")
+
   const ele = doc.createElement('tagged')
-  if (doc.documentElement) {
-    doc.documentElement.appendChild(ele)
-    ele.setAttribute('att', 'val')
-    ele.setAttributeNS('myns', 'd:att2', 'val2')
-  }
+  doc.documentElement.appendChild(ele)
+  ele.setAttribute('att', 'val')
+  ele.setAttributeNS('myns', 'd:att2', 'val2')
   const list = ele.attributes
 
   test('length', function () {
