@@ -5,7 +5,7 @@ import { Utility } from "./Utility"
 /**
  * Represents a token set.
  */
-export class DOMTokenList {
+export class DOMTokenList implements Iterable<string> {
 
   protected _ownerElement: Element
   protected _localName: string
@@ -164,12 +164,13 @@ export class DOMTokenList {
       Utility.OrderedSet.sanitize(value))
   }
 
+
   /**
-   * Allow iteration of tokens.
+   * Returns an iterator for tokens.
    */
-  [Symbol.iterator]() {
+  *[Symbol.iterator](): IterableIterator<string> {
     let set = this._valueAsSet
-    return set.values()
+    yield* set
   }
 
   /**
@@ -178,7 +179,7 @@ export class DOMTokenList {
    */
   get _valueAsSet(): Set<string> {
     let attValue = this._ownerElement.getAttribute(this._localName) || ''
-    let arr =Utility.OrderedSet.parse(attValue)
+    let arr = Utility.OrderedSet.parse(attValue)
     return new Set(arr)
   }
   set _valueAsSet(set: Set<string>) {
