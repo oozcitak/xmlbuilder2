@@ -69,7 +69,7 @@
   "scripts": {
     "pretest": "node ./scripts/concat-ts.js",
     "prepublishOnly": "tsc",
-    "test": "jest",
+    "test": "jest --onlyChanged",
     "cover": "jest --coverage"
   }
 }
