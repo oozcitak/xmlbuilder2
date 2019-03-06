@@ -285,7 +285,7 @@ export class Element extends Node {
    * @param attr - attribute to remove
    */
   removeAttributeNode(attr: Attr): Attr {
-    return this.attributes.removeNamedItemNS(attr.namespaceURI || '', attr.localName)
+    return this.attributes._removeNode(attr)
   }
 
   /**

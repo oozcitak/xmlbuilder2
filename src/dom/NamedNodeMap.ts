@@ -133,6 +133,21 @@ export class NamedNodeMap implements Iterable<Attr> {
   }
 
   /**
+   * Removes the given attribute.
+   * 
+   * @param att - attribute to remove
+   */
+  _removeNode(att: Attr): Attr {
+    let index = this._items.indexOf(att)
+
+    if (index === -1)
+      throw DOMException.NotFoundError
+
+    this._items.splice(index, 1)
+    return att
+  }
+
+  /**
    * Returns an iterator for nodes.
    */
   *[Symbol.iterator](): IterableIterator<Attr> {
