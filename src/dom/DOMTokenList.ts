@@ -24,7 +24,7 @@ export class DOMTokenList {
   /**
    * Returns the number of tokens.
    */
-  get length(): number { return this.valueAsSet.size }
+  get length(): number { return this._valueAsSet.size }
 
   /**
    * Returns the token at the given index.
@@ -32,7 +32,7 @@ export class DOMTokenList {
    * @param index - the index to of the token
    */
   item(index: number): string | null {
-    let set = this.valueAsSet
+    let set = this._valueAsSet
     let i = 0
     for (let token of set) {
       if (i === index) return token
@@ -47,7 +47,7 @@ export class DOMTokenList {
    * @param tokens - the token to check
    */
   contains(token: string): boolean {
-    return this.valueAsSet.has(token)
+    return this._valueAsSet.has(token)
   }
 
   /**
@@ -56,11 +56,11 @@ export class DOMTokenList {
    * @param tokens - the list of tokens to add
    */
   add(...tokens: string[]): void {
-    let set = this.valueAsSet
+    let set = this._valueAsSet
     for (let token of tokens) {
       set.add(token)
     }
-    this.valueAsSet = set
+    this._valueAsSet = set
   }
 
   /**
@@ -69,7 +69,7 @@ export class DOMTokenList {
    * @param tokens - the list of tokens to remove
    */
   remove(...tokens: string[]): void {
-    let set = this.valueAsSet
+    let set = this._valueAsSet
     for (let token of tokens) {
       if (!token)
         throw DOMException.SyntaxError
@@ -78,7 +78,7 @@ export class DOMTokenList {
       else
         set.delete(token)
     }
-    this.valueAsSet = set
+    this._valueAsSet = set
   }
 
   /**
@@ -95,7 +95,7 @@ export class DOMTokenList {
    */
   toggle(token: string, force: boolean | undefined = undefined): boolean {
     if (force === undefined) {
-      let set = this.valueAsSet
+      let set = this._valueAsSet
       if (set.has(token)) {
         this.remove(token)
         return false
@@ -103,7 +103,7 @@ export class DOMTokenList {
         this.add(token)
         return true
       }
-    } else if (force) {
+    } else if (!force) {
       this.remove(token)
       return false
     } else {
@@ -117,6 +117,9 @@ export class DOMTokenList {
    * 
    * @param token - the token to replace
    * @param newToken - the new token
+   * 
+   * @returns `true` if `token` was replaced with `newToken`,
+   * and `false` otherwise.
    */
   replace(token: string, newToken: string): boolean {
     if (!token || !newToken)
@@ -125,13 +128,13 @@ export class DOMTokenList {
       newToken.match(Utility.OrderedSet.WhiteSpace))
       throw DOMException.InvalidCharacterError
 
-    let set = this.valueAsSet
+    let set = this._valueAsSet
     if (!set.has(token)) {
       return false
     } else {
       set.delete(token)
       set.add(newToken)
-      this.valueAsSet = set
+      this._valueAsSet = set
       return true
     }
   }
@@ -146,7 +149,7 @@ export class DOMTokenList {
    * @param token - the token to check
    */
   supports(token: string): boolean {
-    throw DOMException.NotImplementedError
+    throw new TypeError('DOMTokenList has no supported tokens.')
   }
 
   /**
@@ -154,9 +157,7 @@ export class DOMTokenList {
    * list to the given value.
    */
   get value(): string {
-    let set = this.valueAsSet
-    let arr = Array.from(set)
-    return Utility.OrderedSet.serialize(Array.from(this.valueAsSet))
+    return Utility.OrderedSet.serialize(Array.from(this._valueAsSet))
   }
   set value(value: string) {
     this._ownerElement.setAttribute(this._localName,
@@ -167,7 +168,7 @@ export class DOMTokenList {
    * Allow iteration of tokens.
    */
   [Symbol.iterator]() {
-    let set = this.valueAsSet
+    let set = this._valueAsSet
     return set.values()
   }
 
@@ -175,12 +176,12 @@ export class DOMTokenList {
    * Gets or sets a set of strings created from the associated
    * attribute's value by splitting at ASCII whitespace characters.
    */
-  get valueAsSet(): Set<string> {
+  get _valueAsSet(): Set<string> {
     let attValue = this._ownerElement.getAttribute(this._localName) || ''
     let arr =Utility.OrderedSet.parse(attValue)
     return new Set(arr)
   }
-  set valueAsSet(set: Set<string>) {
+  set _valueAsSet(set: Set<string>) {
     if (!this._ownerElement.hasAttribute(this._localName) && set.size === 0)
       return
 
