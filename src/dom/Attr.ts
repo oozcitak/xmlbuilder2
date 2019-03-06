@@ -96,7 +96,7 @@ export class Attr extends Node {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    return new Attr(this.ownerDocument, this.ownerElement,
+    return new Attr(null, null,
       this.localName, this.namespaceURI, this.prefix, this.value)
   }
 

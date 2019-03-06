@@ -1,4 +1,5 @@
 import { Attr } from "./Attr"
+import { Element } from "./Element"
 import { DOMException } from "./DOMException"
 
 /**
@@ -6,9 +7,11 @@ import { DOMException } from "./DOMException"
  */
 export class NamedNodeMap implements Iterable<Attr> {
 
+  protected _ownerElement: Element
   protected _items: Array<Attr>
 
-  constructor() {
+  constructor(ownerElement: Element) {
+    this._ownerElement = ownerElement
     this._items = new Array<Attr>()
   }
 
@@ -43,7 +46,7 @@ export class NamedNodeMap implements Iterable<Attr> {
    * @param namespace - namespace to search for
    * @param localName - local name to search for
    */
-  getNamedItemNS(namespace: string, localName: string): Attr | null {
+  getNamedItemNS(namespace: string | null = null, localName: string): Attr | null {
     for (let att of this._items) {
       if (att.namespaceURI === namespace && att.localName === localName)
         return att
@@ -57,10 +60,19 @@ export class NamedNodeMap implements Iterable<Attr> {
    * @param attr - attribute to set
    */
   setNamedItem(attr: Attr): Attr | null {
-    if (!attr.ownerElement)
+    return this.setNamedItemNS(attr)
+  }
+
+  /**
+   * Sets the attribute given with `attr`.
+   * 
+   * @param attr - attribute to set
+   */
+  setNamedItemNS(attr: Attr): Attr | null {
+    if (attr.ownerElement && attr.ownerElement !== this._ownerElement)
       throw DOMException.InUseAttributeError
 
-    let oldAttr = this.getNamedItemNS(attr.namespaceURI || '', attr.localName)
+    let oldAttr = this.getNamedItemNS(attr.namespaceURI, attr.localName)
     if (oldAttr === attr) return attr
     if (oldAttr) {
       let index = this._items.indexOf(oldAttr)
@@ -70,15 +82,6 @@ export class NamedNodeMap implements Iterable<Attr> {
     }
 
     return oldAttr
-  }
-
-  /**
-   * Sets the attribute given with `attr`.
-   * 
-   * @param attr - attribute to set
-   */
-  setNamedItemNS(attr: Attr): Attr | null {
-    return this.setNamedItem(attr)
   }
 
   /**

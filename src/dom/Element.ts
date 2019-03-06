@@ -17,7 +17,7 @@ export class Element extends Node {
   protected _namespaceURI: string | null
   protected _prefix: string | null
   protected _localName: string
-  protected _attributes: NamedNodeMap = new NamedNodeMap()
+  protected _attributes: NamedNodeMap = new NamedNodeMap(this)
   protected _shadowRoot: ShadowRoot | null = null
   
   /**

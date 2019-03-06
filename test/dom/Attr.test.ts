@@ -33,7 +33,7 @@ describe('Attr', function () {
     expect(clonedAttr).not.toBe(attr)
     expect(clonedAttr.nodeType).toBe(2)
     expect(clonedAttr.nodeName).toBe('ns:name')
-    expect(clonedAttr.ownerElement).toBe(ele)
+    expect(clonedAttr.ownerElement).toBeNull()
     expect(clonedAttr.namespaceURI).toBe('http://www.w3.org/1999/xhtml')
     expect(clonedAttr.prefix).toBe('ns')
     expect(clonedAttr.localName).toBe('name')
