@@ -28,6 +28,7 @@
     "ts-jest": "*",
     "dedent": "*",
     "glob": "*",
+    "@types/node": "*",
     "@types/jest": "*",
     "@types/dedent": "*"
   },
@@ -37,38 +38,11 @@
     },
     "testRegex": "/test/.*\\.test\\.tsx?$",
     "testEnvironment": "node",
-    "setupFiles": [ "./test/TestHelpers.ts" ]
+    "setupFiles": [
+      "./test/TestHelpers.ts"
+    ]
   },
-  "concat-ts": [
-    {
-      "inputFiles": [
-        "./src/dom/DOMException.ts",
-        "./src/dom/Node.ts",
-        "./src/dom/CharacterData.ts",
-        "./src/dom/Text.ts",
-        "./src/dom/Utility.ts",
-        "./src/dom/HTMLCollection.ts",
-        "./src/dom/Document.ts",
-        "./src/dom/XMLDocument.ts",
-        "./src/dom/DocumentFragment.ts",
-        "./src/dom/ShadowRoot.ts",
-        "./src/dom/Element.ts",
-        "./src/dom/DocumentType.ts",
-        "./src/dom/NonElementParentNode.ts",
-        "./src/dom/DocumentOrShadowRoot.ts",
-        "./src/dom/ParentNode.ts",
-        "./src/dom/ChildNode.ts",
-        "./src/dom/Slotable.ts",
-        "./src/dom/*.ts"
-      ],
-      "outputFile": "./lib/dom.ts",
-      "removeImports": true,
-      "deleteText": true
-    }
-  ],
   "scripts": {
-    "pretest": "node ./scripts/concat-ts.js",
-    "prepublishOnly": "tsc",
     "test": "jest --onlyChanged",
     "cover": "jest --coverage"
   }

@@ -1,11 +1,11 @@
-import { Node } from "./Node"
-import { CharacterData } from "./CharacterData"
-import { Document } from "./Document"
+import { Node, Document, ProcessingInstruction, 
+  NodeType } from "./interfaces"
+import { CharacterDataImpl } from "./CharacterDataImpl"
 
 /**
  * Represents a processing instruction node.
  */
-export class ProcessingInstruction extends CharacterData {
+export class ProcessingInstructionImpl extends CharacterDataImpl implements ProcessingInstruction {
 
   protected _target: string
 
@@ -24,7 +24,7 @@ export class ProcessingInstruction extends CharacterData {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return Node.ProcessingInstruction }
+  get nodeType(): number { return NodeType.ProcessingInstruction }
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -46,7 +46,7 @@ export class ProcessingInstruction extends CharacterData {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new ProcessingInstruction(this.ownerDocument,
+    let clonedSelf = new ProcessingInstructionImpl(this.ownerDocument,
       this.target, this.data)
     return clonedSelf
   }

@@ -1,24 +1,22 @@
-import { Node } from './Node'
-import { HTMLCollection } from './HTMLCollection'
-import { Element } from './Element'
-import { DocumentFragment } from './DocumentFragment'
-import { Document } from './Document'
-import { DOMException } from './DOMException'
-import { NodeList } from './NodeList'
-import { Utility } from './Utility'
+import { ParentNode, Node, NodeType, HTMLCollection, 
+  NodeList, Element } from './interfaces';
+import { HTMLCollectionImpl } from './HTMLCollectionImpl';
+import { DOMExceptionImpl } from './DOMExceptionImpl'
+import { Convert } from './Convert'
 
 /**
  * Represents a mixin that extends parent nodes that can have children.
  * This mixin is implemented by {@link Element}, {@link Document} and
  * {@link DocumentFragment}.
  */
-class ParentNode {
+export class ParentNodeImpl implements ParentNode {
   /**
    * Returns the child elements.
    */
   get children(): HTMLCollection {
-    return new HTMLCollection(<Node><unknown>this)
+    return new HTMLCollectionImpl(<Node><unknown>this)
   }
+  set children(value: HTMLCollection) { throw new Error("This property is read-only.") }
 
   /**
    * Returns the first child that is an element, and `null` otherwise.
@@ -27,13 +25,14 @@ class ParentNode {
     let node = (<Node><unknown>this).firstChild
 
     while (node) {
-      if (node.nodeType === Node.Element)
+      if (node.nodeType === NodeType.Element)
         return <Element>node
       else
         node = node.nextSibling
     }
     return null
   }
+  set firstElementChild(value: Element | null) { throw new Error("This property is read-only.") }
 
   /**
    * Returns the last child that is an element, and `null` otherwise.
@@ -42,13 +41,14 @@ class ParentNode {
     let node = (<Node><unknown>this).lastChild
 
     while (node) {
-      if (node.nodeType === Node.Element)
+      if (node.nodeType === NodeType.Element)
         return <Element>node
       else
         node = node.previousSibling
     }
     return null
   }
+  set lastElementChild(value: Element | null) { throw new Error("This property is read-only.") }
 
   /**
    * Returns the number of children that are elements.
@@ -58,7 +58,7 @@ class ParentNode {
     let count = 0
 
     while (node) {
-      if (node.nodeType === Node.Element)
+      if (node.nodeType === NodeType.Element)
         count++
       
       node = node.nextSibling
@@ -66,6 +66,7 @@ class ParentNode {
   
     return count
   }
+  set childElementCount(value: number) { throw new Error("This property is read-only.") }
 
   /**
    * Prepends the list of nodes or strings before the first child node.
@@ -77,7 +78,7 @@ class ParentNode {
     let node = <Node><unknown>this
 
     if(node.ownerDocument) {
-      let childNode = Utility.Tree.Mutation.convertNodesIntoNode(nodes, node.ownerDocument)
+      let childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
       node.insertBefore(childNode, node.firstChild)
     }
   }
@@ -92,7 +93,7 @@ class ParentNode {
     let node = <Node><unknown>this
 
     if(node.ownerDocument) {
-      let childNode = Utility.Tree.Mutation.convertNodesIntoNode(nodes, node.ownerDocument)
+      let childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
       node.appendChild(childNode)
     }
   }
@@ -107,7 +108,7 @@ class ParentNode {
    * @param selectors - a selectors string
    */
   querySelector(selectors: string): Element | null {
-    throw DOMException.NotSupportedError
+    throw DOMExceptionImpl.NotSupportedError
   }
 
   /**
@@ -119,11 +120,7 @@ class ParentNode {
    * @param selectors - a selectors string
    */
   querySelectorAll(selectors: string): NodeList {
-    throw DOMException.NotSupportedError
+    throw DOMExceptionImpl.NotSupportedError
   }
+  
 }
-
-// Apply mixins
-Utility.Internal.applyMixin(Document, ParentNode)
-Utility.Internal.applyMixin(DocumentFragment, ParentNode)
-Utility.Internal.applyMixin(Element, ParentNode)

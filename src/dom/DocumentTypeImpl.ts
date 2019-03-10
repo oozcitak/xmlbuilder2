@@ -1,11 +1,11 @@
-import { Node } from "./Node"
-import { Document } from "./Document"
+import { DocumentType, Node, Document, NodeType } from "./interfaces"
+import { NodeImpl } from './NodeImpl'
 
 /**
  * Represents an object providing methods which are not dependent on 
  * any particular document
  */
-export class DocumentType extends Node {
+export class DocumentTypeImpl extends NodeImpl implements DocumentType {
 
   protected _nodeName: string
   protected _publicId: string
@@ -31,7 +31,7 @@ export class DocumentType extends Node {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return Node.DocumentType }
+  get nodeType(): number { return NodeType.DocumentType }
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -63,7 +63,7 @@ export class DocumentType extends Node {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new DocumentType(this.ownerDocument, this.name,
+    let clonedSelf = new DocumentTypeImpl(this.ownerDocument, this.name,
       this.publicId, this.systemId)
     return clonedSelf
   }
@@ -85,4 +85,11 @@ export class DocumentType extends Node {
     else
       return true
   }
+
+  // MIXIN: ChildNode
+  before(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  after(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  replaceWith(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  remove(): void { throw new Error("Mixin: ChildNode not implemented.") }
+
 }

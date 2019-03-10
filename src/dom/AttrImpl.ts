@@ -1,11 +1,11 @@
-import { Node } from "./Node"
-import { Element } from "./Element"
-import { Document } from "./Document"
+import { Attr, Node, Element, Document, NodeType } from "./interfaces"
+import { NodeImpl } from "./NodeImpl"
 
 /**
  * Represents an attribute of an element node.
  */
-export class Attr extends Node {
+export class AttrImpl extends NodeImpl implements Attr {
+
   protected _namespaceURI: string | null
   protected _prefix: string | null
   protected _localName: string
@@ -42,7 +42,7 @@ export class Attr extends Node {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return Node.Attribute }
+  get nodeType(): number { return NodeType.Attribute }
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -96,7 +96,7 @@ export class Attr extends Node {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    return new Attr(null, null,
+    return new AttrImpl(null, null,
       this.localName, this.namespaceURI, this.prefix, this.value)
   }
 

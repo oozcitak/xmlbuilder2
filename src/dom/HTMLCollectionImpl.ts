@@ -1,13 +1,13 @@
-import { Element } from "./Element"
-import { Node } from "./Node"
+import { Node, Element, HTMLCollection, NodeType } from "./interfaces"
 import { Utility } from "./Utility"
 
 /**
  * Represents a collection of elements.
  */
-export class HTMLCollection implements Iterable<Element> {
+export class HTMLCollectionImpl implements HTMLCollection {
 
-  protected static reservedNames = ['_parent', '_filter', 'length', 'item', 'namedItem', 'get']
+  protected static reservedNames = ['_parent', '_filter', 'length', 
+    'item', 'namedItem', 'get']
 
   protected _parent: Node
   protected _filter: (element: Element) => any
@@ -21,7 +21,7 @@ export class HTMLCollection implements Iterable<Element> {
     this._parent = parent
     this._filter = filter || function (element: Element) { return true }
 
-    return new Proxy(this, this)
+    return new Proxy<HTMLCollectionImpl>(this, this)
   }
 
   /** 
@@ -75,7 +75,7 @@ export class HTMLCollection implements Iterable<Element> {
   *[Symbol.iterator](): IterableIterator<Element> {
     yield* Utility.Tree.getDescendants<Element>(this._parent, false, false,
       (node: Node) => {
-        if (node.nodeType === Node.Element) {
+        if (node.nodeType === NodeType.Element) {
           const ele = <Element>node
           if (this._filter(ele)) return true
         }
@@ -100,7 +100,7 @@ export class HTMLCollection implements Iterable<Element> {
    * Implements a proxy get trap to provide array-like access.
    */
   get(target: HTMLCollection, key: string | symbol, receiver: any): Element | null {
-    if (typeof key === 'string' && HTMLCollection.reservedNames.indexOf(key) === -1) {
+    if (typeof key === 'string' && HTMLCollectionImpl.reservedNames.indexOf(key) === -1) {
       const index = Number(key)
       if (isNaN(Number(index)))
         return target.namedItem(key)

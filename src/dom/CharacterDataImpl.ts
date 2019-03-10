@@ -1,10 +1,10 @@
-import { Node } from "./Node"
-import { Document } from "./Document"
+import { CharacterData, Document, Element, Node } from "./interfaces"
+import { NodeImpl } from "./NodeImpl"
 
 /**
  * Represents a generic text node.
  */
-export abstract class CharacterData extends Node {
+export abstract class CharacterDataImpl extends NodeImpl implements CharacterData {
 
   protected _data: string
 
@@ -117,4 +117,18 @@ export abstract class CharacterData extends Node {
   substringData(offset: number, count: number): string {
     return this.data.substr(offset, count)
   }
+
+
+  // MIXIN: NonDocumentTypeChildNode
+  get previousElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
+  set previousElementSibling(value: Element | null) { }
+  get nextElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
+  set nextElementSibling(value: Element | null) { }
+
+  // MIXIN: ChildNode
+  before(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  after(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  replaceWith(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  remove(): void { throw new Error("Mixin: ChildNode not implemented.") }
+
 }

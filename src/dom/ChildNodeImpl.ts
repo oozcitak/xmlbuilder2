@@ -1,15 +1,13 @@
-import { Node } from './Node'
-import { CharacterData } from './CharacterData'
-import { Element } from './Element'
-import { DocumentType } from './DocumentType'
+import { Node, ChildNode } from './interfaces'
 import { Utility } from './Utility'
+import { Convert } from './Convert'
 
 /**
  * Represents a mixin that extends child nodes that can have siblings
  * including doctypes. This mixin is implemented by {@link Element},
  * {@link CharacterData} and {@link DocumentType}.
  */
-class ChildNode {
+export class ChildNodeImpl implements ChildNode {
 
   /**
    * Inserts nodes just before this node, while replacing strings in
@@ -35,7 +33,7 @@ class ChildNode {
     }
 
     if (context.ownerDocument) {
-      let node = Utility.Tree.Mutation.convertNodesIntoNode(nodes, context.ownerDocument)
+      let node = Convert.nodesIntoNode(nodes, context.ownerDocument)
 
       if (!viablePreviousSibling)
         viablePreviousSibling = parent.firstChild
@@ -70,7 +68,7 @@ class ChildNode {
     }
 
     if (context.ownerDocument) {
-      let node = Utility.Tree.Mutation.convertNodesIntoNode(nodes, context.ownerDocument)
+      let node = Convert.nodesIntoNode(nodes, context.ownerDocument)
 
       Utility.Tree.Mutation.preInsert(node, parent, viableNextSibling)
     }
@@ -100,7 +98,7 @@ class ChildNode {
     }
 
     if (context.ownerDocument) {
-      let node = Utility.Tree.Mutation.convertNodesIntoNode(nodes, context.ownerDocument)
+      let node = Convert.nodesIntoNode(nodes, context.ownerDocument)
 
       // Note: Context object could have been inserted into node.
       if (context.parentNode === parent)
@@ -122,8 +120,3 @@ class ChildNode {
     Utility.Tree.Mutation.removeNode(context, parent)
   }
 }
-
-// Apply mixins
-Utility.Internal.applyMixin(Element, ChildNode)
-Utility.Internal.applyMixin(CharacterData, ChildNode)
-Utility.Internal.applyMixin(DocumentType, ChildNode)

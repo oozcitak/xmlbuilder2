@@ -1,25 +1,20 @@
-import { Element } from "./Element"
-import { Document } from "./Document"
-import { DocumentFragment } from "./DocumentFragment"
+import { Element, Document, ShadowRoot, ShadowRootMode } from "./interfaces"
+import { DocumentFragmentImpl } from "./DocumentFragmentImpl"
 
 /**
  * Represents a shadow root.
  */
-export class ShadowRoot extends DocumentFragment {
-  // mode
-  static readonly Open = "open"
-  static readonly Closed = "closed"
-
+export class ShadowRootImpl extends DocumentFragmentImpl implements ShadowRoot {
   protected _host: Element
-  protected _mode: string
+  protected _mode: ShadowRootMode
   
   /**
    * Initializes a new instance of `ShadowRoot`.
    *
    * @param ownerDocument - the owner document
    */
-  protected constructor(ownerDocument: Document | null = null,
-    host: Element, mode: string) {
+  constructor(ownerDocument: Document | null = null,
+    host: Element, mode: ShadowRootMode) {
     super(ownerDocument)
 
     this._host = host
@@ -32,7 +27,7 @@ export class ShadowRoot extends DocumentFragment {
    * This method is not supported by this module and will throw an
    * exception.
    */
-  get mode(): string { return this._mode }
+  get mode(): ShadowRootMode { return this._mode }
 
   /** 
    * Gets the shadow root's host.
@@ -41,4 +36,7 @@ export class ShadowRoot extends DocumentFragment {
    * exception.
    */
   get host(): Element { return this._host }
+
+  // MIXIN: DocumentOrShadowRoot
+  // No elements
 }

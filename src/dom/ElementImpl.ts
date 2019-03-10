@@ -1,23 +1,24 @@
-import { Node } from './Node'
-import { DOMException } from './DOMException'
-import { HTMLCollection } from './HTMLCollection'
+import { Attr, NamedNodeMap, DOMTokenList, Document, 
+  ShadowRoot, NodeType, Node, Element, 
+  HTMLCollection, NodeList, ShadowRootMode } from './interfaces'
+import { TextImpl } from './TextImpl';
+import { NodeImpl } from './NodeImpl'
+import { AttrImpl } from './AttrImpl'
+import { HTMLCollectionImpl } from './HTMLCollectionImpl'
+import { NamedNodeMapImpl } from './NamedNodeMapImpl'
+import { DOMTokenListImpl } from './DOMTokenListImpl'
 import { Utility } from './Utility'
-import { Attr } from './Attr'
-import { NamedNodeMap } from './NamedNodeMap'
-import { DOMTokenList } from './DOMTokenList'
-import { Document } from './Document'
-import { Text } from './Text'
-import { ShadowRoot } from './ShadowRoot'
+import { DOMExceptionImpl } from './DOMExceptionImpl'
 
 /**
  * Represents an element node.
  */
-export class Element extends Node {
+export class ElementImpl extends NodeImpl implements Element {
 
   protected _namespaceURI: string | null
   protected _prefix: string | null
   protected _localName: string
-  protected _attributes: NamedNodeMap = new NamedNodeMap(this)
+  protected _attributes: NamedNodeMap = new NamedNodeMapImpl(this)
   protected _shadowRoot: ShadowRoot | null = null
   
   /**
@@ -40,7 +41,7 @@ export class Element extends Node {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return Node.Element }
+  get nodeType(): number { return NodeType.Element }
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -88,7 +89,7 @@ export class Element extends Node {
   /** 
    * Returns a {@link DOMTokenList} with tokens from the class attribute.
    */
-  get classList(): DOMTokenList { return new DOMTokenList(this, 'class') }
+  get classList(): DOMTokenList { return new DOMTokenListImpl(this, 'class') }
 
   /** 
    * Gets or sets the slot attribute of this element.
@@ -153,12 +154,11 @@ export class Element extends Node {
     if (attr) {
       attr.value = value
     } else {
-      attr = new Attr(this.ownerDocument, this, qualifiedName,
+      attr = new AttrImpl(this.ownerDocument, this, qualifiedName,
         null, null, value)
       this.attributes.setNamedItem(attr)
     }
   }
-
   /**
    * Sets the value of the attribute with the given `namespace` and 
    * `qualifiedName`.
@@ -174,7 +174,7 @@ export class Element extends Node {
     if (attr) {
       attr.value = value
     } else {
-      attr = new Attr(this.ownerDocument, this, names.localName,
+      attr = new AttrImpl(this.ownerDocument, this, names.localName,
         namespace, names.prefix, value)
       this.attributes.setNamedItemNS(attr)
     }
@@ -285,7 +285,7 @@ export class Element extends Node {
    * @param attr - attribute to remove
    */
   removeAttributeNode(attr: Attr): Attr {
-    return this.attributes._removeNode(attr)
+    return this.attributes.removeNamedItemNS(attr.namespaceURI, attr.localName)
   }
 
   /**
@@ -297,7 +297,7 @@ export class Element extends Node {
    * @param init - A ShadowRootInit dictionary.
    */
   attachShadow(init: object): ShadowRoot {
-    throw DOMException.NotImplementedError
+    throw DOMExceptionImpl.NotImplementedError
   }
 
   /**
@@ -308,7 +308,7 @@ export class Element extends Node {
    * exception.
    */
   get shadowRoot(): ShadowRoot | null {
-    if (!this._shadowRoot || this._shadowRoot.mode === ShadowRoot.Closed)
+    if (!this._shadowRoot || this._shadowRoot.mode === ShadowRootMode.Closed)
       return null
     else
       return this._shadowRoot
@@ -324,7 +324,7 @@ export class Element extends Node {
    * @param selectors 
    */
   closest(selectors: string): Element | null {
-    throw DOMException.NotImplementedError
+    throw DOMExceptionImpl.NotImplementedError
   }
 
   /**
@@ -337,7 +337,7 @@ export class Element extends Node {
    * @param selectors 
    */
   matches(selectors: string): boolean {
-    throw DOMException.NotImplementedError
+    throw DOMExceptionImpl.NotImplementedError
   }
 
   /** 
@@ -348,7 +348,8 @@ export class Element extends Node {
   get textContent(): string | null {
     let str = ''
     for (const child of this._childNodes) {
-      if (child.nodeType !== Node.Comment && child.nodeType !== Node.ProcessingInstruction) {
+      if (child.nodeType !== NodeType.Comment && 
+        child.nodeType !== NodeType.ProcessingInstruction) {
         const childContent = child.textContent
         if (childContent)
           str += childContent
@@ -357,7 +358,7 @@ export class Element extends Node {
     return str
   }
   set textContent(value: string | null) {
-    const node = new Text(this.ownerDocument, value || '')
+    const node = new TextImpl(this.ownerDocument, value || '')
     Utility.Tree.Mutation.replaceAllNode(node, this)
   }
 
@@ -371,7 +372,7 @@ export class Element extends Node {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new Element(this.ownerDocument,
+    let clonedSelf = new ElementImpl(this.ownerDocument,
       this.localName, this.namespaceURI, this.prefix)
 
     // clone attributes
@@ -433,7 +434,7 @@ export class Element extends Node {
    * elements
    */
   getElementsByTagName(qualifiedName: string): HTMLCollection {
-    return new HTMLCollection(this, function (ele: Element) {
+    return new HTMLCollectionImpl(this, function (ele: Element) {
       return (qualifiedName === '*' || ele.tagName === qualifiedName)
     })
   }
@@ -451,7 +452,7 @@ export class Element extends Node {
    * elements
    */
   getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection {
-    return new HTMLCollection(this, function (ele: Element) {
+    return new HTMLCollectionImpl(this, function (ele: Element) {
       return ((localName === '*' || ele.localName === localName) &&
         (namespace === '*' || ele.namespaceURI === namespace))
     })
@@ -469,7 +470,7 @@ export class Element extends Node {
    */
   getElementsByClassName(classNames: string): HTMLCollection {
     let arr = Utility.OrderedSet.parse(classNames)
-    return new HTMLCollection(this, function (ele: Element) {
+    return new HTMLCollectionImpl(this, function (ele: Element) {
       let classes = ele.classList
       let allClassesFound = true
       for (let className of arr) {
@@ -607,4 +608,35 @@ export class Element extends Node {
 
     return null
   }
+
+  // MIXIN: ParentNode
+  get children(): HTMLCollection { throw new Error("Mixin: ParentNode not implemented.") }
+  set children(value: HTMLCollection) { }
+  get firstElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  set firstElementChild(value: Element | null) { }
+  get lastElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  set lastElementChild(value: Element | null) { }
+  get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
+  set childElementCount(value: number) { }
+  prepend(nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
+  append(nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
+  querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  querySelectorAll(selectors: string): NodeList { throw new Error("Mixin: ParentNode not implemented.") }
+
+  // MIXIN: NonDocumentTypeChildNode
+  get previousElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
+  set previousElementSibling(value: Element | null) { }
+  get nextElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
+  set nextElementSibling(value: Element | null) { }
+
+  // MIXIN: ChildNode
+  before(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  after(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  replaceWith(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  remove(): void { throw new Error("Mixin: ChildNode not implemented.") }
+
+  // MIXIN: Slotable
+  get assignedSlot(): undefined { throw new Error("Mixin: Slotable not implemented.") }
+  set assignedSlot(value: undefined) { }
+
 }

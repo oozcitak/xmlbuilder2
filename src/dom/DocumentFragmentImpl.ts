@@ -1,13 +1,13 @@
-import { Node } from "./Node"
-import { Document } from "./Document"
-import { Text } from "./Text"
+import { Node, DocumentFragment, Document, Element, 
+  NodeType, HTMLCollection, NodeList } from "./interfaces"
+import { NodeImpl } from "./NodeImpl"
+import { TextImpl } from "./TextImpl"
 import { Utility } from "./Utility"
-import { Element } from "./Element"
 
 /**
  * Represents a document fragment in the XML tree.
  */
-export class DocumentFragment extends Node {
+export class DocumentFragmentImpl extends NodeImpl implements DocumentFragment {
 
   /**
    * Initializes a new instance of `DocumentFragment`.
@@ -21,7 +21,7 @@ export class DocumentFragment extends Node {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return Node.DocumentFragment }
+  get nodeType(): number { return NodeType.DocumentFragment }
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -36,7 +36,8 @@ export class DocumentFragment extends Node {
   get textContent(): string | null {
     let str = ''
     for (const child of this._childNodes) {
-      if (child.nodeType !== Node.Comment && child.nodeType !== Node.ProcessingInstruction) {
+      if (child.nodeType !== NodeType.Comment && 
+        child.nodeType !== NodeType.ProcessingInstruction) {
         const childContent = child.textContent
         if (childContent)
           str += childContent
@@ -45,7 +46,7 @@ export class DocumentFragment extends Node {
     return str
   }
   set textContent(value: string | null) {
-    const node = new Text(this.ownerDocument, value || '')
+    const node = new TextImpl(this.ownerDocument, value || '')
     Utility.Tree.Mutation.replaceAllNode(node, this)
   }
 
@@ -59,7 +60,7 @@ export class DocumentFragment extends Node {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new DocumentFragment(this.ownerDocument)
+    let clonedSelf = new DocumentFragmentImpl(this.ownerDocument)
 
     // clone child nodes
     if (deep) {
@@ -92,10 +93,21 @@ export class DocumentFragment extends Node {
     return null
   }
 
-  /**
-   * Returns an {@link Element}  who has an id attribute `elementId`.
-   * 
-   * @param elementId - the value of the `id` attribute to match
-   */
-  getElementById(elementId: string): Element | null { return null }
+  // MIXIN: NonElementParentNode
+  getElementById(elementId: string): Element | null { throw new Error("Mixin: NonElementParentNode not implemented.") }
+
+  // MIXIN: ParentNode
+  get children(): HTMLCollection { throw new Error("Mixin: ParentNode not implemented.") }
+  set children(value: HTMLCollection) { }
+  get firstElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  set firstElementChild(value: Element | null) { }
+  get lastElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  set lastElementChild(value: Element | null) { }
+  get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
+  set childElementCount(value: number) { }
+  prepend(nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
+  append(nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
+  querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  querySelectorAll(selectors: string): NodeList { throw new Error("Mixin: ParentNode not implemented.") }
+
 }

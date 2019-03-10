@@ -1,4 +1,4 @@
-import { DOMImplementation } from '../lib/dom'
+import { DOMImplementation } from '../src/dom/index'
 import dedent from "dedent"
 
 export default class TestHelpers {

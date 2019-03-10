@@ -1,12 +1,11 @@
-import { Node } from "./Node"
-import { CharacterData } from "./CharacterData"
-import { Document } from "./Document"
-import { DOMException } from "./DOMException"
+import { Text, Document, Node, NodeType } from "./interfaces"
+import { CharacterDataImpl } from "./CharacterDataImpl"
+import { DOMExceptionImpl } from "./DOMExceptionImpl"
 
 /**
  * Represents a text node.
  */
-export class Text extends CharacterData {
+export class TextImpl extends CharacterDataImpl implements Text {
 
   /**
    * Initializes a new instance of `Text`.
@@ -22,7 +21,7 @@ export class Text extends CharacterData {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return Node.Text }
+  get nodeType(): number { return NodeType.Text }
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -36,7 +35,7 @@ export class Text extends CharacterData {
     let text = ''
 
     let prev = this.previousSibling
-    while (prev && prev.nodeType === Node.Text) {
+    while (prev && prev.nodeType === NodeType.Text) {
       text = (<Text>prev).data + text
       prev = prev.previousSibling
     }
@@ -44,7 +43,7 @@ export class Text extends CharacterData {
     text += this.data
 
     let next = this.nextSibling
-    while (next && next.nodeType === Node.Text) {
+    while (next && next.nodeType === NodeType.Text) {
       text += (<Text>next).data
       next = next.nextSibling
     }
@@ -60,12 +59,12 @@ export class Text extends CharacterData {
    */
   splitText(offset: number): Text {
     if (offset < 0 || offset > this.data.length)
-      throw DOMException.IndexSizeError
+      throw DOMExceptionImpl.IndexSizeError
       
     let newData = this.data.slice(offset)
     this.data = this.data.slice(0, offset)
 
-    let newNode = new Text(this.ownerDocument, newData)
+    let newNode = new TextImpl(this.ownerDocument, newData)
 
     if (this.parentNode)
       this.parentNode.insertBefore(newNode, this.nextSibling)
@@ -83,7 +82,12 @@ export class Text extends CharacterData {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new Text(this.ownerDocument, this.data)
+    let clonedSelf = new TextImpl(this.ownerDocument, this.data)
     return clonedSelf
   }
+
+  // MIXIN: Slotable
+  get assignedSlot(): undefined { throw new Error("Mixin: Slotable not implemented.") }
+  set assignedSlot(value: undefined) { }
+
 }

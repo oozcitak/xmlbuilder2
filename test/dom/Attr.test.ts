@@ -2,7 +2,7 @@ import $$ from '../TestHelpers'
 
 describe('Attr', function () {
 
-  const doc = $$.dom.createDocument('myns', 'root')
+  const doc = $$.dom.createDocument('mydefaultns', 'root')
 
   if (!doc.documentElement)
     throw new Error("documentElement is null")
@@ -44,10 +44,16 @@ describe('Attr', function () {
 
   test('lookupPrefix()', function () {
     expect(attr.lookupPrefix('myns')).toBe('n')
+    expect(attr.lookupPrefix()).toBeNull()
+    const cloned = <any>(attr.cloneNode())
+    expect(cloned.lookupPrefix('none')).toBeNull()
   })
 
   test('lookupNamespaceURI()', function () {
     expect(attr.lookupNamespaceURI('n')).toBe('myns')
+    expect(attr.lookupNamespaceURI()).toBe('mydefaultns')
+    const cloned = <any>(attr.cloneNode())
+    expect(cloned.lookupNamespaceURI('none')).toBeNull()
   })
 
 })

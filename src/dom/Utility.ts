@@ -1,11 +1,8 @@
-import { Node } from './Node'
-import { DOMException } from './DOMException'
-import { CharacterData } from './CharacterData'
-import { ShadowRoot } from './ShadowRoot'
-import { Document } from './Document'
-import { DocumentFragment } from './DocumentFragment'
-import { Text } from './Text'
-import { Element } from './Element'
+import {
+  Node, CharacterData, ShadowRoot, Document,
+  Element, NodeType
+} from './interfaces'
+import { DOMExceptionImpl } from './DOMExceptionImpl'
 
 export class Utility {
 
@@ -78,7 +75,7 @@ export class Utility {
         yield <T><unknown>node
 
       // traverse shadow tree
-      if (shadow && node.nodeType === Node.Element) {
+      if (shadow && node.nodeType === NodeType.Element) {
         let ele = <Element>node
         if (ele.shadowRoot) {
           let child = ele.shadowRoot.firstChild
@@ -126,7 +123,7 @@ export class Utility {
       }
 
       // traverse shadow tree
-      if (options && options.shadow && node.nodeType === Node.Element) {
+      if (options && options.shadow && node.nodeType === NodeType.Element) {
         let ele = <Element>node
         if (ele.shadowRoot) {
           for (let child of ele.shadowRoot.childNodes) {
@@ -180,19 +177,19 @@ export class Utility {
      */
     static isConstrained(node: Node): boolean {
       switch (node.nodeType) {
-        case Node.Document:
+        case NodeType.Document:
           let hasDocType = false
           let hasElement = false
           for (let childNode of node.childNodes) {
             switch (childNode.nodeType) {
-              case Node.ProcessingInstruction:
-              case Node.Comment:
+              case NodeType.ProcessingInstruction:
+              case NodeType.Comment:
                 break
-              case Node.DocumentType:
+              case NodeType.DocumentType:
                 if (hasDocType || hasElement) return false
                 hasDocType = true
                 break
-              case Node.Element:
+              case NodeType.Element:
                 if (hasElement) return false
                 hasElement = true
                 break
@@ -201,24 +198,24 @@ export class Utility {
             }
           }
           break
-        case Node.DocumentFragment:
-        case Node.Element:
+        case NodeType.DocumentFragment:
+        case NodeType.Element:
           for (let childNode of node.childNodes) {
             switch (childNode.nodeType) {
-              case Node.Element:
-              case Node.Text:
-              case Node.ProcessingInstruction:
-              case Node.Comment:
+              case NodeType.Element:
+              case NodeType.Text:
+              case NodeType.ProcessingInstruction:
+              case NodeType.Comment:
                 break
               default:
                 return false
             }
           }
           break
-        case Node.DocumentType:
-        case Node.Text:
-        case Node.ProcessingInstruction:
-        case Node.Comment:
+        case NodeType.DocumentType:
+        case NodeType.Text:
+        case NodeType.ProcessingInstruction:
+        case NodeType.Comment:
           return (!node.hasChildNodes())
       }
 
@@ -232,11 +229,11 @@ export class Utility {
      */
     static nodeLength(node: Node): number {
       switch (node.nodeType) {
-        case Node.DocumentType:
+        case NodeType.DocumentType:
           return 0
-        case Node.Text:
-        case Node.ProcessingInstruction:
-        case Node.Comment:
+        case NodeType.Text:
+        case NodeType.ProcessingInstruction:
+        case NodeType.Comment:
           return (<CharacterData>node).data.length
         default:
           return node.childNodes.length
@@ -317,7 +314,7 @@ export class Utility {
 
       if (options && options.shadow) {
         let root = Utility.Tree.rootNode(node)
-        if (root && root instanceof ShadowRoot) {
+        if (root && (<ShadowRoot>root).host) {
           let nodeHost = (<ShadowRoot>root).host
           return Utility.Tree.isAncestorOf(nodeHost, other, options)
         }
@@ -449,101 +446,101 @@ export class Utility {
       static ensurePreInsertionValidity(node: Node, parent: Node, child: Node | null): void {
         // Only document, document fragment and element nodes can have
         // child nodes
-        if (parent.nodeType !== Node.Document &&
-          parent.nodeType !== Node.DocumentFragment &&
-          parent.nodeType !== Node.Element)
-          throw DOMException.HierarchyRequestError
+        if (parent.nodeType !== NodeType.Document &&
+          parent.nodeType !== NodeType.DocumentFragment &&
+          parent.nodeType !== NodeType.Element)
+          throw DOMExceptionImpl.HierarchyRequestError
 
         // node should not be an ancestor of parent
         if (Utility.Tree.isAncestorOf(parent, node, { self: true, shadow: true }))
-          throw DOMException.HierarchyRequestError
+          throw DOMExceptionImpl.HierarchyRequestError
 
         // insertion reference child node should be a child node of
         // parent
         if (child && child.parentNode !== parent)
-          throw DOMException.NotFoundError
+          throw DOMExceptionImpl.NotFoundError
 
         // only document fragment, document type, element, text,
         // processing instruction or comment nodes can be child nodes
-        if (node.nodeType !== Node.DocumentFragment &&
-          node.nodeType !== Node.DocumentType &&
-          node.nodeType !== Node.Element &&
-          node.nodeType !== Node.Text &&
-          node.nodeType !== Node.ProcessingInstruction &&
-          node.nodeType !== Node.CData &&
-          node.nodeType !== Node.Comment)
-          throw DOMException.HierarchyRequestError
+        if (node.nodeType !== NodeType.DocumentFragment &&
+          node.nodeType !== NodeType.DocumentType &&
+          node.nodeType !== NodeType.Element &&
+          node.nodeType !== NodeType.Text &&
+          node.nodeType !== NodeType.ProcessingInstruction &&
+          node.nodeType !== NodeType.CData &&
+          node.nodeType !== NodeType.Comment)
+          throw DOMExceptionImpl.HierarchyRequestError
 
         // a document node cannot have text child nodes
-        if (node.nodeType === Node.Text &&
-          parent.nodeType === Node.Document)
-          throw DOMException.HierarchyRequestError
+        if (node.nodeType === NodeType.Text &&
+          parent.nodeType === NodeType.Document)
+          throw DOMExceptionImpl.HierarchyRequestError
 
         // a document type node can only be parented to a document
         // node
-        if (node.nodeType === Node.DocumentType &&
-          parent.nodeType !== Node.Document)
-          throw DOMException.HierarchyRequestError
+        if (node.nodeType === NodeType.DocumentType &&
+          parent.nodeType !== NodeType.Document)
+          throw DOMExceptionImpl.HierarchyRequestError
 
-        if (parent.nodeType === Node.Document) {
-          if (node.nodeType === Node.DocumentFragment) {
+        if (parent.nodeType === NodeType.Document) {
+          if (node.nodeType === NodeType.DocumentFragment) {
             if (node.childNodes.length > 1)
-              throw DOMException.HierarchyRequestError
-            else if (node.firstChild && node.firstChild.nodeType === Node.Text)
-              throw DOMException.HierarchyRequestError
+              throw DOMExceptionImpl.HierarchyRequestError
+            else if (node.firstChild && node.firstChild.nodeType === NodeType.Text)
+              throw DOMExceptionImpl.HierarchyRequestError
             else if (node.firstChild) {
               for (let ele of parent.childNodes) {
-                if (ele.nodeType === Node.Element)
-                  throw DOMException.HierarchyRequestError
+                if (ele.nodeType === NodeType.Element)
+                  throw DOMExceptionImpl.HierarchyRequestError
               }
 
               if (child) {
-                if (child.nodeType === Node.DocumentType)
-                  throw DOMException.HierarchyRequestError
+                if (child.nodeType === NodeType.DocumentType)
+                  throw DOMExceptionImpl.HierarchyRequestError
 
                 let doctypeChild = child.nextSibling
                 while (doctypeChild) {
-                  if (doctypeChild.nodeType === Node.DocumentType)
-                    throw DOMException.HierarchyRequestError
+                  if (doctypeChild.nodeType === NodeType.DocumentType)
+                    throw DOMExceptionImpl.HierarchyRequestError
                   doctypeChild = doctypeChild.nextSibling
                 }
               }
             }
-          } else if (node.nodeType === Node.Element) {
+          } else if (node.nodeType === NodeType.Element) {
             for (let ele of parent.childNodes) {
-              if (ele.nodeType === Node.Element)
-                throw DOMException.HierarchyRequestError
+              if (ele.nodeType === NodeType.Element)
+                throw DOMExceptionImpl.HierarchyRequestError
             }
 
             if (child) {
-              if (child.nodeType === Node.DocumentType)
-                throw DOMException.HierarchyRequestError
+              if (child.nodeType === NodeType.DocumentType)
+                throw DOMExceptionImpl.HierarchyRequestError
 
               let doctypeChild = child.nextSibling
               while (doctypeChild) {
-                if (doctypeChild.nodeType === Node.DocumentType)
-                  throw DOMException.HierarchyRequestError
+                if (doctypeChild.nodeType === NodeType.DocumentType)
+                  throw DOMExceptionImpl.HierarchyRequestError
                 doctypeChild = doctypeChild.nextSibling
               }
             }
-          } else if (node.nodeType === Node.DocumentType) {
+          } else if (node.nodeType === NodeType.DocumentType) {
             for (let ele of parent.childNodes) {
-              if (ele.nodeType === Node.DocumentType)
-                throw DOMException.HierarchyRequestError
+              if (ele.nodeType === NodeType.DocumentType)
+                throw DOMExceptionImpl.HierarchyRequestError
             }
 
             if (child) {
               let elementChild = child.nextSibling
               while (elementChild) {
-                if (elementChild.nodeType === Node.Element)
-                  throw DOMException.HierarchyRequestError
+                if (elementChild.nodeType === NodeType.Element)
+                  throw DOMExceptionImpl.HierarchyRequestError
                 elementChild = elementChild.nextSibling
               }
             } else {
               let elementChild = parent.firstChild
               while (elementChild) {
-                if (elementChild.nodeType === Node.Element)
-                  throw DOMException.HierarchyRequestError
+                if (elementChild.nodeType === NodeType.Element)
+                  throw DOMExceptionImpl.HierarchyRequestError
                 elementChild = elementChild.nextSibling
               }
             }
@@ -562,7 +559,7 @@ export class Utility {
       static preInsert(node: Node, parent: Node, child: Node | null): Node {
         Utility.Tree.Mutation.ensurePreInsertionValidity(node, parent, child)
         if (!parent.ownerDocument)
-          throw DOMException.HierarchyRequestError
+          throw DOMExceptionImpl.HierarchyRequestError
 
         let referenceChild = child
         if (referenceChild === node)
@@ -590,12 +587,12 @@ export class Utility {
 
         if (document !== oldDocument) {
           Utility.Tree.forEachDescendant(node, { self: true, shadow: true }, function (inclusiveDescendant: Node) {
-            inclusiveDescendant._ownerDocument = document
+            (<any>inclusiveDescendant)._ownerDocument = document
 
-            if (inclusiveDescendant.nodeType === Node.Element) {
+            if (inclusiveDescendant.nodeType === NodeType.Element) {
               let ele = <Element>inclusiveDescendant
               for (const attr of ele.attributes) {
-                attr._ownerDocument = document
+                (<any>attr)._ownerDocument = document
               }
             }
 
@@ -619,7 +616,7 @@ export class Utility {
        * @param child - child node to insert node before
        */
       static insertNode(node: Node, parent: Node, child: Node | null): void {
-        let count = (node.nodeType === Node.DocumentFragment ?
+        let count = (node.nodeType === NodeType.DocumentFragment ?
           node.childNodes.length : 1)
 
         /**
@@ -634,7 +631,7 @@ export class Utility {
          */
 
         let nodes: Node[] = []
-        if (node.nodeType === Node.DocumentFragment) {
+        if (node.nodeType === NodeType.DocumentFragment) {
           for (let childNode of node.childNodes) {
             nodes.push(childNode)
             Utility.Tree.Mutation.removeNode(childNode, node)
@@ -712,81 +709,81 @@ export class Utility {
       static replaceNode(child: Node, node: Node, parent: Node): Node {
         // Only document, document fragment and element nodes can have
         // child nodes
-        if (parent.nodeType !== Node.Document &&
-          parent.nodeType !== Node.DocumentFragment &&
-          parent.nodeType !== Node.Element)
-          throw DOMException.HierarchyRequestError
+        if (parent.nodeType !== NodeType.Document &&
+          parent.nodeType !== NodeType.DocumentFragment &&
+          parent.nodeType !== NodeType.Element)
+          throw DOMExceptionImpl.HierarchyRequestError
 
         // node should not be an ancestor of parent
         if (Utility.Tree.isAncestorOf(parent, node, { self: true, shadow: true }))
-          throw DOMException.HierarchyRequestError
+          throw DOMExceptionImpl.HierarchyRequestError
 
         // removed child node should be a child node of parent
         if (child.parentNode !== parent)
-          throw DOMException.NotFoundError
+          throw DOMExceptionImpl.NotFoundError
 
         // only document fragment, document type, element, text,
         // processing instruction or comment nodes can be child nodes
-        if (node.nodeType !== Node.DocumentFragment &&
-          node.nodeType !== Node.DocumentType &&
-          node.nodeType !== Node.Element &&
-          node.nodeType !== Node.Text &&
-          node.nodeType !== Node.ProcessingInstruction &&
-          node.nodeType !== Node.Comment)
-          throw DOMException.HierarchyRequestError
+        if (node.nodeType !== NodeType.DocumentFragment &&
+          node.nodeType !== NodeType.DocumentType &&
+          node.nodeType !== NodeType.Element &&
+          node.nodeType !== NodeType.Text &&
+          node.nodeType !== NodeType.ProcessingInstruction &&
+          node.nodeType !== NodeType.Comment)
+          throw DOMExceptionImpl.HierarchyRequestError
 
         // a document node cannot have text child nodes
-        if (node.nodeType === Node.Text &&
-          parent.nodeType === Node.Document)
-          throw DOMException.HierarchyRequestError
+        if (node.nodeType === NodeType.Text &&
+          parent.nodeType === NodeType.Document)
+          throw DOMExceptionImpl.HierarchyRequestError
 
         // a document type node can only be parented to a document
         // node
-        if (node.nodeType === Node.DocumentType &&
-          parent.nodeType !== Node.Document)
-          throw DOMException.HierarchyRequestError
+        if (node.nodeType === NodeType.DocumentType &&
+          parent.nodeType !== NodeType.Document)
+          throw DOMExceptionImpl.HierarchyRequestError
 
-        if (parent.nodeType === Node.Document) {
-          if (node.nodeType === Node.DocumentFragment) {
+        if (parent.nodeType === NodeType.Document) {
+          if (node.nodeType === NodeType.DocumentFragment) {
             if (node.childNodes.length > 1)
-              throw DOMException.HierarchyRequestError
-            else if (node.firstChild && node.firstChild.nodeType === Node.Text)
-              throw DOMException.HierarchyRequestError
+              throw DOMExceptionImpl.HierarchyRequestError
+            else if (node.firstChild && node.firstChild.nodeType === NodeType.Text)
+              throw DOMExceptionImpl.HierarchyRequestError
             else if (node.firstChild) {
               for (let ele of parent.childNodes) {
-                if (ele.nodeType === Node.Element && ele !== child)
-                  throw DOMException.HierarchyRequestError
+                if (ele.nodeType === NodeType.Element && ele !== child)
+                  throw DOMExceptionImpl.HierarchyRequestError
               }
 
               let doctypeChild = child.nextSibling
               while (doctypeChild) {
-                if (doctypeChild.nodeType === Node.DocumentType)
-                  throw DOMException.HierarchyRequestError
+                if (doctypeChild.nodeType === NodeType.DocumentType)
+                  throw DOMExceptionImpl.HierarchyRequestError
                 doctypeChild = doctypeChild.nextSibling
               }
             }
-          } else if (node.nodeType === Node.Element) {
+          } else if (node.nodeType === NodeType.Element) {
             for (let ele of parent.childNodes) {
-              if (ele.nodeType === Node.Element && ele !== child)
-                throw DOMException.HierarchyRequestError
+              if (ele.nodeType === NodeType.Element && ele !== child)
+                throw DOMExceptionImpl.HierarchyRequestError
             }
 
             let doctypeChild = child.nextSibling
             while (doctypeChild) {
-              if (doctypeChild.nodeType === Node.DocumentType)
-                throw DOMException.HierarchyRequestError
+              if (doctypeChild.nodeType === NodeType.DocumentType)
+                throw DOMExceptionImpl.HierarchyRequestError
               doctypeChild = doctypeChild.nextSibling
             }
-          } else if (node.nodeType === Node.DocumentType) {
+          } else if (node.nodeType === NodeType.DocumentType) {
             for (let ele of parent.childNodes) {
-              if (ele.nodeType === Node.DocumentType && ele !== child)
-                throw DOMException.HierarchyRequestError
+              if (ele.nodeType === NodeType.DocumentType && ele !== child)
+                throw DOMExceptionImpl.HierarchyRequestError
             }
 
             let elementChild = child.nextSibling
             while (elementChild) {
-              if (elementChild.nodeType === Node.Element)
-                throw DOMException.HierarchyRequestError
+              if (elementChild.nodeType === NodeType.Element)
+                throw DOMExceptionImpl.HierarchyRequestError
               elementChild = elementChild.nextSibling
             }
           }
@@ -797,7 +794,7 @@ export class Utility {
         let previousSibling = child.previousSibling
 
         if (!parent.ownerDocument)
-          throw DOMException.HierarchyRequestError
+          throw DOMExceptionImpl.HierarchyRequestError
 
         Utility.Tree.Mutation.adoptNode(node, parent.ownerDocument)
 
@@ -811,7 +808,7 @@ export class Utility {
         }
 
         let nodes: Node[] = []
-        if (node.nodeType === Node.DocumentFragment) {
+        if (node.nodeType === NodeType.DocumentFragment) {
           for (let childNode of node.childNodes) {
             nodes.push(childNode)
           }
@@ -838,7 +835,7 @@ export class Utility {
       static replaceAllNode(node: Node | null, parent: Node): void {
         if (node) {
           if (!parent.ownerDocument)
-            throw DOMException.HierarchyRequestError
+            throw DOMExceptionImpl.HierarchyRequestError
 
           Utility.Tree.Mutation.adoptNode(node, parent.ownerDocument)
         }
@@ -849,7 +846,7 @@ export class Utility {
         }
 
         let addedNodes: Node[] = []
-        if (node && node.nodeType === Node.DocumentFragment) {
+        if (node && node.nodeType === NodeType.DocumentFragment) {
           for (let childNode of node.childNodes) {
             addedNodes.push(childNode)
           }
@@ -882,7 +879,7 @@ export class Utility {
        */
       static preRemoveNode(node: Node, parent: Node): Node {
         if (node.parentNode !== parent)
-          throw DOMException.NotFoundError
+          throw DOMExceptionImpl.NotFoundError
 
         Utility.Tree.Mutation.removeNode(node, parent)
 
@@ -965,33 +962,6 @@ export class Utility {
          * change steps for parent.
          */
       }
-
-      /**
-       * Converts the given nodes or strings into a node (if `nodes` has
-       * only one element) or a document fragment.
-       * 
-       * @param nodes - the array of nodes or strings
-       */
-      static convertNodesIntoNode(nodes: Array<Node | string>, document: Document): Node {
-        if (nodes.length === 1) {
-          if (typeof nodes[0] === 'string')
-            return new Text(document, <string>nodes[0])
-          else
-            return <Node>nodes[0]
-        }
-        else {
-          let fragment = new DocumentFragment(document)
-
-          for (let child of nodes) {
-            if (typeof child === 'string')
-              fragment.appendChild(new Text(document, child))
-            else
-              fragment.appendChild(child)
-          }
-
-          return fragment
-        }
-      }
     }
   }
 
@@ -1012,8 +982,8 @@ export class Utility {
     /**
      * Inserts a node into a parent node before the given child node.
      * 
-     * @param node - node to insert
-     * @param parent - parent node to receive node
+     * @param nodeImpl - node to insert
+     * @param parentImpl - parent node to receive node
      * @param child - child node to insert node before
      */
     static insert(node: Node, parent: Node, child: Node | null): void {
@@ -1023,52 +993,56 @@ export class Utility {
           return
       }
 
-      node._parentNode = parent
+      const nodeImpl = <any>node
+      nodeImpl._parentNode = parent
 
-      if (!parent.firstChild) {
-        node._previousSibling = null
-        node._nextSibling = null
+      const parentImpl = <any>parent
+      const childImpl = <any>parent.childNodes
+      if (!parentImpl.firstChild) {
+        nodeImpl._previousSibling = null
+        nodeImpl._nextSibling = null
 
-        parent._firstChild = node
-        parent._lastChild = node
-        parent.childNodes._length = 1
+        parentImpl._firstChild = nodeImpl
+        parentImpl._lastChild = nodeImpl
+        childImpl._length = 1
       } else {
-        let prev = (child ? child.previousSibling : parent.lastChild)
-        let next = (child ? child : null)
+        const prev = (child ? child.previousSibling : parentImpl.lastChild)
+        const next = (child ? child : null)
 
-        node._previousSibling = prev
-        node._nextSibling = next
+        nodeImpl._previousSibling = prev
+        nodeImpl._nextSibling = next
 
-        if (prev) prev._nextSibling = node
-        if (next) next._previousSibling = node
+        if (prev) (<any>prev)._nextSibling = nodeImpl
+        if (next) (<any>next)._previousSibling = nodeImpl
 
-        if (!prev) parent._firstChild = node
-        if (!next) parent._lastChild = node
-        parent.childNodes._length++
+        if (!prev) parentImpl._firstChild = nodeImpl
+        if (!next) parentImpl._lastChild = nodeImpl
+        childImpl._length++
       }
     }
 
     /**
      * Removes a child node from its parent.
      * 
-     * @param node - node to remove
-     * @param parent - parent node
+     * @param nodeImpl - node to remove
+     * @param parentImpl - parent node
      */
     static remove(node: Node, parent: Node): void {
-      node._parentNode = null
-
-      let prev = node.previousSibling
-      let next = node.nextSibling
-
-      node._previousSibling = null
-      node._nextSibling = null
-
+      const nodeImpl = <any>node
+      nodeImpl._parentNode = null
+      const prev = <any>(nodeImpl.previousSibling)
+      const next = <any>(nodeImpl.nextSibling)
+      nodeImpl._previousSibling = null
+      nodeImpl._nextSibling = null
       if (prev) prev._nextSibling = next
       if (next) next._previousSibling = prev
 
-      if (!prev) parent._firstChild = next
-      if (!next) parent._lastChild = prev
-      parent.childNodes._length--
+      const parentImpl = <any>parent
+      if (!prev) parentImpl._firstChild = next
+      if (!next) parentImpl._lastChild = prev
+
+      const childImpl = <any>(parentImpl.childNodes)
+      childImpl._length--
     }
   }
 
@@ -1112,9 +1086,9 @@ export class Utility {
      */
     static validateQName(qualifiedName: string): void {
       if (!Utility.XMLSpec.isName(qualifiedName))
-        throw DOMException.InvalidCharacterError
+        throw DOMExceptionImpl.InvalidCharacterError
       if (!Utility.XMLSpec.isQName(qualifiedName))
-        throw DOMException.InvalidCharacterError
+        throw DOMExceptionImpl.InvalidCharacterError
     }
 
     /**
@@ -1136,41 +1110,24 @@ export class Utility {
       let localName = (parts.length === 2 ? parts[1] : qualifiedName)
 
       if (prefix && !namespace)
-        throw DOMException.NamespaceError
+        throw DOMExceptionImpl.NamespaceError
 
       if (prefix === "xml" && namespace !== Utility.Namespace.XML)
-        throw DOMException.NamespaceError
+        throw DOMExceptionImpl.NamespaceError
 
       if (namespace !== Utility.Namespace.XMLNS &&
         (prefix === "xmlns" || qualifiedName === "xmlns"))
-        throw DOMException.NamespaceError
+        throw DOMExceptionImpl.NamespaceError
 
       if (namespace === Utility.Namespace.XMLNS &&
         (prefix !== "xmlns" && qualifiedName !== "xmlns"))
-        throw DOMException.NamespaceError
+        throw DOMExceptionImpl.NamespaceError
 
       return {
         'namespace': namespace,
         'prefix': prefix,
         'localName': localName
       }
-    }
-  }
-
-  /**
-   * Contains internal functions used by the module.
-   */
-  static Internal = class {
-    /**
-     * Applies the given mixin classes to a base class.
-     * 
-     * @param derivedCtor - base class constructor
-     * @param baseCtor - mixin constructor
-     */
-    static applyMixin(derivedCtor: any, baseCtor: any): void {
-      Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-        derivedCtor.prototype[name] = baseCtor.prototype[name]
-      })
     }
   }
 }

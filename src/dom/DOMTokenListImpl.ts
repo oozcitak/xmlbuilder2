@@ -1,11 +1,11 @@
-import { Element } from "./Element"
-import { DOMException } from "./DOMException"
+import { DOMTokenList, Element } from "./interfaces"
+import { DOMExceptionImpl } from "./DOMExceptionImpl"
 import { Utility } from "./Utility"
 
 /**
  * Represents a token set.
  */
-export class DOMTokenList implements Iterable<string> {
+export class DOMTokenListImpl implements DOMTokenList {
 
   protected _ownerElement: Element
   protected _localName: string
@@ -72,9 +72,9 @@ export class DOMTokenList implements Iterable<string> {
     let set = this._valueAsSet
     for (let token of tokens) {
       if (!token)
-        throw DOMException.SyntaxError
+        throw DOMExceptionImpl.SyntaxError
       else if (token.match(Utility.OrderedSet.WhiteSpace))
-        throw DOMException.InvalidCharacterError
+        throw DOMExceptionImpl.InvalidCharacterError
       else
         set.delete(token)
     }
@@ -123,10 +123,10 @@ export class DOMTokenList implements Iterable<string> {
    */
   replace(token: string, newToken: string): boolean {
     if (!token || !newToken)
-      throw DOMException.SyntaxError
+      throw DOMExceptionImpl.SyntaxError
     else if (token.match(Utility.OrderedSet.WhiteSpace) ||
       newToken.match(Utility.OrderedSet.WhiteSpace))
-      throw DOMException.InvalidCharacterError
+      throw DOMExceptionImpl.InvalidCharacterError
 
     let set = this._valueAsSet
     if (!set.has(token)) {

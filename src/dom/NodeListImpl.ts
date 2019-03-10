@@ -1,9 +1,9 @@
-import { Node } from "./Node"
+import { Node, NodeList } from "./interfaces"
 
 /**
  * Represents an ordered list of nodes.
  */
-export class NodeList implements Iterable<Node> {
+export class NodeListImpl implements NodeList {
 
   _length = 0 // internal
   protected _parentNode: Node

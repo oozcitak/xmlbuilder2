@@ -1,36 +1,32 @@
-import { DocumentFragment } from './DocumentFragment'
-import { Document } from './Document'
-import { Text } from './Text'
-import { NodeList } from './NodeList'
-import { Element } from './Element'
-import { Attr } from './Attr'
+import { Node, NodeList, Element, Attr, Text, Document, NodeType, 
+  Position, DocumentFragment } from './interfaces'
+import { NodeListImpl } from './NodeListImpl'
 import { Utility } from './Utility'
 
 /**
  * Represents a generic XML node.
  */
-export abstract class Node {
-  // node type
-  static readonly Element = 1
-  static readonly Attribute = 2
-  static readonly Text = 3
-  static readonly CData = 4
-  static readonly EntityReference = 5 // historical
-  static readonly Entity = 6 // historical
-  static readonly ProcessingInstruction = 7
-  static readonly Comment = 8
-  static readonly Document = 9
-  static readonly DocumentType = 10
-  static readonly DocumentFragment = 11
-  static readonly Notation = 12 // historical
+export abstract class NodeImpl implements Node {
 
-  // document position
-  static readonly Disconnected = 0x01
-  static readonly Preceding = 0x02
-  static readonly Following = 0x04
-  static readonly Contains = 0x08
-  static readonly ContainedBy = 0x10
-  static readonly ImplementationSpecific = 0x20
+  static readonly ELEMENT_NODE: number = 1
+  static readonly ATTRIBUTE_NODE: number = 2
+  static readonly TEXT_NODE: number = 3
+  static readonly CDATA_SECTION_NODE: number = 4
+  static readonly ENTITY_REFERENCE_NODE: number = 5
+  static readonly ENTITY_NODE: number = 6
+  static readonly PROCESSING_INSTRUCTION_NODE: number = 7
+  static readonly COMMENT_NODE: number = 8
+  static readonly DOCUMENT_NODE: number = 9
+  static readonly DOCUMENT_TYPE_NODE: number = 10
+  static readonly DOCUMENT_FRAGMENT_NODE: number = 11
+  static readonly NOTATION_NODE: number = 12
+
+  static readonly DOCUMENT_POSITION_DISCONNECTED: number = 0x01
+  static readonly DOCUMENT_POSITION_PRECEDING: number = 0x02
+  static readonly DOCUMENT_POSITION_FOLLOWING: number = 0x04
+  static readonly DOCUMENT_POSITION_CONTAINS: number = 0x08
+  static readonly DOCUMENT_POSITION_CONTAINED_BY: number = 0x10
+  static readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: number = 0x20
 
   _parentNode: Node | null = null
   _firstChild: Node | null = null
@@ -48,7 +44,7 @@ export abstract class Node {
    */
   protected constructor(ownerDocument: Document | null = null) {
     this._ownerDocument = ownerDocument
-    this._childNodes = new NodeList(this)
+    this._childNodes = new NodeListImpl(this)
   }
 
   /** 
@@ -74,14 +70,14 @@ export abstract class Node {
     if (!root)
       return false
     else
-      return (root.nodeType === Node.Document)
+      return (root.nodeType === NodeType.Document)
   }
 
   /** 
    * Returns the parent document. 
    */
   get ownerDocument(): Document | null {
-    if (this.nodeType === Node.Document)
+    if (this.nodeType === NodeType.Document)
       return <Document><unknown>this
     else
       return this._ownerDocument
@@ -94,7 +90,7 @@ export abstract class Node {
    * returns the node's shadow-including root, otherwise it returns
    * the node's root node.
    */
-  getRootNode(options: object = { composed: false }): Node | null {
+  getRootNode(options: object = { composed: false }): Node {
     return Utility.Tree.rootNode(this)
   }
 
@@ -107,7 +103,7 @@ export abstract class Node {
    * Returns the parent element. 
    */
   get parentElement(): Element | null {
-    if (this.parentNode && this.parentNode.nodeType === Node.Element)
+    if (this.parentNode && this.parentNode.nodeType === NodeType.Element)
       return <Element>this.parentNode
     else
       return null
@@ -180,7 +176,7 @@ export abstract class Node {
     let node = this.firstChild
     while (node) {
       let nextNode = node.nextSibling
-      if (node.nodeType === Node.Text) {
+      if (node.nodeType === NodeType.Text) {
         let text = <Text>node
         if (text.length === 0) {
           this.removeChild(text)
@@ -192,8 +188,8 @@ export abstract class Node {
     node = this.firstChild
     while (node) {
       let nextNode = node.nextSibling
-      if (node.nodeType === Node.Text &&
-        nextNode && nextNode.nodeType === Node.Text) {
+      if (node.nodeType === NodeType.Text &&
+        nextNode && nextNode.nodeType === NodeType.Text) {
         let text = <Text>node
         let nextText = <Text>nextNode
         text.appendData(nextText.data)
@@ -265,47 +261,47 @@ export abstract class Node {
     let attr1: Attr | null = null
     let attr2: Attr | null = null
 
-    if (node1.nodeType === Node.Attribute) {
+    if (node1.nodeType === NodeType.Attribute) {
       attr1 = <Attr>node1
       node1 = attr1.ownerElement
     }
 
-    if (node2.nodeType === Node.Attribute) {
+    if (node2.nodeType === NodeType.Attribute) {
       attr2 = <Attr>node2
       node2 = attr2.ownerElement
 
       if (attr1 && node1 && (node1 === node2)) {
         for (let attr of (<Element>node2).attributes) {
           if (attr.isEqualNode(attr1)) {
-            return Node.ImplementationSpecific | Node.Preceding
+            return Position.ImplementationSpecific | Position.Preceding
           } else if (attr.isEqualNode(attr2)) {
-            return Node.ImplementationSpecific | Node.Following
+            return Position.ImplementationSpecific | Position.Following
           }
         }
       }
     }
 
     if (!node1 || !node2 || (node1.getRootNode != node2.getRootNode)) {
-      return Node.Disconnected | Node.ImplementationSpecific |
-        Node.Preceding
+      return Position.Disconnected | Position.ImplementationSpecific |
+      Position.Preceding
       // TODO: return preceding or following consistently
       // Use a cached Math.random() value
     }
 
     if ((!attr1 && Utility.Tree.isAncestorOf(node2, node1)) ||
       (attr2 && (node1 === node2))) {
-      return Node.Contains | Node.Preceding
+      return Position.Contains | Position.Preceding
     }
 
     if ((!attr2 && Utility.Tree.isDescendantOf(node2, node1)) ||
       (attr1 && (node1 === node2))) {
-      return Node.ContainedBy | Node.Following
+      return Position.ContainedBy | Position.Following
     }
 
     if (Utility.Tree.isPreceding(node2, node1))
-      return Node.Preceding
+      return Position.Preceding
 
-    return Node.Following
+    return Position.Following
   }
 
   /**

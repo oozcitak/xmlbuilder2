@@ -8,10 +8,11 @@
 		"newLine": "lf",
         "sourceMap": true,
         "esModuleInterop": true,
-        "outDir": "lib"
+        "outDir": "lib",
+        "types": [ "node", "jest", "dedent" ]
     },
     "include": [
-        "lib/**/*"
+        "src/**/*"
     ],
     "exclude": [
         "node_modules"

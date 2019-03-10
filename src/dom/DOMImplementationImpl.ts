@@ -1,15 +1,17 @@
-import { DocumentType } from "./DocumentType"
-import { Element } from "./Element"
-import { Document } from "./Document"
-import { XMLDocument } from "./XMLDocument"
+import { DOMImplementation, DocumentType, 
+  Document, XMLDocument } from "./interfaces";
+import { DocumentTypeImpl } from "./DocumentTypeImpl"
+import { DocumentImpl } from "./DocumentImpl"
+import { XMLDocumentImpl } from "./XMLDocumentImpl"
+import { TextImpl } from "./TextImpl";
+import { ElementImpl } from "./ElementImpl"
 import { Utility } from "./Utility"
-import { Text } from "./Text"
 
 /**
  * Represents an object providing methods which are not dependent on 
  * any particular document
  */
-export class DOMImplementation {
+export class DOMImplementationImpl implements DOMImplementation {
 
   private static _instance: DOMImplementation
 
@@ -19,10 +21,10 @@ export class DOMImplementation {
    * Gets the instance of dom implementation.
    */
   static get Instance(): DOMImplementation {
-    if(!DOMImplementation._instance)
-      DOMImplementation._instance = new DOMImplementation()
+    if(!DOMImplementationImpl._instance)
+      DOMImplementationImpl._instance = new DOMImplementationImpl()
 
-    return DOMImplementation._instance
+    return DOMImplementationImpl._instance
   }
   /**
    * Creates and returns a {@link DocType}.
@@ -35,7 +37,7 @@ export class DOMImplementation {
     publicId: string, systemId: string): DocumentType {
     Utility.Namespace.validateQName(qualifiedName)
 
-    return new DocumentType(null, qualifiedName, publicId, systemId)
+    return new DocumentTypeImpl(null, qualifiedName, publicId, systemId)
   }
 
   /**
@@ -47,7 +49,7 @@ export class DOMImplementation {
    */
   createDocument(namespace: string, qualifiedName: string,
     doctype: DocumentType | null = null): XMLDocument {
-    let document = new XMLDocument()
+    let document = new XMLDocumentImpl()
 
     if (doctype)
       document.appendChild(doctype)
@@ -74,26 +76,26 @@ export class DOMImplementation {
    * @param title - document title
    */
   createHTMLDocument(title: string | undefined = undefined): Document {
-    let document = new Document()
+    let document = new DocumentImpl()
     document._contentType = 'text/html'
   
-    let doctype = new DocumentType(document, 'html')
+    let doctype = new DocumentTypeImpl(document, 'html')
     document.appendChild(doctype)
   
-    let htmlElement = new Element(document, 'html', Utility.Namespace.HTML)
+    let htmlElement = new ElementImpl(document, 'html', Utility.Namespace.HTML)
     document.appendChild(htmlElement)
 
-    let headElement = new Element(document, 'head', Utility.Namespace.HTML)
+    let headElement = new ElementImpl(document, 'head', Utility.Namespace.HTML)
     htmlElement.appendChild(headElement)
 
     if(title !== undefined) {
-      let titleElement = new Element(document, 'title', Utility.Namespace.HTML)
+      let titleElement = new ElementImpl(document, 'title', Utility.Namespace.HTML)
       headElement.appendChild(titleElement)
-      let textElement = new Text(document, title)
+      let textElement = new TextImpl(document, title)
       titleElement.appendChild(textElement)
     }
 
-    let bodyElement = new Element(document, 'body', Utility.Namespace.HTML)
+    let bodyElement = new ElementImpl(document, 'body', Utility.Namespace.HTML)
     htmlElement.appendChild(bodyElement)
 
     // document's content type is determined by namespace

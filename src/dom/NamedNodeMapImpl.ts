@@ -1,11 +1,10 @@
-import { Attr } from "./Attr"
-import { Element } from "./Element"
-import { DOMException } from "./DOMException"
+import { NamedNodeMap, Element, Attr } from "./interfaces"
+import { DOMExceptionImpl } from "./DOMExceptionImpl"
 
 /**
  * Represents a collection of nodes.
  */
-export class NamedNodeMap implements Iterable<Attr> {
+export class NamedNodeMapImpl implements NamedNodeMap {
 
   protected _ownerElement: Element
   protected _items: Array<Attr>
@@ -70,7 +69,7 @@ export class NamedNodeMap implements Iterable<Attr> {
    */
   setNamedItemNS(attr: Attr): Attr | null {
     if (attr.ownerElement && attr.ownerElement !== this._ownerElement)
-      throw DOMException.InUseAttributeError
+      throw DOMExceptionImpl.InUseAttributeError
 
     let oldAttr = this.getNamedItemNS(attr.namespaceURI, attr.localName)
     if (oldAttr === attr) return attr
@@ -100,7 +99,7 @@ export class NamedNodeMap implements Iterable<Attr> {
     }
 
     if (index === -1)
-      throw DOMException.NotFoundError
+      throw DOMExceptionImpl.NotFoundError
 
     let removed = this._items[index]
     this._items.splice(index, 1)
@@ -125,26 +124,11 @@ export class NamedNodeMap implements Iterable<Attr> {
     }
 
     if (index === -1)
-      throw DOMException.NotFoundError
+      throw DOMExceptionImpl.NotFoundError
 
     let removed = this._items[index]
     this._items.splice(index, 1)
     return removed
-  }
-
-  /**
-   * Removes the given attribute.
-   * 
-   * @param att - attribute to remove
-   */
-  _removeNode(att: Attr): Attr {
-    let index = this._items.indexOf(att)
-
-    if (index === -1)
-      throw DOMException.NotFoundError
-
-    this._items.splice(index, 1)
-    return att
   }
 
   /**

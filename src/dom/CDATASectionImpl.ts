@@ -1,12 +1,10 @@
-import { Node } from "./Node"
-import { Text } from "./Text"
-import { Document } from "./Document"
+import { CDATASection, Node, Document, NodeType } from "./interfaces"
+import { TextImpl } from "./TextImpl"
 
 /**
  * Represents a CDATA node.
  */
-export class CDATASection extends Text {
-
+export class CDATASectionImpl extends TextImpl implements CDATASection {
   /**
    * Initializes a new instance of `CDATASection`.
    *
@@ -21,7 +19,7 @@ export class CDATASection extends Text {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return Node.CData }
+  get nodeType(): number { return NodeType.CData }
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -38,7 +36,7 @@ export class CDATASection extends Text {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new CDATASection(this.ownerDocument, this.data)
+    let clonedSelf = new CDATASectionImpl(this.ownerDocument, this.data)
     return clonedSelf
   }
 }

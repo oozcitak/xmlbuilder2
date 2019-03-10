@@ -1,11 +1,10 @@
-import { Node } from "./Node"
-import { CharacterData } from "./CharacterData"
-import { Document } from "./Document"
+import { Comment, Node, Document, NodeType } from "./interfaces"
+import { CharacterDataImpl } from "./CharacterDataImpl"
 
 /**
  * Represents a comment node.
  */
-export class Comment extends CharacterData {
+export class CommentImpl extends CharacterDataImpl implements Comment {
 
   /**
    * Initializes a new instance of `Comment`.
@@ -21,7 +20,7 @@ export class Comment extends CharacterData {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return Node.Comment }
+  get nodeType(): number { return NodeType.Comment }
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -38,7 +37,7 @@ export class Comment extends CharacterData {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new Comment(this.ownerDocument, this.data)
+    let clonedSelf = new CommentImpl(this.ownerDocument, this.data)
     return clonedSelf
   }
 }
