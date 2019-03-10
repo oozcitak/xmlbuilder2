@@ -1,6 +1,6 @@
 import { Node, ChildNode } from './interfaces'
-import { Utility } from './Utility'
-import { Convert } from './Convert'
+import { Convert } from './util/Convert'
+import { TreeMutation } from './util/TreeMutation';
 
 /**
  * Represents a mixin that extends child nodes that can have siblings
@@ -40,7 +40,7 @@ export class ChildNodeImpl implements ChildNode {
       else
         viablePreviousSibling = viablePreviousSibling.nextSibling
 
-      Utility.Tree.Mutation.preInsert(node, parent, viablePreviousSibling)
+      TreeMutation.preInsert(node, parent, viablePreviousSibling)
     }
   }
 
@@ -70,7 +70,7 @@ export class ChildNodeImpl implements ChildNode {
     if (context.ownerDocument) {
       let node = Convert.nodesIntoNode(nodes, context.ownerDocument)
 
-      Utility.Tree.Mutation.preInsert(node, parent, viableNextSibling)
+      TreeMutation.preInsert(node, parent, viableNextSibling)
     }
   }
 
@@ -102,9 +102,9 @@ export class ChildNodeImpl implements ChildNode {
 
       // Note: Context object could have been inserted into node.
       if (context.parentNode === parent)
-        Utility.Tree.Mutation.replaceNode(context, node, parent)
+        TreeMutation.replaceNode(context, node, parent)
       else
-        Utility.Tree.Mutation.preInsert(node, parent, viableNextSibling)
+        TreeMutation.preInsert(node, parent, viableNextSibling)
     }
   }
 
@@ -117,6 +117,6 @@ export class ChildNodeImpl implements ChildNode {
     let parent = context.parentNode
     if (!parent) return
 
-    Utility.Tree.Mutation.removeNode(context, parent)
+    TreeMutation.removeNode(context, parent)
   }
 }

@@ -8,7 +8,7 @@ import { DocumentFragmentImpl } from './DocumentFragmentImpl'
 import { DocumentImpl } from './DocumentImpl'
 import { DocumentOrShadowRootImpl } from './DocumentOrShadowRootImpl'
 import { DocumentTypeImpl } from './DocumentTypeImpl'
-import { DOMExceptionImpl } from './DOMExceptionImpl'
+import { DOMException } from './DOMException'
 import { DOMImplementationImpl } from './DOMImplementationImpl'
 import { DOMTokenListImpl } from './DOMTokenListImpl'
 import { ElementImpl } from './ElementImpl'
@@ -61,7 +61,7 @@ export { CommentImpl as Comment }
 export { DocumentFragmentImpl as DocumentFragment }
 export { DocumentImpl as Document }
 export { DocumentTypeImpl as DocumentType }
-export { DOMExceptionImpl as DOMException }
+export { DOMException as DOMException }
 export { DOMImplementationImpl as DOMImplementation }
 export { DOMTokenListImpl as DOMTokenList }
 export { ElementImpl as Element }

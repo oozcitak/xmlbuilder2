@@ -1,6 +1,6 @@
-import { Node, Document } from './interfaces'
-import { TextImpl } from './TextImpl'
-import { DocumentFragmentImpl } from './DocumentFragmentImpl'
+import { Node, Document } from '../interfaces'
+import { TextImpl } from '../TextImpl'
+import { DocumentFragmentImpl } from '../DocumentFragmentImpl'
 
 /**
  * Includes conversion methods.

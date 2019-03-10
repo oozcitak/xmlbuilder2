@@ -1,5 +1,5 @@
 import { NamedNodeMap, Element, Attr } from "./interfaces"
-import { DOMExceptionImpl } from "./DOMExceptionImpl"
+import { DOMException } from "./DOMException"
 
 /**
  * Represents a collection of nodes.
@@ -69,7 +69,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
    */
   setNamedItemNS(attr: Attr): Attr | null {
     if (attr.ownerElement && attr.ownerElement !== this._ownerElement)
-      throw DOMExceptionImpl.InUseAttributeError
+      throw DOMException.InUseAttributeError
 
     let oldAttr = this.getNamedItemNS(attr.namespaceURI, attr.localName)
     if (oldAttr === attr) return attr
@@ -99,7 +99,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     }
 
     if (index === -1)
-      throw DOMExceptionImpl.NotFoundError
+      throw DOMException.NotFoundError
 
     let removed = this._items[index]
     this._items.splice(index, 1)
@@ -124,7 +124,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     }
 
     if (index === -1)
-      throw DOMExceptionImpl.NotFoundError
+      throw DOMException.NotFoundError
 
     let removed = this._items[index]
     this._items.splice(index, 1)

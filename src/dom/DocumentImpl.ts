@@ -1,9 +1,11 @@
-import { Document, DOMImplementation, DocumentType, Element, Text,
+import {
+  Document, DOMImplementation, DocumentType, Element, Text,
   NodeFilter, NodeType, Node, HTMLCollection, DocumentFragment,
-  NodeList, WhatToShow, Attr, ProcessingInstruction, Comment, 
-  CDATASection } from './interfaces';
+  NodeList, WhatToShow, Attr, ProcessingInstruction, Comment,
+  CDATASection
+} from './interfaces';
 import { NodeImpl } from './NodeImpl';
-import { DOMExceptionImpl } from './DOMExceptionImpl'
+import { DOMException } from './DOMException'
 import { CDATASectionImpl } from './CDATASectionImpl'
 import { TextImpl } from './TextImpl'
 import { AttrImpl } from './AttrImpl'
@@ -11,8 +13,12 @@ import { ProcessingInstructionImpl } from './ProcessingInstructionImpl'
 import { CommentImpl } from './CommentImpl'
 import { DocumentFragmentImpl } from './DocumentFragmentImpl'
 import { HTMLCollectionImpl } from './HTMLCollectionImpl'
-import { Utility } from './Utility'
 import { ElementImpl } from './ElementImpl';
+import { Namespace } from './util/Namespace';
+import { XMLSpec } from './util/XMLSpec';
+import { OrderedSet } from './util/OrderedSet';
+import { TreeQuery } from './util/TreeQuery';
+import { TreeMutation } from './util/TreeMutation';
 
 /**
  * Represents a document node.
@@ -160,7 +166,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * elements
    */
   getElementsByClassName(classNames: string): HTMLCollection {
-    let arr = Utility.OrderedSet.parse(classNames)
+    let arr = OrderedSet.parse(classNames)
     return new HTMLCollectionImpl(this, function (ele: Element) {
       let classes = ele.classList
       let allClassesFound = true
@@ -182,8 +188,8 @@ export class DocumentImpl extends NodeImpl implements Document {
    * @returns the new {@link Element}
    */
   createElement(localName: string): Element {
-    if (!localName.match(Utility.XMLSpec.Name))
-      throw DOMExceptionImpl.InvalidCharacterError
+    if (!localName.match(XMLSpec.Name))
+      throw DOMException.InvalidCharacterError
 
     return new ElementImpl(this, localName, null, null)
   }
@@ -198,7 +204,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * @returns the new {@link Element}
    */
   createElementNS(namespace: string | null, qualifiedName: string): Element {
-    let names = Utility.Namespace.extractNames(namespace, qualifiedName)
+    let names = Namespace.extractNames(namespace, qualifiedName)
 
     return new ElementImpl(this, names.localName, names.namespace,
       names.prefix)
@@ -233,7 +239,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    */
   createCDATASection(data: string): CDATASection {
     if (data.includes(']]>'))
-      throw DOMExceptionImpl.InvalidCharacterError
+      throw DOMException.InvalidCharacterError
     return new CDATASectionImpl(this, data)
   }
 
@@ -258,10 +264,10 @@ export class DocumentImpl extends NodeImpl implements Document {
    * @returns the new {@link ProcessingInstruction}
    */
   createProcessingInstruction(target: string, data: string): ProcessingInstruction {
-    if (!target.match(Utility.XMLSpec.Name))
-      throw DOMExceptionImpl.InvalidCharacterError
+    if (!target.match(XMLSpec.Name))
+      throw DOMException.InvalidCharacterError
     if (data.includes("?>"))
-      throw DOMExceptionImpl.InvalidCharacterError
+      throw DOMException.InvalidCharacterError
 
     return new ProcessingInstructionImpl(this, target, data)
   }
@@ -275,18 +281,18 @@ export class DocumentImpl extends NodeImpl implements Document {
    */
   importNode(node: Node, deep: boolean = false): Node {
     if (node.nodeType === NodeType.Document)
-      throw DOMExceptionImpl.NotSupportedError
+      throw DOMException.NotSupportedError
 
     if ((<any>node).host) // ShadowRoot
-      throw DOMExceptionImpl.NotSupportedError
+      throw DOMException.NotSupportedError
 
     const clonedNode = node.cloneNode(deep)
 
-    for(const child of Utility.Tree.getDescendants<NodeImpl>(clonedNode, true, false)) {
+    for (const child of TreeQuery.getDescendants<NodeImpl>(clonedNode, true, false)) {
       child._ownerDocument = this
       if (child.nodeType === NodeType.Element) {
         const ele = <ElementImpl>child
-        for(const attr of ele.attributes) {
+        for (const attr of ele.attributes) {
           (<AttrImpl>attr)._ownerDocument = this
         }
       }
@@ -305,12 +311,12 @@ export class DocumentImpl extends NodeImpl implements Document {
    */
   adoptNode(node: Node): Node {
     if (node.nodeType === NodeType.Document)
-      throw DOMExceptionImpl.NotSupportedError
+      throw DOMException.NotSupportedError
 
     if ((<any>node).host) // ShadowRoot
-      throw DOMExceptionImpl.HierarchyRequestError
+      throw DOMException.HierarchyRequestError
 
-    Utility.Tree.Mutation.adoptNode(node, this)
+    TreeMutation.adoptNode(node, this)
 
     return node
   }
@@ -323,8 +329,8 @@ export class DocumentImpl extends NodeImpl implements Document {
    * @returns the new {@link Attr}
    */
   createAttribute(localName: string): Attr {
-    if (!localName.match(Utility.XMLSpec.Name))
-      throw DOMExceptionImpl.InvalidCharacterError
+    if (!localName.match(XMLSpec.Name))
+      throw DOMException.InvalidCharacterError
 
     return new AttrImpl(this, null, localName, null, null, '')
   }
@@ -339,7 +345,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * @returns the new {@link Attr}
    */
   createAttributeNS(namespace: string, qualifiedName: string): Attr {
-    let names = Utility.Namespace.extractNames(namespace, qualifiedName)
+    let names = Namespace.extractNames(namespace, qualifiedName)
 
     return new AttrImpl(this, null, names.localName, names.namespace,
       names.prefix, '')
@@ -355,7 +361,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * to be created
    */
   createEvent(eventInterface: string): never {
-    throw DOMExceptionImpl.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -365,7 +371,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * exception.
    */
   createRange(): never {
-    throw DOMExceptionImpl.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -376,7 +382,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    */
   createNodeIterator(root: Node, whatToShow: number = WhatToShow.All,
     filter: NodeFilter | null = null): never {
-    throw DOMExceptionImpl.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -387,7 +393,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    */
   createTreeWalker(root: Node, whatToShow: number = WhatToShow.All,
     filter: NodeFilter | null = null): never {
-    throw DOMExceptionImpl.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -409,7 +415,7 @@ export class DocumentImpl extends NodeImpl implements Document {
         clonedSelf.appendChild(clonedChild)
       }
     }
-    
+
     return clonedSelf
   }
 
@@ -445,7 +451,7 @@ export class DocumentImpl extends NodeImpl implements Document {
 
   // MIXIN: NonElementParentNode
   getElementById(elementId: string): Element | null { throw new Error("Mixin: NonElementParentNode not implemented.") }
-  
+
   // MIXIN: DocumentOrShadowRoot
   // No elements
 

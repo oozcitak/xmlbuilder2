@@ -1,12 +1,12 @@
 import { Node, Element, HTMLCollection, NodeType } from "./interfaces"
-import { Utility } from "./Utility"
+import { TreeQuery } from "./util/TreeQuery";
 
 /**
  * Represents a collection of elements.
  */
 export class HTMLCollectionImpl implements HTMLCollection {
 
-  protected static reservedNames = ['_parent', '_filter', 'length', 
+  protected static reservedNames = ['_parent', '_filter', 'length',
     'item', 'namedItem', 'get']
 
   protected _parent: Node
@@ -73,7 +73,7 @@ export class HTMLCollectionImpl implements HTMLCollection {
    * Returns an iterator for nodes.
    */
   *[Symbol.iterator](): IterableIterator<Element> {
-    yield* Utility.Tree.getDescendants<Element>(this._parent, false, false,
+    yield* TreeQuery.getDescendants<Element>(this._parent, false, false,
       (node: Node) => {
         if (node.nodeType === NodeType.Element) {
           const ele = <Element>node

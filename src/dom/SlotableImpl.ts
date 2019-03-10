@@ -1,5 +1,5 @@
 import { Slotable } from './interfaces'
-import { DOMExceptionImpl } from './DOMExceptionImpl';
+import { DOMException } from './DOMException';
 
 /**
  * Represents a mixin that allows nodes to become the contents of

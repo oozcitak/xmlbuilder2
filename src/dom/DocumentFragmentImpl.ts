@@ -1,8 +1,10 @@
-import { Node, DocumentFragment, Document, Element, 
-  NodeType, HTMLCollection, NodeList } from "./interfaces"
+import {
+  Node, DocumentFragment, Document, Element,
+  NodeType, HTMLCollection, NodeList
+} from "./interfaces"
 import { NodeImpl } from "./NodeImpl"
 import { TextImpl } from "./TextImpl"
-import { Utility } from "./Utility"
+import { TreeMutation } from "./util/TreeMutation";
 
 /**
  * Represents a document fragment in the XML tree.
@@ -36,7 +38,7 @@ export class DocumentFragmentImpl extends NodeImpl implements DocumentFragment {
   get textContent(): string | null {
     let str = ''
     for (const child of this._childNodes) {
-      if (child.nodeType !== NodeType.Comment && 
+      if (child.nodeType !== NodeType.Comment &&
         child.nodeType !== NodeType.ProcessingInstruction) {
         const childContent = child.textContent
         if (childContent)
@@ -47,7 +49,7 @@ export class DocumentFragmentImpl extends NodeImpl implements DocumentFragment {
   }
   set textContent(value: string | null) {
     const node = new TextImpl(this.ownerDocument, value || '')
-    Utility.Tree.Mutation.replaceAllNode(node, this)
+    TreeMutation.replaceAllNode(node, this)
   }
 
   /**

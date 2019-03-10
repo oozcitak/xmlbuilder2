@@ -1,6 +1,6 @@
 import { DOMTokenList, Element } from "./interfaces"
-import { DOMExceptionImpl } from "./DOMExceptionImpl"
-import { Utility } from "./Utility"
+import { OrderedSet } from "./util/OrderedSet";
+import { DOMException } from "./DOMException"
 
 /**
  * Represents a token set.
@@ -72,9 +72,9 @@ export class DOMTokenListImpl implements DOMTokenList {
     let set = this._valueAsSet
     for (let token of tokens) {
       if (!token)
-        throw DOMExceptionImpl.SyntaxError
-      else if (token.match(Utility.OrderedSet.WhiteSpace))
-        throw DOMExceptionImpl.InvalidCharacterError
+        throw DOMException.SyntaxError
+      else if (token.match(OrderedSet.WhiteSpace))
+        throw DOMException.InvalidCharacterError
       else
         set.delete(token)
     }
@@ -123,10 +123,10 @@ export class DOMTokenListImpl implements DOMTokenList {
    */
   replace(token: string, newToken: string): boolean {
     if (!token || !newToken)
-      throw DOMExceptionImpl.SyntaxError
-    else if (token.match(Utility.OrderedSet.WhiteSpace) ||
-      newToken.match(Utility.OrderedSet.WhiteSpace))
-      throw DOMExceptionImpl.InvalidCharacterError
+      throw DOMException.SyntaxError
+    else if (token.match(OrderedSet.WhiteSpace) ||
+      newToken.match(OrderedSet.WhiteSpace))
+      throw DOMException.InvalidCharacterError
 
     let set = this._valueAsSet
     if (!set.has(token)) {
@@ -157,11 +157,11 @@ export class DOMTokenListImpl implements DOMTokenList {
    * list to the given value.
    */
   get value(): string {
-    return Utility.OrderedSet.serialize(Array.from(this._valueAsSet))
+    return OrderedSet.serialize(Array.from(this._valueAsSet))
   }
   set value(value: string) {
     this._ownerElement.setAttribute(this._localName,
-      Utility.OrderedSet.sanitize(value))
+      OrderedSet.sanitize(value))
   }
 
 
@@ -179,7 +179,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    */
   get _valueAsSet(): Set<string> {
     let attValue = this._ownerElement.getAttribute(this._localName) || ''
-    let arr = Utility.OrderedSet.parse(attValue)
+    let arr = OrderedSet.parse(attValue)
     return new Set(arr)
   }
   set _valueAsSet(set: Set<string>) {
@@ -187,7 +187,7 @@ export class DOMTokenListImpl implements DOMTokenList {
       return
 
     let arr = Array.from(set)
-    let attValue = Utility.OrderedSet.serialize(arr)
+    let attValue = OrderedSet.serialize(arr)
     this._ownerElement.setAttribute(this._localName, attValue)
   }
 }

@@ -1,7 +1,8 @@
 import { Node, NodeList, Element, Attr, Text, Document, NodeType, 
   Position, DocumentFragment } from './interfaces'
 import { NodeListImpl } from './NodeListImpl'
-import { Utility } from './Utility'
+import { TreeMutation } from './util/TreeMutation'
+import { TreeQuery } from './util/TreeQuery';
 
 /**
  * Represents a generic XML node.
@@ -91,7 +92,7 @@ export abstract class NodeImpl implements Node {
    * the node's root node.
    */
   getRootNode(options: object = { composed: false }): Node {
-    return Utility.Tree.rootNode(this)
+    return TreeQuery.rootNode(this)
   }
 
   /** 
@@ -288,17 +289,17 @@ export abstract class NodeImpl implements Node {
       // Use a cached Math.random() value
     }
 
-    if ((!attr1 && Utility.Tree.isAncestorOf(node2, node1)) ||
+    if ((!attr1 && TreeQuery.isAncestorOf(node2, node1)) ||
       (attr2 && (node1 === node2))) {
       return Position.Contains | Position.Preceding
     }
 
-    if ((!attr2 && Utility.Tree.isDescendantOf(node2, node1)) ||
+    if ((!attr2 && TreeQuery.isDescendantOf(node2, node1)) ||
       (attr1 && (node1 === node2))) {
       return Position.ContainedBy | Position.Following
     }
 
-    if (Utility.Tree.isPreceding(node2, node1))
+    if (TreeQuery.isPreceding(node2, node1))
       return Position.Preceding
 
     return Position.Following
@@ -312,7 +313,7 @@ export abstract class NodeImpl implements Node {
    */
   contains(node: Node | null): boolean {
     if (!node) return false
-    return ((node === this) || Utility.Tree.isDescendantOf(this, node))
+    return ((node === this) || TreeQuery.isDescendantOf(this, node))
   }
 
   /**
@@ -377,7 +378,7 @@ export abstract class NodeImpl implements Node {
    */
   insertBefore(newChild: Node | DocumentFragment,
     refChild: Node | null): Node | null {
-    return Utility.Tree.Mutation.preInsert(newChild, this, refChild)
+    return TreeMutation.preInsert(newChild, this, refChild)
   }
 
   /**
@@ -394,7 +395,7 @@ export abstract class NodeImpl implements Node {
    * @returns the newly inserted child node
    */
   appendChild(newChild: Node): Node | null {
-    return Utility.Tree.Mutation.appendNode(newChild, this)
+    return TreeMutation.appendNode(newChild, this)
   }
 
   /**
@@ -408,7 +409,7 @@ export abstract class NodeImpl implements Node {
    * @returns the removed child node
    */
   replaceChild(newChild: Node, oldChild: Node): Node {
-    return Utility.Tree.Mutation.replaceNode(newChild, oldChild, this)
+    return TreeMutation.replaceNode(newChild, oldChild, this)
   }
 
   /**
@@ -420,6 +421,6 @@ export abstract class NodeImpl implements Node {
   * @returns the removed child node
   */
   removeChild(oldChild: Node): Node {
-    return Utility.Tree.Mutation.preRemoveNode(oldChild, this)
+    return TreeMutation.preRemoveNode(oldChild, this)
   }
 }

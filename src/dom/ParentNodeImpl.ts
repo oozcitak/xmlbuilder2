@@ -1,8 +1,8 @@
 import { ParentNode, Node, NodeType, HTMLCollection, 
   NodeList, Element } from './interfaces';
 import { HTMLCollectionImpl } from './HTMLCollectionImpl';
-import { DOMExceptionImpl } from './DOMExceptionImpl'
-import { Convert } from './Convert'
+import { DOMException } from './DOMException'
+import { Convert } from './util/Convert'
 
 /**
  * Represents a mixin that extends parent nodes that can have children.
@@ -108,7 +108,7 @@ export class ParentNodeImpl implements ParentNode {
    * @param selectors - a selectors string
    */
   querySelector(selectors: string): Element | null {
-    throw DOMExceptionImpl.NotSupportedError
+    throw DOMException.NotSupportedError
   }
 
   /**
@@ -120,7 +120,7 @@ export class ParentNodeImpl implements ParentNode {
    * @param selectors - a selectors string
    */
   querySelectorAll(selectors: string): NodeList {
-    throw DOMExceptionImpl.NotSupportedError
+    throw DOMException.NotSupportedError
   }
   
 }

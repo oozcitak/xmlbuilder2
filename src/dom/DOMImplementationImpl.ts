@@ -1,11 +1,13 @@
-import { DOMImplementation, DocumentType, 
-  Document, XMLDocument } from "./interfaces";
+import {
+  DOMImplementation, DocumentType,
+  Document, XMLDocument
+} from "./interfaces";
 import { DocumentTypeImpl } from "./DocumentTypeImpl"
 import { DocumentImpl } from "./DocumentImpl"
 import { XMLDocumentImpl } from "./XMLDocumentImpl"
 import { TextImpl } from "./TextImpl";
 import { ElementImpl } from "./ElementImpl"
-import { Utility } from "./Utility"
+import { Namespace } from './util/Namespace';
 
 /**
  * Represents an object providing methods which are not dependent on 
@@ -21,7 +23,7 @@ export class DOMImplementationImpl implements DOMImplementation {
    * Gets the instance of dom implementation.
    */
   static get Instance(): DOMImplementation {
-    if(!DOMImplementationImpl._instance)
+    if (!DOMImplementationImpl._instance)
       DOMImplementationImpl._instance = new DOMImplementationImpl()
 
     return DOMImplementationImpl._instance
@@ -35,7 +37,7 @@ export class DOMImplementationImpl implements DOMImplementation {
    */
   createDocumentType(qualifiedName: string,
     publicId: string, systemId: string): DocumentType {
-    Utility.Namespace.validateQName(qualifiedName)
+    Namespace.validateQName(qualifiedName)
 
     return new DocumentTypeImpl(null, qualifiedName, publicId, systemId)
   }
@@ -60,9 +62,9 @@ export class DOMImplementationImpl implements DOMImplementation {
     }
 
     // document's content type is determined by namespace
-    if (namespace === Utility.Namespace.HTML)
+    if (namespace === Namespace.HTML)
       document._contentType = 'application/xhtml+xml'
-    else if (namespace === Utility.Namespace.SVG)
+    else if (namespace === Namespace.SVG)
       document._contentType = 'image/svg+xml'
     else
       document._contentType = 'application/xml'
@@ -78,24 +80,24 @@ export class DOMImplementationImpl implements DOMImplementation {
   createHTMLDocument(title: string | undefined = undefined): Document {
     let document = new DocumentImpl()
     document._contentType = 'text/html'
-  
+
     let doctype = new DocumentTypeImpl(document, 'html')
     document.appendChild(doctype)
-  
-    let htmlElement = new ElementImpl(document, 'html', Utility.Namespace.HTML)
+
+    let htmlElement = new ElementImpl(document, 'html', Namespace.HTML)
     document.appendChild(htmlElement)
 
-    let headElement = new ElementImpl(document, 'head', Utility.Namespace.HTML)
+    let headElement = new ElementImpl(document, 'head', Namespace.HTML)
     htmlElement.appendChild(headElement)
 
-    if(title !== undefined) {
-      let titleElement = new ElementImpl(document, 'title', Utility.Namespace.HTML)
+    if (title !== undefined) {
+      let titleElement = new ElementImpl(document, 'title', Namespace.HTML)
       headElement.appendChild(titleElement)
       let textElement = new TextImpl(document, title)
       titleElement.appendChild(textElement)
     }
 
-    let bodyElement = new ElementImpl(document, 'body', Utility.Namespace.HTML)
+    let bodyElement = new ElementImpl(document, 'body', Namespace.HTML)
     htmlElement.appendChild(bodyElement)
 
     // document's content type is determined by namespace

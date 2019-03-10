@@ -7,8 +7,10 @@ import { AttrImpl } from './AttrImpl'
 import { HTMLCollectionImpl } from './HTMLCollectionImpl'
 import { NamedNodeMapImpl } from './NamedNodeMapImpl'
 import { DOMTokenListImpl } from './DOMTokenListImpl'
-import { Utility } from './Utility'
-import { DOMExceptionImpl } from './DOMExceptionImpl'
+import { DOMException } from './DOMException'
+import { Namespace } from './util/Namespace';
+import { OrderedSet } from './util/OrderedSet';
+import { TreeMutation } from './util/TreeMutation';
 
 /**
  * Represents an element node.
@@ -168,7 +170,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param value - attribute value to set
    */
   setAttributeNS(namespace: string, qualifiedName: string, value: string): void {
-    let names = Utility.Namespace.extractNames(namespace, qualifiedName)
+    let names = Namespace.extractNames(namespace, qualifiedName)
     let attr = this.attributes.getNamedItemNS(namespace, names.localName)
 
     if (attr) {
@@ -297,7 +299,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param init - A ShadowRootInit dictionary.
    */
   attachShadow(init: object): ShadowRoot {
-    throw DOMExceptionImpl.NotImplementedError
+    throw DOMException.NotImplementedError
   }
 
   /**
@@ -324,7 +326,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param selectors 
    */
   closest(selectors: string): Element | null {
-    throw DOMExceptionImpl.NotImplementedError
+    throw DOMException.NotImplementedError
   }
 
   /**
@@ -337,7 +339,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param selectors 
    */
   matches(selectors: string): boolean {
-    throw DOMExceptionImpl.NotImplementedError
+    throw DOMException.NotImplementedError
   }
 
   /** 
@@ -359,7 +361,7 @@ export class ElementImpl extends NodeImpl implements Element {
   }
   set textContent(value: string | null) {
     const node = new TextImpl(this.ownerDocument, value || '')
-    Utility.Tree.Mutation.replaceAllNode(node, this)
+    TreeMutation.replaceAllNode(node, this)
   }
 
   /**
@@ -469,7 +471,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * elements
    */
   getElementsByClassName(classNames: string): HTMLCollection {
-    let arr = Utility.OrderedSet.parse(classNames)
+    let arr = OrderedSet.parse(classNames)
     return new HTMLCollectionImpl(this, function (ele: Element) {
       let classes = ele.classList
       let allClassesFound = true
@@ -595,7 +597,7 @@ export class ElementImpl extends NodeImpl implements Element {
       return this.namespaceURI
 
     for (let attr of this.attributes) {
-      if (attr.namespaceURI === Utility.Namespace.XMLNS) {
+      if (attr.namespaceURI === Namespace.XMLNS) {
         if ((attr.prefix === 'xmlns' && attr.localName === prefix) ||
           (!prefix && !attr.prefix && attr.localName == 'xmlns')) {
           return attr.value || null

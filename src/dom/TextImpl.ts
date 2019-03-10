@@ -1,6 +1,6 @@
 import { Text, Document, Node, NodeType } from "./interfaces"
 import { CharacterDataImpl } from "./CharacterDataImpl"
-import { DOMExceptionImpl } from "./DOMExceptionImpl"
+import { DOMException } from "./DOMException"
 
 /**
  * Represents a text node.
@@ -59,7 +59,7 @@ export class TextImpl extends CharacterDataImpl implements Text {
    */
   splitText(offset: number): Text {
     if (offset < 0 || offset > this.data.length)
-      throw DOMExceptionImpl.IndexSizeError
+      throw DOMException.IndexSizeError
       
     let newData = this.data.slice(offset)
     this.data = this.data.slice(0, offset)

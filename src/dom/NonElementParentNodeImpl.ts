@@ -1,5 +1,5 @@
 import { NonElementParentNode, Node, Element, NodeType } from './interfaces';
-import { Utility } from './Utility'
+import { TreeQuery } from './util/TreeQuery';
 
 /**
  * Represents a mixin that extends non-element parent nodes. This mixin
@@ -12,7 +12,7 @@ export class NonElementParentNodeImpl implements NonElementParentNode {
    * @param id - the value of the `id` attribute to match
    */
   getElementById(id: string): Element | null {
-    let nodeFound = Utility.Tree.forEachDescendant(<Node><unknown>this, {},
+    let nodeFound = TreeQuery.forEachDescendant(<Node><unknown>this, {},
       function (node: Node): Element | undefined {
         if (node.nodeType === NodeType.Element && (<Element>node).id === id) {
           return <Element>node
