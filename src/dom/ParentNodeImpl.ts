@@ -76,7 +76,7 @@ export class ParentNodeImpl implements ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  prepend(nodes: [Node | string]): void {
+  prepend(...nodes: [Node | string]): void {
     let node = <Node><unknown>this
 
     if (node.ownerDocument) {
@@ -91,7 +91,7 @@ export class ParentNodeImpl implements ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  append(nodes: [Node | string]): void {
+  append(...nodes: [Node | string]): void {
     let node = <Node><unknown>this
 
     if (node.ownerDocument) {

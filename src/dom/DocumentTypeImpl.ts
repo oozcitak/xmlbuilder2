@@ -87,9 +87,9 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
   }
 
   // MIXIN: ChildNode
-  before(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
-  after(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
-  replaceWith(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  before(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  after(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  replaceWith(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
   remove(): void { throw new Error("Mixin: ChildNode not implemented.") }
 
 }

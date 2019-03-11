@@ -102,7 +102,7 @@ export interface Node {
   /**
    * Returns a duplicate of this node, i.e., serves as a generic copy 
    * constructor for nodes. The duplicate node has no parent 
-   * ({@link ParentNode} returns `null`).
+   * ({@link parentNode} returns `null`).
    *
    * @param deep - if `true`, recursively clone the subtree under the 
    * specified node if `false`, clone only the node itself (and its 
@@ -987,7 +987,7 @@ export interface ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  prepend(nodes: [Node | string]): void
+  prepend(...nodes: [Node | string]): void
 
   /**
    * Appends the list of nodes or strings after the last child node.
@@ -995,7 +995,7 @@ export interface ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  append(nodes: [Node | string]): void
+  append(...nodes: [Node | string]): void
 
   /**
    * Returns the first element that is a descendant of node that
@@ -1031,19 +1031,19 @@ export interface ChildNode {
    * Inserts nodes just before this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  before(nodes: Array<Node | string>): void
+  before(...nodes: Array<Node | string>): void
 
   /**
    * Inserts nodes just after this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  after(nodes: Array<Node | string>): void
+  after(...nodes: Array<Node | string>): void
 
   /**
    * Replaces nodes with this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  replaceWith(nodes: Array<Node | string>): void
+  replaceWith(...nodes: Array<Node | string>): void
 
   /**
    * Removes this node form its tree.

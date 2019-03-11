@@ -206,8 +206,9 @@ export class TreeMutation {
     if (node.nodeType === NodeType.DocumentFragment) {
       for (let childNode of node.childNodes) {
         nodes.push(childNode)
-        TreeMutation.removeNode(childNode, node)
       }
+      // remove child nodes
+      (<any>node)._firstChild = null
     } else {
       nodes.push(node)
     }

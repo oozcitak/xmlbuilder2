@@ -126,9 +126,9 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
   set nextElementSibling(value: Element | null) { }
 
   // MIXIN: ChildNode
-  before(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
-  after(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
-  replaceWith(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  before(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  after(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  replaceWith(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
   remove(): void { throw new Error("Mixin: ChildNode not implemented.") }
 
 }

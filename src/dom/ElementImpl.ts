@@ -622,8 +622,8 @@ export class ElementImpl extends NodeImpl implements Element {
   set lastElementChild(value: Element | null) { }
   get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
   set childElementCount(value: number) { }
-  prepend(nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
-  append(nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
+  prepend(...nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
+  append(...nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
   querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
   querySelectorAll(selectors: string): NodeList { throw new Error("Mixin: ParentNode not implemented.") }
 
@@ -634,9 +634,9 @@ export class ElementImpl extends NodeImpl implements Element {
   set nextElementSibling(value: Element | null) { }
 
   // MIXIN: ChildNode
-  before(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
-  after(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
-  replaceWith(nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  before(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  after(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  replaceWith(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
   remove(): void { throw new Error("Mixin: ChildNode not implemented.") }
 
   // MIXIN: Slotable

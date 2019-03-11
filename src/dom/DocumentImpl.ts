@@ -463,8 +463,8 @@ export class DocumentImpl extends NodeImpl implements Document {
   set lastElementChild(value: Element | null) { }
   get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
   set childElementCount(value: number) { }
-  prepend(nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
-  append(nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
+  prepend(...nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
+  append(...nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
   querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
   querySelectorAll(selectors: string): NodeList { throw new Error("Mixin: ParentNode not implemented.") }
 

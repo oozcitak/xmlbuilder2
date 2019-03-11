@@ -13,7 +13,7 @@ export class ChildNodeImpl implements ChildNode {
    * Inserts nodes just before this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  before(nodes: Array<Node | string>): void {
+  before(...nodes: Array<Node | string>): void {
     const context = <Node><unknown>this
 
     const parent = context.parentNode
@@ -48,7 +48,7 @@ export class ChildNodeImpl implements ChildNode {
    * Inserts nodes just after this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  after(nodes: Array<Node | string>): void {
+  after(...nodes: Array<Node | string>): void {
     const context = <Node><unknown>this
 
     const parent = context.parentNode
@@ -78,7 +78,7 @@ export class ChildNodeImpl implements ChildNode {
    * Replaces nodes with this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  replaceWith(nodes: Array<Node | string>): void {
+  replaceWith(...nodes: Array<Node | string>): void {
     const context = <Node><unknown>this
 
     const parent = context.parentNode
