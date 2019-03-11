@@ -38,6 +38,17 @@ describe('DOMImplementation', function () {
       `)
   })
 
+  test('createHTMLDocument() without title', function () {
+    const doc = $$.dom.createHTMLDocument()
+    expect(doc.contentType).toBe('application/xhtml+xml')
+    expect($$.printTree(doc)).toBe($$.t`
+      !DOCTYPE html
+      html
+        head
+        body
+      `)
+  })
+
   test('hasFeature()', function () {
     expect($$.dom.hasFeature()).toBe(true)
   })
