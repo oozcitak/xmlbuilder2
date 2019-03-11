@@ -19,8 +19,7 @@ export class Convert {
         return new TextImpl(document, <string>nodes[0])
       else
         return <Node>nodes[0]
-    }
-    else {
+    } else {
       let fragment = new DocumentFragmentImpl(document)
 
       for (let child of nodes) {

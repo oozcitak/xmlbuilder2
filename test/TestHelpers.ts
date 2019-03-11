@@ -1,7 +1,48 @@
 import { DOMImplementation } from '../src/dom/index'
 import dedent from "dedent"
+import { Attr as AttrImpl } from '../src/dom/index'
+import { CDATASection as CDATASectionImpl } from '../src/dom/index'
+import { CharacterData as CharacterDataImpl } from '../src/dom/index'
+import { Comment as CommentImpl } from '../src/dom/index'
+import { DocumentFragment as DocumentFragmentImpl } from '../src/dom/index'
+import { Document as DocumentImpl } from '../src/dom/index'
+import { DocumentType as DocumentTypeImpl } from '../src/dom/index'
+import { DOMException as DOMExceptionImpl } from '../src/dom/index'
+import { DOMImplementation as DOMImplementationImpl } from '../src/dom/index'
+import { DOMTokenList as DOMTokenListImpl } from '../src/dom/index'
+import { Element as ElementImpl } from '../src/dom/index'
+import { HTMLCollection as HTMLCollectionImpl } from '../src/dom/index'
+import { NamedNodeMap as NamedNodeMapImpl } from '../src/dom/index'
+import { NodeFilter as NodeFilterImpl } from '../src/dom/index'
+import { Node as NodeImpl } from '../src/dom/index'
+import { NodeList as NodeListImpl } from '../src/dom/index'
+import { ProcessingInstruction as ProcessingInstructionImpl } from '../src/dom/index'
+import { ShadowRoot as ShadowRootImpl } from '../src/dom/index'
+import { Text as TextImpl } from '../src/dom/index'
+import { XMLDocument as XMLDocumentImpl } from '../src/dom/index'
 
 export default class TestHelpers {
+  static Attr = AttrImpl
+  static CDATASection = CDATASectionImpl
+  static CharacterData = CharacterDataImpl
+  static Comment = CommentImpl
+  static DocumentFragment = DocumentFragmentImpl
+  static Document = DocumentImpl
+  static DocumentType = DocumentTypeImpl
+  static DOMException = DOMExceptionImpl
+  static DOMImplementation = DOMImplementationImpl
+  static DOMTokenList = DOMTokenListImpl
+  static Element = ElementImpl
+  static HTMLCollection = HTMLCollectionImpl
+  static NamedNodeMap = NamedNodeMapImpl
+  static NodeFilter = NodeFilterImpl
+  static Node = NodeImpl
+  static NodeList = NodeListImpl
+  static ProcessingInstruction = ProcessingInstructionImpl
+  static ShadowRoot = ShadowRootImpl
+  static Text = TextImpl
+  static XMLDocument = XMLDocumentImpl
+
   /**
    * Returns the dom implemention.
    */

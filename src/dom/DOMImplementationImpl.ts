@@ -15,7 +15,7 @@ import { Namespace } from './util/Namespace';
  */
 export class DOMImplementationImpl implements DOMImplementation {
 
-  private static _instance: DOMImplementation
+  private static _instance: DOMImplementation | undefined = undefined
 
   private constructor() { }
 
