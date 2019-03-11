@@ -10,7 +10,7 @@ describe('NodeList', function () {
   const ele1 = doc.createElement('tag1')
   const ele2 = doc.createElement('tag2')
   const ele3 = doc.createElement('tag3')
-  
+
   doc.documentElement.appendChild(ele1)
   doc.documentElement.appendChild(ele2)
   doc.documentElement.appendChild(ele3)
@@ -29,8 +29,7 @@ describe('NodeList', function () {
 
   test('keys()', function () {
     let i = 0
-    for(const index of list.keys())
-    {
+    for (const index of list.keys()) {
       expect(index).toBe(i)
       i++
     }
@@ -39,8 +38,7 @@ describe('NodeList', function () {
   test('values()', function () {
     let i = 0
     let arr = [ele1, ele2, ele3]
-    for(const ele of list.values())
-    {
+    for (const ele of list.values()) {
       expect(ele).toBe(arr[i])
       i++
     }
@@ -49,8 +47,7 @@ describe('NodeList', function () {
   test('entries()', function () {
     let i = 0
     let arr = [ele1, ele2, ele3]
-    for(const entry of list.entries())
-    {
+    for (const entry of list.entries()) {
       expect(entry[0]).toBe(i)
       expect(entry[1]).toBe(arr[i])
       i++
@@ -60,8 +57,7 @@ describe('NodeList', function () {
   test('iteration()', function () {
     let i = 0
     let arr = [ele1, ele2, ele3]
-    for(const ele of list)
-    {
+    for (const ele of list) {
       expect(ele).toBe(arr[i])
       i++
     }

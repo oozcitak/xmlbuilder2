@@ -1,6 +1,8 @@
-import { Attr, NamedNodeMap, DOMTokenList, Document, 
-  ShadowRoot, NodeType, Node, Element, 
-  HTMLCollection, NodeList, ShadowRootMode } from './interfaces'
+import {
+  Attr, NamedNodeMap, DOMTokenList, Document,
+  ShadowRoot, NodeType, Node, Element,
+  HTMLCollection, NodeList, ShadowRootMode
+} from './interfaces'
 import { TextImpl } from './TextImpl';
 import { NodeImpl } from './NodeImpl'
 import { AttrImpl } from './AttrImpl'
@@ -22,7 +24,7 @@ export class ElementImpl extends NodeImpl implements Element {
   protected _localName: string
   protected _attributes: NamedNodeMap = new NamedNodeMapImpl(this)
   protected _shadowRoot: ShadowRoot | null = null
-  
+
   /**
    * Initializes a new instance of `Element`.
    *
@@ -350,7 +352,7 @@ export class ElementImpl extends NodeImpl implements Element {
   get textContent(): string | null {
     let str = ''
     for (const child of this._childNodes) {
-      if (child.nodeType !== NodeType.Comment && 
+      if (child.nodeType !== NodeType.Comment &&
         child.nodeType !== NodeType.ProcessingInstruction) {
         const childContent = child.textContent
         if (childContent)

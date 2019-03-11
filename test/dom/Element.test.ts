@@ -133,7 +133,7 @@ describe('Element', function () {
   test('getAttributeNode()', function () {
     const attr = ele1.getAttributeNode('att1')
     expect(attr).not.toBeNull()
-    if(attr) {
+    if (attr) {
       expect(attr.value).toBe('newvalue1')
     }
     expect(ele1.getAttributeNode('none')).toBeNull()
@@ -142,7 +142,7 @@ describe('Element', function () {
   test('getAttributeNodeNS()', function () {
     const attr = ele1.getAttributeNodeNS('http://www.w3.org/1999/xhtml', 'name')
     expect(attr).not.toBeNull()
-    if(attr) {
+    if (attr) {
       expect(attr.value).toBe('newvalue')
     }
     expect(ele1.getAttributeNodeNS('http://www.w3.org/1999/xhtml', 'none')).toBeNull()
@@ -226,8 +226,8 @@ describe('Element', function () {
 
     if (!iaedoc.documentElement)
       throw new Error("documentElement is null")
-  
-    const iaede = iaedoc.documentElement  
+
+    const iaede = iaedoc.documentElement
     const ele = doc.createElement('node')
     iaede.appendChild(ele)
     ele.insertAdjacentElement('beforebegin', iaedoc.createElement('one'))
@@ -250,8 +250,8 @@ describe('Element', function () {
 
     if (!iaedoc.documentElement)
       throw new Error("documentElement is null")
-  
-    const iaede = iaedoc.documentElement  
+
+    const iaede = iaedoc.documentElement
     const ele = doc.createElement('node')
     iaede.appendChild(ele)
     ele.insertAdjacentText('beforebegin', 'one')

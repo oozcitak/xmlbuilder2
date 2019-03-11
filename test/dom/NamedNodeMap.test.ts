@@ -99,9 +99,9 @@ describe('NamedNodeMap', function () {
   test('iteration', function () {
     ele.setAttribute('att', 'val')
     ele.setAttributeNS('myns', 'd:att2', 'val2')
-    
+
     let names = ''
-    let values  = ''
+    let values = ''
     for (const ele of list) {
       names += '_' + ele.name
       values += '_' + ele.value

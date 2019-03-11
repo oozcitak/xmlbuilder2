@@ -7,7 +7,7 @@ import { DocumentFragmentImpl } from "./DocumentFragmentImpl"
 export class ShadowRootImpl extends DocumentFragmentImpl implements ShadowRoot {
   protected _host: Element
   protected _mode: ShadowRootMode
-  
+
   /**
    * Initializes a new instance of `ShadowRoot`.
    *

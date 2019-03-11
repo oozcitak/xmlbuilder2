@@ -12,7 +12,7 @@ export class NonDocumentTypeChildNodeImpl implements NonDocumentTypeChildNode {
    */
   get previousElementSibling(): Element | null {
     let node = (<Node><unknown>this).previousSibling
-    while(node) {
+    while (node) {
       if (node.nodeType === NodeType.Element)
         return <Element>node
       else
@@ -27,14 +27,14 @@ export class NonDocumentTypeChildNodeImpl implements NonDocumentTypeChildNode {
    */
   get nextElementSibling(): Element | null {
     let node = (<Node><unknown>this).nextSibling
-    while(node) {
+    while (node) {
       if (node.nodeType === NodeType.Element)
         return <Element>node
       else
         node.nextSibling
     }
     return null
-  }  
+  }
   set nextElementSibling(value: Element | null) { throw new Error("This property is read-only.") }
-  
+
 }

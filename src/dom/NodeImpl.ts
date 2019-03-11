@@ -1,5 +1,7 @@
-import { Node, NodeList, Element, Attr, Text, Document, NodeType, 
-  Position, DocumentFragment } from './interfaces'
+import {
+  Node, NodeList, Element, Attr, Text, Document, NodeType,
+  Position, DocumentFragment
+} from './interfaces'
 import { NodeListImpl } from './NodeListImpl'
 import { TreeMutation } from './util/TreeMutation'
 import { TreeQuery } from './util/TreeQuery';
@@ -284,7 +286,7 @@ export abstract class NodeImpl implements Node {
 
     if (!node1 || !node2 || (node1.getRootNode != node2.getRootNode)) {
       return Position.Disconnected | Position.ImplementationSpecific |
-      Position.Preceding
+        Position.Preceding
       // TODO: return preceding or following consistently
       // Use a cached Math.random() value
     }

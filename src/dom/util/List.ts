@@ -68,7 +68,7 @@ export class List {
 
     const prev = <any>(nodeImpl.previousSibling)
     const next = <any>(nodeImpl.nextSibling)
-    
+
     nodeImpl._previousSibling = null
     nodeImpl._nextSibling = null
 

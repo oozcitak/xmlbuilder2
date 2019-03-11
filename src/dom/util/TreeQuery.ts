@@ -55,9 +55,9 @@ export class TreeQuery {
 
     for (const child of TreeQuery.getDescendantNodes(node, self, shadow,
       (node) => { return node.nodeType === NodeType.Element })) {
-        const ele = <Element><unknown>child
-        if (!filter || filter(ele))
-          yield <Element><unknown>ele
+      const ele = <Element><unknown>child
+      if (!filter || filter(ele))
+        yield <Element><unknown>ele
     }
   }
 

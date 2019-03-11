@@ -1,6 +1,6 @@
 import { NodeType, Node, Document, Element } from "../interfaces";
 import { DOMException } from "..";
-import { List } from "./NodeList";
+import { List } from "./List";
 import { TreeQuery } from "./TreeQuery";
 
 /**

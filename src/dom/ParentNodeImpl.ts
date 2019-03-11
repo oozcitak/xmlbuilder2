@@ -1,5 +1,7 @@
-import { ParentNode, Node, NodeType, HTMLCollection, 
-  NodeList, Element } from './interfaces';
+import {
+  ParentNode, Node, NodeType, HTMLCollection,
+  NodeList, Element
+} from './interfaces';
 import { HTMLCollectionImpl } from './HTMLCollectionImpl';
 import { DOMException } from './DOMException'
 import { Convert } from './util/Convert'
@@ -60,10 +62,10 @@ export class ParentNodeImpl implements ParentNode {
     while (node) {
       if (node.nodeType === NodeType.Element)
         count++
-      
+
       node = node.nextSibling
     }
-  
+
     return count
   }
   set childElementCount(value: number) { throw new Error("This property is read-only.") }
@@ -77,7 +79,7 @@ export class ParentNodeImpl implements ParentNode {
   prepend(nodes: [Node | string]): void {
     let node = <Node><unknown>this
 
-    if(node.ownerDocument) {
+    if (node.ownerDocument) {
       let childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
       node.insertBefore(childNode, node.firstChild)
     }
@@ -92,7 +94,7 @@ export class ParentNodeImpl implements ParentNode {
   append(nodes: [Node | string]): void {
     let node = <Node><unknown>this
 
-    if(node.ownerDocument) {
+    if (node.ownerDocument) {
       let childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
       node.appendChild(childNode)
     }
@@ -122,5 +124,5 @@ export class ParentNodeImpl implements ParentNode {
   querySelectorAll(selectors: string): NodeList {
     throw DOMException.NotSupportedError
   }
-  
+
 }

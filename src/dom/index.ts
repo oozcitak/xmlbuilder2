@@ -27,7 +27,7 @@ import { TextImpl } from './TextImpl'
 import { XMLDocumentImpl } from './XMLDocumentImpl'
 
 // Apply mixins
-const applyMixin = function(derivedCtor: any, baseCtor: any): void {
+const applyMixin = function (derivedCtor: any, baseCtor: any): void {
   Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
     derivedCtor.prototype[name] = baseCtor.prototype[name]
   })

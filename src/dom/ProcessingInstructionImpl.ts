@@ -1,5 +1,7 @@
-import { Node, Document, ProcessingInstruction, 
-  NodeType } from "./interfaces"
+import {
+  Node, Document, ProcessingInstruction,
+  NodeType
+} from "./interfaces"
 import { CharacterDataImpl } from "./CharacterDataImpl"
 
 /**

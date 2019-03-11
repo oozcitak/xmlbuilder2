@@ -13,7 +13,7 @@ export class XMLSpec {
   static isName(name: string): boolean {
     return (!!name.match(XMLSpec.Name))
   }
-  
+
   static isQName(name: string): boolean {
     return (!!name.match(XMLSpec.QName))
   }

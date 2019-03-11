@@ -223,7 +223,7 @@ export interface Node {
 /**
  * Represents a generic text node.
  */
-export interface CharacterData extends Node, 
+export interface CharacterData extends Node,
   NonDocumentTypeChildNode, ChildNode {
 
   /** 
@@ -345,7 +345,7 @@ export interface HTMLCollection extends Iterable<Element> {
 /**
  * Represents a document node.
  */
-export interface Document extends Node, NonElementParentNode, 
+export interface Document extends Node, NonElementParentNode,
   DocumentOrShadowRoot, ParentNode {
 
   /** 
@@ -606,7 +606,7 @@ export interface DocumentFragment extends Node, NonElementParentNode,
  * Represents a shadow root.
  */
 export interface ShadowRoot extends DocumentFragment, DocumentOrShadowRoot {
-  
+
   /** 
    * Gets the shadow root's mode.
    * 
@@ -628,7 +628,7 @@ export interface ShadowRoot extends DocumentFragment, DocumentOrShadowRoot {
 /**
  * Represents an element node.
  */
-export interface Element extends Node, ParentNode, 
+export interface Element extends Node, ParentNode,
   NonDocumentTypeChildNode, ChildNode, Slotable {
 
   /** 
@@ -860,7 +860,7 @@ export interface Element extends Node, ParentNode,
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByTagNameNS(namespace: string | null, 
+  getElementsByTagNameNS(namespace: string | null,
     localName: string): HTMLCollection
 
   /**
@@ -1141,7 +1141,7 @@ export interface DOMImplementation {
    * @param qualifiedName - the qualified name of the document element
    * @param doctype - a {@link DocType} to assign to this document
    */
-  createDocument(namespace: string  | null, qualifiedName: string,
+  createDocument(namespace: string | null, qualifiedName: string,
     doctype: DocumentType | null): XMLDocument
 
   /**
@@ -1286,7 +1286,7 @@ export interface NamedNodeMap extends Iterable<Attr> {
    * @param attr - attribute to set
    */
   setNamedItemNS(attr: Attr): Attr | null
-  
+
   /**
    * Removes the attribute with the given `qualifiedName`.
    * 
@@ -1366,7 +1366,7 @@ export interface NodeList extends Iterable<Node> {
   forEach(callback: (node: Node, index: number, list: NodeList) => any,
     thisArg: any): void
 
-  }
+}
 
 /**
  * Represents a mixin that extends child nodes that can have siblings
