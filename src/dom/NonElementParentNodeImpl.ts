@@ -12,13 +12,12 @@ export class NonElementParentNodeImpl implements NonElementParentNode {
    * @param id - the value of the `id` attribute to match
    */
   getElementById(id: string): Element | null {
-    let nodeFound = TreeQuery.forEachDescendant(<Node><unknown>this, {},
-      function (node: Node): Element | undefined {
-        if (node.nodeType === NodeType.Element && (<Element>node).id === id) {
-          return <Element>node
+    for (const ele of TreeQuery.getDescendantElements(<Node><unknown>this)) {
+      if (ele.id === id) {
+        return ele
       }
-    })
+    }
 
-    return nodeFound
+    return null
   }
 }

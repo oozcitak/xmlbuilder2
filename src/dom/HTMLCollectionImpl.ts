@@ -73,15 +73,8 @@ export class HTMLCollectionImpl implements HTMLCollection {
    * Returns an iterator for nodes.
    */
   *[Symbol.iterator](): IterableIterator<Element> {
-    yield* TreeQuery.getDescendants<Element>(this._parent, false, false,
-      (node: Node) => {
-        if (node.nodeType === NodeType.Element) {
-          const ele = <Element>node
-          if (this._filter(ele)) return true
-        }
-        return false
-      }
-    )
+    yield* TreeQuery.getDescendantElements(this._parent, false, false,
+      (ele) => { return !!this._filter(ele) })
   }
 
   /**

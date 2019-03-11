@@ -15,11 +15,11 @@ export class TreeQuery {
    * @param shadow - whether to visit shadow tree nodes
    * @param filter - a function to filter nodes
    */
-  static *getDescendants<T>(node: Node, self: boolean = false,
-    shadow: boolean = false, filter?: (childNode: Node) => any): IterableIterator<T> {
+  static *getDescendantNodes(node: Node, self: boolean = false,
+    shadow: boolean = false, filter?: (childNode: Node) => any): IterableIterator<Node> {
 
     if (self && (!filter || filter(node)))
-      yield <T><unknown>node
+      yield node
 
     // traverse shadow tree
     if (shadow && node.nodeType === NodeType.Element) {
@@ -27,7 +27,7 @@ export class TreeQuery {
       if (ele.shadowRoot) {
         let child = ele.shadowRoot.firstChild
         while (child) {
-          yield* TreeQuery.getDescendants<T>(child, true, shadow, filter)
+          yield* TreeQuery.getDescendantNodes(child, true, shadow, filter)
           child = child.nextSibling
         }
       }
@@ -36,64 +36,28 @@ export class TreeQuery {
     // traverse child nodes
     let child = node.firstChild
     while (child) {
-      yield* TreeQuery.getDescendants<T>(child, true, shadow, filter)
+      yield* TreeQuery.getDescendantNodes(child, true, shadow, filter)
       child = child.nextSibling
     }
   }
 
   /**
-   * Applies the given function to all descendant nodes of the given
-   * node, optionaly including shadow trees. In tree order is 
-   * preorder, depth-first traversal of a tree.
+   * Traverses through all descendant element nodes of the tree rooted at
+   * `node` in depth-first preorder.
    * 
-   * @param node - the node whose descendants will be traversed
-   * @param options - an object to set traversal settings.
-   * If `options.self` is truthy, traversal includes `node`
-   * itself. If `options.shadow` is truthy, traversal includes the 
-   * node's and its descendant's shadow trees as well.
-   * @param func - the function to apply to the descendant nodes. The
-   * function receives each descendant node as an argument and should
-   * return a value to stop iteration, or `undefined` to continue 
-   * with the next descendant.
-   * 
-   * @returns the value returned from `func` or `shadowFunc` whichever
-   * returns a value first.
+   * @param node - root node of the tree
+   * @param self - whether to include `node` in traversal
+   * @param shadow - whether to visit shadow tree nodes
+   * @param filter - a function to filter nodes
    */
-  static forEachDescendant(node: Node,
-    options: { self?: boolean, shadow?: boolean } = { self: false, shadow: false },
-    func: (childNode: Node) => any): any {
-    // apply to node itself
-    if (options && options.self) {
-      let res = func(node)
-      if (res !== undefined)
-        return res
-    }
+  static *getDescendantElements(node: Node, self: boolean = false,
+    shadow: boolean = false, filter?: (childNode: Element) => any): IterableIterator<Element> {
 
-    // traverse shadow tree
-    if (options && options.shadow && node.nodeType === NodeType.Element) {
-      let ele = <Element>node
-      if (ele.shadowRoot) {
-        for (let child of ele.shadowRoot.childNodes) {
-          let res = func(child)
-          if (res !== undefined) {
-            return res
-          } else {
-            let res = TreeQuery.forEachDescendant(child, options, func)
-            if (res !== undefined) return res
-          }
-        }
-      }
-    }
-
-    // traverse child nodes
-    for (let child of node.childNodes) {
-      let res = func(child)
-      if (res !== undefined) {
-        return res
-      } else {
-        let res = TreeQuery.forEachDescendant(child, options, func)
-        if (res !== undefined) return res
-      }
+    for (const child of TreeQuery.getDescendantNodes(node, self, shadow,
+      (node) => { return node.nodeType === NodeType.Element })) {
+        const ele = <Element><unknown>child
+        if (!filter || filter(ele))
+          yield <Element><unknown>ele
     }
   }
 
@@ -365,16 +329,11 @@ export class TreeQuery {
     if (root === null) return -1
 
     let pos = 0
-    let found = false
-
-    TreeQuery.forEachDescendant(root, {}, function (childNode) {
+    for (const childNode of TreeQuery.getDescendantNodes(root)) {
       pos++
-      if (!found && (childNode === node)) found = true
-    })
+      if (childNode === node) return pos
+    }
 
-    if (found)
-      return pos
-    else
-      return -1
+    return -1
   }
 }

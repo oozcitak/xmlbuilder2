@@ -158,7 +158,7 @@ export class TreeMutation {
       TreeMutation.removeNode(node, node.parentNode)
 
     if (document !== oldDocument) {
-      TreeQuery.forEachDescendant(node, { self: true, shadow: true }, function (inclusiveDescendant: Node) {
+      for (const inclusiveDescendant of TreeQuery.getDescendantNodes(node, true, true)) {
         (<any>inclusiveDescendant)._ownerDocument = document
 
         if (inclusiveDescendant.nodeType === NodeType.Element) {
@@ -176,7 +176,7 @@ export class TreeMutation {
          * callback name "adoptedCallback", and an argument list 
          * containing oldDocument and document.
          */
-      })
+      }
     }
   }
 

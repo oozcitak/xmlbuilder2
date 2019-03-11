@@ -288,11 +288,10 @@ export class DocumentImpl extends NodeImpl implements Document {
 
     const clonedNode = node.cloneNode(deep)
 
-    for (const child of TreeQuery.getDescendants<NodeImpl>(clonedNode, true, false)) {
-      child._ownerDocument = this
+    for (const child of TreeQuery.getDescendantNodes(clonedNode, true, false)) {
+      (<NodeImpl>child)._ownerDocument = this
       if (child.nodeType === NodeType.Element) {
-        const ele = <ElementImpl>child
-        for (const attr of ele.attributes) {
+        for (const attr of (<ElementImpl>child).attributes) {
           (<AttrImpl>attr)._ownerDocument = this
         }
       }
