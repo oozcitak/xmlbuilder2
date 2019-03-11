@@ -18,6 +18,11 @@ describe('DOMImplementation', function () {
       !DOCTYPE qname PUBLIC pubid SYSTEM sysid
       qname
       `)
+
+    const xhtml = $$.dom.createDocument('http://www.w3.org/1999/xhtml', 'html')
+    expect(xhtml.contentType).toBe('application/xhtml+xml')
+    const svg = $$.dom.createDocument('http://www.w3.org/2000/svg', 'svg')
+    expect(svg.contentType).toBe('image/svg+xml')
   })
 
   test('createHTMLDocument()', function () {
