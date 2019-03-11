@@ -14,9 +14,9 @@ export class ChildNodeImpl implements ChildNode {
    * nodes with equivalent text nodes.
    */
   before(nodes: Array<Node | string>): void {
-    let context = <Node><unknown>this
+    const context = <Node><unknown>this
 
-    let parent = context.parentNode
+    const parent = context.parentNode
     if (!parent) return
 
     let viablePreviousSibling = context.previousSibling
@@ -33,7 +33,7 @@ export class ChildNodeImpl implements ChildNode {
     }
 
     if (context.ownerDocument) {
-      let node = Convert.nodesIntoNode(nodes, context.ownerDocument)
+      const node = Convert.nodesIntoNode(nodes, context.ownerDocument)
 
       if (!viablePreviousSibling)
         viablePreviousSibling = parent.firstChild
@@ -49,9 +49,9 @@ export class ChildNodeImpl implements ChildNode {
    * nodes with equivalent text nodes.
    */
   after(nodes: Array<Node | string>): void {
-    let context = <Node><unknown>this
+    const context = <Node><unknown>this
 
-    let parent = context.parentNode
+    const parent = context.parentNode
     if (!parent) return
 
     let viableNextSibling = context.nextSibling
@@ -68,7 +68,7 @@ export class ChildNodeImpl implements ChildNode {
     }
 
     if (context.ownerDocument) {
-      let node = Convert.nodesIntoNode(nodes, context.ownerDocument)
+      const node = Convert.nodesIntoNode(nodes, context.ownerDocument)
 
       TreeMutation.preInsert(node, parent, viableNextSibling)
     }
@@ -79,9 +79,9 @@ export class ChildNodeImpl implements ChildNode {
    * nodes with equivalent text nodes.
    */
   replaceWith(nodes: Array<Node | string>): void {
-    let context = <Node><unknown>this
+    const context = <Node><unknown>this
 
-    let parent = context.parentNode
+    const parent = context.parentNode
     if (!parent) return
 
     let viableNextSibling = context.nextSibling
@@ -98,7 +98,7 @@ export class ChildNodeImpl implements ChildNode {
     }
 
     if (context.ownerDocument) {
-      let node = Convert.nodesIntoNode(nodes, context.ownerDocument)
+      const node = Convert.nodesIntoNode(nodes, context.ownerDocument)
 
       // Note: Context object could have been inserted into node.
       if (context.parentNode === parent)
@@ -112,9 +112,9 @@ export class ChildNodeImpl implements ChildNode {
    * Removes this node form its tree.
    */
   remove(): void {
-    let context = <Node><unknown>this
+    const context = <Node><unknown>this
 
-    let parent = context.parentNode
+    const parent = context.parentNode
     if (!parent) return
 
     TreeMutation.removeNode(context, parent)
