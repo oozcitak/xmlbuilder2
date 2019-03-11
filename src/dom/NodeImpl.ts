@@ -274,7 +274,7 @@ export abstract class NodeImpl implements Node {
       node2 = attr2.ownerElement
 
       if (attr1 && node1 && (node1 === node2)) {
-        for (let attr of (<Element>node2).attributes) {
+        for (const attr of (<Element>node2).attributes) {
           if (attr.isEqualNode(attr1)) {
             return Position.ImplementationSpecific | Position.Preceding
           } else if (attr.isEqualNode(attr2)) {
