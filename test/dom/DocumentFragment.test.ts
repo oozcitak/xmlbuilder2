@@ -12,6 +12,7 @@ describe('DocumentFragment', function () {
   node.appendChild(doc.createTextNode('this'))
   node.appendChild(doc.createCDATASection('is'))
   node.appendChild(doc.createTextNode('a'))
+  node.appendChild(doc.createTextNode(''))
   node.appendChild(doc.createTextNode('test'))
 
   test('constructor()', function () {
@@ -23,9 +24,14 @@ describe('DocumentFragment', function () {
     expect(node.textContent).toBe('thisisatest')
     node.textContent = 'or is it?'
     expect(node.childNodes.length).toBe(1)
-    const text = <any>node.childNodes.item(0)
+    let text = <any>node.childNodes.item(0)
     expect(text.nodeType).toBe(3)
     expect(text.data).toBe('or is it?')
+    node.textContent = null
+    expect(node.childNodes.length).toBe(1)
+    text = <any>node.childNodes.item(0)
+    expect(text.nodeType).toBe(3)
+    expect(text.data).toBe('')
   })
 
   test('cloneNode()', function () {
