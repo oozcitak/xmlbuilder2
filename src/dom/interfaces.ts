@@ -144,7 +144,7 @@ export interface Node {
    * 
    * @param namespace - the namespace to search
    */
-  lookupPrefix(namespace?: string | null): string | null
+  lookupPrefix(namespace: string | null): string | null
 
   /**
    * Returns the namespace URI for a given prefix if present, and `null`
@@ -152,7 +152,7 @@ export interface Node {
    * 
    * @param prefix - the prefix to search
    */
-  lookupNamespaceURI(prefix?: string | null): string | null
+  lookupNamespaceURI(prefix: string | null): string | null
 
   /**
    * Returns `true` if the namespace is the default namespace on this
@@ -160,7 +160,7 @@ export interface Node {
    * 
    * @param namespace - the namespace to check
    */
-  isDefaultNamespace(namespace?: string | null): boolean
+  isDefaultNamespace(namespace: string | null): boolean
 
   /**
    * Inserts the node `newChild` before the existing child node

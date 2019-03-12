@@ -23,6 +23,11 @@ describe('Document', function () {
   nele1.id = 'div1'
   nele1.setAttribute('class', 'para')
   nele1.appendChild(text1)
+  const sroot = doc.createElement('shadow')
+  doc.documentElement.appendChild(sroot)
+  const custom = doc.createElementNS('http://www.w3.org/1999/xhtml', 'my-custom-element')
+  sroot.appendChild(custom)
+  const shadow = custom.attachShadow({ mode: 'open' })
 
   test('constructor()', function () {
     expect($$.printTree(doc)).toBe($$.t`
@@ -33,6 +38,8 @@ describe('Document', function () {
         tagged id="tele2"
         div id="div1" class="para"
           # contents
+        shadow
+          my-custom-element
       `)
     expect(doc.URL).toBe('about:blank')
     expect(doc.documentURI).toBe('about:blank')
@@ -49,6 +56,12 @@ describe('Document', function () {
     expect(() => doc.createElement('invalid name')).toThrow()
   })
 
+  test('doctype', function () {
+    expect(doc.doctype).toBe(doctype)
+    const emptyDoc = $$.dom.createDocument('', 'root')
+    expect(emptyDoc.doctype).toBe(null)
+  })
+
   test('getElementById()', function () {
     expect(doc.getElementById('uniq')).toBe(tele)
   })
@@ -59,7 +72,7 @@ describe('Document', function () {
     expect(list.item(0)).toBe(tele1)
     expect(list.item(1)).toBe(tele2)
     const listAll = doc.getElementsByTagName('*')
-    expect(listAll.length).toBe(5)
+    expect(listAll.length).toBe(7)
   })
 
   test('getElementsByTagNameNS()', function () {
@@ -143,10 +156,13 @@ describe('Document', function () {
 
   test('importNode()', function () {
     const ele1 = doc.createElement('tagged')
+    ele1.setAttribute('att', 'val')
     const ele2 = doc.importNode(ele1)
     expect(ele1).not.toBe(ele2)
     expect(ele1.nodeType).toBe(ele2.nodeType)
     expect(ele1.nodeName).toBe(ele2.nodeName)
+    expect(() => doc.importNode($$.dom.createDocument('myns', 'root'))).toThrow()
+    expect(() => doc.importNode(shadow)).toThrow()
   })
 
   test('adoptNode()', function () {
@@ -166,6 +182,9 @@ describe('Document', function () {
     if (otherDoc.documentElement) {
       expect(otherDoc.documentElement.firstChild).toBeNull()
     }
+
+    expect(() => doc.adoptNode($$.dom.createDocument('myns', 'root'))).toThrow()
+    expect(() => doc.adoptNode(shadow)).toThrow()
   })
 
   test('cloneNode()', function () {
@@ -204,10 +223,16 @@ describe('Document', function () {
 
   test('lookupPrefix()', function () {
     expect(doc.lookupPrefix('myns')).toBe('n')
+    expect(doc.lookupPrefix(null)).toBeNull()
+    const emptyDoc = $$.dom.createDocument('', '')
+    expect(emptyDoc.lookupPrefix('myns')).toBeNull()
   })
 
   test('lookupNamespaceURI()', function () {
     expect(doc.lookupNamespaceURI('n')).toBe('myns')
+    expect(doc.lookupNamespaceURI(null)).toBeNull()
+    const emptyDoc = $$.dom.createDocument('', '')
+    expect(emptyDoc.lookupNamespaceURI(null)).toBeNull()
   })
 
   test('Unsupported Methods', function () {
