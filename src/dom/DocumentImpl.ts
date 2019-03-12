@@ -79,8 +79,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * with the document.
    */
   get implementation(): DOMImplementation {
-    const DOMImplementationImpl = require('./DOMImplementationImpl')
-    return DOMImplementationImpl.Instance
+    return require('./DOMImplementationImpl').Instance
   }
 
   /**

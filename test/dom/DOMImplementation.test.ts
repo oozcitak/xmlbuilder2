@@ -2,6 +2,12 @@ import $$ from '../TestHelpers'
 
 describe('DOMImplementation', function () {
 
+  test('singleton pattern', function () {
+    const impl1 = $$.dom
+    const impl2 = $$.dom
+    expect(impl1).toBe(impl2)
+  })
+
   test('createDocumentType()', function () {
     const doctype = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     expect($$.printTree(doctype)).toBe($$.t`

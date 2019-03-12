@@ -9,7 +9,7 @@ import { DocumentImpl } from './DocumentImpl'
 import { DocumentOrShadowRootImpl } from './DocumentOrShadowRootImpl'
 import { DocumentTypeImpl } from './DocumentTypeImpl'
 import { DOMException } from './DOMException'
-import { DOMImplementationImpl } from './DOMImplementationImpl'
+import { DOMImplementationImpl, Instance as DOMImplementationInstance } from './DOMImplementationImpl'
 import { DOMTokenListImpl } from './DOMTokenListImpl'
 import { ElementImpl } from './ElementImpl'
 import { HTMLCollectionImpl } from './HTMLCollectionImpl'
@@ -78,3 +78,4 @@ export { ProcessingInstructionImpl as ProcessingInstruction }
 export { ShadowRootImpl as ShadowRoot }
 export { TextImpl as Text }
 export { XMLDocumentImpl as XMLDocument }
+export { DOMImplementationInstance }

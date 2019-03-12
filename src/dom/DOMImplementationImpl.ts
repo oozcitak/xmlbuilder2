@@ -15,19 +15,6 @@ import { Namespace } from './util/Namespace'
  */
 export class DOMImplementationImpl implements DOMImplementation {
 
-  private static _instance: DOMImplementation | undefined = undefined
-
-  private constructor() { }
-
-  /**
-   * Gets the instance of dom implementation.
-   */
-  static get Instance(): DOMImplementation {
-    if (!DOMImplementationImpl._instance)
-      DOMImplementationImpl._instance = new DOMImplementationImpl()
-
-    return DOMImplementationImpl._instance
-  }
   /**
    * Creates and returns a {@link DocType}.
    * 
@@ -111,3 +98,5 @@ export class DOMImplementationImpl implements DOMImplementation {
    */
   hasFeature(): boolean { return true }
 }
+
+export const Instance = new DOMImplementationImpl()

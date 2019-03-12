@@ -21,6 +21,7 @@ import { ProcessingInstruction as ProcessingInstructionImpl } from '../src/dom/i
 import { ShadowRoot as ShadowRootImpl } from '../src/dom/index'
 import { Text as TextImpl } from '../src/dom/index'
 import { XMLDocument as XMLDocumentImpl } from '../src/dom/index'
+import { DOMImplementationInstance } from '../src/dom/index'
 
 export default class TestHelpers {
   static Attr = AttrImpl
@@ -47,7 +48,7 @@ export default class TestHelpers {
   /**
    * Returns the dom implemention.
    */
-  static dom: DOMImplementation = DOMImplementation.Instance
+  static dom: DOMImplementation = DOMImplementationInstance
 
   /**
    * De-indents template literals.
