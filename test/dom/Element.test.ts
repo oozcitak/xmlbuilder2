@@ -61,6 +61,8 @@ describe('Element', function () {
     expect(ele2.className).toBe('a b c')
     ele2.className = 'd e f'
     expect(ele2.className).toBe('d e f')
+    expect(ele1.className).toBe('')
+    expect(ele1.slot).toBe('')
   })
 
   test('classList', function () {
@@ -92,6 +94,7 @@ describe('Element', function () {
 
   test('getAttributeNS()', function () {
     expect(ele1.getAttributeNS('http://www.w3.org/1999/xhtml', 'name')).toBe('value')
+    expect(ele1.getAttributeNS('my ns', 'non')).toBeNull()
   })
 
   test('setAttribute()', function () {
@@ -190,9 +193,9 @@ describe('Element', function () {
     ele4.textContent = 'masterofbobbitts'
     expect(ele4.childNodes.length).toBe(1)
     const txt = ele4.firstChild
-    if (txt) {
-      expect(txt.textContent).toBe('masterofbobbitts')
-    }
+    if(!txt)
+      throw new Error("Text node  empty")
+    expect(txt.textContent).toBe('masterofbobbitts')
   })
 
   test('closest()', function () {
@@ -316,7 +319,7 @@ describe('Element', function () {
     ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns1')
     ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:name', 'ns2')
     ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:namez', '')
-    expect(ele.lookupNamespaceURI()).toBe('ns1')
+    expect(ele.lookupNamespaceURI(null)).toBe('ns1')
     expect(ele.lookupNamespaceURI('name')).toBe('ns2')
     expect(ele.lookupNamespaceURI('namez')).toBeNull()
   })
