@@ -15,7 +15,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param data - the text content
    */
   protected constructor(ownerDocument: Document | null,
-    data: string | null = null) {
+    data: string | null) {
     super(ownerDocument)
 
     this._data = data || ''
@@ -49,7 +49,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * Gets or sets the text data of the node. 
    */
   get data(): string { return this._data }
-  set data(value: string) { this._data = value || '' }
+  set data(value: string) { this._data = value }
 
   /** 
    * Returns the number of code units in {@link data}.

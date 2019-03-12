@@ -37,6 +37,12 @@ describe('CharacterData', function () {
     expect(node1.nodeValue).toBe('old data')
     expect(node1.textContent).toBe('old data')
     expect(node1.data).toBe('old data')
+    // assign null
+    node1.nodeValue = null
+    expect(node1.data).toBe('')
+    node1.data = 'data'
+    node1.textContent = null
+    expect(node1.data).toBe('')
     node1.data = 'data'
   })
 
