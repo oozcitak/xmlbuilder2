@@ -271,10 +271,33 @@ describe('Element', function () {
 
   test('lookupPrefix()', function () {
     expect(ele1.lookupPrefix('myns')).toBe('n')
+    expect(ele1.lookupPrefix('none')).toBeNull()
+
+    const nsdoc = $$.dom.createDocument('myns', 'root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele = doc.createElementNS('myns', 'n:root')
+    de.appendChild(ele)
+    ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns1')
+    ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:name', 'ns2')
+    expect(ele.lookupPrefix('ns2')).toBe('name')
   })
 
   test('lookupNamespaceURI()', function () {
     expect(ele1.lookupNamespaceURI('n')).toBe('myns')
+    expect(ele1.lookupNamespaceURI('none')).toBeNull()
+
+    const nsdoc = $$.dom.createDocument('myns', 'root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele = doc.createElementNS('myns', 'n:root')
+    de.appendChild(ele)
+    ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns1')
+    ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:name', 'ns2')
+    expect(ele.lookupNamespaceURI()).toBe('ns1')
+    expect(ele.lookupNamespaceURI('name')).toBe('ns2')
   })
 
   test('attachShadow()', function () {
