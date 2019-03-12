@@ -16,7 +16,7 @@ export class DocumentFragmentImpl extends NodeImpl implements DocumentFragment {
    *
    * @param ownerDocument - the owner document
    */
-  public constructor(ownerDocument: Document | null = null) {
+  public constructor(ownerDocument: Document | null) {
     super(ownerDocument)
   }
 

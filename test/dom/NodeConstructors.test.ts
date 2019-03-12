@@ -25,7 +25,7 @@ describe('Node Constructors', function () {
   })
 
   test('CDATA constructor()', function () {
-    const node = new $$.CDATASection()
+    const node = new $$.CDATASection(null)
     expect(node.ownerDocument).toBeNull()
     expect(node.data).toBe('')
     const node2 = new $$.CDATASection(doc, 'test')
@@ -34,7 +34,7 @@ describe('Node Constructors', function () {
   })
 
   test('Comment constructor()', function () {
-    const node = new $$.Comment()
+    const node = new $$.Comment(null)
     expect(node.ownerDocument).toBeNull()
     expect(node.data).toBe('')
     const node2 = new $$.Comment(doc, 'test')
@@ -43,7 +43,7 @@ describe('Node Constructors', function () {
   })
 
   test('DocumentFragment constructor()', function () {
-    const node = new $$.DocumentFragment()
+    const node = new $$.DocumentFragment(null)
     expect(node.ownerDocument).toBeNull()
     const node2 = new $$.DocumentFragment(doc)
     expect(node2.ownerDocument).toBe(doc)
@@ -92,7 +92,7 @@ describe('Node Constructors', function () {
   })
 
   test('Text constructor()', function () {
-    const node = new $$.Text()
+    const node = new $$.Text(null)
     expect(node.ownerDocument).toBeNull()
     expect(node.data).toBe('')
     const node2 = new $$.Text(doc, 'test')

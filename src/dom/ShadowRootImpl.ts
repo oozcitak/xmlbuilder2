@@ -13,7 +13,7 @@ export class ShadowRootImpl extends DocumentFragmentImpl implements ShadowRoot {
    *
    * @param ownerDocument - the owner document
    */
-  constructor(ownerDocument: Document | null = null,
+  constructor(ownerDocument: Document | null,
     host: Element, mode: "open" | "closed") {
     super(ownerDocument)
 

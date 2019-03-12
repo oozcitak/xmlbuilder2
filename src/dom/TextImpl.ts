@@ -13,7 +13,7 @@ export class TextImpl extends CharacterDataImpl implements Text {
    * @param ownerDocument - the owner document
    * @param data - the text content
    */
-  public constructor(ownerDocument: Document | null = null,
+  public constructor(ownerDocument: Document | null,
     data: string | null = null) {
     super(ownerDocument, data)
   }

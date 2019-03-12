@@ -29,6 +29,7 @@ describe('ProcessingInstruction', function () {
   test('isEqualNode()', function () {
     const node2 = doc.createProcessingInstruction('program', 'instruction')
     expect(node.isEqualNode(node2)).toBeTruthy()
+    expect(node.isEqualNode()).toBeFalsy()
   })
 
 })

@@ -45,7 +45,7 @@ export abstract class NodeImpl implements Node {
    *
    * @param ownerDocument - the owner document
    */
-  protected constructor(ownerDocument: Document | null = null) {
+  protected constructor(ownerDocument: Document | null) {
     this._ownerDocument = ownerDocument
     this._childNodes = new NodeListImpl(this)
   }

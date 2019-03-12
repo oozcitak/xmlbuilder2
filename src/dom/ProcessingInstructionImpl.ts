@@ -17,7 +17,7 @@ export class ProcessingInstructionImpl extends CharacterDataImpl implements Proc
    * @param ownerDocument - the parent document
    * @param data - the text content
    */
-  public constructor(ownerDocument: Document | null = null,
+  public constructor(ownerDocument: Document | null,
     target: string, data: string | null = null) {
     super(ownerDocument, data)
     this._target = target

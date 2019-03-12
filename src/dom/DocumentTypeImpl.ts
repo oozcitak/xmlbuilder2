@@ -19,7 +19,7 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
    * @param publicId - the `PUBLIC` identifier
    * @param publicId - the `SYSTEM` identifier
    */
-  public constructor(ownerDocument: Document | null = null,
+  public constructor(ownerDocument: Document | null,
     name: string, publicId: string = '', systemId: string = '') {
     super(ownerDocument)
 

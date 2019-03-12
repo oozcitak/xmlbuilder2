@@ -14,7 +14,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param ownerDocument - the owner document
    * @param data - the text content
    */
-  protected constructor(ownerDocument: Document | null = null,
+  protected constructor(ownerDocument: Document | null,
     data: string | null = null) {
     super(ownerDocument)
 
