@@ -803,7 +803,7 @@ export interface Element extends Node, ParentNode,
    * 
    * @param init - A ShadowRootInit dictionary.
    */
-  attachShadow(init: { mode: string }): ShadowRoot
+  attachShadow(init: { mode: "open" | "closed" }): ShadowRoot
 
   /**
    * Returns element's shadow root, if any, and if shadow root's mode

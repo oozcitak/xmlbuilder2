@@ -1,5 +1,6 @@
-import { DOMImplementation } from '../src/dom/index'
 import dedent from "dedent"
+
+import { DOMImplementation } from '../src/dom/index'
 import { Attr as AttrImpl } from '../src/dom/index'
 import { CDATASection as CDATASectionImpl } from '../src/dom/index'
 import { CharacterData as CharacterDataImpl } from '../src/dom/index'

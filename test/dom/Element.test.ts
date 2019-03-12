@@ -277,4 +277,32 @@ describe('Element', function () {
     expect(ele1.lookupNamespaceURI('n')).toBe('myns')
   })
 
+  test('attachShadow()', function () {
+    const doc = $$.dom.createHTMLDocument('my doc')
+    const body = doc.getElementsByTagName('body')[0]
+    if (!body)
+      throw new Error("body element is null")
+    const custom = doc.createElementNS('http://www.w3.org/1999/xhtml', 'my-custom-element')
+    body.appendChild(custom)
+    const shadow = custom.attachShadow({ mode: 'open' })
+    expect(shadow.mode).toBe('open')
+    expect(shadow.host).toBe(custom)
+    expect(() => custom.attachShadow({ mode: 'open' })).toThrow()
+  })
+
+  test('attachShadow()', function () {
+    const doc = $$.dom.createHTMLDocument('my doc')
+    const body = doc.getElementsByTagName('body')[0]
+    if (!body)
+      throw new Error("body element is null")
+    const custom = doc.createElementNS('http://www.w3.org/1999/xhtml', 'my-custom-element')
+    body.appendChild(custom)
+    custom.attachShadow({ mode: 'open' })
+    const shadow = custom.shadowRoot
+    if (!shadow)
+      throw new Error("shadow root is null")
+    expect(shadow.mode).toBe('open')
+    expect(shadow.host).toBe(custom)
+  })
+
 })

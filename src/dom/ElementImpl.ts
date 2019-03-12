@@ -3,6 +3,7 @@ import {
   ShadowRoot, NodeType, Node, Element,
   HTMLCollection, NodeList, ShadowRootMode
 } from './interfaces'
+import { HTMLSpec } from './util/HTMLSpec'
 import { TextImpl } from './TextImpl'
 import { NodeImpl } from './NodeImpl'
 import { AttrImpl } from './AttrImpl'
@@ -13,6 +14,7 @@ import { DOMException } from './DOMException'
 import { Namespace } from './util/Namespace'
 import { OrderedSet } from './util/OrderedSet'
 import { TreeMutation } from './util/TreeMutation'
+import { ShadowRootImpl } from './ShadowRootImpl'
 
 /**
  * Represents an element node.
@@ -295,21 +297,24 @@ export class ElementImpl extends NodeImpl implements Element {
   /**
    * Creates a shadow root for element and returns it.
    * 
-   * This method is not supported by this module and will throw an
-   * exception.
-   * 
    * @param init - A ShadowRootInit dictionary.
    */
-  attachShadow(init: object): ShadowRoot {
-    throw DOMException.NotImplementedError
+  attachShadow(init: { mode: "open" | "closed" }): ShadowRoot {
+    if (this.namespaceURI !== Namespace.HTML)
+      throw DOMException.NotSupportedError
+    if(!HTMLSpec.isValidCustomElementName(this.localName) && !HTMLSpec.isValidElementName(this.localName))
+      throw DOMException.NotSupportedError
+    if(this._shadowRoot)
+      throw DOMException.InvalidStateError
+
+    const shadow = new ShadowRootImpl(this.ownerDocument, this, init.mode)
+    this._shadowRoot = shadow
+    return shadow
   }
 
   /**
    * Returns element's shadow root, if any, and if shadow root's mode
-   * is "open", and null otherwise.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
+   * is `open`, and `null` otherwise.
    */
   get shadowRoot(): ShadowRoot | null {
     if (!this._shadowRoot || this._shadowRoot.mode === ShadowRootMode.Closed)

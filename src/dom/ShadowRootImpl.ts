@@ -6,7 +6,7 @@ import { DocumentFragmentImpl } from "./DocumentFragmentImpl"
  */
 export class ShadowRootImpl extends DocumentFragmentImpl implements ShadowRoot {
   protected _host: Element
-  protected _mode: ShadowRootMode
+  protected _mode: "open" | "closed"
 
   /**
    * Initializes a new instance of `ShadowRoot`.
@@ -14,7 +14,7 @@ export class ShadowRootImpl extends DocumentFragmentImpl implements ShadowRoot {
    * @param ownerDocument - the owner document
    */
   constructor(ownerDocument: Document | null = null,
-    host: Element, mode: ShadowRootMode) {
+    host: Element, mode: "open" | "closed") {
     super(ownerDocument)
 
     this._host = host
@@ -27,7 +27,7 @@ export class ShadowRootImpl extends DocumentFragmentImpl implements ShadowRoot {
    * This method is not supported by this module and will throw an
    * exception.
    */
-  get mode(): ShadowRootMode { return this._mode }
+  get mode(): "open" | "closed" { return this._mode }
 
   /** 
    * Gets the shadow root's host.
