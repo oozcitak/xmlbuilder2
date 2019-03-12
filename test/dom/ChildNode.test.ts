@@ -68,6 +68,57 @@ describe('ChildNode', function () {
       `)
   })
 
+  test('before() with own node', function () {
+    const doc = $$.dom.createDocument('myns', 'n:root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele1 = doc.createElement('ele1')
+    const ele2 = doc.createElement('ele2')
+    const ele3 = doc.createElement('ele3')
+    const ele4 = doc.createElement('ele4')
+    de.appendChild(ele1)
+    de.appendChild(ele2)
+    de.appendChild(ele3)
+    de.appendChild(ele4)
+    
+    ele4.before(ele3, ele2, ele1)
+
+    expect($$.printTree(doc)).toBe($$.t`
+      n:root
+        ele3
+        ele2
+        ele1
+        ele4
+      `)
+  })
+
+  test('before() with removed node', function () {
+    const doc = $$.dom.createDocument('myns', 'n:root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele1 = doc.createElement('ele1')
+    const ele2 = doc.createElement('ele2')
+    const ele3 = doc.createElement('ele3')
+    const ele4 = doc.createElement('ele4')
+    de.appendChild(ele1)
+    de.appendChild(ele2)
+    de.appendChild(ele3)
+    de.appendChild(ele4)
+
+    ele4.remove()
+    // no-op
+    ele4.before(ele1)
+
+    expect($$.printTree(doc)).toBe($$.t`
+      n:root
+        ele1
+        ele2
+        ele3
+      `)
+  })
+
   test('after()', function () {
     const doctype = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     const doc = $$.dom.createDocument('myns', 'n:root', doctype)
@@ -112,6 +163,57 @@ describe('ChildNode', function () {
       `)
   })
 
+  test('after() with own node', function () {
+    const doc = $$.dom.createDocument('myns', 'n:root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele1 = doc.createElement('ele1')
+    const ele2 = doc.createElement('ele2')
+    const ele3 = doc.createElement('ele3')
+    const ele4 = doc.createElement('ele4')
+    de.appendChild(ele1)
+    de.appendChild(ele2)
+    de.appendChild(ele3)
+    de.appendChild(ele4)
+    
+    ele1.after(ele4, ele3, ele2)
+
+    expect($$.printTree(doc)).toBe($$.t`
+      n:root
+        ele1
+        ele4
+        ele3
+        ele2
+      `)
+  })
+
+  test('after() with removed node', function () {
+    const doc = $$.dom.createDocument('myns', 'n:root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele1 = doc.createElement('ele1')
+    const ele2 = doc.createElement('ele2')
+    const ele3 = doc.createElement('ele3')
+    const ele4 = doc.createElement('ele4')
+    de.appendChild(ele1)
+    de.appendChild(ele2)
+    de.appendChild(ele3)
+    de.appendChild(ele4)
+
+    ele4.remove()
+    // no-op
+    ele4.after(ele1)
+
+    expect($$.printTree(doc)).toBe($$.t`
+      n:root
+        ele1
+        ele2
+        ele3
+      `)
+  })
+
   test('replaceWith()', function () {
     const doctype = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     const doc = $$.dom.createDocument('myns', 'n:root', doctype)
@@ -153,6 +255,81 @@ describe('ChildNode', function () {
       `)
   })
 
+  test('replaceWith() with own node', function () {
+    const doc = $$.dom.createDocument('myns', 'n:root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele1 = doc.createElement('ele1')
+    const ele2 = doc.createElement('ele2')
+    const ele3 = doc.createElement('ele3')
+    const ele4 = doc.createElement('ele4')
+    de.appendChild(ele1)
+    de.appendChild(ele2)
+    de.appendChild(ele3)
+    de.appendChild(ele4)
+    
+    ele1.replaceWith(ele4, ele3, ele2)
+
+    expect($$.printTree(doc)).toBe($$.t`
+      n:root
+        ele4
+        ele3
+        ele2
+      `)
+  })
+
+  test('replaceWith() with self node', function () {
+    const doc = $$.dom.createDocument('myns', 'n:root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele1 = doc.createElement('ele1')
+    const ele2 = doc.createElement('ele2')
+    const ele3 = doc.createElement('ele3')
+    const ele4 = doc.createElement('ele4')
+    de.appendChild(ele1)
+    de.appendChild(ele2)
+    de.appendChild(ele3)
+    de.appendChild(ele4)
+    
+    ele1.replaceWith(ele4, ele3, ele2, ele1)
+
+    expect($$.printTree(doc)).toBe($$.t`
+      n:root
+        ele4
+        ele3
+        ele2
+        ele1
+      `)
+  })
+
+  test('replaceWith() with removed node', function () {
+    const doc = $$.dom.createDocument('myns', 'n:root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele1 = doc.createElement('ele1')
+    const ele2 = doc.createElement('ele2')
+    const ele3 = doc.createElement('ele3')
+    const ele4 = doc.createElement('ele4')
+    de.appendChild(ele1)
+    de.appendChild(ele2)
+    de.appendChild(ele3)
+    de.appendChild(ele4)
+
+    ele4.remove()
+    // no-op
+    ele4.replaceWith(ele1)
+
+    expect($$.printTree(doc)).toBe($$.t`
+      n:root
+        ele1
+        ele2
+        ele3
+      `)
+  })
+
   test('remove()', function () {
     const doctype = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     const doc = $$.dom.createDocument('myns', 'n:root', doctype)
@@ -170,6 +347,32 @@ describe('ChildNode', function () {
 
     expect($$.printTree(doc)).toBe($$.t`
       n:root
+      `)
+  })
+
+  test('remove() with removed node', function () {
+    const doc = $$.dom.createDocument('myns', 'n:root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele1 = doc.createElement('ele1')
+    const ele2 = doc.createElement('ele2')
+    const ele3 = doc.createElement('ele3')
+    const ele4 = doc.createElement('ele4')
+    de.appendChild(ele1)
+    de.appendChild(ele2)
+    de.appendChild(ele3)
+    de.appendChild(ele4)
+
+    ele4.remove()
+    // no-op
+    ele4.remove()
+
+    expect($$.printTree(doc)).toBe($$.t`
+      n:root
+        ele1
+        ele2
+        ele3
       `)
   })
 
