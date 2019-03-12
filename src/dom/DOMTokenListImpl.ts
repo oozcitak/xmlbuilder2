@@ -1,5 +1,6 @@
 import { DOMTokenList, Element } from "./interfaces"
 import { OrderedSet } from "./util/OrderedSet"
+import { Convert } from "./util/Convert"
 import { DOMException } from "./DOMException"
 
 /**
@@ -24,7 +25,9 @@ export class DOMTokenListImpl implements DOMTokenList {
   /**
    * Returns the number of tokens.
    */
-  get length(): number { return this._valueAsSet.size }
+  get length(): number { 
+    return Convert.attValueToSet(this._ownerElement, this._localName).size 
+  }
 
   /**
    * Returns the token at the given index.
@@ -32,7 +35,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param index - the index to of the token
    */
   item(index: number): string | null {
-    const set = this._valueAsSet
+    const set = Convert.attValueToSet(this._ownerElement, this._localName)
     let i = 0
     for (const token of set) {
       if (i === index) return token
@@ -47,7 +50,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param tokens - the token to check
    */
   contains(token: string): boolean {
-    return this._valueAsSet.has(token)
+    return Convert.attValueToSet(this._ownerElement, this._localName).has(token)
   }
 
   /**
@@ -56,11 +59,11 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param tokens - the list of tokens to add
    */
   add(...tokens: Array<string>): void {
-    const set = this._valueAsSet
+    const set = Convert.attValueToSet(this._ownerElement, this._localName)
     for (const token of tokens) {
       set.add(token)
     }
-    this._valueAsSet = set
+    Convert.setToAttValue(this._ownerElement, this._localName, set)
   }
 
   /**
@@ -69,7 +72,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param tokens - the list of tokens to remove
    */
   remove(...tokens: Array<string>): void {
-    const set = this._valueAsSet
+    const set = Convert.attValueToSet(this._ownerElement, this._localName)
     for (const token of tokens) {
       if (!token)
         throw DOMException.SyntaxError
@@ -78,7 +81,7 @@ export class DOMTokenListImpl implements DOMTokenList {
       else
         set.delete(token)
     }
-    this._valueAsSet = set
+    Convert.setToAttValue(this._ownerElement, this._localName, set)
   }
 
   /**
@@ -95,7 +98,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    */
   toggle(token: string, force: boolean | undefined = undefined): boolean {
     if (force === undefined) {
-      const set = this._valueAsSet
+      const set = Convert.attValueToSet(this._ownerElement, this._localName)
       if (set.has(token)) {
         this.remove(token)
         return false
@@ -128,13 +131,13 @@ export class DOMTokenListImpl implements DOMTokenList {
       newToken.match(OrderedSet.WhiteSpace))
       throw DOMException.InvalidCharacterError
 
-      const set = this._valueAsSet
+    const set = Convert.attValueToSet(this._ownerElement, this._localName)
     if (!set.has(token)) {
       return false
     } else {
       set.delete(token)
       set.add(newToken)
-      this._valueAsSet = set
+      Convert.setToAttValue(this._ownerElement, this._localName, set)
       return true
     }
   }
@@ -157,37 +160,19 @@ export class DOMTokenListImpl implements DOMTokenList {
    * list to the given value.
    */
   get value(): string {
-    return OrderedSet.serialize(Array.from(this._valueAsSet))
+    return OrderedSet.serialize(
+      Convert.attValueToSet(this._ownerElement, this._localName))
   }
   set value(value: string) {
-    this._ownerElement.setAttribute(this._localName,
-      OrderedSet.sanitize(value))
+    Convert.setToAttValue(this._ownerElement, this._localName,
+      OrderedSet.parse(value))
   }
-
 
   /**
    * Returns an iterator for tokens.
    */
   *[Symbol.iterator](): IterableIterator<string> {
-    const set = this._valueAsSet
+    const set = Convert.attValueToSet(this._ownerElement, this._localName)
     yield* set
-  }
-
-  /**
-   * Gets or sets a set of strings created from the associated
-   * attribute's value by splitting at ASCII whitespace characters.
-   */
-  get _valueAsSet(): Set<string> {
-    const attValue = this._ownerElement.getAttribute(this._localName) || ''
-    const arr = OrderedSet.parse(attValue)
-    return new Set(arr)
-  }
-  set _valueAsSet(set: Set<string>) {
-    if (!this._ownerElement.hasAttribute(this._localName) && set.size === 0)
-      return
-
-      const arr = Array.from(set)
-      const attValue = OrderedSet.serialize(arr)
-    this._ownerElement.setAttribute(this._localName, attValue)
   }
 }

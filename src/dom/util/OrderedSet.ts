@@ -13,12 +13,12 @@ export class OrderedSet {
    * 
    * @param value - a string of whitespace separated tokens
    */
-  static parse(value: string): string[] {
+  static parse(value: string): Set<string> {
     const arr = value.split(OrderedSet.WhiteSpace)
     // remove empty strings
-    const filtered: string[] = []
+    const filtered = new Set<string>()
     for (const str of arr)
-      if (str) filtered.push(str)
+      if (str) filtered.add(str)
     return filtered
   }
   /**
@@ -26,8 +26,8 @@ export class OrderedSet {
    * 
    * @param tokens - an array of token strings
    */
-  static serialize(tokens: string[]): string {
-    return tokens.join(' ')
+  static serialize(tokens: Set<string>): string {
+    return [...tokens].join(' ')
   }
   /**
    * Removes duplicate tokens and convert all whitespace characters

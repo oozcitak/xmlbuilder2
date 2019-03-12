@@ -11,6 +11,9 @@ describe('DOMTokenList', function () {
   doc.documentElement.appendChild(ele)
   ele.setAttribute('class', 'one two three')
   const list = ele.classList
+  const ele2 = doc.createElement('node')
+  doc.documentElement.appendChild(ele2)
+  const list2 = ele2.classList
 
   test('length', function () {
     expect(list.length).toBe(3)
@@ -20,6 +23,8 @@ describe('DOMTokenList', function () {
     expect(list.item(0)).toBe('one')
     expect(list.item(1)).toBe('two')
     expect(list.item(2)).toBe('three')
+    expect(list.item(-1)).toBe(null)
+    expect(list.item(1001)).toBe(null)
   })
 
   test('contains()', function () {
@@ -37,6 +42,8 @@ describe('DOMTokenList', function () {
   test('remove()', function () {
     list.remove('four', 'five')
     expect(list.length).toBe(3)
+    expect(() => list.remove('')).toThrow()
+    expect(() => list.remove(' ')).toThrow()
   })
 
   test('toggle()', function () {
@@ -81,6 +88,11 @@ describe('DOMTokenList', function () {
       names += '_' + name
     }
     expect(names).toBe('_one_two_three')
+  })
+
+  test('empty token list', function () {
+    list2.value = ''
+    expect(list2.length).toBe(0)
   })
 
 })
