@@ -195,8 +195,8 @@ export class ElementImpl extends NodeImpl implements Element {
     try {
       this.attributes.removeNamedItem(qualifiedName)
     } catch (e) {
-      if (e.name !== "NotFoundError")
-        throw e
+      // ignore NotFoundError thrown by
+      // NamedNodeMap.removeNamedItem()
     }
   }
 
@@ -211,8 +211,8 @@ export class ElementImpl extends NodeImpl implements Element {
     try {
       this.attributes.removeNamedItemNS(namespace, localName)
     } catch (e) {
-      if (e.name !== "NotFoundError")
-        throw e
+      // ignore NotFoundError thrown by
+      // NamedNodeMap.removeNamedItem()
     }
   }
 

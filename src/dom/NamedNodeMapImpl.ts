@@ -71,7 +71,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     if (attr.ownerElement && attr.ownerElement !== this._ownerElement)
       throw DOMException.InUseAttributeError
 
-      const oldAttr = this.getNamedItemNS(attr.namespaceURI, attr.localName)
+    const oldAttr = this.getNamedItemNS(attr.namespaceURI, attr.localName)
     if (oldAttr === attr) return attr
     if (oldAttr) {
       const index = this._items.indexOf(oldAttr)
@@ -101,7 +101,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     if (index === -1)
       throw DOMException.NotFoundError
 
-      const removed = this._items[index]
+    const removed = this._items[index]
     this._items.splice(index, 1)
     return removed
   }
@@ -126,7 +126,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     if (index === -1)
       throw DOMException.NotFoundError
 
-      const removed = this._items[index]
+    const removed = this._items[index]
     this._items.splice(index, 1)
     return removed
   }

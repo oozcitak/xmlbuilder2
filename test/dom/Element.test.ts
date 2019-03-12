@@ -331,7 +331,27 @@ describe('Element', function () {
     expect(() => custom.attachShadow({ mode: 'open' })).toThrow()
   })
 
-  test('attachShadow()', function () {
+  test('attachShadow() non-html namespace', function () {
+    const xmldoc = $$.dom.createDocument('ns', 'root')
+    if (!xmldoc.documentElement)
+      throw new Error("documentElement is null")
+    const xmlde = xmldoc.documentElement
+    const custom2 = xmldoc.createElementNS('somens', 'my-custom-element')
+    xmlde.appendChild(custom2)
+    expect(() => custom2.attachShadow({ mode: 'open' })).toThrow()
+  })
+
+  test('attachShadow() invalid element name', function () {
+    const doc = $$.dom.createHTMLDocument('my doc')
+    const body = doc.getElementsByTagName('body')[0]
+    if (!body)
+      throw new Error("body element is null")
+    const custom = doc.createElementNS('http://www.w3.org/1999/xhtml', 'nonono')
+    body.appendChild(custom)
+    expect(() => custom.attachShadow({ mode: 'open' })).toThrow()
+  })
+
+  test('shadowRoot', function () {
     const doc = $$.dom.createHTMLDocument('my doc')
     const body = doc.getElementsByTagName('body')[0]
     if (!body)
