@@ -29,7 +29,11 @@ import { XMLDocumentImpl } from './XMLDocumentImpl'
 // Apply mixins
 const applyMixin = function (derivedCtor: any, baseCtor: any): void {
   Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-    derivedCtor.prototype[name] = baseCtor.prototype[name]
+    const propDesc = Object.getOwnPropertyDescriptor(baseCtor.prototype, name)
+    if (!propDesc) 
+      throw new Error('Mixin property is undefined.')
+    else
+      Object.defineProperty(derivedCtor.prototype, name, propDesc);
   })
 }
 // ChildNode

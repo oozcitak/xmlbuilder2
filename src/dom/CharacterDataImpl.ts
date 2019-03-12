@@ -118,12 +118,9 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
     return this.data.substr(offset, count)
   }
 
-
   // MIXIN: NonDocumentTypeChildNode
   get previousElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
-  set previousElementSibling(value: Element | null) { }
   get nextElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
-  set nextElementSibling(value: Element | null) { }
 
   // MIXIN: ChildNode
   before(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }

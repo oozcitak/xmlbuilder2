@@ -16,11 +16,10 @@ export class NonDocumentTypeChildNodeImpl implements NonDocumentTypeChildNode {
       if (node.nodeType === NodeType.Element)
         return <Element>node
       else
-        node.previousSibling
+        node = node.previousSibling
     }
     return null
   }
-  set previousElementSibling(value: Element | null) { throw new Error("This property is read-only.") }
 
   /**
    * Returns the next sibling that is an element node.
@@ -31,10 +30,9 @@ export class NonDocumentTypeChildNodeImpl implements NonDocumentTypeChildNode {
       if (node.nodeType === NodeType.Element)
         return <Element>node
       else
-        node.nextSibling
+        node = node.nextSibling
     }
     return null
   }
-  set nextElementSibling(value: Element | null) { throw new Error("This property is read-only.") }
 
 }

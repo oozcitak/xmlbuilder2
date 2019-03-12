@@ -629,9 +629,7 @@ export class ElementImpl extends NodeImpl implements Element {
 
   // MIXIN: NonDocumentTypeChildNode
   get previousElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
-  set previousElementSibling(value: Element | null) { }
   get nextElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
-  set nextElementSibling(value: Element | null) { }
 
   // MIXIN: ChildNode
   before(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
