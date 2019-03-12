@@ -932,7 +932,7 @@ export interface DocumentType extends Node, ChildNode {
 
 /**
  * Represents a mixin that extends non-element parent nodes. This mixin
- * is imlpemented by {@link Document} and {@link DocumentFragment}.
+ * is implemented by {@link Document} and {@link DocumentFragment}.
  */
 export interface NonElementParentNode {
 
@@ -987,7 +987,7 @@ export interface ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  prepend(...nodes: [Node | string]): void
+  prepend(...nodes: Array<Node | string>): void
 
   /**
    * Appends the list of nodes or strings after the last child node.
@@ -995,7 +995,7 @@ export interface ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  append(...nodes: [Node | string]): void
+  append(...nodes: Array<Node | string>): void
 
   /**
    * Returns the first element that is a descendant of node that
@@ -1187,14 +1187,14 @@ export interface DOMTokenList extends Iterable<string> {
    * 
    * @param tokens - the list of tokens to add
    */
-  add(...tokens: string[]): void
+  add(...tokens: Array<string>): void
 
   /**
    * Removes the given tokens from the set.
    * 
    * @param tokens - the list of tokens to remove
    */
-  remove(...tokens: string[]): void
+  remove(...tokens: Array<string>): void
 
   /**
    * Removes a given token from the set and returns `false` if it exists,

@@ -456,13 +456,9 @@ export class DocumentImpl extends NodeImpl implements Document {
 
   // MIXIN: ParentNode
   get children(): HTMLCollection { throw new Error("Mixin: ParentNode not implemented.") }
-  set children(value: HTMLCollection) { }
   get firstElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
-  set firstElementChild(value: Element | null) { }
   get lastElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
-  set lastElementChild(value: Element | null) { }
   get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
-  set childElementCount(value: number) { }
   prepend(...nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
   append(...nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
   querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }

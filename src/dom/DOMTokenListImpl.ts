@@ -55,7 +55,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * 
    * @param tokens - the list of tokens to add
    */
-  add(...tokens: string[]): void {
+  add(...tokens: Array<string>): void {
     let set = this._valueAsSet
     for (let token of tokens) {
       set.add(token)
@@ -68,7 +68,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * 
    * @param tokens - the list of tokens to remove
    */
-  remove(...tokens: string[]): void {
+  remove(...tokens: Array<string>): void {
     let set = this._valueAsSet
     for (let token of tokens) {
       if (!token)

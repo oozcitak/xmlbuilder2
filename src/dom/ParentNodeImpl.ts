@@ -18,7 +18,6 @@ export class ParentNodeImpl implements ParentNode {
   get children(): HTMLCollection {
     return new HTMLCollectionImpl(<Node><unknown>this)
   }
-  set children(value: HTMLCollection) { throw new Error("This property is read-only.") }
 
   /**
    * Returns the first child that is an element, and `null` otherwise.
@@ -34,7 +33,6 @@ export class ParentNodeImpl implements ParentNode {
     }
     return null
   }
-  set firstElementChild(value: Element | null) { throw new Error("This property is read-only.") }
 
   /**
    * Returns the last child that is an element, and `null` otherwise.
@@ -50,7 +48,6 @@ export class ParentNodeImpl implements ParentNode {
     }
     return null
   }
-  set lastElementChild(value: Element | null) { throw new Error("This property is read-only.") }
 
   /**
    * Returns the number of children that are elements.
@@ -68,7 +65,6 @@ export class ParentNodeImpl implements ParentNode {
 
     return count
   }
-  set childElementCount(value: number) { throw new Error("This property is read-only.") }
 
   /**
    * Prepends the list of nodes or strings before the first child node.
@@ -76,7 +72,7 @@ export class ParentNodeImpl implements ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  prepend(...nodes: [Node | string]): void {
+  prepend(...nodes: Array<Node | string>): void {
     let node = <Node><unknown>this
 
     if (node.ownerDocument) {
@@ -91,7 +87,7 @@ export class ParentNodeImpl implements ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  append(...nodes: [Node | string]): void {
+  append(...nodes: Array<Node | string>): void {
     let node = <Node><unknown>this
 
     if (node.ownerDocument) {

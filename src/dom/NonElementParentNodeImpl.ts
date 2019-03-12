@@ -3,7 +3,7 @@ import { TreeQuery } from './util/TreeQuery';
 
 /**
  * Represents a mixin that extends non-element parent nodes. This mixin
- * is imlpemented by {@link Document} and {@link DocumentFragment}.
+ * is implemented by {@link Document} and {@link DocumentFragment}.
  */
 export class NonElementParentNodeImpl implements NonElementParentNode {
   /**
