@@ -86,6 +86,7 @@ export class TextImpl extends CharacterDataImpl implements Text {
   }
 
   // MIXIN: Slotable
+  /* istanbul ignore next */
   get assignedSlot(): undefined { throw new Error("Mixin: Slotable not implemented.") }
 
 }

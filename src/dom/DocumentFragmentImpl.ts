@@ -96,16 +96,25 @@ export class DocumentFragmentImpl extends NodeImpl implements DocumentFragment {
   }
 
   // MIXIN: NonElementParentNode
+  /* istanbul ignore next */
   getElementById(elementId: string): Element | null { throw new Error("Mixin: NonElementParentNode not implemented.") }
 
   // MIXIN: ParentNode
+  /* istanbul ignore next */
   get children(): HTMLCollection { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   get firstElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   get lastElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   prepend(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   append(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   querySelectorAll(selectors: string): NodeList { throw new Error("Mixin: ParentNode not implemented.") }
 
 }

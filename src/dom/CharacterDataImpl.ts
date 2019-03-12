@@ -119,13 +119,19 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
   }
 
   // MIXIN: NonDocumentTypeChildNode
+  /* istanbul ignore next */
   get previousElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
+  /* istanbul ignore next */
   get nextElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
 
   // MIXIN: ChildNode
+  /* istanbul ignore next */
   before(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  /* istanbul ignore next */
   after(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  /* istanbul ignore next */
   replaceWith(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  /* istanbul ignore next */
   remove(): void { throw new Error("Mixin: ChildNode not implemented.") }
 
 }

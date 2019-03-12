@@ -619,26 +619,41 @@ export class ElementImpl extends NodeImpl implements Element {
   }
 
   // MIXIN: ParentNode
+  /* istanbul ignore next */
   get children(): HTMLCollection { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   get firstElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   get lastElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   prepend(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   append(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
+  /* istanbul ignore next */
   querySelectorAll(selectors: string): NodeList { throw new Error("Mixin: ParentNode not implemented.") }
 
   // MIXIN: NonDocumentTypeChildNode
+  /* istanbul ignore next */
   get previousElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
+  /* istanbul ignore next */
   get nextElementSibling(): Element | null { throw new Error("Mixin: NonDocumentTypeChildNode not implemented.") }
 
   // MIXIN: ChildNode
+  /* istanbul ignore next */
   before(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  /* istanbul ignore next */
   after(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  /* istanbul ignore next */
   replaceWith(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  /* istanbul ignore next */
   remove(): void { throw new Error("Mixin: ChildNode not implemented.") }
 
   // MIXIN: Slotable
+  /* istanbul ignore next */
   get assignedSlot(): undefined { throw new Error("Mixin: Slotable not implemented.") }
 
 }
