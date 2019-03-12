@@ -193,9 +193,16 @@ describe('Node', function () {
 
   test('insertBefore()', function () {
     const newText = doc.createTextNode('txt')
+    let count = ele1.childNodes.length
     ele1.insertBefore(newText, child4)
+    expect(ele1.childNodes.length).toBe(count + 1)
     expect(child4.previousSibling).toBe(newText)
+    expect(newText.previousSibling).toBe(child3)
     expect(newText.nextSibling).toBe(child4)
+    // duplicates nodes are not allowed
+    count = ele1.childNodes.length
+    ele1.insertBefore(newText, child4)
+    expect(ele1.childNodes.length).toBe(count)
   })
 
   test('appendChild()', function () {
