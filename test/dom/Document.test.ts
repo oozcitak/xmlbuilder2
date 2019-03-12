@@ -46,6 +46,7 @@ describe('Document', function () {
     expect(doc.nodeName).toBe('#document')
     expect(doc.doctype).toBe(doctype)
     expect(doc.documentElement && doc.documentElement.tagName).toBe('n:root')
+    expect(() => doc.createElement('invalid name')).toThrow()
   })
 
   test('getElementById()', function () {
@@ -74,13 +75,13 @@ describe('Document', function () {
   })
 
   test('createElement()', function () {
-    expect(() => { doc.createElement('invalid name') }).toThrowError
+    expect(() => { doc.createElement('invalid name') }).toThrow()
     const ele = doc.createElement('tagged')
     expect(ele.tagName).toBe('tagged')
   })
 
   test('createElementNS()', function () {
-    expect(() => { doc.createElementNS('http://www.w3.org/1999/xhtml', 'invalid name') }).toThrowError
+    expect(() => { doc.createElementNS('http://www.w3.org/1999/xhtml', 'invalid name') }).toThrow()
     const ele = doc.createElementNS('http://www.w3.org/1999/xhtml', 'n:div')
     expect(ele.tagName).toBe('n:div')
     expect(ele.namespaceURI).toBe('http://www.w3.org/1999/xhtml')
@@ -102,7 +103,7 @@ describe('Document', function () {
   })
 
   test('createCDATASection()', function () {
-    expect(() => { doc.createCDATASection(']]>') }).toThrowError
+    expect(() => { doc.createCDATASection(']]>') }).toThrow()
     const ele = doc.createCDATASection('contents')
     expect(ele.nodeType).toBe(4)
     expect(ele.nodeName).toBe('#cdata-section')
@@ -116,9 +117,9 @@ describe('Document', function () {
     expect(ele.data).toBe('contents')
   })
 
-  test('createComment()', function () {
-    expect(() => { doc.createProcessingInstruction('invalid target', 'contents') }).toThrowError
-    expect(() => { doc.createProcessingInstruction('target', '?>') }).toThrowError
+  test('createProcessingInstruction()', function () {
+    expect(() => { doc.createProcessingInstruction('invalid target', 'contents') }).toThrow()
+    expect(() => { doc.createProcessingInstruction('target', '?>') }).toThrow()
     const ele = doc.createProcessingInstruction('target', 'contents')
     expect(ele.nodeType).toBe(7)
     expect(ele.nodeName).toBe('target')
@@ -126,13 +127,13 @@ describe('Document', function () {
   })
 
   test('createAttribute()', function () {
-    expect(() => { doc.createAttribute('invalid name') }).toThrowError
+    expect(() => { doc.createAttribute('invalid name') }).toThrow()
     const ele = doc.createAttribute('attr')
     expect(ele.name).toBe('attr')
   })
 
   test('createAttributeNS()', function () {
-    expect(() => { doc.createAttributeNS('http://www.w3.org/1999/xhtml', 'invalid name') }).toThrowError
+    expect(() => { doc.createAttributeNS('http://www.w3.org/1999/xhtml', 'invalid name') }).toThrow()
     const ele = doc.createAttributeNS('http://www.w3.org/1999/xhtml', 'n:div')
     expect(ele.name).toBe('n:div')
     expect(ele.namespaceURI).toBe('http://www.w3.org/1999/xhtml')
@@ -210,10 +211,15 @@ describe('Document', function () {
   })
 
   test('Unsupported Methods', function () {
-    expect(() => { doc.createEvent('mouseevent') }).toThrowError
-    expect(() => { doc.createRange() }).toThrowError
-    expect(() => { doc.createNodeIterator(tele) }).toThrowError
-    expect(() => { doc.createTreeWalker(tele) }).toThrowError
+    expect(() => { doc.createEvent('mouseevent') }).toThrow()
+    expect(() => { doc.createRange() }).toThrow()
+    expect(() => { doc.createNodeIterator(tele) }).toThrow()
+    expect(() => { doc.createTreeWalker(tele) }).toThrow()
+  })
+
+  test('implementation', function () {
+    const impl = doc.implementation
+    expect(impl.createDocument).toBeTruthy()
   })
 
 })
