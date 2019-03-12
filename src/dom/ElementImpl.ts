@@ -3,16 +3,16 @@ import {
   ShadowRoot, NodeType, Node, Element,
   HTMLCollection, NodeList, ShadowRootMode
 } from './interfaces'
-import { TextImpl } from './TextImpl';
+import { TextImpl } from './TextImpl'
 import { NodeImpl } from './NodeImpl'
 import { AttrImpl } from './AttrImpl'
 import { HTMLCollectionImpl } from './HTMLCollectionImpl'
 import { NamedNodeMapImpl } from './NamedNodeMapImpl'
 import { DOMTokenListImpl } from './DOMTokenListImpl'
 import { DOMException } from './DOMException'
-import { Namespace } from './util/Namespace';
-import { OrderedSet } from './util/OrderedSet';
-import { TreeMutation } from './util/TreeMutation';
+import { Namespace } from './util/Namespace'
+import { OrderedSet } from './util/OrderedSet'
+import { TreeMutation } from './util/TreeMutation'
 
 /**
  * Represents an element node.
@@ -115,9 +115,9 @@ export class ElementImpl extends NodeImpl implements Element {
    * Returns the list of all attribute's qualified names.
    */
   getAttributeNames(): string[] {
-    let names: string[] = []
+    const names: string[] = []
 
-    for (let att of this.attributes) {
+    for (const att of this.attributes) {
       names.push(att.name)
     }
 
@@ -130,7 +130,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param qualifiedName - qualified name to search for
    */
   getAttribute(qualifiedName: string): string | null {
-    let att = this.attributes.getNamedItem(qualifiedName)
+    const att = this.attributes.getNamedItem(qualifiedName)
     return (att ? att.value : null)
   }
 
@@ -142,7 +142,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param localName - local name to search for
    */
   getAttributeNS(namespace: string, localName: string): string | null {
-    let att = this.attributes.getNamedItemNS(namespace, localName)
+    const att = this.attributes.getNamedItemNS(namespace, localName)
     return (att ? att.value : null)
   }
 
@@ -172,7 +172,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param value - attribute value to set
    */
   setAttributeNS(namespace: string, qualifiedName: string, value: string): void {
-    let names = Namespace.extractNames(namespace, qualifiedName)
+    const names = Namespace.extractNames(namespace, qualifiedName)
     let attr = this.attributes.getNamedItemNS(namespace, names.localName)
 
     if (attr) {
@@ -221,7 +221,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param qualifiedName - qualified name to search for
    */
   hasAttribute(qualifiedName: string): boolean {
-    for (let att of this.attributes) {
+    for (const att of this.attributes) {
       if (att.name === qualifiedName)
         return true
     }
@@ -237,7 +237,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param localName - local name to search for
    */
   hasAttributeNS(namespace: string, localName: string): boolean {
-    for (let att of this.attributes) {
+    for (const att of this.attributes) {
       if (att.namespaceURI === namespace && att.localName === localName)
         return true
     }
@@ -376,19 +376,19 @@ export class ElementImpl extends NodeImpl implements Element {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new ElementImpl(this.ownerDocument,
+    const clonedSelf = new ElementImpl(this.ownerDocument,
       this.localName, this.namespaceURI, this.prefix)
 
     // clone attributes
-    for (let attr of this.attributes) {
-      let clonedAtt = <Attr>attr.cloneNode(deep)
+    for (const attr of this.attributes) {
+      const clonedAtt = <Attr>attr.cloneNode(deep)
       clonedSelf.attributes.setNamedItem(clonedAtt)
     }
 
     // clone child nodes
     if (deep) {
-      for (let child of this.childNodes) {
-        let clonedChild = child.cloneNode(deep)
+      for (const child of this.childNodes) {
+        const clonedChild = child.cloneNode(deep)
         clonedSelf.appendChild(clonedChild)
       }
     }
@@ -405,7 +405,7 @@ export class ElementImpl extends NodeImpl implements Element {
     if (!node || !super.isEqualNode(node))
       return false
 
-    let other = <Element>node
+    const other = <Element>node
     if (!other || this.namespaceURI !== other.namespaceURI ||
       this.prefix !== other.prefix ||
       this.localName !== other.localName ||
@@ -413,8 +413,8 @@ export class ElementImpl extends NodeImpl implements Element {
       return false
     } else {
       for (let i = 0; i < this.attributes.length; i++) {
-        let att1 = this.attributes.item(i)
-        let att2 = other.attributes.item(i)
+        const att1 = this.attributes.item(i)
+        const att2 = other.attributes.item(i)
         if (att1 && att2 && (
           att1.namespaceURI !== att2.namespaceURI ||
           att1.localName !== att2.localName ||
@@ -473,11 +473,11 @@ export class ElementImpl extends NodeImpl implements Element {
    * elements
    */
   getElementsByClassName(classNames: string): HTMLCollection {
-    let arr = OrderedSet.parse(classNames)
+    const arr = OrderedSet.parse(classNames)
     return new HTMLCollectionImpl(this, function (ele: Element) {
-      let classes = ele.classList
+      const classes = ele.classList
       let allClassesFound = true
-      for (let className of arr) {
+      for (const className of arr) {
         if (!classes.contains(className)) {
           allClassesFound = false
           break
@@ -539,7 +539,7 @@ export class ElementImpl extends NodeImpl implements Element {
   insertAdjacentText(where: string, data: string): void {
     if (!this.ownerDocument) return
 
-    let text = this.ownerDocument.createTextNode(data)
+    const text = this.ownerDocument.createTextNode(data)
 
     switch (where.toLowerCase()) {
       case 'beforebegin':
@@ -574,7 +574,7 @@ export class ElementImpl extends NodeImpl implements Element {
       return this.prefix
     }
 
-    for (let attr of this.attributes) {
+    for (const attr of this.attributes) {
       if (attr.prefix === "xmlns" && attr.value === namespace) {
         return attr.localName
       }
@@ -598,7 +598,7 @@ export class ElementImpl extends NodeImpl implements Element {
     if (this.namespaceURI && this.prefix === prefix)
       return this.namespaceURI
 
-    for (let attr of this.attributes) {
+    for (const attr of this.attributes) {
       if (attr.namespaceURI === Namespace.XMLNS) {
         if ((attr.prefix === 'xmlns' && attr.localName === prefix) ||
           (!prefix && !attr.prefix && attr.localName == 'xmlns')) {

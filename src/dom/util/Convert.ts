@@ -20,9 +20,9 @@ export class Convert {
       else
         return <Node>nodes[0]
     } else {
-      let fragment = new DocumentFragmentImpl(document)
+      const fragment = new DocumentFragmentImpl(document)
 
-      for (let child of nodes) {
+      for (const child of nodes) {
         if (typeof child === 'string')
           fragment.appendChild(new TextImpl(document, child))
         else

@@ -33,7 +33,7 @@ const applyMixin = function (derivedCtor: any, baseCtor: any): void {
     if (!propDesc) 
       throw new Error('Mixin property is undefined.')
     else
-      Object.defineProperty(derivedCtor.prototype, name, propDesc);
+      Object.defineProperty(derivedCtor.prototype, name, propDesc)
   })
 }
 // ChildNode

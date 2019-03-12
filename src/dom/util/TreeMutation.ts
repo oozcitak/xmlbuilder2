@@ -1,7 +1,7 @@
-import { NodeType, Node, Document, Element } from "../interfaces";
-import { DOMException } from "..";
-import { List } from "./List";
-import { TreeQuery } from "./TreeQuery";
+import { NodeType, Node, Document, Element } from "../interfaces"
+import { DOMException } from "../DOMException"
+import { List } from "./List"
+import { TreeQuery } from "./TreeQuery"
 
 /**
  * Contains tree mutation algorithms.
@@ -61,7 +61,7 @@ export class TreeMutation {
         else if (node.firstChild && node.firstChild.nodeType === NodeType.Text)
           throw DOMException.HierarchyRequestError
         else if (node.firstChild) {
-          for (let ele of parent.childNodes) {
+          for (const ele of parent.childNodes) {
             if (ele.nodeType === NodeType.Element)
               throw DOMException.HierarchyRequestError
           }
@@ -79,7 +79,7 @@ export class TreeMutation {
           }
         }
       } else if (node.nodeType === NodeType.Element) {
-        for (let ele of parent.childNodes) {
+        for (const ele of parent.childNodes) {
           if (ele.nodeType === NodeType.Element)
             throw DOMException.HierarchyRequestError
         }
@@ -96,7 +96,7 @@ export class TreeMutation {
           }
         }
       } else if (node.nodeType === NodeType.DocumentType) {
-        for (let ele of parent.childNodes) {
+        for (const ele of parent.childNodes) {
           if (ele.nodeType === NodeType.DocumentType)
             throw DOMException.HierarchyRequestError
         }
@@ -152,7 +152,7 @@ export class TreeMutation {
    * @param document - document to receive the node and its subtree
    */
   static adoptNode(node: Node, document: Document): void {
-    let oldDocument = node.ownerDocument
+    const oldDocument = node.ownerDocument
 
     if (node.parentNode)
       TreeMutation.removeNode(node, node.parentNode)
@@ -162,7 +162,7 @@ export class TreeMutation {
         (<any>inclusiveDescendant)._ownerDocument = document
 
         if (inclusiveDescendant.nodeType === NodeType.Element) {
-          let ele = <Element>inclusiveDescendant
+          const ele = <Element>inclusiveDescendant
           for (const attr of ele.attributes) {
             (<any>attr)._ownerDocument = document
           }
@@ -188,7 +188,7 @@ export class TreeMutation {
    * @param child - child node to insert node before
    */
   static insertNode(node: Node, parent: Node, child: Node | null): void {
-    let count = (node.nodeType === NodeType.DocumentFragment ?
+    const count = (node.nodeType === NodeType.DocumentFragment ?
       node.childNodes.length : 1)
 
     /**
@@ -202,9 +202,9 @@ export class TreeMutation {
      *    offset by count.
      */
 
-    let nodes: Node[] = []
+    const nodes: Node[] = []
     if (node.nodeType === NodeType.DocumentFragment) {
-      for (let childNode of node.childNodes) {
+      for (const childNode of node.childNodes) {
         nodes.push(childNode)
       }
       // remove child nodes
@@ -219,9 +219,9 @@ export class TreeMutation {
      * mutation record for node with [ ], nodes, null, and null.
      */
 
-    let previousSibling = (child ? child.previousSibling : parent.lastChild)
+    const previousSibling = (child ? child.previousSibling : parent.lastChild)
 
-    for (let node of nodes) {
+    for (const node of nodes) {
       if (!child)
         List.append(node, parent)
       else
@@ -323,7 +323,7 @@ export class TreeMutation {
         else if (node.firstChild && node.firstChild.nodeType === NodeType.Text)
           throw DOMException.HierarchyRequestError
         else if (node.firstChild) {
-          for (let ele of parent.childNodes) {
+          for (const ele of parent.childNodes) {
             if (ele.nodeType === NodeType.Element && ele !== child)
               throw DOMException.HierarchyRequestError
           }
@@ -336,7 +336,7 @@ export class TreeMutation {
           }
         }
       } else if (node.nodeType === NodeType.Element) {
-        for (let ele of parent.childNodes) {
+        for (const ele of parent.childNodes) {
           if (ele.nodeType === NodeType.Element && ele !== child)
             throw DOMException.HierarchyRequestError
         }
@@ -348,7 +348,7 @@ export class TreeMutation {
           doctypeChild = doctypeChild.nextSibling
         }
       } else if (node.nodeType === NodeType.DocumentType) {
-        for (let ele of parent.childNodes) {
+        for (const ele of parent.childNodes) {
           if (ele.nodeType === NodeType.DocumentType && ele !== child)
             throw DOMException.HierarchyRequestError
         }
@@ -371,7 +371,7 @@ export class TreeMutation {
 
     TreeMutation.adoptNode(node, parent.ownerDocument)
 
-    let removedNodes: Node[] = []
+    const removedNodes: Node[] = []
 
     if (child.parentNode) {
       removedNodes.push(child)
@@ -380,9 +380,9 @@ export class TreeMutation {
       TreeMutation.removeNode(child, parent)
     }
 
-    let nodes: Node[] = []
+    const nodes: Node[] = []
     if (node.nodeType === NodeType.DocumentFragment) {
-      for (let childNode of node.childNodes) {
+      for (const childNode of node.childNodes) {
         nodes.push(childNode)
       }
     } else {
@@ -413,21 +413,21 @@ export class TreeMutation {
       TreeMutation.adoptNode(node, parent.ownerDocument)
     }
 
-    let removedNodes: Node[] = []
-    for (let childNode of parent.childNodes) {
+    const removedNodes: Node[] = []
+    for (const childNode of parent.childNodes) {
       removedNodes.push(childNode)
     }
 
-    let addedNodes: Node[] = []
+    const addedNodes: Node[] = []
     if (node && node.nodeType === NodeType.DocumentFragment) {
-      for (let childNode of node.childNodes) {
+      for (const childNode of node.childNodes) {
         addedNodes.push(childNode)
       }
     } else if (node) {
       addedNodes.push(node)
     }
 
-    for (let childNode of removedNodes) {
+    for (const childNode of removedNodes) {
       // TODO: Remove all parent's children, in tree order, 
       // with the suppress observers flag set.
       TreeMutation.removeNode(childNode, parent)

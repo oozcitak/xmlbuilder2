@@ -1,6 +1,6 @@
 import { Node, ChildNode } from './interfaces'
 import { Convert } from './util/Convert'
-import { TreeMutation } from './util/TreeMutation';
+import { TreeMutation } from './util/TreeMutation'
 
 /**
  * Represents a mixin that extends child nodes that can have siblings
@@ -23,7 +23,7 @@ export class ChildNodeImpl implements ChildNode {
     let flag = true
     while (flag && viablePreviousSibling) {
       flag = false
-      for (let child of nodes) {
+      for (const child of nodes) {
         if (child === viablePreviousSibling) {
           viablePreviousSibling = viablePreviousSibling.previousSibling
           flag = true
@@ -58,7 +58,7 @@ export class ChildNodeImpl implements ChildNode {
     let flag = true
     while (flag && viableNextSibling) {
       flag = false
-      for (let child of nodes) {
+      for (const child of nodes) {
         if (child === viableNextSibling) {
           viableNextSibling = viableNextSibling.nextSibling
           flag = true
@@ -88,7 +88,7 @@ export class ChildNodeImpl implements ChildNode {
     let flag = true
     while (flag && viableNextSibling) {
       flag = false
-      for (let child of nodes) {
+      for (const child of nodes) {
         if (child === viableNextSibling) {
           viableNextSibling = viableNextSibling.nextSibling
           flag = true

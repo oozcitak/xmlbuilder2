@@ -3,8 +3,8 @@ import {
   NodeFilter, NodeType, Node, HTMLCollection, DocumentFragment,
   NodeList, WhatToShow, Attr, ProcessingInstruction, Comment,
   CDATASection
-} from './interfaces';
-import { NodeImpl } from './NodeImpl';
+} from './interfaces'
+import { NodeImpl } from './NodeImpl'
 import { DOMException } from './DOMException'
 import { CDATASectionImpl } from './CDATASectionImpl'
 import { TextImpl } from './TextImpl'
@@ -13,12 +13,12 @@ import { ProcessingInstructionImpl } from './ProcessingInstructionImpl'
 import { CommentImpl } from './CommentImpl'
 import { DocumentFragmentImpl } from './DocumentFragmentImpl'
 import { HTMLCollectionImpl } from './HTMLCollectionImpl'
-import { ElementImpl } from './ElementImpl';
-import { Namespace } from './util/Namespace';
-import { XMLSpec } from './util/XMLSpec';
-import { OrderedSet } from './util/OrderedSet';
-import { TreeQuery } from './util/TreeQuery';
-import { TreeMutation } from './util/TreeMutation';
+import { ElementImpl } from './ElementImpl'
+import { Namespace } from './util/Namespace'
+import { XMLSpec } from './util/XMLSpec'
+import { OrderedSet } from './util/OrderedSet'
+import { TreeQuery } from './util/TreeQuery'
+import { TreeMutation } from './util/TreeMutation'
 
 /**
  * Represents a document node.
@@ -102,7 +102,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * Returns the {@link DocType} or `null` if there is none.
    */
   get doctype(): DocumentType | null {
-    for (let child of this.childNodes) {
+    for (const child of this.childNodes) {
       if (child.nodeType === NodeType.DocumentType)
         return <DocumentType>child
     }
@@ -113,7 +113,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * Returns the document element or `null` if there is none.
    */
   get documentElement(): Element | null {
-    for (let child of this.childNodes) {
+    for (const child of this.childNodes) {
       if (child.nodeType === NodeType.Element)
         return <Element>child
     }
@@ -166,11 +166,11 @@ export class DocumentImpl extends NodeImpl implements Document {
    * elements
    */
   getElementsByClassName(classNames: string): HTMLCollection {
-    let arr = OrderedSet.parse(classNames)
+    const arr = OrderedSet.parse(classNames)
     return new HTMLCollectionImpl(this, function (ele: Element) {
-      let classes = ele.classList
+      const classes = ele.classList
       let allClassesFound = true
-      for (let className of arr) {
+      for (const className of arr) {
         if (!classes.contains(className)) {
           allClassesFound = false
           break
@@ -204,7 +204,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * @returns the new {@link Element}
    */
   createElementNS(namespace: string | null, qualifiedName: string): Element {
-    let names = Namespace.extractNames(namespace, qualifiedName)
+    const names = Namespace.extractNames(namespace, qualifiedName)
 
     return new ElementImpl(this, names.localName, names.namespace,
       names.prefix)
@@ -344,7 +344,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * @returns the new {@link Attr}
    */
   createAttributeNS(namespace: string, qualifiedName: string): Attr {
-    let names = Namespace.extractNames(namespace, qualifiedName)
+    const names = Namespace.extractNames(namespace, qualifiedName)
 
     return new AttrImpl(this, null, names.localName, names.namespace,
       names.prefix, '')
@@ -405,12 +405,12 @@ export class DocumentImpl extends NodeImpl implements Document {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new DocumentImpl()
+    const clonedSelf = new DocumentImpl()
 
     // clone child nodes
     if (deep) {
-      for (let child of this.childNodes) {
-        let clonedChild = child.cloneNode(deep)
+      for (const child of this.childNodes) {
+        const clonedChild = child.cloneNode(deep)
         clonedSelf.appendChild(clonedChild)
       }
     }

@@ -48,9 +48,8 @@ export class ProcessingInstructionImpl extends CharacterDataImpl implements Proc
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new ProcessingInstructionImpl(this.ownerDocument,
+    return new ProcessingInstructionImpl(this.ownerDocument,
       this.target, this.data)
-    return clonedSelf
   }
 
   /**

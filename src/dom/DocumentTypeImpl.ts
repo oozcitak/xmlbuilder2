@@ -63,9 +63,8 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new DocumentTypeImpl(this.ownerDocument, this.name,
+    return new DocumentTypeImpl(this.ownerDocument, this.name,
       this.publicId, this.systemId)
-    return clonedSelf
   }
 
   /**
@@ -77,7 +76,7 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
     if (!node || !super.isEqualNode(node))
       return false
 
-    let other = <DocumentType>node
+    const other = <DocumentType>node
     if (!other || this.name !== other.name ||
       this.publicId !== other.publicId ||
       this.systemId !== other.systemId)

@@ -67,7 +67,7 @@ export default class TestHelpers {
     switch (node.nodeType) {
       case 1: // Element
         str = `${indent}${node.tagName}`
-        for (let attr of node.attributes) {
+        for (const attr of node.attributes) {
           str += ` ${attr.name}="${attr.value}"`
         }
         str += `\n`
@@ -99,7 +99,7 @@ export default class TestHelpers {
       default:
         throw new Error('Unknown node type')
     }
-    for (let child of node.childNodes) {
+    for (const child of node.childNodes) {
       str += TestHelpers.printTree(child, level + 1)
     }
 

@@ -23,7 +23,7 @@ export class TreeQuery {
 
     // traverse shadow tree
     if (shadow && node.nodeType === NodeType.Element) {
-      let ele = <Element>node
+      const ele = <Element>node
       if (ele.shadowRoot) {
         let child = ele.shadowRoot.firstChild
         while (child) {
@@ -91,7 +91,7 @@ export class TreeQuery {
       case NodeType.Document:
         let hasDocType = false
         let hasElement = false
-        for (let childNode of node.childNodes) {
+        for (const childNode of node.childNodes) {
           switch (childNode.nodeType) {
             case NodeType.ProcessingInstruction:
             case NodeType.Comment:
@@ -111,7 +111,7 @@ export class TreeQuery {
         break
       case NodeType.DocumentFragment:
       case NodeType.Element:
-        for (let childNode of node.childNodes) {
+        for (const childNode of node.childNodes) {
           switch (childNode.nodeType) {
             case NodeType.Element:
             case NodeType.Text:
@@ -194,7 +194,7 @@ export class TreeQuery {
     if (options && options.self && node === other)
       return true
 
-    for (let child of node.childNodes) {
+    for (const child of node.childNodes) {
       if (child === other)
         return true
       if (TreeQuery.isDescendantOf(child, other, options))
@@ -224,9 +224,9 @@ export class TreeQuery {
       return true
 
     if (options && options.shadow) {
-      let root = TreeQuery.rootNode(node)
+      const root = TreeQuery.rootNode(node)
       if (root && (<ShadowRoot>root).host) {
-        let nodeHost = (<ShadowRoot>root).host
+        const nodeHost = (<ShadowRoot>root).host
         return TreeQuery.isAncestorOf(nodeHost, other, options)
       }
     }
@@ -266,8 +266,8 @@ export class TreeQuery {
    * @param other - the node to check
    */
   static isPreceding(node: Node, other: Node): boolean {
-    let nodePos = TreeQuery.treePosition(node)
-    let otherPos = TreeQuery.treePosition(other)
+    const nodePos = TreeQuery.treePosition(node)
+    const otherPos = TreeQuery.treePosition(other)
 
     if (nodePos === -1 || otherPos === -1)
       return false
@@ -286,8 +286,8 @@ export class TreeQuery {
    * @param other - the node to check
    */
   static isFollowing(node: Node, other: Node): boolean {
-    let nodePos = TreeQuery.treePosition(node)
-    let otherPos = TreeQuery.treePosition(other)
+    const nodePos = TreeQuery.treePosition(node)
+    const otherPos = TreeQuery.treePosition(other)
 
     if (nodePos === -1 || otherPos === -1)
       return false
@@ -325,7 +325,7 @@ export class TreeQuery {
    * @param node - the node to get the index of
    */
   private static treePosition(node: Node): number {
-    let root = TreeQuery.rootNode(node)
+    const root = TreeQuery.rootNode(node)
     if (root === null) return -1
 
     let pos = 0

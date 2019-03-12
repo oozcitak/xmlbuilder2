@@ -1,4 +1,4 @@
-import { Node } from "../interfaces";
+import { Node } from "../interfaces"
 
 /**
  * Contains methods for manipulating a {@link NodeList}.
@@ -23,7 +23,7 @@ export class List {
    */
   static insert(node: Node, parent: Node, child: Node | null): void {
     // an ordered set cannot contain duplicates
-    for (let child of parent.childNodes) {
+    for (const child of parent.childNodes) {
       if (node === child)
         return
     }

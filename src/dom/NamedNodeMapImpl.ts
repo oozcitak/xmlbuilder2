@@ -32,7 +32,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
    * @param qualifiedName - qualified name to search for
    */
   getNamedItem(qualifiedName: string): Attr | null {
-    for (let att of this._items) {
+    for (const att of this._items) {
       if (att.name === qualifiedName) return att
     }
     return null
@@ -46,7 +46,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
    * @param localName - local name to search for
    */
   getNamedItemNS(namespace: string | null = null, localName: string): Attr | null {
-    for (let att of this._items) {
+    for (const att of this._items) {
       if (att.namespaceURI === namespace && att.localName === localName)
         return att
     }
@@ -71,10 +71,10 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     if (attr.ownerElement && attr.ownerElement !== this._ownerElement)
       throw DOMException.InUseAttributeError
 
-    let oldAttr = this.getNamedItemNS(attr.namespaceURI, attr.localName)
+      const oldAttr = this.getNamedItemNS(attr.namespaceURI, attr.localName)
     if (oldAttr === attr) return attr
     if (oldAttr) {
-      let index = this._items.indexOf(oldAttr)
+      const index = this._items.indexOf(oldAttr)
       this._items[index] = attr
     } else {
       this._items.push(attr)
@@ -91,7 +91,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
   removeNamedItem(qualifiedName: string): Attr {
     let index = -1
     for (let i = 0; i < this.length; i++) {
-      let att = this._items[i]
+      const att = this._items[i]
       if (att.name === qualifiedName) {
         index = i
         break
@@ -101,7 +101,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     if (index === -1)
       throw DOMException.NotFoundError
 
-    let removed = this._items[index]
+      const removed = this._items[index]
     this._items.splice(index, 1)
     return removed
   }
@@ -116,7 +116,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
   removeNamedItemNS(namespace: string, localName: string): Attr {
     let index = -1
     for (let i = 0; i < this.length; i++) {
-      let att = this._items[i]
+      const att = this._items[i]
       if (att.namespaceURI === namespace && att.localName === localName) {
         index = i
         break
@@ -126,7 +126,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     if (index === -1)
       throw DOMException.NotFoundError
 
-    let removed = this._items[index]
+      const removed = this._items[index]
     this._items.splice(index, 1)
     return removed
   }

@@ -1,5 +1,5 @@
 import { XMLDocument } from './interfaces'
-import { DocumentImpl } from './DocumentImpl';
+import { DocumentImpl } from './DocumentImpl'
 
 /**
  * Represents an XML document.

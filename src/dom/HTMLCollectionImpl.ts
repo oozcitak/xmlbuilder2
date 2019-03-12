@@ -1,5 +1,5 @@
 import { Node, Element, HTMLCollection, NodeType } from "./interfaces"
-import { TreeQuery } from "./util/TreeQuery";
+import { TreeQuery } from "./util/TreeQuery"
 
 /**
  * Represents a collection of elements.
@@ -29,7 +29,7 @@ export class HTMLCollectionImpl implements HTMLCollection {
    */
   get length(): number {
     let count = 0
-    for (let node of this) {
+    for (const node of this) {
       count++
     }
     return count
@@ -42,7 +42,7 @@ export class HTMLCollectionImpl implements HTMLCollection {
    */
   item(index: number): Element | null {
     let i = 0
-    for (let node of this) {
+    for (const node of this) {
       if (i === index)
         return node
       else
@@ -61,7 +61,7 @@ export class HTMLCollectionImpl implements HTMLCollection {
   namedItem(name: string): Element | null {
     if (!name) return null
 
-    for (let node of this) {
+    for (const node of this) {
       if (node.id === name || node.getAttribute('name') === name)
         return node
     }

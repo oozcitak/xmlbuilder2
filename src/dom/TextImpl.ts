@@ -61,10 +61,10 @@ export class TextImpl extends CharacterDataImpl implements Text {
     if (offset < 0 || offset > this.data.length)
       throw DOMException.IndexSizeError
 
-    let newData = this.data.slice(offset)
+    const newData = this.data.slice(offset)
     this.data = this.data.slice(0, offset)
 
-    let newNode = new TextImpl(this.ownerDocument, newData)
+    const newNode = new TextImpl(this.ownerDocument, newData)
 
     if (this.parentNode)
       this.parentNode.insertBefore(newNode, this.nextSibling)
@@ -82,8 +82,7 @@ export class TextImpl extends CharacterDataImpl implements Text {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new TextImpl(this.ownerDocument, this.data)
-    return clonedSelf
+    return new TextImpl(this.ownerDocument, this.data)
   }
 
   // MIXIN: Slotable

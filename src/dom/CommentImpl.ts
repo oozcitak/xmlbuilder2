@@ -37,7 +37,6 @@ export class CommentImpl extends CharacterDataImpl implements Comment {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new CommentImpl(this.ownerDocument, this.data)
-    return clonedSelf
+    return new CommentImpl(this.ownerDocument, this.data)
   }
 }

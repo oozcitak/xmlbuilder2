@@ -4,7 +4,7 @@ import {
 } from './interfaces'
 import { NodeListImpl } from './NodeListImpl'
 import { TreeMutation } from './util/TreeMutation'
-import { TreeQuery } from './util/TreeQuery';
+import { TreeQuery } from './util/TreeQuery'
 
 /**
  * Represents a generic XML node.
@@ -69,7 +69,7 @@ export abstract class NodeImpl implements Node {
    * Returns whether the node is rooted to a document node. 
    */
   get isConnected(): boolean {
-    let root = this.getRootNode()
+    const root = this.getRootNode()
     if (!root)
       return false
     else
@@ -178,9 +178,9 @@ export abstract class NodeImpl implements Node {
     // remove empty text nodes
     let node = this.firstChild
     while (node) {
-      let nextNode = node.nextSibling
+      const nextNode = node.nextSibling
       if (node.nodeType === NodeType.Text) {
-        let text = <Text>node
+        const text = <Text>node
         if (text.length === 0) {
           this.removeChild(text)
         }
@@ -190,11 +190,11 @@ export abstract class NodeImpl implements Node {
     // combine adjacent text nodes
     node = this.firstChild
     while (node) {
-      let nextNode = node.nextSibling
+      const nextNode = node.nextSibling
       if (node.nodeType === NodeType.Text &&
         nextNode && nextNode.nodeType === NodeType.Text) {
-        let text = <Text>node
-        let nextText = <Text>nextNode
+        const text = <Text>node
+        const nextText = <Text>nextNode
         text.appendData(nextText.data)
         this.removeChild(nextText)
       } else {
@@ -202,7 +202,7 @@ export abstract class NodeImpl implements Node {
       }
     }
     // normalize child nodes
-    for (let child of this.childNodes) {
+    for (const child of this.childNodes) {
       child.normalize()
     }
   }
@@ -357,7 +357,7 @@ export abstract class NodeImpl implements Node {
   isDefaultNamespace(namespace: string | null): boolean {
     if (!namespace) namespace = null
 
-    let defaultNamespace = this.lookupNamespaceURI(null)
+    const defaultNamespace = this.lookupNamespaceURI(null)
 
     return defaultNamespace === namespace
   }

@@ -1,5 +1,5 @@
-import { XMLSpec } from "./XMLSpec";
-import { DOMException } from "..";
+import { XMLSpec } from "./XMLSpec"
+import { DOMException } from "../DOMException"
 
 /**
  * Includes methods for namespaces.
@@ -38,9 +38,9 @@ export class Namespace {
     if (!namespace) namespace = null
     Namespace.validateQName(qualifiedName)
 
-    let parts = qualifiedName.split(':')
-    let prefix = (parts.length === 2 ? parts[0] : null)
-    let localName = (parts.length === 2 ? parts[1] : qualifiedName)
+    const parts = qualifiedName.split(':')
+    const prefix = (parts.length === 2 ? parts[0] : null)
+    const localName = (parts.length === 2 ? parts[1] : qualifiedName)
 
     if (prefix && !namespace)
       throw DOMException.NamespaceError

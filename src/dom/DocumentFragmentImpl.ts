@@ -4,7 +4,7 @@ import {
 } from "./interfaces"
 import { NodeImpl } from "./NodeImpl"
 import { TextImpl } from "./TextImpl"
-import { TreeMutation } from "./util/TreeMutation";
+import { TreeMutation } from "./util/TreeMutation"
 
 /**
  * Represents a document fragment in the XML tree.
@@ -62,12 +62,12 @@ export class DocumentFragmentImpl extends NodeImpl implements DocumentFragment {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new DocumentFragmentImpl(this.ownerDocument)
+    const clonedSelf = new DocumentFragmentImpl(this.ownerDocument)
 
     // clone child nodes
     if (deep) {
-      for (let child of this.childNodes) {
-        let clonedChild = child.cloneNode(deep)
+      for (const child of this.childNodes) {
+        const clonedChild = child.cloneNode(deep)
         clonedSelf.appendChild(clonedChild)
       }
     }

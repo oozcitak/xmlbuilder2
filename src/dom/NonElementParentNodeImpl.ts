@@ -1,5 +1,5 @@
-import { NonElementParentNode, Node, Element, NodeType } from './interfaces';
-import { TreeQuery } from './util/TreeQuery';
+import { NonElementParentNode, Node, Element, NodeType } from './interfaces'
+import { TreeQuery } from './util/TreeQuery'
 
 /**
  * Represents a mixin that extends non-element parent nodes. This mixin

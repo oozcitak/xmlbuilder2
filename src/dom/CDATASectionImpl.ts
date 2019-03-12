@@ -36,7 +36,6 @@ export class CDATASectionImpl extends TextImpl implements CDATASection {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    let clonedSelf = new CDATASectionImpl(this.ownerDocument, this.data)
-    return clonedSelf
+    return new CDATASectionImpl(this.ownerDocument, this.data)
   }
 }

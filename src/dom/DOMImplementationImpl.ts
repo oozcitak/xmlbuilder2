@@ -1,13 +1,13 @@
 import {
   DOMImplementation, DocumentType,
   Document, XMLDocument
-} from "./interfaces";
+} from "./interfaces"
 import { DocumentTypeImpl } from "./DocumentTypeImpl"
 import { DocumentImpl } from "./DocumentImpl"
 import { XMLDocumentImpl } from "./XMLDocumentImpl"
-import { TextImpl } from "./TextImpl";
+import { TextImpl } from "./TextImpl"
 import { ElementImpl } from "./ElementImpl"
-import { Namespace } from './util/Namespace';
+import { Namespace } from './util/Namespace'
 
 /**
  * Represents an object providing methods which are not dependent on 
@@ -51,13 +51,13 @@ export class DOMImplementationImpl implements DOMImplementation {
    */
   createDocument(namespace: string, qualifiedName: string,
     doctype: DocumentType | null = null): XMLDocument {
-    let document = new XMLDocumentImpl()
+    const document = new XMLDocumentImpl()
 
     if (doctype)
       document.appendChild(doctype)
 
     if (qualifiedName) {
-      let element = document.createElementNS(namespace, qualifiedName)
+      const element = document.createElementNS(namespace, qualifiedName)
       document.appendChild(element)
     }
 
@@ -78,26 +78,26 @@ export class DOMImplementationImpl implements DOMImplementation {
    * @param title - document title
    */
   createHTMLDocument(title: string | undefined = undefined): Document {
-    let document = new DocumentImpl()
+    const document = new DocumentImpl()
     document._contentType = 'text/html'
 
-    let doctype = new DocumentTypeImpl(document, 'html')
+    const doctype = new DocumentTypeImpl(document, 'html')
     document.appendChild(doctype)
 
-    let htmlElement = new ElementImpl(document, 'html', Namespace.HTML)
+    const htmlElement = new ElementImpl(document, 'html', Namespace.HTML)
     document.appendChild(htmlElement)
 
-    let headElement = new ElementImpl(document, 'head', Namespace.HTML)
+    const headElement = new ElementImpl(document, 'head', Namespace.HTML)
     htmlElement.appendChild(headElement)
 
     if (title !== undefined) {
-      let titleElement = new ElementImpl(document, 'title', Namespace.HTML)
+      const titleElement = new ElementImpl(document, 'title', Namespace.HTML)
       headElement.appendChild(titleElement)
-      let textElement = new TextImpl(document, title)
+      const textElement = new TextImpl(document, title)
       titleElement.appendChild(textElement)
     }
 
-    let bodyElement = new ElementImpl(document, 'body', Namespace.HTML)
+    const bodyElement = new ElementImpl(document, 'body', Namespace.HTML)
     htmlElement.appendChild(bodyElement)
 
     // document's content type is determined by namespace

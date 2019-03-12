@@ -14,10 +14,10 @@ export class OrderedSet {
    * @param value - a string of whitespace separated tokens
    */
   static parse(value: string): string[] {
-    let arr = value.split(OrderedSet.WhiteSpace)
+    const arr = value.split(OrderedSet.WhiteSpace)
     // remove empty strings
-    let filtered: string[] = []
-    for (let str of arr)
+    const filtered: string[] = []
+    for (const str of arr)
       if (str) filtered.push(str)
     return filtered
   }

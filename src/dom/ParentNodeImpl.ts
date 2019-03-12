@@ -1,8 +1,8 @@
 import {
   ParentNode, Node, NodeType, HTMLCollection,
   NodeList, Element
-} from './interfaces';
-import { HTMLCollectionImpl } from './HTMLCollectionImpl';
+} from './interfaces'
+import { HTMLCollectionImpl } from './HTMLCollectionImpl'
 import { DOMException } from './DOMException'
 import { Convert } from './util/Convert'
 
@@ -73,10 +73,10 @@ export class ParentNodeImpl implements ParentNode {
    * @param nodes - the array of nodes or strings
    */
   prepend(...nodes: Array<Node | string>): void {
-    let node = <Node><unknown>this
+    const node = <Node><unknown>this
 
     if (node.ownerDocument) {
-      let childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
+      const childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
       node.insertBefore(childNode, node.firstChild)
     }
   }
@@ -88,10 +88,10 @@ export class ParentNodeImpl implements ParentNode {
    * @param nodes - the array of nodes or strings
    */
   append(...nodes: Array<Node | string>): void {
-    let node = <Node><unknown>this
+    const node = <Node><unknown>this
 
     if (node.ownerDocument) {
-      let childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
+      const childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
       node.appendChild(childNode)
     }
   }

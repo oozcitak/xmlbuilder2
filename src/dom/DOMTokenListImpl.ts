@@ -1,5 +1,5 @@
 import { DOMTokenList, Element } from "./interfaces"
-import { OrderedSet } from "./util/OrderedSet";
+import { OrderedSet } from "./util/OrderedSet"
 import { DOMException } from "./DOMException"
 
 /**
@@ -32,9 +32,9 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param index - the index to of the token
    */
   item(index: number): string | null {
-    let set = this._valueAsSet
+    const set = this._valueAsSet
     let i = 0
-    for (let token of set) {
+    for (const token of set) {
       if (i === index) return token
       i++
     }
@@ -56,8 +56,8 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param tokens - the list of tokens to add
    */
   add(...tokens: Array<string>): void {
-    let set = this._valueAsSet
-    for (let token of tokens) {
+    const set = this._valueAsSet
+    for (const token of tokens) {
       set.add(token)
     }
     this._valueAsSet = set
@@ -69,8 +69,8 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param tokens - the list of tokens to remove
    */
   remove(...tokens: Array<string>): void {
-    let set = this._valueAsSet
-    for (let token of tokens) {
+    const set = this._valueAsSet
+    for (const token of tokens) {
       if (!token)
         throw DOMException.SyntaxError
       else if (token.match(OrderedSet.WhiteSpace))
@@ -95,7 +95,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    */
   toggle(token: string, force: boolean | undefined = undefined): boolean {
     if (force === undefined) {
-      let set = this._valueAsSet
+      const set = this._valueAsSet
       if (set.has(token)) {
         this.remove(token)
         return false
@@ -128,7 +128,7 @@ export class DOMTokenListImpl implements DOMTokenList {
       newToken.match(OrderedSet.WhiteSpace))
       throw DOMException.InvalidCharacterError
 
-    let set = this._valueAsSet
+      const set = this._valueAsSet
     if (!set.has(token)) {
       return false
     } else {
@@ -169,7 +169,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * Returns an iterator for tokens.
    */
   *[Symbol.iterator](): IterableIterator<string> {
-    let set = this._valueAsSet
+    const set = this._valueAsSet
     yield* set
   }
 
@@ -178,16 +178,16 @@ export class DOMTokenListImpl implements DOMTokenList {
    * attribute's value by splitting at ASCII whitespace characters.
    */
   get _valueAsSet(): Set<string> {
-    let attValue = this._ownerElement.getAttribute(this._localName) || ''
-    let arr = OrderedSet.parse(attValue)
+    const attValue = this._ownerElement.getAttribute(this._localName) || ''
+    const arr = OrderedSet.parse(attValue)
     return new Set(arr)
   }
   set _valueAsSet(set: Set<string>) {
     if (!this._ownerElement.hasAttribute(this._localName) && set.size === 0)
       return
 
-    let arr = Array.from(set)
-    let attValue = OrderedSet.serialize(arr)
+      const arr = Array.from(set)
+      const attValue = OrderedSet.serialize(arr)
     this._ownerElement.setAttribute(this._localName, attValue)
   }
 }
