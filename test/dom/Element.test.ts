@@ -195,6 +195,14 @@ describe('Element', function () {
     }
   })
 
+  test('closest()', function () {
+    expect(() => ele1.closest('*')).toThrow()
+  })
+
+  test('matches()', function () {
+    expect(() => ele1.matches('*')).toThrow()
+  })
+
   test('cloneNode()', function () {
     const clonedNode = <any>ele5.cloneNode()
     expect(clonedNode.attributes.length).toBe(2)
@@ -207,6 +215,16 @@ describe('Element', function () {
   test('isEqualNode()', function () {
     expect(ele5.isEqualNode(ele6)).toBeTruthy()
     expect(ele5.isEqualNode(ele1)).toBeFalsy()
+
+    const en_ele1 = doc.createElementNS('ns1', 'p1:name1')
+    const en_ele2 = doc.createElementNS('ns2', 'p2:name2')
+    expect(en_ele1.isEqualNode(en_ele2)).toBeFalsy()
+
+    const en_ele3 = doc.createElementNS('ns1', 'p1:name1')
+    en_ele3.setAttributeNS('ns1', 'n1:name1', 'val1')
+    const en_ele4 = doc.createElementNS('ns1', 'p1:name1')
+    en_ele4.setAttributeNS('ns2', 'n2:name2', 'val2')
+    expect(en_ele3.isEqualNode(en_ele4)).toBeFalsy()
   })
 
   test('getElementsByTagName()', function () {
