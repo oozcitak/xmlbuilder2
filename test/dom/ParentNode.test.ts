@@ -28,10 +28,12 @@ describe('ParentNode', function () {
 
   test('firstElementChild', function () {
     expect(de.firstElementChild).toBe(child2)
+    expect(child2.firstElementChild).toBeNull()
   })
 
   test('lastElementChild', function () {
     expect(de.lastElementChild).toBe(child4)
+    expect(child2.lastElementChild).toBeNull()
   })
 
   test('childElementCount', function () {
