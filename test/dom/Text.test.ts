@@ -38,6 +38,8 @@ describe('Text', function () {
     const node5 = node.splitText(5)
     const node6 = node5.splitText(2)
     expect(node.wholeText).toBe('peaceathome')
+    expect(() => node.splitText(-1)).toThrow()
+    expect(() => node.splitText(1001)).toThrow()
   })
 
   test('cloneNode()', function () {
