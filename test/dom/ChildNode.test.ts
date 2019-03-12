@@ -46,6 +46,28 @@ describe('ChildNode', function () {
       `)
   })
 
+  test('before() with single node', function () {
+    const doc = $$.dom.createDocument('myns', 'n:root')
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele = doc.createElement('ele')
+    de.appendChild(ele)
+    const txt = doc.createTextNode('txt')
+    de.appendChild(txt)
+    
+    ele.before('text1')
+    txt.before('text2')
+
+    expect($$.printTree(doc)).toBe($$.t`
+      n:root
+        # text1
+        ele
+        # text2
+        # txt
+      `)
+  })
+
   test('after()', function () {
     const doctype = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     const doc = $$.dom.createDocument('myns', 'n:root', doctype)
