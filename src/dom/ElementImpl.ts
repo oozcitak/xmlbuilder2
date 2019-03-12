@@ -618,8 +618,8 @@ export class ElementImpl extends NodeImpl implements Element {
   get firstElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
   get lastElementChild(): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
   get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
-  prepend(...nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
-  append(...nodes: [Node | string]): void { throw new Error("Mixin: ParentNode not implemented.") }
+  prepend(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
+  append(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
   querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
   querySelectorAll(selectors: string): NodeList { throw new Error("Mixin: ParentNode not implemented.") }
 
@@ -635,6 +635,5 @@ export class ElementImpl extends NodeImpl implements Element {
 
   // MIXIN: Slotable
   get assignedSlot(): undefined { throw new Error("Mixin: Slotable not implemented.") }
-  set assignedSlot(value: undefined) { }
 
 }

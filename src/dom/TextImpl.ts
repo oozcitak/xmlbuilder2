@@ -88,6 +88,5 @@ export class TextImpl extends CharacterDataImpl implements Text {
 
   // MIXIN: Slotable
   get assignedSlot(): undefined { throw new Error("Mixin: Slotable not implemented.") }
-  set assignedSlot(value: undefined) { }
 
 }

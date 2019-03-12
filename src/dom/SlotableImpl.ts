@@ -11,9 +11,9 @@ export class SlotableImpl implements Slotable {
   /**
    * Returns the <slot> element which this node is inserted in.
    * 
-   * This method is not supported by this module.
+   * This method is not supported by this module and will throw an
+   * exception.
    */
-  get assignedSlot(): undefined { return undefined }
-  set assignedSlot(value: undefined) { throw new Error("This property is read-only.") }
+  get assignedSlot(): undefined { throw DOMException.NotSupportedError }
 
 }
