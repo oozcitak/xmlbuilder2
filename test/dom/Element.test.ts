@@ -354,6 +354,16 @@ describe('Element', function () {
     expect(() => custom.attachShadow({ mode: 'open' })).toThrow()
   })
 
+  test('attachShadow() reserved element name', function () {
+    const doc = $$.dom.createHTMLDocument('my doc')
+    const body = doc.getElementsByTagName('body')[0]
+    if (!body)
+      throw new Error("body element is null")
+    const custom = doc.createElementNS('http://www.w3.org/1999/xhtml', 'font-face')
+    body.appendChild(custom)
+    expect(() => custom.attachShadow({ mode: 'open' })).toThrow()
+  })
+
   test('shadowRoot', function () {
     const doc = $$.dom.createHTMLDocument('my doc')
     const body = doc.getElementsByTagName('body')[0]
