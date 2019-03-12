@@ -300,6 +300,7 @@ describe('Element', function () {
     ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns1')
     ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:name', 'ns2')
     expect(ele.lookupPrefix('ns2')).toBe('name')
+    expect(ele.lookupPrefix('')).toBeNull()
   })
 
   test('lookupNamespaceURI()', function () {
@@ -314,8 +315,10 @@ describe('Element', function () {
     de.appendChild(ele)
     ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns1')
     ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:name', 'ns2')
+    ele.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:namez', '')
     expect(ele.lookupNamespaceURI()).toBe('ns1')
     expect(ele.lookupNamespaceURI('name')).toBe('ns2')
+    expect(ele.lookupNamespaceURI('namez')).toBeNull()
   })
 
   test('attachShadow()', function () {
