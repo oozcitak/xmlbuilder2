@@ -26,9 +26,13 @@ describe('HTMLCollection', function () {
     expect(list.item(0)).toBe(ele1)
     expect(list.item(1)).toBe(ele3)
     expect(list.item(2)).toBe(ele2)
+    expect(list.item(-1)).toBeNull()
+    expect(list.item(1001)).toBeNull()
     expect(list.namedItem('ele1')).toBe(ele1)
     expect(list.namedItem('ele2')).toBe(ele2)
     expect(list.namedItem('ele3')).toBe(ele3)
+    expect(list.namedItem('')).toBeNull()
+    expect(list.namedItem('none')).toBeNull()
   })
 
   test('indexers', function () {
