@@ -11,6 +11,9 @@ describe('NamedNodeMap', function () {
   doc.documentElement.appendChild(ele)
   ele.setAttribute('att', 'val')
   ele.setAttributeNS('myns', 'd:att2', 'val2')
+  const elex = doc.createElement('tagged2')
+  doc.documentElement.appendChild(elex)
+  elex.setAttribute('att2', 'val2')
   const list = ele.attributes
 
   test('length', function () {
@@ -30,6 +33,7 @@ describe('NamedNodeMap', function () {
       expect(attr2.name).toBe('d:att2')
       expect(attr2.value).toBe('val2')
     }
+    expect(list.item(-1)).toBeNull()
   })
 
   test('getNamedItem()', function () {
@@ -67,15 +71,18 @@ describe('NamedNodeMap', function () {
     let attr = doc.createAttributeNS('myns', 'd:att2')
     attr.value = 'newval'
     let oldattr = list.setNamedItemNS(attr)
-    expect(oldattr).not.toBeNull()
-    if (oldattr) {
-      expect(oldattr.value).toBe('val2')
-    }
+    if (!oldattr)
+      throw new Error("Atribute is null")
+    expect(oldattr.value).toBe('val2')
+    expect(list.setNamedItemNS(attr)).toBe(attr)
     let newattr = list.getNamedItemNS('myns', 'att2')
-    expect(newattr).not.toBeNull()
-    if (newattr) {
-      expect(newattr.value).toBe('newval')
-    }
+    if (!newattr)
+      throw new Error("Atribute is null")
+    expect(newattr.value).toBe('newval')
+    const attx = elex.attributes.item(0)
+    if (!attx)
+      throw new Error("Atribute is null")
+    expect(() => list.setNamedItemNS(attx)).toThrow()
   })
 
   test('removeNamedItem()', function () {
@@ -85,6 +92,7 @@ describe('NamedNodeMap', function () {
       expect(oldattr.value).toBe('newval')
     }
     expect(list.getNamedItem('att')).toBeNull()
+    expect(() => list.removeNamedItem('none')).toThrow()
   })
 
   test('removeNamedItemNS()', function () {
@@ -94,6 +102,7 @@ describe('NamedNodeMap', function () {
       expect(oldattr.value).toBe('newval')
     }
     expect(list.getNamedItemNS('myns', 'att2')).toBeNull()
+    expect(() => list.removeNamedItemNS('none', 'none')).toThrow()
   })
 
   test('iteration', function () {
