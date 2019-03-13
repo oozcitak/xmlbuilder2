@@ -45,7 +45,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
    * @param namespace - namespace to search for
    * @param localName - local name to search for
    */
-  getNamedItemNS(namespace: string | null = null, localName: string): Attr | null {
+  getNamedItemNS(namespace: string | null, localName: string): Attr | null {
     for (const att of this._items) {
       if (att.namespaceURI === namespace && att.localName === localName)
         return att
