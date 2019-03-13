@@ -198,6 +198,38 @@ describe('Element', function () {
     expect(txt.textContent).toBe('masterofbobbitts')
   })
 
+  test('textContent with empty child', function () {
+    const doct = $$.dom.createDocument('myns', 'root')
+
+    if (!doct.documentElement)
+      throw new Error("documentElement is null")
+  
+    const node = doct.createProcessingInstruction('program', 'instruction')
+    doct.documentElement.appendChild(doc.createTextNode('a'))
+    doct.documentElement.appendChild(doc.createTextNode(''))
+    doct.documentElement.appendChild(doc.createTextNode('b'))
+    doct.documentElement.appendChild(doc.createComment('comment'))
+    doct.documentElement.appendChild(doc.createTextNode('c'))
+  
+    expect(doct.documentElement.textContent).toBe('abc')
+  })
+
+  test('textContent with empty content', function () {
+    const doct = $$.dom.createDocument('myns', 'root')
+
+    if (!doct.documentElement)
+      throw new Error("documentElement is null")
+  
+    const node = doct.createProcessingInstruction('program', 'instruction')
+    doct.documentElement.appendChild(doc.createTextNode('a'))
+    doct.documentElement.appendChild(doc.createTextNode(''))
+    doct.documentElement.appendChild(doc.createTextNode('b'))
+    doct.documentElement.appendChild(doc.createComment('comment'))
+    doct.documentElement.appendChild(doc.createTextNode('c'))
+    doct.documentElement.textContent = null
+    expect(doct.documentElement.textContent).toBe('')
+  })
+
   test('closest()', function () {
     expect(() => ele1.closest('*')).toThrow()
   })
@@ -266,6 +298,27 @@ describe('Element', function () {
       `)
   })
 
+  test('insertAdjacentElement() with null parent', function () {
+    const iaedoc = $$.dom.createDocument('', 'root')
+
+    if (!iaedoc.documentElement)
+      throw new Error("documentElement is null")
+
+    const iaede = iaedoc.documentElement
+    const ele = doc.createElement('node')
+    iaede.appendChild(ele)
+    ele.remove()
+    const cn1 = iaedoc.createElement('one')
+    const cn2 = iaedoc.createElement('two')
+
+    expect(ele.insertAdjacentElement('beforebegin', cn1)).toBeNull()
+    expect(ele.insertAdjacentElement('afterend', cn2)).toBeNull()
+
+    expect($$.printTree(iaedoc)).toBe($$.t`
+      root
+      `)
+  })
+
   test('insertAdjacentText()', function () {
     const iaedoc = $$.dom.createDocument('', 'root')
 
@@ -287,6 +340,25 @@ describe('Element', function () {
         node
         # four
         # three
+      `)
+  })
+
+  test('insertAdjacentText() with null parent', function () {
+    const iaedoc = $$.dom.createDocument('', 'root')
+
+    if (!iaedoc.documentElement)
+      throw new Error("documentElement is null")
+
+    const iaede = iaedoc.documentElement
+    const ele = doc.createElement('node')
+    iaede.appendChild(ele)
+    ele.remove()
+
+    expect(ele.insertAdjacentText('beforebegin', 'one')).toBeUndefined()
+    expect(ele.insertAdjacentText('afterend', 'two')).toBeUndefined()
+
+    expect($$.printTree(iaedoc)).toBe($$.t`
+      root
       `)
   })
 

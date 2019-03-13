@@ -542,9 +542,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @returns the inserted element
    */
   insertAdjacentText(where: string, data: string): void {
-    if (!this.ownerDocument) return
-
-    const text = this.ownerDocument.createTextNode(data)
+    const text = new TextImpl(this.ownerDocument, data)
 
     switch (where.toLowerCase()) {
       case 'beforebegin':
