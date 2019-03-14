@@ -19,9 +19,9 @@ export class List {
    * 
    * @param node - node to insert
    * @param parent - parent node to receive node
-   * @param child - child node to insert node before
+   * @param refChild - child node to insert node before
    */
-  static insert(node: Node, parent: Node, child: Node | null): void {
+  static insert(node: Node, parent: Node, refChild: Node | null): void {
     // an ordered set cannot contain duplicates
     for (const childNode of parent.childNodes) {
       if (node === childNode)
@@ -41,8 +41,8 @@ export class List {
       parentImpl._lastChild = nodeImpl
       childImpl._length = 1
     } else {
-      const prev = (child ? child.previousSibling : parentImpl.lastChild)
-      const next = (child ? child : null)
+      const prev = (refChild ? refChild.previousSibling : parentImpl.lastChild)
+      const next = (refChild ? refChild : null)
 
       nodeImpl._previousSibling = prev
       nodeImpl._nextSibling = next
