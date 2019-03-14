@@ -155,7 +155,7 @@ describe('Node', function () {
 
     expect(newEle1.isEqualNode(newEle2)).toBeTruthy()
     expect(newEle1.isEqualNode(newEle3)).toBeFalsy()
-    
+
     expect(newEle1.isEqualNode()).toBeFalsy()
   })
 
@@ -181,7 +181,7 @@ describe('Node', function () {
     child1.setAttributeNode(att12)
     const att13 = doc.createAttribute('att13')
     child1.setAttributeNode(att13)
- 
+
     expect(att12.compareDocumentPosition(att13)).toBe(0x20 + 0x04)
     expect(att12.compareDocumentPosition(att11)).toBe(0x20 + 0x02)
 
@@ -196,7 +196,7 @@ describe('Node', function () {
     const otherde = otherdoc.documentElement
     const otherele = otherdoc.createElement('otherele')
     otherde.appendChild(otherele)
- 
+
     // Position.Disconnected | Position.ImplementationSpecific | Position.Preceding
     expect(child1.compareDocumentPosition(otherele)).toBe(0x20 + 0x01 + 0x02)
     // TODO: for consistency this should return
@@ -255,10 +255,52 @@ describe('Node', function () {
   })
 
   test('appendChild()', function () {
-    const newText = doc.createTextNode('txt')
-    ele1.appendChild(newText)
-    expect(child4.nextSibling).toBe(newText)
-    expect(newText.previousSibling).toBe(child4)
+    const aadoc = $$.dom.createDocument('ns', 'doc')
+    if (!aadoc.documentElement)
+      throw new Error("documentElement is null")
+    const aae = aadoc.documentElement
+    const node1 = aadoc.createElement('node1')
+    const node2 = aadoc.createElement('node2')
+    const node3 = aadoc.createElement('node3')
+    const node4 = aadoc.createElement('node4')
+    aae.appendChild(node1)
+    aae.appendChild(node2)
+    aae.appendChild(node3)
+    aae.appendChild(node4)
+
+    expect(aae.childNodes.length).toBe(4)
+    const newText = aadoc.createTextNode('newtxt')
+    aae.appendChild(newText)
+    expect(aae.childNodes.length).toBe(5)
+    expect(aae.childNodes.item(0)).toBe(node1)
+    expect(aae.childNodes.item(1)).toBe(node2)
+    expect(aae.childNodes.item(2)).toBe(node3)
+    expect(aae.childNodes.item(3)).toBe(node4)
+    expect(aae.childNodes.item(4)).toBe(newText)
+    expect(aae.lastChild).toBe(newText)
+
+    expect($$.printTree(aadoc)).toBe($$.t`
+      doc
+        node1
+        node2
+        node3
+        node4
+        # newtxt
+        `)
+
+    // adding existing node. no-op
+    expect(aae.childNodes.length).toBe(5)
+    aae.appendChild(newText)
+    expect(aae.childNodes.length).toBe(5)
+
+    expect($$.printTree(aadoc)).toBe($$.t`
+      doc
+        node1
+        node2
+        node3
+        node4
+        # newtxt
+        `)
   })
 
   test('replaceChild()', function () {

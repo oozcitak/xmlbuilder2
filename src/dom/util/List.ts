@@ -23,8 +23,8 @@ export class List {
    */
   static insert(node: Node, parent: Node, child: Node | null): void {
     // an ordered set cannot contain duplicates
-    for (const child of parent.childNodes) {
-      if (node === child)
+    for (const childNode of parent.childNodes) {
+      if (node === childNode)
         return
     }
 
