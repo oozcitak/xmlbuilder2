@@ -37,9 +37,24 @@ describe('Text', function () {
   test('splitText()', function () {
     const node5 = node.splitText(5)
     const node6 = node5.splitText(2)
+    expect(node.data).toBe('peace')
+    expect(node5.data).toBe('at')
+    expect(node6.data).toBe('home')
     expect(node.wholeText).toBe('peaceathome')
     expect(() => node.splitText(-1)).toThrow()
     expect(() => node.splitText(1001)).toThrow()
+
+    node.textContent = 'peaceathome'
+    node5.remove()
+    node6.remove()
+
+    const node7 = node.splitText(5)
+    node7.remove()
+    const node8 = node7.splitText(2)
+    expect(node.data).toBe('peace')
+    expect(node7.data).toBe('at')
+    expect(node8.data).toBe('home')
+    expect(node.wholeText).toBe('peace')
   })
 
   test('cloneNode()', function () {
