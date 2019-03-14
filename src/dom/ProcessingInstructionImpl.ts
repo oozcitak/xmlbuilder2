@@ -57,8 +57,8 @@ export class ProcessingInstructionImpl extends CharacterDataImpl implements Proc
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node): boolean {
-    if (!node || !super.isEqualNode(node))
+  isEqualNode(node: Node | null = null): boolean {
+    if (!super.isEqualNode(node))
       return false
 
     return (this.target === (<ProcessingInstruction>node).target)

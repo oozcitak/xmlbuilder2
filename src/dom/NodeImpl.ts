@@ -220,7 +220,7 @@ export abstract class NodeImpl implements Node {
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node): boolean {
+  isEqualNode(node: Node | null): boolean {
     if (!node || this.nodeType !== node.nodeType ||
       this.childNodes.length !== node.childNodes.length) {
       return false
@@ -244,7 +244,7 @@ export abstract class NodeImpl implements Node {
    * 
    * @param node - the node to compare with
    */
-  isSameNode(node?: Node): boolean {
+  isSameNode(node: Node | null): boolean {
     return (!!node && node === this)
   }
 
@@ -281,7 +281,7 @@ export abstract class NodeImpl implements Node {
       }
     }
 
-    if (!node1 || !node2 || (node1.getRootNode != node2.getRootNode)) {
+    if (!node1 || !node2 || (node1.getRootNode() !== node2.getRootNode())) {
       return Position.Disconnected | Position.ImplementationSpecific |
         Position.Preceding
       // TODO: return preceding or following consistently

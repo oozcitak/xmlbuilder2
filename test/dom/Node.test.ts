@@ -155,6 +155,8 @@ describe('Node', function () {
 
     expect(newEle1.isEqualNode(newEle2)).toBeTruthy()
     expect(newEle1.isEqualNode(newEle3)).toBeFalsy()
+    
+    expect(newEle1.isEqualNode()).toBeFalsy()
   })
 
   test('isSameNode()', function () {
@@ -166,8 +168,40 @@ describe('Node', function () {
   })
 
   test('compareDocumentPosition()', function () {
-    expect(child1.compareDocumentPosition(child2) & 4).toBeTruthy()
-    expect(child4.compareDocumentPosition(de) & 2).toBeTruthy()
+    expect(child1.compareDocumentPosition(child1)).toBe(0)
+    expect(child1.compareDocumentPosition(child2)).toBe(0x04)
+    expect(child2.compareDocumentPosition(child1)).toBe(0x02)
+    expect(child4.compareDocumentPosition(de)).toBe(0x08 + 0x02)
+  })
+
+  test('compareDocumentPosition() attribute', function () {
+    const att11 = doc.createAttribute('att11')
+    child1.setAttributeNode(att11)
+    const att12 = doc.createAttribute('att12')
+    child1.setAttributeNode(att12)
+    const att13 = doc.createAttribute('att13')
+    child1.setAttributeNode(att13)
+ 
+    expect(att12.compareDocumentPosition(att13)).toBe(0x20 + 0x04)
+    expect(att12.compareDocumentPosition(att11)).toBe(0x20 + 0x02)
+
+    expect(child1.compareDocumentPosition(att11)).toBe(0x10 + 0x04)
+    expect(att11.compareDocumentPosition(child1)).toBe(0x08 + 0x02)
+  })
+
+  test('compareDocumentPosition() disconnected', function () {
+    const otherdoc = $$.dom.createDocument('ns', 'otherdoc')
+    if (!otherdoc.documentElement)
+      throw new Error("documentElement is null")
+    const otherde = otherdoc.documentElement
+    const otherele = otherdoc.createElement('otherele')
+    otherde.appendChild(otherele)
+ 
+    // Position.Disconnected | Position.ImplementationSpecific | Position.Preceding
+    expect(child1.compareDocumentPosition(otherele)).toBe(0x20 + 0x01 + 0x02)
+    // TODO: for consistency this should return
+    // Position.Disconnected | Position.ImplementationSpecific | Position.Following
+    expect(otherele.compareDocumentPosition(child1)).toBe(0x20 + 0x01 + 0x02)
   })
 
   test('contains()', function () {

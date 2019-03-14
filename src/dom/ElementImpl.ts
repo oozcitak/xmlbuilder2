@@ -273,7 +273,10 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param attr - attribute to set
    */
   setAttributeNode(attr: Attr): Attr | null {
-    return this.attributes.setNamedItem(attr)
+    const attrImpl = <AttrImpl>attr
+    attrImpl._ownerDocument = this.ownerDocument
+    attrImpl._ownerElement = this
+    return this.attributes.setNamedItem(attrImpl)
   }
 
   /**
@@ -282,7 +285,10 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param attr - attribute to set
    */
   setAttributeNodeNS(attr: Attr): Attr | null {
-    return this.attributes.setNamedItemNS(attr)
+    const attrImpl = <AttrImpl>attr
+    attrImpl._ownerDocument = this.ownerDocument
+    attrImpl._ownerElement = this
+    return this.attributes.setNamedItemNS(attrImpl)
   }
 
   /**
@@ -406,8 +412,8 @@ export class ElementImpl extends NodeImpl implements Element {
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node): boolean {
-    if (!node || !super.isEqualNode(node))
+  isEqualNode(node: Node | null = null): boolean {
+    if (!super.isEqualNode(node))
       return false
 
     const other = <Element>node
@@ -604,7 +610,7 @@ export class ElementImpl extends NodeImpl implements Element {
     for (const attr of this.attributes) {
       if (attr.namespaceURI === Namespace.XMLNS) {
         if ((attr.prefix === 'xmlns' && attr.localName === prefix) ||
-          (!prefix && !attr.prefix && attr.localName == 'xmlns')) {
+          (!prefix && !attr.prefix && attr.localName === 'xmlns')) {
           return attr.value || null
         }
       }

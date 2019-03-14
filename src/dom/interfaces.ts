@@ -115,14 +115,14 @@ export interface Node {
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node): boolean
+  isEqualNode(node?: Node | null): boolean
 
   /**
    * Determines if the given node is reference equal to this one.
    * 
    * @param node - the node to compare with
    */
-  isSameNode(node?: Node): boolean
+  isSameNode(node?: Node | null): boolean
 
   /**
    * Returns a bitmask indicating the position of the given `node`

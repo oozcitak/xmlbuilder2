@@ -72,8 +72,8 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node): boolean {
-    if (!node || !super.isEqualNode(node))
+  isEqualNode(node: Node | null = null): boolean {
+    if (!super.isEqualNode(node))
       return false
 
     const other = <DocumentType>node

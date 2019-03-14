@@ -80,4 +80,23 @@ describe('Attr', function () {
     expect(cloned.lookupNamespaceURI('none')).toBeNull()
   })
 
+  test('isEqualNode()', function () {
+    const attr1 = doc.createAttributeNS('my ns', 'att')
+    attr1.value = 'val'
+    const attr2 = doc.createAttributeNS('my ns', 'att')
+    attr2.value = 'val'
+    const attr3 = doc.createAttributeNS('my other ns', 'att')
+    attr3.value = 'val'
+    const attr4 = doc.createAttributeNS('my ns', 'other_att')
+    attr4.value = 'val'
+    const attr5 = doc.createAttributeNS('my ns', 'att')
+    attr5.value = 'other val'
+    expect(attr1.isEqualNode(attr2)).toBeTruthy()
+    expect(attr1.isEqualNode(attr3)).toBeFalsy()
+    expect(attr1.isEqualNode(attr4)).toBeFalsy()
+    expect(attr1.isEqualNode(attr5)).toBeFalsy()
+    expect(attr1.isEqualNode(null)).toBeFalsy()
+    expect(attr1.isEqualNode()).toBeFalsy()
+  })
+
 })

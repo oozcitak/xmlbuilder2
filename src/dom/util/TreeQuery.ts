@@ -253,7 +253,7 @@ export class TreeQuery {
     if (options && options.self && node === other)
       return true
 
-    return (node.parentNode != null &&
+    return (!!node.parentNode &&
       node.parentNode === other.parentNode)
   }
 

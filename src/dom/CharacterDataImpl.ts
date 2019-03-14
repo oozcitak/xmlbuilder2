@@ -26,8 +26,8 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node): boolean {
-    if (!node || !super.isEqualNode(node))
+  isEqualNode(node: Node | null = null): boolean {
+    if (!super.isEqualNode(node))
       return false
 
     return (this.data === (<CharacterData>node).data)

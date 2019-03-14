@@ -10,7 +10,7 @@ export class AttrImpl extends NodeImpl implements Attr {
   protected _prefix: string | null
   protected _localName: string
   protected _value: string
-  protected _ownerElement: Element | null
+  _ownerElement: Element | null
 
   /** 
    * Useless; always returns true 
@@ -140,5 +140,20 @@ export class AttrImpl extends NodeImpl implements Attr {
       return this.ownerElement.lookupNamespaceURI(prefix)
 
     return null
+  }
+
+  /**
+   * Determines if the given node is equal to this one.
+   * 
+   * @param node - the node to compare with
+   */
+  isEqualNode(node: Node | null = null): boolean {
+    if (!super.isEqualNode(node))
+      return false
+
+    const other = <Attr>node
+    return (other && this.namespaceURI === other.namespaceURI &&
+      this.localName === other.localName &&
+      this.value === other.value)
   }
 }
