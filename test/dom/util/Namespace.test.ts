@@ -1,7 +1,7 @@
 import $$ from '../../TestHelpers'
 import { Namespace } from '../../../src/dom/util/Namespace';
 
-describe('Namespave', function () {
+describe('Namespace', function () {
 
   test('validateQName()', function () {
     expect(() => Namespace.validateQName('name')).not.toThrow()
