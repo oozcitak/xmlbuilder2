@@ -86,6 +86,18 @@ export class AttrImpl extends NodeImpl implements Attr {
   get value(): string { return this._value }
   set value(value: string) { this._value = value }
 
+  /** 
+   * Gets or sets the data associated with a {@link Attr} node.
+   */
+  get nodeValue(): string | null { return this._value }
+  set nodeValue(value: string | null) { this._value = value || '' }
+
+  /** 
+   * Gets or sets the data associated with a {@link Attr} node.
+   */
+  get textContent(): string | null { return this._value }
+  set textContent(value: string | null) { this._value = value || '' }
+
   /**
    * Returns a duplicate of this node, i.e., serves as a generic copy 
    * constructor for nodes. The duplicate node has no parent 

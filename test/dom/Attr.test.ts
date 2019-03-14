@@ -30,6 +30,30 @@ describe('Attr', function () {
     attr.value = 'value'
   })
 
+  test('nodeValue', function () {
+    attr.nodeValue = 'modified'
+    expect(attr.nodeValue).toBe('modified')
+    attr.nodeValue = 'value'
+  })
+
+  test('textContent', function () {
+    attr.textContent = 'modified'
+    expect(attr.textContent).toBe('modified')
+    attr.textContent = 'value'
+  })
+
+  test('nodeValue with null', function () {
+    attr.nodeValue = null
+    expect(attr.nodeValue).toBe('')
+    attr.nodeValue = 'value'
+  })
+
+  test('textContent with null', function () {
+    attr.textContent = null
+    expect(attr.textContent).toBe('')
+    attr.textContent = 'value'
+  })
+
   test('cloneNode()', function () {
     const clonedAttr = attr.cloneNode()
     expect(clonedAttr).not.toBe(attr)
