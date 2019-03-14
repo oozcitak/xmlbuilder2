@@ -100,6 +100,12 @@ describe('Document', function () {
     expect(ele.namespaceURI).toBe('http://www.w3.org/1999/xhtml')
     expect(ele.prefix).toBe('n')
     expect(ele.localName).toBe('div')
+    expect(() => { doc.createElementNS(null, 'prefix:name') }).toThrow()
+    expect(() => { doc.createElementNS('some ns', 'xml:name') }).toThrow()
+    expect(() => { doc.createElementNS('some ns', 'xmlns:name') }).toThrow()
+    expect(() => { doc.createElementNS('some ns', 'xmlns') }).toThrow()
+    expect(() => { doc.createElementNS('http://www.w3.org/2000/xmlns/', 'some:name') }).toThrow()
+    expect(() => { doc.createElementNS('http://www.w3.org/2000/xmlns/', 'somename') }).toThrow()
   })
 
   test('createDocumentFragment()', function () {

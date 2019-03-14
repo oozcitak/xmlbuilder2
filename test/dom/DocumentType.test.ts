@@ -2,9 +2,8 @@ import $$ from '../TestHelpers'
 
 describe('DocumentType', function () {
 
-  const node = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
-
   test('constructor()', function () {
+    const node = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     expect(node.nodeType).toBe(10)
     expect(node.nodeName).toBe('qname')
     expect(node.name).toBe('qname')
@@ -12,7 +11,13 @@ describe('DocumentType', function () {
     expect(node.systemId).toBe('sysid')
   })
 
+  test('constructor() invalid name', function () {
+    expect(() => $$.dom.createDocumentType('not_a_qname:', 'pub', 'sys')).toThrow()
+    expect(() => $$.dom.createDocumentType('not a name', 'pub', 'sys')).toThrow()
+  })
+
   test('isEqualNode()', function () {
+    const node = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     const otherNode = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     expect(node).not.toBe(otherNode)
     expect(node.isEqualNode(otherNode)).toBeTruthy()
@@ -25,6 +30,7 @@ describe('DocumentType', function () {
   })
 
   test('cloneNode()', function () {
+    const node = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     const clonedNode = <any>node.cloneNode()
     expect(clonedNode.nodeType).toBe(10)
     expect(clonedNode.nodeName).toBe('qname')
