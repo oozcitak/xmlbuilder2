@@ -117,9 +117,10 @@ describe('Node', function () {
     de.appendChild(newEle)
     newEle.appendChild(doc.createTextNode('part 1 '))
     newEle.appendChild(doc.createTextNode('part 2 '))
+    newEle.appendChild(doc.createTextNode(''))
     newEle.appendChild(doc.createComment('separator'))
     newEle.appendChild(doc.createTextNode('part 3 '))
-    expect(newEle.childNodes.length).toBe(4)
+    expect(newEle.childNodes.length).toBe(5)
     newEle.normalize()
     expect(newEle.childNodes.length).toBe(3)
 
