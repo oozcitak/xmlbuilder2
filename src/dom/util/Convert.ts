@@ -45,8 +45,7 @@ export class Convert {
    */
   static attValueToSet(ownerElement: Element, localName: string): Set<string> {
     const attValue = ownerElement.getAttribute(localName) || ''
-    const arr = OrderedSet.parse(attValue)
-    return new Set(arr)
+    return OrderedSet.parse(attValue)
   }
 
   /**
@@ -62,8 +61,7 @@ export class Convert {
     if (!ownerElement.hasAttribute(localName) && set.size === 0)
       return
 
-    const arr = Array.from(set)
-    const attValue = OrderedSet.serialize(arr)
+    const attValue = OrderedSet.serialize(set)
     ownerElement.setAttribute(localName, attValue)
   }
 }
