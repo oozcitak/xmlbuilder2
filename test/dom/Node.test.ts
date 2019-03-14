@@ -2,7 +2,8 @@ import $$ from '../TestHelpers'
 
 describe('Node', function () {
 
-  const doc = $$.dom.createDocument('myns', 'n:root')
+  const doctype = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
+  const doc = $$.dom.createDocument('myns', 'n:root', doctype)
 
   if (!doc.documentElement)
     throw new Error("documentElement is null")
@@ -36,6 +37,8 @@ describe('Node', function () {
     expect(newEle.isConnected).toBeFalsy()
     de.appendChild(newEle)
     expect(newEle.isConnected).toBeTruthy()
+    newEle.remove()
+    expect(newEle.isConnected).toBeFalsy()
   })
 
   test('ownerDocument', function () {
@@ -57,8 +60,8 @@ describe('Node', function () {
     expect(doc.parentElement).toBeNull()
   })
 
-  test('hasChildNodes', function () {
-    expect(ele1.hasChildNodes).toBeTruthy()
+  test('hasChildNodes()', function () {
+    expect(ele1.hasChildNodes()).toBeTruthy()
   })
 
   test('childNodes', function () {
@@ -90,6 +93,9 @@ describe('Node', function () {
     charNode.nodeValue = 'maestro'
     expect(charNode.nodeValue).toBe('maestro')
     charNode.nodeValue = 'master'
+
+    doctype.nodeValue = 'N/A'
+    expect(doctype.nodeValue).toBeNull()
   })
 
   test('textContent', function () {
@@ -100,8 +106,10 @@ describe('Node', function () {
     const charNode = child4.firstChild
     if (!charNode)
       throw new Error("charNode is null")
-
     expect(charNode.textContent).toBe('masterofbobbitts')
+
+    doctype.textContent = 'N/A'
+    expect(doctype.textContent).toBeNull()
   })
 
   test('normalize()', function () {
@@ -171,12 +179,17 @@ describe('Node', function () {
     const newText = doc.createTextNode('txt')
     child4.appendChild(newText)
     expect(newText.lookupPrefix('myns')).toBe('n')
+    expect(newText.lookupPrefix(null)).toBeNull()
+    newText.remove()
+    expect(newText.lookupPrefix('myns')).toBeNull()
   })
 
   test('lookupNamespaceURI()', function () {
     const newText = doc.createTextNode('txt')
     child4.appendChild(newText)
     expect(newText.lookupNamespaceURI('n')).toBe('myns')
+    newText.remove()
+    expect(newText.lookupNamespaceURI('n')).toBeNull()
   })
 
   test('isDefaultNamespace()', function () {
@@ -189,6 +202,7 @@ describe('Node', function () {
     html.appendChild(newText)
     expect(newText.isDefaultNamespace('http://www.w3.org/1999/xhtml')).toBeTruthy()
     expect(newText.isDefaultNamespace('none')).toBeFalsy()
+    expect(newText.isDefaultNamespace('')).toBeFalsy()
   })
 
   test('insertBefore()', function () {

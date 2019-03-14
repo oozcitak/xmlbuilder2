@@ -70,10 +70,7 @@ export abstract class NodeImpl implements Node {
    */
   get isConnected(): boolean {
     const root = this.getRootNode()
-    if (!root)
-      return false
-    else
-      return (root.nodeType === NodeType.Document)
+    return (root.nodeType === NodeType.Document)
   }
 
   /** 
