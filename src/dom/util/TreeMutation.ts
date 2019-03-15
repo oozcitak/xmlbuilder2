@@ -325,16 +325,23 @@ export class TreeMutation {
 
     if (parent.nodeType === NodeType.Document) {
       if (node.nodeType === NodeType.DocumentFragment) {
-        if (node.childNodes.length > 1)
-          throw DOMException.HierarchyRequestError
-        else if (node.firstChild && node.firstChild.nodeType === NodeType.Text)
-          throw DOMException.HierarchyRequestError
-        else if (node.firstChild) {
+        let eleCount = 0
+        for (const childNode of node.childNodes) {
+          if (childNode.nodeType === NodeType.Element) 
+            eleCount++
+          else if (childNode.nodeType === NodeType.Text)
+            throw DOMException.HierarchyRequestError
+
+          if (eleCount > 1)
+            throw DOMException.HierarchyRequestError
+        }
+
+        if (eleCount === 1) {
           for (const ele of parent.childNodes) {
             if (ele.nodeType === NodeType.Element && ele !== child)
               throw DOMException.HierarchyRequestError
           }
-
+ 
           let doctypeChild = child.nextSibling
           while (doctypeChild) {
             if (doctypeChild.nodeType === NodeType.DocumentType)
@@ -360,11 +367,11 @@ export class TreeMutation {
             throw DOMException.HierarchyRequestError
         }
 
-        let elementChild = child.nextSibling
+        let elementChild = child.previousSibling
         while (elementChild) {
           if (elementChild.nodeType === NodeType.Element)
             throw DOMException.HierarchyRequestError
-          elementChild = elementChild.nextSibling
+          elementChild = elementChild.previousSibling
         }
       }
     }
