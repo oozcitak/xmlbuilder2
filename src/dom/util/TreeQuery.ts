@@ -18,7 +18,7 @@ export class TreeQuery {
   static *getDescendantNodes(node: Node, self: boolean = false,
     shadow: boolean = false, filter?: (childNode: Node) => any): IterableIterator<Node> {
 
-    if (self && (!filter || filter(node)))
+    if (self && (!filter || !!filter(node)))
       yield node
 
     // traverse shadow tree
@@ -56,8 +56,33 @@ export class TreeQuery {
     for (const child of TreeQuery.getDescendantNodes(node, self, shadow,
       (node) => { return node.nodeType === NodeType.Element })) {
       const ele = <Element><unknown>child
-      if (!filter || filter(ele))
+      if (!filter || !!filter(ele))
         yield <Element><unknown>ele
+    }
+  }
+
+  /**
+   * Traverses through all sibling nodes of `node`.
+   * 
+   * @param node - root node of the tree
+   * @param self - whether to include `node` in traversal
+   * @param filter - a function to filter nodes
+   */
+  static *getSiblingNodes(node: Node, self: boolean = false,
+    filter?: (childNode: Node) => any): IterableIterator<Node> {
+
+    if (node.parentNode) {
+      let child = node.parentNode.firstChild
+      while (child) {
+        if (!filter || !!filter(child)) {
+          if (child === node) {
+            if (self) yield child
+          } else {
+            yield child
+          }
+        }
+        child = child.nextSibling
+      }
     }
   }
 
@@ -188,16 +213,10 @@ export class TreeQuery {
    * node's and its descendant's shadow trees as well.
    */
   static isDescendantOf(node: Node, other: Node,
-    options: { self?: boolean, shadow?: boolean } = { self: false, shadow: false }
-  ): boolean {
+    self: boolean = false, shadow: boolean = false): boolean {
 
-    if (options && options.self && node === other)
-      return true
-
-    for (const child of node.childNodes) {
+    for (const child of TreeQuery.getDescendantNodes(node, self, shadow)) {
       if (child === other)
-        return true
-      if (TreeQuery.isDescendantOf(child, other, options))
         return true
     }
 
@@ -217,21 +236,9 @@ export class TreeQuery {
    * node's and its descendant's shadow trees as well.
    */
   static isAncestorOf(node: Node, other: Node,
-    options: { self?: boolean, shadow?: boolean } = { self: false, shadow: false }
-  ): boolean {
+    self: boolean = false, shadow: boolean = false): boolean {
 
-    if (TreeQuery.isDescendantOf(other, node, options))
-      return true
-
-    if (options && options.shadow) {
-      const root = TreeQuery.rootNode(node)
-      if (root && (<ShadowRoot>root).host) {
-        const nodeHost = (<ShadowRoot>root).host
-        return TreeQuery.isAncestorOf(nodeHost, other, options)
-      }
-    }
-
-    return false
+    return TreeQuery.isDescendantOf(other, node, self, shadow)
   }
 
   /**
@@ -243,18 +250,19 @@ export class TreeQuery {
    * @param other - the node to check
    * @param options - an object to set traversal settings.
    * If `options.self` is truthy, traversal includes `node`
-   * itself. If `options.shadow` is truthy, traversal includes the 
-   * node's and its descendant's shadow trees as well.
+   * itself.
    */
-  static isSiblingOf(node: Node, other: Node,
-    options: { self?: boolean, shadow?: boolean } = { self: false, shadow: false }
-  ): boolean {
+  static isSiblingOf(node: Node, other: Node, 
+    self: boolean = false): boolean {
 
-    if (options && options.self && node === other)
-      return true
+    if (node === other) {
+      if (self) return true
+    } else {
+      return (!!node.parentNode &&
+        node.parentNode === other.parentNode)
+    }
 
-    return (!!node.parentNode &&
-      node.parentNode === other.parentNode)
+    return false
   }
 
   /**
@@ -326,7 +334,6 @@ export class TreeQuery {
    */
   private static treePosition(node: Node): number {
     const root = TreeQuery.rootNode(node)
-    if (root === null) return -1
 
     let pos = 0
     for (const childNode of TreeQuery.getDescendantNodes(root)) {
