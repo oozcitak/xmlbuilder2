@@ -108,21 +108,21 @@ export interface Node {
    * specified node if `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
-  cloneNode(deep?: boolean): Node
+  cloneNode(deep: boolean): Node
 
   /**
    * Determines if the given node is equal to this one.
    * 
    * @param node - the node to compare with
    */
-  isEqualNode(node?: Node | null): boolean
+  isEqualNode(node: Node | null): boolean
 
   /**
    * Determines if the given node is reference equal to this one.
    * 
    * @param node - the node to compare with
    */
-  isSameNode(node?: Node | null): boolean
+  isSameNode(node: Node | null): boolean
 
   /**
    * Returns a bitmask indicating the position of the given `node`
@@ -178,8 +178,7 @@ export interface Node {
    * 
    * @returns the newly inserted child node
    */
-  insertBefore(newChild: Node | DocumentFragment,
-    refChild: Node | null): Node | null
+  insertBefore(newChild: Node, refChild: Node | null): Node
 
   /**
    * Adds the node `newChild` to the end of the list of children of this
@@ -194,7 +193,7 @@ export interface Node {
    * 
    * @returns the newly inserted child node
    */
-  appendChild(newChild: Node): Node | null
+  appendChild(newChild: Node): Node
 
   /**
    * Replaces the child node `oldChild` with `newChild` in the list of 
@@ -429,7 +428,7 @@ export interface Document extends Node, NonElementParentNode,
    * @returns an {@link HTMLCollection} of matching descendant
    * elements
    */
-  getElementsByTagNameNS(namespace: string, localName: string): HTMLCollection
+  getElementsByTagNameNS(namespace: string | null, localName: string): HTMLCollection
 
   /**
    * Returns a {@link HTMLCollection} of all descendant elements 

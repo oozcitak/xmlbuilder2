@@ -375,8 +375,7 @@ export abstract class NodeImpl implements Node {
    * 
    * @returns the newly inserted child node
    */
-  insertBefore(newChild: Node | DocumentFragment,
-    refChild: Node | null): Node | null {
+  insertBefore(newChild: Node, refChild: Node | null): Node {
     return TreeMutation.preInsert(newChild, this, refChild)
   }
 
@@ -393,7 +392,7 @@ export abstract class NodeImpl implements Node {
    * 
    * @returns the newly inserted child node
    */
-  appendChild(newChild: Node): Node | null {
+  appendChild(newChild: Node): Node {
     return TreeMutation.appendNode(newChild, this)
   }
 
