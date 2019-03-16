@@ -82,6 +82,137 @@ describe('TreeQuery', function () {
     expect(count).toBe(3)
   })
 
+  test('isConstrained()', function () {
+    const doctype = $$.dom.createDocumentType('name', 'pub', 'sys')
+    const doc = $$.dom.createDocument('ns', '')
+    
+    doc.appendChild(doc.createComment('comment'))
+    doc.appendChild(doc.createProcessingInstruction('target', 'data'))
+    doc.appendChild(doctype)
+    doc.appendChild(doc.createComment('comment'))
+    doc.appendChild(doc.createProcessingInstruction('target', 'data'))
+    doc.appendChild(doc.createElement('root'))
+    doc.appendChild(doc.createComment('comment'))
+    doc.appendChild(doc.createProcessingInstruction('target', 'data'))
+    
+    if (!doc.documentElement)
+      throw new Error("documentElement is null")
+    const de = doc.documentElement
+    const ele = doc.createElement('ele')
+    de.append(
+      doc.createComment('comment'),
+      doc.createProcessingInstruction('target', 'data'),
+      doc.createCDATASection('cdata'),
+      doc.createTextNode('text'),
+      ele,
+      doc.createComment('comment'),
+      doc.createProcessingInstruction('target', 'data'),      
+      doc.createCDATASection('cdata'),
+      doc.createTextNode('text')
+    )
+    ele.append(
+      doc.createComment('comment'),
+      doc.createProcessingInstruction('target', 'data'),
+      doc.createCDATASection('cdata'),
+      doc.createTextNode('text'),
+      doc.createComment('comment'),
+      doc.createProcessingInstruction('target', 'data'),      
+      doc.createCDATASection('cdata'),
+      doc.createTextNode('text')
+    )    
+
+    expect(TreeQuery.isConstrained(doc)).toBeTruthy()
+  })
+
+  test('isConstrained() invalid documents', function () {
+    {
+      // two doctypes
+      const doctype1 = $$.dom.createDocumentType('root', 'pub', 'sys');
+      const doctype2 = $$.dom.createDocumentType('root', 'pub', 'sys');
+      const doc = $$.dom.createDocument('ns', '');
+      (<any>doctype1)._parentNode = doc;
+      (<any>doctype2)._parentNode = doc;
+      (<any>doc)._firstChild = doctype1;
+      (<any>doctype1)._nextSibling = doctype2;
+      (<any>doc)._lastChild = doctype2;
+      expect(TreeQuery.isConstrained(doc)).toBeFalsy()
+    }
+    {
+      // doctype after element
+      const doctype = $$.dom.createDocumentType('root', 'pub', 'sys');
+      const doc = $$.dom.createDocument('ns', '');
+      const ele = doc.createElement('root');
+      (<any>doctype)._parentNode = doc;
+      (<any>ele)._parentNode = doc;
+      (<any>doc)._firstChild = ele;
+      (<any>ele)._nextSibling = doctype;
+      (<any>doc)._lastChild = doctype;
+      expect(TreeQuery.isConstrained(doc)).toBeFalsy()
+    }
+    {
+      // two document elements
+      const doc = $$.dom.createDocument('ns', '');
+      const ele1 = doc.createElement('root');
+      const ele2 = doc.createElement('root');
+      (<any>ele1)._parentNode = doc;
+      (<any>ele2)._parentNode = doc;
+      (<any>doc)._firstChild = ele1;
+      (<any>ele1)._nextSibling = ele2;
+      (<any>doc)._lastChild = ele2;
+      expect(TreeQuery.isConstrained(doc)).toBeFalsy()
+    }
+    {
+      // text at root level
+      const doc = $$.dom.createDocument('ns', '');
+      const node = doc.createTextNode('root');
+      (<any>node)._parentNode = doc;
+      (<any>doc)._firstChild = node;
+      (<any>doc)._lastChild = node;
+      expect(TreeQuery.isConstrained(doc)).toBeFalsy()
+    }
+    {
+      // CDATA at root level
+      const doc = $$.dom.createDocument('ns', '');
+      const node = doc.createCDATASection('root');
+      (<any>node)._parentNode = doc;
+      (<any>doc)._firstChild = node;
+      (<any>doc)._lastChild = node;
+      expect(TreeQuery.isConstrained(doc)).toBeFalsy()
+    }
+    {
+      // CDATA at root level
+      const doc = $$.dom.createDocument('ns', '');
+      const node = doc.createCDATASection('root');
+      (<any>node)._parentNode = doc;
+      (<any>doc)._firstChild = node;
+      (<any>doc)._lastChild = node;
+      expect(TreeQuery.isConstrained(doc)).toBeFalsy()
+    }
+    {
+      // doctype in fragment
+      const doctype = $$.dom.createDocumentType('root', 'pub', 'sys');
+      const doc = $$.dom.createDocument('ns', '');
+      const ele = doc.createDocumentFragment();
+      (<any>doctype)._parentNode = ele;
+      (<any>ele)._firstChild = doctype;
+      (<any>ele)._lastChild = doctype;
+      expect(TreeQuery.isConstrained(ele)).toBeFalsy()
+    }
+    {
+      // error in nested elements
+      const doctype = $$.dom.createDocumentType('root', 'pub', 'sys');
+      const doc = $$.dom.createDocument('ns', '');
+      const de = doc.createElement('root');
+      const ele = doc.createElement('root');
+      doc.appendChild(de);
+      de.appendChild(ele);
+      (<any>doctype)._parentNode = ele;
+      (<any>ele)._firstChild = doctype;
+      (<any>ele)._lastChild = doctype;
+      expect(TreeQuery.isConstrained(doc)).toBeFalsy()
+    }
+  })
+
   test('nodeLength()', function () {
     const doctype = $$.dom.createDocumentType('name', 'pubId', 'sysId')
     const doc = $$.dom.createDocument('my ns', 'root', doctype)

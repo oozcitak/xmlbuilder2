@@ -1,4 +1,5 @@
 import { Node, CharacterData, ShadowRoot, Element, NodeType } from '../interfaces'
+import { NodeFilter } from '..';
 
 /**
  * Includes query and traversal methods for trees.
@@ -141,6 +142,7 @@ export class TreeQuery {
             case NodeType.Element:
             case NodeType.Text:
             case NodeType.ProcessingInstruction:
+            case NodeType.CData:
             case NodeType.Comment:
               break
             default:
@@ -151,10 +153,16 @@ export class TreeQuery {
       case NodeType.DocumentType:
       case NodeType.Text:
       case NodeType.ProcessingInstruction:
+      case NodeType.CData:
       case NodeType.Comment:
         return (!node.hasChildNodes())
     }
 
+    for (const childNode of node.childNodes) {
+      // recursively check child nodes
+      if (!TreeQuery.isConstrained(childNode))
+        return false
+    }
     return true
   }
 

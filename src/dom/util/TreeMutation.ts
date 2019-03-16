@@ -24,7 +24,7 @@ export class TreeMutation {
       throw DOMException.HierarchyRequestError
 
     // node should not be an ancestor of parent
-    if (TreeQuery.isAncestorOf(parent, node, { self: true, shadow: true }))
+    if (TreeQuery.isAncestorOf(parent, node, true, true))
       throw DOMException.HierarchyRequestError
 
     // insertion reference child node should be a child node of
@@ -58,7 +58,7 @@ export class TreeMutation {
       if (node.nodeType === NodeType.DocumentFragment) {
         let eleCount = 0
         for (const childNode of node.childNodes) {
-          if (childNode.nodeType === NodeType.Element) 
+          if (childNode.nodeType === NodeType.Element)
             eleCount++
           else if (childNode.nodeType === NodeType.Text)
             throw DOMException.HierarchyRequestError
@@ -295,7 +295,7 @@ export class TreeMutation {
       throw DOMException.HierarchyRequestError
 
     // node should not be an ancestor of parent
-    if (TreeQuery.isAncestorOf(parent, node, { self: true, shadow: true }))
+    if (TreeQuery.isAncestorOf(parent, node, true, true))
       throw DOMException.HierarchyRequestError
 
     // removed child node should be a child node of parent
@@ -309,6 +309,7 @@ export class TreeMutation {
       node.nodeType !== NodeType.Element &&
       node.nodeType !== NodeType.Text &&
       node.nodeType !== NodeType.ProcessingInstruction &&
+      node.nodeType !== NodeType.CData &&
       node.nodeType !== NodeType.Comment)
       throw DOMException.HierarchyRequestError
 
@@ -327,7 +328,7 @@ export class TreeMutation {
       if (node.nodeType === NodeType.DocumentFragment) {
         let eleCount = 0
         for (const childNode of node.childNodes) {
-          if (childNode.nodeType === NodeType.Element) 
+          if (childNode.nodeType === NodeType.Element)
             eleCount++
           else if (childNode.nodeType === NodeType.Text)
             throw DOMException.HierarchyRequestError
@@ -341,7 +342,7 @@ export class TreeMutation {
             if (ele.nodeType === NodeType.Element && ele !== child)
               throw DOMException.HierarchyRequestError
           }
- 
+
           let doctypeChild = child.nextSibling
           while (doctypeChild) {
             if (doctypeChild.nodeType === NodeType.DocumentType)
