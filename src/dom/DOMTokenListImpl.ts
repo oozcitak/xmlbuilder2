@@ -144,10 +144,7 @@ export class DOMTokenListImpl implements DOMTokenList {
 
   /**
    * Determines if a given token is in the associated attribute's
-   * supported tokens
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
+   * supported tokens.
    * 
    * @param token - the token to check
    */

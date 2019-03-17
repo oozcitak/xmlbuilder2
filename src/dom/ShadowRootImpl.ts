@@ -23,17 +23,11 @@ export class ShadowRootImpl extends DocumentFragmentImpl implements ShadowRoot {
 
   /** 
    * Gets the shadow root's mode.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    */
   get mode(): "open" | "closed" { return this._mode }
 
   /** 
    * Gets the shadow root's host.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    */
   get host(): Element { return this._host }
 

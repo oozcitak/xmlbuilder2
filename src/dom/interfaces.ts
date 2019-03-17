@@ -550,9 +550,6 @@ export interface Document extends Node, NonElementParentNode,
   /**
    * Creates an event of the type specified.
    * 
-   * This method is not supported by this module and will throw an
-   * exception.
-   * 
    * @param eventInterface - a string representing the type of event 
    * to be created
    */
@@ -560,26 +557,17 @@ export interface Document extends Node, NonElementParentNode,
 
   /**
    * Creates a new Range object.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    */
   createRange(): never
 
   /**
    * Creates a new NodeIterator object.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    */
   createNodeIterator(root: Node, whatToShow?: number,
     filter?: NodeFilter | null): never
 
   /**
    * Creates a new TreeWalker object.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    */
   createTreeWalker(root: Node, whatToShow?: number,
     filter?: NodeFilter | null): never
@@ -608,17 +596,11 @@ export interface ShadowRoot extends DocumentFragment, DocumentOrShadowRoot {
 
   /** 
    * Gets the shadow root's mode.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    */
   readonly mode: string
 
   /** 
    * Gets the shadow root's host.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    */
   readonly host: Element
 
@@ -797,9 +779,6 @@ export interface Element extends Node, ParentNode,
   /**
    * Creates a shadow root for element and returns it.
    * 
-   * This method is not supported by this module and will throw an
-   * exception.
-   * 
    * @param init - A ShadowRootInit dictionary.
    */
   attachShadow(init: { mode: "open" | "closed" }): ShadowRoot
@@ -807,18 +786,12 @@ export interface Element extends Node, ParentNode,
   /**
    * Returns element's shadow root, if any, and if shadow root's mode
    * is "open", and null otherwise.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    */
   readonly shadowRoot: ShadowRoot | null
 
   /**
    * Returns the first (starting at element) inclusive ancestor that
    * matches selectors, and `null` otherwise.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    * 
    * @param selectors 
    */
@@ -827,9 +800,6 @@ export interface Element extends Node, ParentNode,
   /**
    * Returns `true` if matching selectors against element's root yields 
    * element, and `false` otherwise.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    * 
    * @param selectors 
    */
@@ -1000,18 +970,12 @@ export interface ParentNode {
    * Returns the first element that is a descendant of node that
    * matches selectors.
    * 
-   * This method is not supported by this module and will throw an
-   * exception.
-   * 
    * @param selectors - a selectors string
    */
   querySelector(selectors: string): Element | null
 
   /**
    * Returns all element descendants of node that match selectors.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    * 
    * @param selectors - a selectors string
    */
@@ -1060,8 +1024,6 @@ export interface Slotable {
 
   /**
    * Returns the <slot> element which this node is inserted in.
-   * 
-   * This method is not supported by this module.
    */
   readonly assignedSlot: any
 }
@@ -1223,9 +1185,6 @@ export interface DOMTokenList extends Iterable<string> {
   /**
    * Determines if a given token is in the associated attribute's
    * supported tokens
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    * 
    * @param token - the token to check
    */
