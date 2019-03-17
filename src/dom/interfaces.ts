@@ -597,7 +597,7 @@ export interface ShadowRoot extends DocumentFragment, DocumentOrShadowRoot {
   /** 
    * Gets the shadow root's mode.
    */
-  readonly mode: string
+  readonly mode: ShadowRootMode
 
   /** 
    * Gets the shadow root's host.
@@ -781,11 +781,11 @@ export interface Element extends Node, ParentNode,
    * 
    * @param init - A ShadowRootInit dictionary.
    */
-  attachShadow(init: { mode: "open" | "closed" }): ShadowRoot
+  attachShadow(init: { mode: ShadowRootMode }): ShadowRoot
 
   /**
    * Returns element's shadow root, if any, and if shadow root's mode
-   * is "open", and null otherwise.
+   * is `"open"`, and null otherwise.
    */
   readonly shadowRoot: ShadowRoot | null
 
@@ -1418,7 +1418,4 @@ export enum WhatToShow {
 /**
  * Defines the mode of a shadow root.
  */
-export enum ShadowRootMode {
-  Open = "open",
-  Closed = "closed"
-}
+export type ShadowRootMode = 'open' | 'closed'

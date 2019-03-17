@@ -305,7 +305,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * 
    * @param init - A ShadowRootInit dictionary.
    */
-  attachShadow(init: { mode: "open" | "closed" }): ShadowRoot {
+  attachShadow(init: { mode: ShadowRootMode }): ShadowRoot {
     if (this.namespaceURI !== Namespace.HTML)
       throw DOMException.NotSupportedError
     if(!HTMLSpec.isValidCustomElementName(this.localName) && !HTMLSpec.isValidElementName(this.localName))
@@ -320,13 +320,13 @@ export class ElementImpl extends NodeImpl implements Element {
 
   /**
    * Returns element's shadow root, if any, and if shadow root's mode
-   * is `open`, and `null` otherwise.
+   * is `"open"`, and `null` otherwise.
    */
   get shadowRoot(): ShadowRoot | null {
-    if (!this._shadowRoot || this._shadowRoot.mode === ShadowRootMode.Closed)
-      return null
-    else
+    if (this._shadowRoot && this._shadowRoot.mode === 'open')
       return this._shadowRoot
+    else
+      return null
   }
 
   /**
