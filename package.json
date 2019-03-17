@@ -43,7 +43,7 @@
     ]
   },
   "scripts": {
-    "test": "jest --onlyChanged",
+    "test": "jest",
     "cover": "jest --coverage"
   }
 }
