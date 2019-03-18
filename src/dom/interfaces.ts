@@ -1357,6 +1357,121 @@ export interface ProcessingInstruction extends CharacterData {
 }
 
 /**
+ * Represents an object which can be used to iterate through the nodes
+ * of a subtree.
+ */
+export interface NodeIterator {
+  /**
+   * Gets the root node of the subtree.
+   */
+  readonly root: Node
+
+  /**
+   * Gets the node to which the iterator is attached.
+   */
+  readonly referenceNode: Node
+
+  /**
+   * Gets a flag that indicates whether the iterator is anchored before
+   * or after  the anchor node. If is `true`, the iterator is anchored 
+   * before the node, otherwise it is anchored after the node.
+   */
+  readonly pointerBeforeReferenceNode: boolean
+
+  /**
+   * Gets the node types to match
+   */
+  readonly whatToShow: number
+
+  /**
+   * Gets the filter used to selected the nodes.
+   */
+  readonly filter: NodeFilter | null
+
+  /**
+   * Returns the next node in the subtree, or `null` if there are none.
+   */
+  nextNode(): Node | null
+
+  /**
+   * Returns the previous node in the subtree, or `null` if there
+   * are none.
+   */
+  previousNode(): Node | null
+
+  /**
+   * This method is a no-op and is not used.
+   */
+  detach(): void
+}
+
+/**
+ * Represents the nodes of a subtree and a position within them.
+ */
+export interface TreeWalker {
+  /**
+   * Gets the root node of the subtree.
+   */
+  readonly root: Node
+
+  /**
+   * Gets the node types to match
+   */
+  readonly whatToShow: number
+
+  /**
+   * Gets the filter used to selected the nodes.
+   */
+  readonly filter: NodeFilter | null
+
+  /**
+   * Gets or sets the node to which the iterator is pointing at.
+   */
+  currentNode: Node
+
+  /**
+   * Moves the iterator to the first parent node of current node, and
+   * returns it. Returns `null` if no such node exists.
+   */
+  parentNode(): Node | null
+
+  /**
+   * Moves the iterator to the first child node of current node, and
+   * returns it. Returns `null` if no such node exists.
+   */
+  firstChild(): Node | null
+
+  /**
+   * Moves the iterator to the last child node of current node, and
+   * returns it. Returns `null` if no such node exists.
+   */
+  lastChild(): Node | null
+
+  /**
+   * Moves the iterator to the previous sibling of current node, and
+   * returns it. Returns `null` if no such node exists.
+   */
+  previousSibling(): Node | null
+
+  /**
+   * Moves the iterator to the next sibling of current node, and
+   * returns it. Returns `null` if no such node exists.
+   */
+  nextSibling(): Node | null
+
+  /**
+   * Returns the next node in the subtree, or `null` if there are none.
+   */
+  nextNode(): Node | null
+
+  /**
+   * Returns the previous node in the subtree, or `null` if there
+   * are none.
+   */
+  previousNode(): Node | null
+}
+
+/**
  * Defines the type of a node object.
  */
 export enum NodeType {
