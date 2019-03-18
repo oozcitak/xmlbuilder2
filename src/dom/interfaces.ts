@@ -106,6 +106,18 @@ export interface Event {
 }
 
 /**
+ * Represents an object that receive event notifications.
+ */
+export interface EventListener {
+  /**
+   * A callback function that is called when an event occurs.
+   * 
+   * @param event - the event to handle.
+   */
+  handleEvent: (event: Event) => void
+}
+
+/**
  * Represents an object that can receive events.
  */
 export interface EventTarget {
@@ -116,31 +128,33 @@ export interface EventTarget {
    * @param callback - object to receive a notification when an event occurs.
    * @param options - object that specifies event characteristics.
    */
-  addEventListener(type: string, callback: ((event: Event) => any) | null,
-    options?: { passive: boolean, once: boolean } | boolean): void
+  addEventListener(type: string,
+    callback: | EventListener | null | ((event: Event) => void),
+    options?: { passive: boolean, once: boolean, capture: boolean } | boolean): void
 
-  /**
-   * Removes an event listener.
-   * 
-   * @param type - event type to listen for.
-   * @param callback - object to receive a notification when an event occurs.
-   * @param options - object that specifies event characteristics.
-   */
-  removeEventListener(type: string, callback: ((event: Event) => any) | null,
+   /**
+    * Removes an event listener.
+    * 
+    * @param type - event type to listen for.
+    * @param callback - object to receive a notification when an event occurs.
+    * @param options - object that specifies event characteristics.
+    */
+  removeEventListener(type: string,
+    callback: | EventListener | null | ((event: Event) => void),
     options?: { capture: boolean } | boolean): void
 
-  /**
-   * Dispatches an event to this event target.
-   * 
-   * @param event - the event to dispatch.
-   */
+   /**
+    * Dispatches an event to this event target.
+    * 
+    * @param event - the event to dispatch.
+    */
   dispatchEvent(event: Event): boolean
 }
 
 /**
  * Represents a generic XML node.
  */
-export interface Node {
+export interface Node extends EventTarget {
 
   /** 
    * Returns the type of node. 
@@ -1683,3 +1697,15 @@ export enum WhatToShow {
  * Defines the mode of a shadow root.
  */
 export type ShadowRootMode = 'open' | 'closed'
+
+/**
+ * Defines an entry in the event listeners list.
+ */
+export type EventListenerEntry = {
+  type: string
+  callback: EventListener
+  capture: boolean
+  passive: boolean
+  once: boolean
+  removed: boolean
+}

@@ -11,7 +11,7 @@ import { Namespace } from './util/Namespace'
 
 /**
  * Represents an object providing methods which are not dependent on 
- * any particular document
+ * any particular document.
  */
 export class DOMImplementationImpl implements DOMImplementation {
 
