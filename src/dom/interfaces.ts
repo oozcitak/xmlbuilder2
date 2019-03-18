@@ -1,4 +1,143 @@
 /**
+ * Represents a DOM event.
+ */
+export interface Event {
+  /**
+   * Returns the type of event.
+   */
+  readonly type: string
+
+  /**
+   * Returns the object to which event is dispatched (its target).
+   */
+  readonly target: EventTarget | null
+
+  /**
+   * Historical alias of target.
+   */
+  readonly srcElement: EventTarget | null
+
+  /**
+   * Returns the object whose event listener's callback is currently
+   * being invoked.
+   */
+  readonly currentTarget: EventTarget | null
+
+  /**
+   * Returns the event's path (objects on which listeners will be 
+   * invoked). This does not include nodes in shadow trees if the 
+   * shadow root was created with its `mode` `"closed"`.
+   */
+  composedPath(): Array<EventTarget>
+
+  /**
+   * Returns the event's phase.
+   */
+  readonly eventPhase: number
+
+  /**
+   * Prevents event from reaching any objects other than the current 
+   * object.
+   */
+  stopPropagation(): void
+
+  /**
+   * Historical alias of `stopPropagation()`.
+   */
+  cancelBubble: boolean
+
+  /**
+   * Prevents event from reaching any registered event listeners after 
+   * the current one finishes running.
+   */
+  stopImmediatePropagation(): void
+
+  /**
+   * Returns `true` if the event goes through its target's ancestors in
+   * reverse tree order, and `false` otherwise.
+   */
+  readonly bubbles: boolean
+
+  /**
+   * A historical alias of `stopPropagation()`.
+   */
+  readonly cancelable: boolean
+
+  /**
+   * Historical property.
+   */
+  returnValue: boolean
+
+  /**
+   * Cancels the event (if it is cancelable).
+   */
+  preventDefault(): void
+
+  /**
+   * Indicates whether the event was cancelled with `preventDefault()`.
+   */
+  readonly defaultPrevented: boolean
+
+  /**
+   * Determines whether the event can bubble to the shadow DOM.
+   */
+  readonly composed: boolean
+
+  /**
+   * Returns `true` if event was dispatched by the user agent, and
+   * `false` otherwise.
+   */
+  readonly isTrusted: boolean
+
+  /**
+   * Returns the the number of milliseconds measured relative to the
+   * time origin.
+   */
+  readonly timeStamp: number
+
+  /**
+   * Historical method to initializes the value of an event.
+   * 
+   * @param type - the type of event.
+   * @param bubbles - whether the event propagates in reverse.
+   * @param cancelable - whether the event can be cancelled.
+   */
+  initEvent(type: string, bubbles?: boolean, cancelable?: boolean): void
+}
+
+/**
+ * Represents an object that can receive events.
+ */
+export interface EventTarget {
+  /**
+   * Registers an event handler.
+   * 
+   * @param type - event type to listen for.
+   * @param callback - object to receive a notification when an event occurs.
+   * @param options - object that specifies event characteristics.
+   */
+  addEventListener(type: string, callback: ((event: Event) => any) | null,
+    options?: { passive: boolean, once: boolean } | boolean): void
+
+  /**
+   * Removes an event listener.
+   * 
+   * @param type - event type to listen for.
+   * @param callback - object to receive a notification when an event occurs.
+   * @param options - object that specifies event characteristics.
+   */
+  removeEventListener(type: string, callback: ((event: Event) => any) | null,
+    options?: { capture: boolean } | boolean): void
+
+  /**
+   * Dispatches an event to this event target.
+   * 
+   * @param event - the event to dispatch.
+   */
+  dispatchEvent(event: Event): boolean
+}
+
+/**
  * Represents a generic XML node.
  */
 export interface Node {
@@ -1469,6 +1608,16 @@ export interface TreeWalker {
    * are none.
    */
   previousNode(): Node | null
+}
+
+/**
+ * Defines the event phase.
+ */
+export enum EventPhase {
+  None = 0,
+  Capturing = 1,
+  AtTarget = 2,
+  Bubbling = 3
 }
 
 /**
