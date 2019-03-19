@@ -106,6 +106,26 @@ export interface Event {
 }
 
 /**
+ * Represents and event that carries custom data.
+ */
+export interface CustomEvent extends Event {
+  /**
+   * Gets custom event data.
+   */
+  readonly detail: any
+ 
+  /**
+   * Initializes the value of an event.
+   * 
+   * @param type - the type of event.
+   * @param bubbles - whether the event propagates in reverse.
+   * @param cancelable - whether the event can be cancelled.
+   * @param detail - custom event data
+   */
+  initCustomEvent(type: string, bubbles?: boolean, cancelable?: boolean, detail?: any): void
+}
+
+/**
  * Represents an object that receive event notifications.
  */
 export interface EventListener {
@@ -1707,6 +1727,13 @@ export interface EventInit {
   bubbles?: boolean
   cancelable?: boolean
   composed?: boolean
+}
+
+/**
+ * Represents custom event initialization options.
+ */
+export interface CustomEventInit extends EventInit {
+  detail?: any
 }
 
 /**
