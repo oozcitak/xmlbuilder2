@@ -41,6 +41,7 @@ export class EventImpl implements Event {
       this._cancelable = eventInit.cancelable || false
       this._composed = eventInit.composed || false
     }
+    this._initialized = true
     this._timeStamp = new Date().getTime()
   }
 
