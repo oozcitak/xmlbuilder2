@@ -12,6 +12,7 @@ import { DOMException } from './DOMException'
 import { DOMImplementationImpl, Instance as DOMImplementationInstance } from './DOMImplementationImpl'
 import { DOMTokenListImpl } from './DOMTokenListImpl'
 import { ElementImpl } from './ElementImpl'
+import { EventTargetImpl } from './EventTargetImpl'
 import { HTMLCollectionImpl } from './HTMLCollectionImpl'
 import { NamedNodeMapImpl } from './NamedNodeMapImpl'
 import { NodeFilterImpl } from './NodeFilterImpl'
@@ -68,6 +69,7 @@ export { DOMException as DOMException }
 export { DOMImplementationImpl as DOMImplementation }
 export { DOMTokenListImpl as DOMTokenList }
 export { ElementImpl as Element }
+export { EventTargetImpl as EventTarget }
 export { HTMLCollectionImpl as HTMLCollection }
 export { NamedNodeMapImpl as NamedNodeMap }
 export { NodeFilterImpl as NodeFilter }
