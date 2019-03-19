@@ -1,9 +1,11 @@
 // Import implementation classes
+import { AbstractRangeImpl } from './AbstractRangeImpl'
 import { AttrImpl } from './AttrImpl'
 import { CDATASectionImpl } from './CDATASectionImpl'
 import { CharacterDataImpl } from './CharacterDataImpl'
 import { ChildNodeImpl } from './ChildNodeImpl'
 import { CommentImpl } from './CommentImpl'
+import { CustomEventImpl } from './CustomEventImpl'
 import { DocumentFragmentImpl } from './DocumentFragmentImpl'
 import { DocumentImpl } from './DocumentImpl'
 import { DocumentOrShadowRootImpl } from './DocumentOrShadowRootImpl'
@@ -59,10 +61,12 @@ applyMixin(TextImpl, SlotableImpl)
 applyMixin(ElementImpl, SlotableImpl)
 
 // Export classes and drop `Impl`
+export { AbstractRangeImpl as AbstractRange }
 export { AttrImpl as Attr }
 export { CDATASectionImpl as CDATASection }
 export { CharacterDataImpl as CharacterData }
 export { CommentImpl as Comment }
+export { CustomEventImpl as CustomEvent }
 export { DocumentFragmentImpl as DocumentFragment }
 export { DocumentImpl as Document }
 export { DocumentTypeImpl as DocumentType }

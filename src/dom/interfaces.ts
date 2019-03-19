@@ -1723,6 +1723,190 @@ export interface TreeWalker {
 }
 
 /**
+ * Represents an abstract range.
+ */
+export interface AbstractRange {
+  /**
+   * Returns the start node of the range.
+   */
+  readonly startContainer: Node
+
+  /**
+   * Returns the start offset of the range.
+   */
+  readonly startOffset: number
+
+  /**
+   * Returns the end node of the range.
+   */
+  readonly endContainer: Node
+
+  /**
+   * Returns the end offest of the range.
+   */
+  readonly endOffset: number
+
+  /**
+   * Returns `true` if the range starts and ends at the same point.
+   */
+  readonly collapsed: boolean
+}
+
+/**
+ * Represents a static range.
+ */
+export interface StaticRange extends AbstractRange { }
+
+/**
+ * Represents a live range.
+ */
+export interface Range extends AbstractRange {
+  /**
+   * Returns the node, furthest away from the document, that is an 
+   * ancestor of both range's start node and end node.
+   */
+  readonly commonAncestorContainer: Node
+
+  /**
+   * Sets the start of the range to the given boundary point.
+   * 
+   * @param node - node of the boundary point
+   * @param offset - offset of the boundary point along node's content
+   */
+  setStart(node: Node, offset: number): void
+
+  /**
+   * Sets the end of the range to the given boundary point.
+   * 
+   * @param node - node of the boundary point
+   * @param offset - offset of the boundary point along node's content
+   */  
+  setEnd(node: Node, offset: number): void
+
+  /**
+   * Sets the start of the range to just before the given node.
+   * 
+   * @param node - node of the boundary point
+   */
+  setStartBefore(node: Node): void
+
+  /**
+   * Sets the start of the range to just after the given node.
+   * 
+   * @param node - node of the boundary point
+   */
+  setStartAfter(node: Node): void
+
+  /**
+   * Sets the end of the range to just before the given node.
+   * 
+   * @param node - node of the boundary point
+   */
+  setEndBefore(node: Node): void
+
+  /**
+   * Sets the end of the range to just after the given node.
+   * 
+   * @param node - node of the boundary point
+   */
+  setEndAfter(node: Node): void
+
+  /**
+   * Collapses the range.
+   * 
+   * @param toStart - `true` to collapse to start node, otherwise
+   * `false` to collapse to the end node.
+   */
+  collapse(toStart?: boolean): void
+
+  /**
+   * Sets the range to contain the given node.
+   * 
+   * @param node - the range to select
+   */
+  selectNode(node: Node): void
+
+  /**
+   * Sets the range to contain the given node's contens.
+   * 
+   * @param node - the range to select
+   */
+  selectNodeContents(node: Node): void
+
+  /**
+   * Compares the boundary points of this range with another one.
+   * 
+   * @param how - comparison method
+   * @param sourceRange - the range to compare to
+   */
+  compareBoundaryPoints(how: HowToCompare, sourceRange: Range): number
+
+  /**
+   * Removes the contents of the range from the tree.
+   */
+  deleteContents(): void
+
+  /**
+   * Moves the contents of the to a document fragment.
+   */
+  extractContents(): DocumentFragment
+
+  /**
+   * Copies the contents of the to a document fragment.
+   */
+  cloneContents(): DocumentFragment
+
+  /**
+   * Inserts a node at the start boundary point.
+   * 
+   * @param node - the node to insert
+   */
+  insertNode(node: Node): void
+
+  /**
+   * Moves content of the Range into a new node, placing the new node 
+   * at the start of the range.
+   * 
+   * @param newParent - a node to receive range's content
+   */
+  surroundContents(newParent: Node): void
+
+  /**
+   * Creates a new range with identical boundary points.
+   */
+  cloneRange(): Range
+
+  /**
+   * Unused method. Kept for compatibility.
+   */
+  detach(): void
+
+  /**
+   * Determines whether the range contains the given boundary point.
+   * 
+   * @param node - the node of the boundary point
+   * @param offset - the offset of the boundary point
+   */
+  isPointInRange(node: Node, offset: number): boolean
+
+  /**
+   * Returns `-1`, `0`, or `1` depending on whether `node` is
+   * before, the same as, or after the range.
+   * 
+   * @param node - the node to compare
+   * @param offset - an offset within node
+   */
+  comparePoint(node: Node, offset: number): number
+
+  /**
+   * Determines whether the given node intersects the range.
+   * 
+   * @param node - the node to check
+   */
+  intersectsNode(node: Node): boolean
+}
+
+/**
  * Defines the event phase.
  */
 export enum EventPhase {
@@ -1789,6 +1973,16 @@ export enum WhatToShow {
   DocumentType = 0x200,
   DocumentFragment = 0x400,
   Notation = 0x800
+}
+
+/**
+ * Defines how boundary points are compared.
+ */
+export enum HowToCompare {
+  StartToStart = 0,
+  StartToEnd = 1,
+  EndToEnd = 2,
+  EndToStart = 3
 }
 
 /**
