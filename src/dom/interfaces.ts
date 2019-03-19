@@ -113,7 +113,7 @@ export interface CustomEvent extends Event {
    * Gets custom event data.
    */
   readonly detail: any
- 
+
   /**
    * Initializes the value of an event.
    * 
@@ -123,6 +123,84 @@ export interface CustomEvent extends Event {
    * @param detail - custom event data
    */
   initCustomEvent(type: string, bubbles?: boolean, cancelable?: boolean, detail?: any): void
+}
+
+/**
+ * Represents an object that is used to observe mutations to the node tree.
+ */
+export interface MutationObserver {
+  /**
+   * Observes a given target and reports any mutations based on options.
+   * 
+   * @param target - the node to observe
+   * @param options - mutation criteria to observe
+   */
+  observe(target: Node, options?: MutationObserverInit): void
+
+  /**
+   * Stops observing mutations.
+   */
+  disconnect(): void
+
+  /**
+   * Returns the list of mutations.
+   */
+  takeRecords(): Array<MutationRecord>
+}
+
+/**
+ * Represents a mutation record.
+ */
+export interface MutationRecord {
+  /**
+   * Returns `"attributes"` if it was an attribute mutation,
+   * `"characterData"` if it was a mutation to a CharacterData node, 
+   * and `"childList"` if it was a mutation to the tree of nodes.
+   */
+  readonly type: string
+
+  /**
+   * Returns the node the mutation affected.
+   */
+  readonly target: Node
+
+  /**
+   * Returns a list of added nodes.
+   */
+  readonly addedNodes: NodeList
+
+  /**
+   * Returns a list of removed nodes.
+   */
+  readonly removedNodes: NodeList
+
+  /**
+   * Returns the previous sibling of added or removed nodes.
+   */
+  readonly previousSibling: Node | null
+
+  /**
+   * Returns the next sibling of added or removed nodes.
+   */
+  readonly nextSibling: Node | null
+
+  /**
+   * Returns the local name of the changed attribute, and `null` otherwise.
+   */
+  readonly attributeName: string | null
+
+  /**
+   * Returns the namespace of the changed attribute, and `null` otherwise.
+   */
+  readonly attributeNamespace: string | null
+
+  /**
+   * Returns a value depending on `type`:
+   * * For `"attributes"` the attribute value before the change,
+   * * For `"characterData"` node `data` before the change,
+   * * For `"childList"` `null`.
+   */
+  readonly oldValue: string | null
 }
 
 /**
@@ -152,22 +230,22 @@ export interface EventTarget {
     callback: | EventListener | null | ((event: Event) => void),
     options?: { passive: boolean, once: boolean, capture: boolean } | boolean): void
 
-   /**
-    * Removes an event listener.
-    * 
-    * @param type - event type to listen for.
-    * @param callback - object to receive a notification when an event occurs.
-    * @param options - object that specifies event characteristics.
-    */
+  /**
+   * Removes an event listener.
+   * 
+   * @param type - event type to listen for.
+   * @param callback - object to receive a notification when an event occurs.
+   * @param options - object that specifies event characteristics.
+   */
   removeEventListener(type: string,
     callback: | EventListener | null | ((event: Event) => void),
     options?: { capture: boolean } | boolean): void
 
-   /**
-    * Dispatches an event to this event target.
-    * 
-    * @param event - the event to dispatch.
-    */
+  /**
+   * Dispatches an event to this event target.
+   * 
+   * @param event - the event to dispatch.
+   */
   dispatchEvent(event: Event): boolean
 }
 
@@ -1717,8 +1795,8 @@ export enum WhatToShow {
  * Represents settings for the getRootNode() function.
  */
 export interface GetRootNodeOptions {
-  composed?: boolean;
-};
+  composed?: boolean
+}
 
 /**
  * Represents event initialization options.
@@ -1735,6 +1813,18 @@ export interface EventInit {
 export interface CustomEventInit extends EventInit {
   detail?: any
 }
+
+export interface MutationObserverInit {
+  childList: boolean
+  attributes: boolean
+  characterData: boolean
+  subtree: boolean
+  attributeOldValue: boolean
+  characterDataOldValue: boolean
+  attributeFilter: Array<string>
+}
+
+export type MutationCallback = (mutations: Array<MutationRecord>, observer: MutationObserver) => void
 
 /**
  * Defines the mode of a shadow root.
