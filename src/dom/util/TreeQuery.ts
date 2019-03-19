@@ -1,5 +1,6 @@
-import { Node, CharacterData, ShadowRoot, Element, NodeType } from '../interfaces'
-import { NodeFilter } from '..';
+import {
+  Node, CharacterData, ShadowRoot, Element, NodeType 
+} from '../interfaces'
 
 /**
  * Includes query and traversal methods for trees.
@@ -200,12 +201,23 @@ export class TreeQuery {
    * whose parent is `null`.
    * 
    * @param node - a node of the tree
+   * @param shadow - `true` to return shadow-including root, otherwise 
+   * `false`
    */
-  static rootNode(node: Node): Node {
-    if (!node.parentNode)
-      return node
-    else
-      return TreeQuery.rootNode(node.parentNode)
+  static rootNode(node: Node, shadow = false): Node {
+    if (shadow) {
+      const root = TreeQuery.rootNode(node, false)
+      const host = (<ShadowRoot>root).host
+      if (host)
+        return TreeQuery.rootNode(host, true)
+      else
+        return root
+    } else {
+      if (!node.parentNode)
+        return node
+      else
+        return TreeQuery.rootNode(node.parentNode)
+    }
   }
 
   /**

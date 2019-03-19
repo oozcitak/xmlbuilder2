@@ -188,7 +188,7 @@ export interface Node extends EventTarget {
    * returns the node's shadow-including root, otherwise it returns
    * the node's root node.
    */
-  getRootNode(options?: { composed: boolean }): Node
+  getRootNode(options?: GetRootNodeOptions): Node
 
   /** 
    * Returns the parent node. 
@@ -1691,6 +1691,22 @@ export enum WhatToShow {
   DocumentType = 0x200,
   DocumentFragment = 0x400,
   Notation = 0x800
+}
+
+/**
+ * Represents settings for the getRootNode() function.
+ */
+export interface GetRootNodeOptions {
+  composed?: boolean;
+};
+
+/**
+ * Represents event initialization options.
+ */
+export interface EventInit {
+  bubbles?: boolean
+  cancelable?: boolean
+  composed?: boolean
 }
 
 /**

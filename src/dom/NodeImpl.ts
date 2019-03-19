@@ -1,11 +1,11 @@
 import {
-  Node, NodeList, Element, Attr, Text, Document, NodeType,
-  Position, EventListener, Event, EventListenerEntry
+  Node, NodeList, Element, Attr, Text, Document, NodeType, 
+  Position, GetRootNodeOptions
 } from './interfaces'
+import { EventTargetImpl } from './EventTargetImpl';
 import { NodeListImpl } from './NodeListImpl'
 import { TreeMutation } from './util/TreeMutation'
 import { TreeQuery } from './util/TreeQuery'
-import { EventTargetImpl } from './EventTargetImpl';
 
 /**
  * Represents a generic XML node.
@@ -92,8 +92,8 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
    * returns the node's shadow-including root, otherwise it returns
    * the node's root node.
    */
-  getRootNode(options: object = { composed: false }): Node {
-    return TreeQuery.rootNode(this)
+  getRootNode(options?: GetRootNodeOptions): Node {
+    return TreeQuery.rootNode(this, !!options && options.composed)
   }
 
   /** 
