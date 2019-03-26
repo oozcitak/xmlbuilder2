@@ -2,7 +2,7 @@ import {
   Node, NodeList, Element, Attr, Text, Document, NodeType, 
   Position, GetRootNodeOptions
 } from './interfaces'
-import { EventTargetImpl } from './EventTargetImpl';
+import { EventTargetImpl } from './EventTargetImpl'
 import { NodeListImpl } from './NodeListImpl'
 import { TreeMutation } from './util/TreeMutation'
 import { TreeQuery } from './util/TreeQuery'

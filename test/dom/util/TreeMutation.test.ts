@@ -1,5 +1,5 @@
 import $$ from '../../TestHelpers'
-import { TreeMutation } from '../../../src/dom/util/TreeMutation';
+import { TreeMutation } from '../../../src/dom/util/TreeMutation'
 
 describe('TreeMutation', function () {
 

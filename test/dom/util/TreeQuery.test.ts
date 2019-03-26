@@ -1,5 +1,5 @@
 import $$ from '../../TestHelpers'
-import { TreeQuery } from '../../../src/dom/util/TreeQuery';
+import { TreeQuery } from '../../../src/dom/util/TreeQuery'
 
 describe('TreeQuery', function () {
 

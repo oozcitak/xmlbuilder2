@@ -1,5 +1,5 @@
 import $$ from '../../TestHelpers'
-import { Namespace } from '../../../src/dom/util/Namespace';
+import { Namespace } from '../../../src/dom/util/Namespace'
 
 describe('Namespace', function () {
 
