@@ -82,20 +82,6 @@ export abstract class CharacterDataToken extends XMLToken {
 
     this.data = data
   }
-
-  /**
-   * Determines if text content is empty (only whitespace).
-   */
-  get empty(): boolean {
-    for (let i = 0; i < this.data.length; i++) {
-      const ch = this.data.charCodeAt(i)
-      if (ch !== 9 && ch !== 10 && ch !== 13 && ch !== 32) {
-        return false
-      }
-    }
-
-    return true
-  }
 }
 
 /**

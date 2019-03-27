@@ -1,6 +1,6 @@
-import { 
-  XMLToken, EOFToken, DeclarationToken, PIToken, TextToken, 
-  ClosingTagToken, ElementToken, CommentToken, DocTypeToken 
+import {
+  XMLToken, EOFToken, DeclarationToken, PIToken, TextToken,
+  ClosingTagToken, ElementToken, CommentToken, DocTypeToken, CDATAToken
 } from './XMLToken'
 import { TokenType } from './TokenType';
 
@@ -86,11 +86,6 @@ export class XMLStringLexer implements Iterable<XMLToken> {
    */
   private seek(count: number): void {
     this._index += count
-    if (this._index < 0) {
-      this._index = 0
-    } else if (this._index > this._length - 1) {
-      this._index = this._length - 1
-    }
   }
 
   /**
@@ -163,15 +158,18 @@ export class XMLStringLexer implements Iterable<XMLToken> {
       const nextChar = this.peekChar()
       if (char === '?' && nextChar === '>') {
         this.seek(1)
-        break
+        return new DeclarationToken(version, encoding, standalone)
       } else if (inName && XMLStringLexer.isSpace(char) || char === '=') {
         inName = false
         inValue = true
         this.skipSpace()
+        if (char !== '=') { this.seek(1) }
         startQuote = this.consumeChar()
         if (!XMLStringLexer.isQuote(startQuote)) {
           throw new Error('Missing quote character before attribute value')
         }
+      } else if (inName) {
+        attName += char
       } else if (inValue && char === startQuote) {
         inName = true
         inValue = false
@@ -184,16 +182,16 @@ export class XMLStringLexer implements Iterable<XMLToken> {
           standalone = attValue
         else
           throw new Error('Invalid attribute name: ' + attName)
-      } else {
-        if (inName) {
-          attName += char
-        } else if (inValue) {
-          attValue += char
-        }
+
+        attName = ''
+        attValue = ''
+        this.skipSpace()
+      } else if (inValue) {
+        attValue += char
       }
     }
 
-    return new DeclarationToken(version, encoding, standalone)
+    throw new Error('Missing declaration end symbol `?>`')
   }
 
   /**
@@ -201,28 +199,37 @@ export class XMLStringLexer implements Iterable<XMLToken> {
    */
   private doctype(): XMLToken {
     let name = ''
+    let pubId = ''
+    let sysId = ''
+
+    // name
     this.skipSpace()
     while (!this.eof) {
       const char = this.consumeChar()
-      const sepChar = (char === '[' || char === '>')
-      if (XMLStringLexer.isSpace(char) || sepChar) {
-        if (sepChar) { this.revert() }
+      if (char === '>') {
+        return new DocTypeToken(name, '', '')
+      } else if (char === '[') {
+        this.revert()
+        break
+      } else if (XMLStringLexer.isSpace(char)) {
         break
       } else {
         name += char
       }
     }
 
-    let pubId = ''
-    let sysId = ''
+    this.skipSpace()
     if (this.peek(6) === 'PUBLIC') {
+      this.seek(6)
       // pubId
       this.skipSpace()
+      let startQuote = this.consumeChar()
+      if (!XMLStringLexer.isQuote(startQuote)) {
+        throw new Error('Missing quote character before pubId value')
+      }
       while (!this.eof) {
         const char = this.consumeChar()
-        const sepChar = (char === '[' || char === '>')
-        if (XMLStringLexer.isSpace(char) || sepChar) {
-          if (sepChar) { this.revert() }
+        if (char === startQuote) {
           break
         } else {
           pubId += char
@@ -230,24 +237,29 @@ export class XMLStringLexer implements Iterable<XMLToken> {
       }
       // sysId
       this.skipSpace()
+      startQuote = this.consumeChar()
+      if (!XMLStringLexer.isQuote(startQuote)) {
+        throw new Error('Missing quote character before sysId value')
+      }
       while (!this.eof) {
         const char = this.consumeChar()
-        const sepChar = (char === '[' || char === '>')
-        if (XMLStringLexer.isSpace(char) || sepChar) {
-          if (sepChar) { this.revert() }
+        if (char === startQuote) {
           break
         } else {
           sysId += char
         }
       }
     } else if (this.peek(6) === 'SYSTEM') {
+      this.seek(6)
       // sysId
       this.skipSpace()
+      let startQuote = this.consumeChar()
+      if (!XMLStringLexer.isQuote(startQuote)) {
+        throw new Error('Missing quote character before sysId value')
+      }
       while (!this.eof) {
         const char = this.consumeChar()
-        const sepChar = (char === '[' || char === '>')
-        if (XMLStringLexer.isSpace(char) || sepChar) {
-          if (sepChar) { this.revert() }
+        if (char === startQuote) {
           break
         } else {
           sysId += char
@@ -261,8 +273,8 @@ export class XMLStringLexer implements Iterable<XMLToken> {
     while (!this.eof) {
       const char = this.consumeChar()
       if (char === '>') {
-        break
-      } else  if (char === '[') {
+        return new DocTypeToken(name, pubId, sysId)
+      } else if (char === '[') {
         hasInternalSubset = true
         break
       }
@@ -279,12 +291,12 @@ export class XMLStringLexer implements Iterable<XMLToken> {
       while (!this.eof) {
         const char = this.consumeChar()
         if (char === '>') {
-          break
+          return new DocTypeToken(name, pubId, sysId)
         }
       }
     }
 
-    return new DocTypeToken(name, pubId, sysId)
+    throw new Error('Missing doctype end symbol `>`')
   }
 
   /**
@@ -298,7 +310,10 @@ export class XMLStringLexer implements Iterable<XMLToken> {
       const nextChar = this.peekChar()
       const endTag = (char === '?' && nextChar === '>')
       if (XMLStringLexer.isSpace(char) || endTag) {
-        if (endTag) { this.revert() }
+        if (endTag) { 
+          this.seek(1)
+          return new PIToken(target, '')
+        }
         break
       } else {
         target += char
@@ -312,13 +327,13 @@ export class XMLStringLexer implements Iterable<XMLToken> {
       const nextChar = this.peekChar()
       if (char === '?' && nextChar === '>') {
         this.seek(1)
-        break
+        return new PIToken(target, data)
       } else {
         data += char
       }
     }
 
-    return new PIToken(target, data)
+    throw new Error('Missing processing instruction end symbol `?>`')
   }
 
   /**
@@ -349,12 +364,12 @@ export class XMLStringLexer implements Iterable<XMLToken> {
       const char = this.consumeChar()
       if (char === '-' && this.peek(2) === '->') {
         this.seek(2)
-        break
+        return new CommentToken(data)
       }
       data += char
     }
 
-    return new CommentToken(data)
+    throw new Error('Missing comment end symbol `-->`')
   }
 
   /**
@@ -367,12 +382,12 @@ export class XMLStringLexer implements Iterable<XMLToken> {
       const char = this.consumeChar()
       if (char === ']' && this.peek(2) === ']>') {
         this.seek(2)
-        break
+        return new CDATAToken(data)
       }
       data += char
     }
 
-    return new CommentToken(data)
+    throw new Error('Missing CDATA end symbol `]>`')
   }
 
   /**
@@ -380,8 +395,7 @@ export class XMLStringLexer implements Iterable<XMLToken> {
    */
   private openTag(): XMLToken {
     let name = ''
-    let selfClosing = false
-    let attributes: { [name: string]: string } = { }
+    let attributes: { [name: string]: string } = {}
     let attName = ''
     let attValue = ''
     let inAttName = false
@@ -392,11 +406,17 @@ export class XMLStringLexer implements Iterable<XMLToken> {
     this.skipSpace()
     while (!this.eof) {
       const char = this.consumeChar()
-      if (XMLStringLexer.isSpace(char) || char === '>') {
-        this.revert()
+      const nextChar = this.peekChar()
+      if (char === '>') {
+        return new ElementToken(name, { }, false)
+      } else if (char === '/' && nextChar === '>') {
+        this.seek(1)
+        return new ElementToken(name, { }, true)
+      } else if (XMLStringLexer.isSpace(char)) {
         break
+      } else {
+        name += char
       }
-      name += char
     }
 
     // attributes
@@ -407,34 +427,38 @@ export class XMLStringLexer implements Iterable<XMLToken> {
       const char = this.consumeChar()
       const nextChar = this.peekChar()
       if (char === '>') {
-        break
+        return new ElementToken(name, attributes, false)
       } else if (char === '/' && nextChar === '>') {
-        selfClosing = true
         this.seek(1)
-        break
-      } else if (inAttName && (XMLStringLexer.isSpace(char) || char === '=')) {
-        inAttName = false
-        inAttValue = true
-        this.skipSpace()
-        startQuote = this.consumeChar()
-        if (!XMLStringLexer.isQuote(startQuote)) {
-          throw new Error('Missing quote character before attribute value')
-        }
-      } else if (inAttValue && char === startQuote) {
-        inAttName = true
-        inAttValue = false
-
-        attributes[attName] = attValue
-      } else {
-        if (inAttName) {
+        return new ElementToken(name, attributes, true)
+      } else if (inAttName) {
+        if (XMLStringLexer.isSpace(char)) {
+          this.skipSpace()
+        } else if (char === '=') {
+          inAttName = false
+          inAttValue = true
+          this.skipSpace()
+          startQuote = this.consumeChar()
+          if (!XMLStringLexer.isQuote(startQuote)) {
+            throw new Error('Missing quote character before attribute value')
+          }
+        } else {
           attName += char
-        } else if (inAttValue) {
+        }
+      } else if (inAttValue) {
+        if (char === startQuote) {
+          inAttName = true
+          inAttValue = false
+          attributes[attName] = attValue
+          attName = ''
+          attValue = ''
+        } else {
           attValue += char
         }
       }
     }
 
-    return new ElementToken(name, attributes, selfClosing)
+    throw new Error('Missing opening element tag end symbol `>`')
   }
 
   /**
@@ -447,13 +471,13 @@ export class XMLStringLexer implements Iterable<XMLToken> {
     while (!this.eof) {
       const char = this.consumeChar()
       if (char === '>') {
-        break
+        return new ClosingTagToken(name)
       } else if (!XMLStringLexer.isSpace(char)) {
         name += char
       }
     }
 
-    return new ClosingTagToken(name)
+    throw new Error('Missing closing element tag end symbol `>`')
   }
 
   /**
