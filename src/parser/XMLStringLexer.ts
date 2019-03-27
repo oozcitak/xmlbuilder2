@@ -1,13 +1,13 @@
 import {
-  XMLToken, EOFToken, DeclarationToken, PIToken, TextToken,
+  EOFToken, DeclarationToken, PIToken, TextToken,
   ClosingTagToken, ElementToken, CommentToken, DocTypeToken, CDATAToken
 } from './XMLToken'
-import { TokenType } from './TokenType';
+import { XMLToken, TokenType, XMLLexer } from './interfaces'
 
 /**
  * Represents a lexer for XML content in a string.
  */
-export class XMLStringLexer implements Iterable<XMLToken> {
+export class XMLStringLexer implements XMLLexer {
 
   _str = ''
   _length = 0

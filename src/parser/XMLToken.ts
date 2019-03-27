@@ -1,10 +1,10 @@
-import { TokenType } from "./TokenType";
+import { TokenType, XMLToken } from "./interfaces"
 
 /**
  * Represents a token.
  */
-export abstract class XMLToken {
-  type: TokenType
+abstract class XMLTokenBase implements XMLToken {
+  _type: TokenType
 
   /**
    * Initializes a new instance of `XMLToken`.
@@ -12,14 +12,19 @@ export abstract class XMLToken {
    * @param type - token type
    */
   constructor(type: TokenType) {
-    this.type = type
+    this._type = type
   }
+
+  /**
+   * Returns the token type.
+   */
+  get type(): TokenType { return this._type }
 }
 
 /**
  * Represents an end-of-file token.
  */
-export class EOFToken extends XMLToken {
+export class EOFToken extends XMLTokenBase {
   /**
    * Initializes a new instance of `EOFToken`.
    */
@@ -31,7 +36,7 @@ export class EOFToken extends XMLToken {
 /**
  * Represents an XML declaration token.
  */
-export class DeclarationToken extends XMLToken {
+export class DeclarationToken extends XMLTokenBase {
   version = ''
   encoding = ''
   standalone = ''
@@ -51,7 +56,7 @@ export class DeclarationToken extends XMLToken {
 /**
  * Represents an doctype token.
  */
-export class DocTypeToken extends XMLToken {
+export class DocTypeToken extends XMLTokenBase {
   name = ''
   pubId = ''
   sysId = ''
@@ -71,7 +76,7 @@ export class DocTypeToken extends XMLToken {
 /**
  * Represents a character data token.
  */
-export abstract class CharacterDataToken extends XMLToken {
+export abstract class CharacterDataToken extends XMLTokenBase {
   data = ''
   
   /**
@@ -139,7 +144,7 @@ export class PIToken extends CharacterDataToken {
 /**
  * Represents an element token.
  */
-export class ElementToken extends XMLToken {
+export class ElementToken extends XMLTokenBase {
   name = ''
   attributes = { }
   selfClosing = false
@@ -159,7 +164,7 @@ export class ElementToken extends XMLToken {
 /**
  * Represents a closing tag token.
  */
-export class ClosingTagToken extends XMLToken {
+export class ClosingTagToken extends XMLTokenBase {
   name = ''
   
   /**

@@ -1,6 +1,6 @@
-import $$ from '../../TestHelpers'
-import { XMLStringLexer } from '../../../src/parser/util/XMLStringLexer'
-import * as Token from '../../../src/parser/util/XMLToken'
+import $$ from '../TestHelpers'
+import { XMLStringLexer } from '../../src/parser/XMLStringLexer'
+import * as Token from '../../src/parser/XMLToken'
 
 describe('XMLStringLexer', function () {
 
