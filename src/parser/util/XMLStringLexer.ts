@@ -1,12 +1,14 @@
 import { 
   XMLToken, EOFToken, DeclarationToken, PIToken, TextToken, 
-  ClosingTagToken, ElementToken, CommentToken 
+  ClosingTagToken, ElementToken, CommentToken, DocTypeToken 
 } from './XMLToken'
+import { TokenType } from './TokenType';
 
 /**
  * Represents a lexer for XML content in a string.
  */
-export class XMLStringLexer {
+export class XMLStringLexer implements Iterable<XMLToken> {
+
   _str = ''
   _length = 0
   _index = 0
@@ -19,66 +21,6 @@ export class XMLStringLexer {
   constructor(str: string) {
     this._str = str
     this._length = str.length
-  }
-
-  /**
-   * Determines whether the parser is at or past the end of the string.
-   */
-  get eof(): boolean {
-    return (this._index >= this._length)
-  }
-
-  /**
-   * Consumes and returns a single character.
-   */
-  consumeChar(): string {
-    const char = this._str[this._index]
-    this._index++
-    return char
-  }
-
-  /**
-   * Skips over whitespace characters.
-   */
-  skipSpace(): void {
-    while (XMLStringLexer.isSpace(this._str[this._index])) {
-      this._index++
-    }
-  }
-
-  /**
-   * Unconsumes one character.
-   */
-  revert(): void {
-    if (this._index > 0) {
-      this._index--
-    }
-  }
-
-  /**
-   * Skips over a number of characters.
-   */
-  seek(count: number): void {
-    this._index += count
-    if (this._index < 0) {
-      this._index = 0
-    } else if (this._index > this._length - 1) {
-      this._index = this._length - 1
-    }
-  }
-
-  /**
-   * Returns a single character without consuming.
-   */
-  peekChar(): string {
-    return this._str[this._index]
-  }
-
-  /**
-   * Returns a given number of characters without consuming.
-   */
-  peek(count: number): string {
-    return this._str.substr(this._index, count)
   }
 
   /**
@@ -99,16 +41,88 @@ export class XMLStringLexer {
   }
 
   /**
+   * Resets the lexer to the beginning of the string.
+   */
+  private reset(): void {
+    this._index = 0
+  }
+
+  /**
+   * Determines whether the parser is at or past the end of the string.
+   */
+  private get eof(): boolean {
+    return (this._index >= this._length)
+  }
+
+  /**
+   * Consumes and returns a single character.
+   */
+  private consumeChar(): string {
+    const char = this._str[this._index]
+    this._index++
+    return char
+  }
+
+  /**
+   * Skips over whitespace characters.
+   */
+  private skipSpace(): void {
+    while (!this.eof && XMLStringLexer.isSpace(this._str[this._index])) {
+      this._index++
+    }
+  }
+
+  /**
+   * Unconsumes one character.
+   */
+  private revert(): void {
+    if (this._index > 0) {
+      this._index--
+    }
+  }
+
+  /**
+   * Skips over a number of characters.
+   */
+  private seek(count: number): void {
+    this._index += count
+    if (this._index < 0) {
+      this._index = 0
+    } else if (this._index > this._length - 1) {
+      this._index = this._length - 1
+    }
+  }
+
+  /**
+   * Returns a single character without consuming.
+   */
+  private peekChar(): string {
+    return this._str[this._index]
+  }
+
+  /**
+   * Returns a given number of characters without consuming.
+   */
+  private peek(count: number): string {
+    return this._str.substr(this._index, count)
+  }
+
+  /**
    * Branches from an opening bracket (`<`).
    */
-  openBracket(): XMLToken {
+  private openBracket(): XMLToken {
     if (this.eof) {
       return new EOFToken()
     }
 
     switch (this.consumeChar()) {
       case '?':
-        return this.declarationOrPI()
+        if (this.peek(3) === 'xml') {
+          this.seek(3)
+          return this.declaration()
+        } else {
+          return this.pi()
+        }
       case '!':
         if (this.peek(2) === '--') {
           this.seek(2)
@@ -129,37 +143,11 @@ export class XMLStringLexer {
   }
 
   /**
-   * Produces an XML declaration or processing instruction token.
-   * 
-   */
-  declarationOrPI(): XMLToken {
-    let name = ''
-    this.skipSpace()
-    while (!this.eof) {
-      const char = this.consumeChar()
-      const nextChar = this.peekChar()
-      const endTag = (char === '?' && nextChar === '>')
-      if (XMLStringLexer.isSpace(char) || endTag) {
-        if (endTag) { this.revert() }
-        if (name === 'xml') {
-          return this.declaration()
-        } else {
-          return this.pi(name)
-        }
-      }
-      name += char
-    }
-
-    throw new Error('Missing ?>')
-  }
-
-  /**
    * Produces an XML declaration token.
-   * `XMLDecl ::= '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'`
    */
-  declaration(): XMLToken {
-    let name = ''
-    let value = ''
+  private declaration(): XMLToken {
+    let attName = ''
+    let attValue = ''
     let version = ''
     let encoding = ''
     let standalone = ''
@@ -174,6 +162,7 @@ export class XMLStringLexer {
       const char = this.consumeChar()
       const nextChar = this.peekChar()
       if (char === '?' && nextChar === '>') {
+        this.seek(1)
         break
       } else if (inName && XMLStringLexer.isSpace(char) || char === '=') {
         inName = false
@@ -187,19 +176,19 @@ export class XMLStringLexer {
         inName = true
         inValue = false
 
-        if (name === 'version')
-          version = value
-        else if (name === 'encoding')
-          encoding = value
-        else if (name === 'standalone')
-          standalone = value
+        if (attName === 'version')
+          version = attValue
+        else if (attName === 'encoding')
+          encoding = attValue
+        else if (attName === 'standalone')
+          standalone = attValue
         else
-          throw new Error('Invalid attribute name: ' + name)
+          throw new Error('Invalid attribute name: ' + attName)
       } else {
         if (inName) {
-          name += char
+          attName += char
         } else if (inValue) {
-          value += char
+          attValue += char
         }
       }
     }
@@ -208,31 +197,135 @@ export class XMLStringLexer {
   }
 
   /**
-   * Produces a processing instruction token.
-   * `PI ::= '<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>'`
+   * Produces a doc type token.
    */
-  pi(target: string): XMLToken {
-    let value = ''
+  private doctype(): XMLToken {
+    let name = ''
+    this.skipSpace()
+    while (!this.eof) {
+      const char = this.consumeChar()
+      const sepChar = (char === '[' || char === '>')
+      if (XMLStringLexer.isSpace(char) || sepChar) {
+        if (sepChar) { this.revert() }
+        break
+      } else {
+        name += char
+      }
+    }
 
+    let pubId = ''
+    let sysId = ''
+    if (this.peek(6) === 'PUBLIC') {
+      // pubId
+      this.skipSpace()
+      while (!this.eof) {
+        const char = this.consumeChar()
+        const sepChar = (char === '[' || char === '>')
+        if (XMLStringLexer.isSpace(char) || sepChar) {
+          if (sepChar) { this.revert() }
+          break
+        } else {
+          pubId += char
+        }
+      }
+      // sysId
+      this.skipSpace()
+      while (!this.eof) {
+        const char = this.consumeChar()
+        const sepChar = (char === '[' || char === '>')
+        if (XMLStringLexer.isSpace(char) || sepChar) {
+          if (sepChar) { this.revert() }
+          break
+        } else {
+          sysId += char
+        }
+      }
+    } else if (this.peek(6) === 'SYSTEM') {
+      // sysId
+      this.skipSpace()
+      while (!this.eof) {
+        const char = this.consumeChar()
+        const sepChar = (char === '[' || char === '>')
+        if (XMLStringLexer.isSpace(char) || sepChar) {
+          if (sepChar) { this.revert() }
+          break
+        } else {
+          sysId += char
+        }
+      }
+    }
+
+    // skip internal subset
+    let hasInternalSubset = false
+    this.skipSpace()
+    while (!this.eof) {
+      const char = this.consumeChar()
+      if (char === '>') {
+        break
+      } else  if (char === '[') {
+        hasInternalSubset = true
+        break
+      }
+    }
+
+    if (hasInternalSubset) {
+      while (!this.eof) {
+        const char = this.consumeChar()
+        if (char === ']') {
+          break
+        }
+      }
+      this.skipSpace()
+      while (!this.eof) {
+        const char = this.consumeChar()
+        if (char === '>') {
+          break
+        }
+      }
+    }
+
+    return new DocTypeToken(name, pubId, sysId)
+  }
+
+  /**
+   * Produces a processing instruction token.
+   */
+  private pi(): XMLToken {
+    let target = ''
+    this.skipSpace()
+    while (!this.eof) {
+      const char = this.consumeChar()
+      const nextChar = this.peekChar()
+      const endTag = (char === '?' && nextChar === '>')
+      if (XMLStringLexer.isSpace(char) || endTag) {
+        if (endTag) { this.revert() }
+        break
+      } else {
+        target += char
+      }
+    }
+
+    let data = ''
     this.skipSpace()
     while (!this.eof) {
       const char = this.consumeChar()
       const nextChar = this.peekChar()
       if (char === '?' && nextChar === '>') {
+        this.seek(1)
         break
       } else {
-        value += char
+        data += char
       }
     }
 
-    return new PIToken(target, value)
+    return new PIToken(target, data)
   }
 
   /**
    * Produces a text token.
    * 
    */
-  text(): XMLToken {
+  private text(): XMLToken {
     let data = ''
     while (!this.eof) {
       const char = this.consumeChar()
@@ -250,12 +343,12 @@ export class XMLStringLexer {
    * Produces a comment token.
    * 
    */
-  comment(): XMLToken {
+  private comment(): XMLToken {
     let data = ''
     while (!this.eof) {
       const char = this.consumeChar()
       if (char === '-' && this.peek(2) === '->') {
-        this.revert()
+        this.seek(2)
         break
       }
       data += char
@@ -268,12 +361,12 @@ export class XMLStringLexer {
    * Produces a CDATA token.
    * 
    */
-  cdata(): XMLToken {
+  private cdata(): XMLToken {
     let data = ''
     while (!this.eof) {
       const char = this.consumeChar()
       if (char === ']' && this.peek(2) === ']>') {
-        this.revert()
+        this.seek(2)
         break
       }
       data += char
@@ -285,19 +378,31 @@ export class XMLStringLexer {
   /**
    * Produces an element token.
    */
-  openTag(): XMLToken {
+  private openTag(): XMLToken {
     let name = ''
     let selfClosing = false
     let attributes: { [name: string]: string } = { }
     let attName = ''
     let attValue = ''
-    let inName = false
-    let inValue = false
+    let inAttName = false
+    let inAttValue = false
     let startQuote = ''
 
+    // element name
     this.skipSpace()
-    inName = true
-    inValue = false
+    while (!this.eof) {
+      const char = this.consumeChar()
+      if (XMLStringLexer.isSpace(char) || char === '>') {
+        this.revert()
+        break
+      }
+      name += char
+    }
+
+    // attributes
+    this.skipSpace()
+    inAttName = true
+    inAttValue = false
     while (!this.eof) {
       const char = this.consumeChar()
       const nextChar = this.peekChar()
@@ -305,24 +410,25 @@ export class XMLStringLexer {
         break
       } else if (char === '/' && nextChar === '>') {
         selfClosing = true
+        this.seek(1)
         break
-      } else if (inName && XMLStringLexer.isSpace(char) || char === '=') {
-        inName = false
-        inValue = true
+      } else if (inAttName && (XMLStringLexer.isSpace(char) || char === '=')) {
+        inAttName = false
+        inAttValue = true
         this.skipSpace()
         startQuote = this.consumeChar()
         if (!XMLStringLexer.isQuote(startQuote)) {
           throw new Error('Missing quote character before attribute value')
         }
-      } else if (inValue && char === startQuote) {
-        inName = true
-        inValue = false
+      } else if (inAttValue && char === startQuote) {
+        inAttName = true
+        inAttValue = false
 
         attributes[attName] = attValue
       } else {
-        if (inName) {
+        if (inAttName) {
           attName += char
-        } else if (inValue) {
+        } else if (inAttValue) {
           attValue += char
         }
       }
@@ -335,15 +441,16 @@ export class XMLStringLexer {
    * Produces a closing tag token.
    * 
    */
-  closeTag(): XMLToken {
+  private closeTag(): XMLToken {
     let name = ''
     this.skipSpace()
     while (!this.eof) {
       const char = this.consumeChar()
-      if (XMLStringLexer.isSpace(char) || char === '>') {
+      if (char === '>') {
         break
+      } else if (!XMLStringLexer.isSpace(char)) {
+        name += char
       }
-      name += char
     }
 
     return new ClosingTagToken(name)
@@ -354,9 +461,13 @@ export class XMLStringLexer {
    * 
    * @param char - the character to check
    */
-  static isSpace(char: string): boolean {
-    const ch = char.charCodeAt(0)
-    return ch === 9 || ch === 10 || ch === 13 || ch === 32
+  private static isSpace(char: string): boolean {
+    if (!char) {
+      return true
+    } else {
+      const ch = char.charCodeAt(0)
+      return ch === 9 || ch === 10 || ch === 13 || ch === 32
+    }
   }
 
   /**
@@ -364,11 +475,24 @@ export class XMLStringLexer {
    * 
    * @param char - the character to check
    */
-  static isQuote(char: string): string {
-    if (char === '"' || char === "'")
-      return char
-    else
-      return ''
+  private static isQuote(char: string): boolean {
+    return (char === '"' || char === '\'')
   }
-}
 
+  /**
+   * Returns an iterator for the lexer.
+   */
+  *[Symbol.iterator](): IterableIterator<XMLToken> {
+    this.reset()
+    let flag = true
+    while (flag) {
+      const token = this.nextToken()
+      if (token.type === TokenType.EOF) {
+        flag = false
+      } else {
+        yield token
+      }
+    }
+  }
+
+}

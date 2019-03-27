@@ -52,15 +52,17 @@ export class DeclarationToken extends XMLToken {
  * Represents an doctype token.
  */
 export class DocTypeToken extends XMLToken {
+  name = ''
   pubId = ''
   sysId = ''
 
   /**
    * Initializes a new instance of `DocTypeToken`.
    */
-  constructor(pubId: string, sysId: string) {
+  constructor(name: string, pubId: string, sysId: string) {
     super(TokenType.DocType)
 
+    this.name = name
     this.pubId = pubId
     this.sysId = sysId
   }
@@ -79,6 +81,20 @@ export abstract class CharacterDataToken extends XMLToken {
     super(type)
 
     this.data = data
+  }
+
+  /**
+   * Determines if text content is empty (only whitespace).
+   */
+  get empty(): boolean {
+    for (let i = 0; i < this.data.length; i++) {
+      const ch = this.data.charCodeAt(i)
+      if (ch !== 9 && ch !== 10 && ch !== 13 && ch !== 32) {
+        return false
+      }
+    }
+
+    return true
   }
 }
 
