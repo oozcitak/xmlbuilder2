@@ -50,6 +50,22 @@ describe('Node', function () {
     expect(ele1.getRootNode()).toBe(doc)
   })
 
+  test('getRootNode() shadow', function () {
+    const sdoc = $$.dom.createHTMLDocument('my doc')
+    const sbody = sdoc.getElementsByTagName('body')[0]
+    if (!sbody)
+      throw new Error("body element is null")  
+    const sele = sdoc.createElementNS('http://www.w3.org/1999/xhtml', 'my-custom-element')
+    sbody.appendChild(sele)
+    const shadowRoot = sele.attachShadow({mode: "open"})
+    const snode = doc.createElement('node')
+    shadowRoot.appendChild(snode)
+
+    expect(snode.getRootNode()).toBe(shadowRoot)
+    expect(snode.getRootNode({composed: false})).toBe(shadowRoot)
+    expect(snode.getRootNode({composed: true})).toBe(sdoc)
+  })
+
   test('parentNode', function () {
     expect(ele1.parentNode).toBe(de)
     expect(doc.parentElement).toBeNull()
