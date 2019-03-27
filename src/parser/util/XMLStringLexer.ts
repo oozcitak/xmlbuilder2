@@ -106,10 +106,6 @@ export class XMLStringLexer implements Iterable<XMLToken> {
    * Branches from an opening bracket (`<`).
    */
   private openBracket(): XMLToken {
-    if (this.eof) {
-      return new EOFToken()
-    }
-
     switch (this.consumeChar()) {
       case '?':
         if (this.peek(3) === 'xml') {
@@ -154,7 +150,7 @@ export class XMLStringLexer implements Iterable<XMLToken> {
     inName = true
     inValue = false
     while (!this.eof) {
-      const char = this.consumeChar()
+      let char = this.consumeChar()
       const nextChar = this.peekChar()
       if (char === '?' && nextChar === '>') {
         this.seek(1)
@@ -163,7 +159,8 @@ export class XMLStringLexer implements Iterable<XMLToken> {
         inName = false
         inValue = true
         this.skipSpace()
-        if (char !== '=') { this.seek(1) }
+        while (char !== '=') { char = this.consumeChar() }
+        this.skipSpace()
         startQuote = this.consumeChar()
         if (!XMLStringLexer.isQuote(startQuote)) {
           throw new Error('Missing quote character before attribute value')
@@ -486,12 +483,8 @@ export class XMLStringLexer implements Iterable<XMLToken> {
    * @param char - the character to check
    */
   private static isSpace(char: string): boolean {
-    if (!char) {
-      return true
-    } else {
-      const ch = char.charCodeAt(0)
-      return ch === 9 || ch === 10 || ch === 13 || ch === 32
-    }
+    const ch = char.charCodeAt(0)
+    return ch === 9 || ch === 10 || ch === 13 || ch === 32
   }
 
   /**
