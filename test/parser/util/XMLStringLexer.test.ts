@@ -163,4 +163,129 @@ describe('XMLStringLexer', function () {
     expect(i).toBe(tokens.length)
   })
 
+  test('declaration attribute without quote', function () {
+    const xmlStr = $$.t`
+      <?xml version=1.0?>
+      <root/>
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('declaration attribute without equals', function () {
+    const xmlStr = $$.t`
+      <?xml version 1.0?>
+      <root/>
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('unknown declaration attribute', function () {
+    const xmlStr = $$.t`
+      <?xml venison='1.0'?>
+      <root/>
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('incomplete declaration', function () {
+    const xmlStr = $$.t`
+      <?xml version='1.0'
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('doctype pubId without quote', function () {
+    const xmlStr = $$.t`
+      <!DOCTYPE root PUBLIC pubId>
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('doctype sysId without quote', function () {
+    const xmlStr = $$.t`
+      <!DOCTYPE root PUBLIC 'pubId' sysId>
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('doctype sysId without quote', function () {
+    const xmlStr = $$.t`
+      <!DOCTYPE root SYSTEM sysId>
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('incomplete doctype', function () {
+    const xmlStr = $$.t`
+      <!DOCTYPE root
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('incomplete processing instruction', function () {
+    const xmlStr = $$.t`
+      <?target name="content"
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('incomplete comment', function () {
+    const xmlStr = $$.t`
+      <!-- comment
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('incomplete CDATA', function () {
+    const xmlStr = $$.t`
+      <![CDATA[here
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('element attribute without quote', function () {
+    const xmlStr = $$.t`
+      <root att=val/>
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('element attribute without equals sign', function () {
+    const xmlStr = $$.t`
+      <root att val/>
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('incomplete element', function () {
+    const xmlStr = $$.t`
+      <root
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
+  test('incomplete closing element tag', function () {
+    const xmlStr = $$.t`
+      <root>hello</root
+      `
+    const lexer = new XMLStringLexer(xmlStr)
+    lexer.nextToken() // <root>
+    lexer.nextToken() // hello
+    expect(() => lexer.nextToken()).toThrow()
+  })
+
 })

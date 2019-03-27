@@ -159,7 +159,10 @@ export class XMLStringLexer implements Iterable<XMLToken> {
         inName = false
         inValue = true
         this.skipSpace()
-        while (char !== '=') { char = this.consumeChar() }
+        while (!this.eof && char !== '=') { char = this.consumeChar() }
+        if (char !== '=') {
+          throw new Error('Missing equals sign before attribute value')
+        }
         this.skipSpace()
         startQuote = this.consumeChar()
         if (!XMLStringLexer.isQuote(startQuote)) {
@@ -421,37 +424,37 @@ export class XMLStringLexer implements Iterable<XMLToken> {
     inAttName = true
     inAttValue = false
     while (!this.eof) {
-      const char = this.consumeChar()
+      let char = this.consumeChar()
       const nextChar = this.peekChar()
       if (char === '>') {
         return new ElementToken(name, attributes, false)
       } else if (char === '/' && nextChar === '>') {
         this.seek(1)
         return new ElementToken(name, attributes, true)
+      } else if (inAttName && XMLStringLexer.isSpace(char) || char === '=') {
+        inAttName = false
+        inAttValue = true
+        this.skipSpace()
+        while (!this.eof && char !== '=') { char = this.consumeChar() }
+        if (char !== '=') {
+          throw new Error('Missing equals sign before attribute value')
+        }
+        this.skipSpace()
+        startQuote = this.consumeChar()
+        if (!XMLStringLexer.isQuote(startQuote)) {
+          throw new Error('Missing quote character before attribute value')
+        }
       } else if (inAttName) {
-        if (XMLStringLexer.isSpace(char)) {
-          this.skipSpace()
-        } else if (char === '=') {
-          inAttName = false
-          inAttValue = true
-          this.skipSpace()
-          startQuote = this.consumeChar()
-          if (!XMLStringLexer.isQuote(startQuote)) {
-            throw new Error('Missing quote character before attribute value')
-          }
-        } else {
-          attName += char
-        }
+        attName += char
+      } else if (inAttValue && char === startQuote) {
+        inAttName = true
+        inAttValue = false
+        attributes[attName] = attValue
+        attName = ''
+        attValue = ''
+        this.skipSpace()
       } else if (inAttValue) {
-        if (char === startQuote) {
-          inAttName = true
-          inAttValue = false
-          attributes[attName] = attValue
-          attName = ''
-          attValue = ''
-        } else {
-          attValue += char
-        }
+        attValue += char
       }
     }
 
