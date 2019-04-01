@@ -76,7 +76,7 @@ export class DocTypeToken extends XMLTokenBase {
 /**
  * Represents a character data token.
  */
-export abstract class CharacterDataToken extends XMLTokenBase {
+abstract class CharacterDataToken extends XMLTokenBase {
   data = ''
   
   /**
@@ -86,6 +86,13 @@ export abstract class CharacterDataToken extends XMLTokenBase {
     super(type)
 
     this.data = data
+  }
+
+  /**
+   * Determines if the token contents are entirely whitespace characters.
+   */
+  get isWhitespace(): boolean {
+    return !!this.data.match(/^[\t\n\f\r ]*$/)
   }
 }
 
@@ -146,13 +153,14 @@ export class PIToken extends CharacterDataToken {
  */
 export class ElementToken extends XMLTokenBase {
   name = ''
-  attributes = { }
+  attributes: { [key:string]: string } = { }
   selfClosing = false
   
   /**
    * Initializes a new instance of `ElementToken`.
    */
-  constructor(name: string, attributes: object, selfClosing: boolean) {
+  constructor(name: string, attributes: { [key:string]: string },
+    selfClosing: boolean) {
     super(TokenType.Element)
 
     this.name = name

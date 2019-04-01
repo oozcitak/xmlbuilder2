@@ -21,7 +21,7 @@ describe('TreeQuery', function () {
     shadowRoot.appendChild(doc.createElement('sh2'))
 
     let str = ''
-    for (const childNode of TreeQuery.getDescendantNodes(doc, true, true, (node) => { return (node.nodeType == 3) })) {
+    for (const childNode of TreeQuery.getDescendantNodes(doc, true, true, (node) => { return (node.nodeType === 3) })) {
         str += childNode.nodeValue + ' '
     }
     expect(str).toBe('text shtext ')
@@ -66,12 +66,12 @@ describe('TreeQuery', function () {
     de.append(...ele)
 
     let str = ''
-    for (const childNode of TreeQuery.getSiblingNodes(txt1, true, (node) => { return (node.nodeType == 3) })) {
+    for (const childNode of TreeQuery.getSiblingNodes(txt1, true, (node) => { return (node.nodeType === 3) })) {
       str += childNode.nodeValue + ' '
     }
     expect(str).toBe('text1 text2 ')
     str = ''
-    for (const childNode of TreeQuery.getSiblingNodes(txt1, false, (node) => { return (node.nodeType == 3) })) {
+    for (const childNode of TreeQuery.getSiblingNodes(txt1, false, (node) => { return (node.nodeType === 3) })) {
       str += childNode.nodeValue + ' '
     }
     expect(str).toBe('text2 ')

@@ -81,7 +81,11 @@ export default class TestHelpers {
         str = `${indent}[ ${node.data}\n`
         break
       case 7: // ProcessingInstruction
-        str = `${indent}? ${node.target} ${node.data}\n`
+        if (node.data) {
+          str = `${indent}? ${node.target} ${node.data}\n`
+        } else {
+          str = `${indent}? ${node.target}\n`
+        }
         break
       case 8: // Comment
         str = `${indent}! ${node.data}\n`

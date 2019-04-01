@@ -24,6 +24,11 @@ export class XMLStringLexer implements XMLLexer {
   }
 
   /**
+   * Determines whether whitespace-only text nodes are skipped or not.
+   */
+  skipWhitespaceOnlyText = false
+
+  /**
    * Returns the next token.
    */
   nextToken(): XMLToken {
@@ -31,13 +36,25 @@ export class XMLStringLexer implements XMLLexer {
       return new EOFToken()
     }
 
+    let token: XMLToken = new EOFToken()
     const char = this.consumeChar()
     if (char === '<') {
-      return this.openBracket()
+      token = this.openBracket()
     } else {
       this.revert()
-      return this.text()
+      token = this.text()
     }
+
+    if (this.skipWhitespaceOnlyText) {
+      if (token.type === TokenType.Text) {
+        const textToken = <TextToken>token
+        if (textToken.isWhitespace) {
+          token = this.nextToken()
+        }
+      }
+    }
+
+    return token
   }
 
   /**
@@ -304,13 +321,12 @@ export class XMLStringLexer implements XMLLexer {
    */
   private pi(): XMLToken {
     let target = ''
-    this.skipSpace()
     while (!this.eof) {
       const char = this.consumeChar()
       const nextChar = this.peekChar()
       const endTag = (char === '?' && nextChar === '>')
       if (XMLStringLexer.isSpace(char) || endTag) {
-        if (endTag) { 
+        if (endTag) {
           this.seek(1)
           return new PIToken(target, '')
         }
@@ -321,7 +337,6 @@ export class XMLStringLexer implements XMLLexer {
     }
 
     let data = ''
-    this.skipSpace()
     while (!this.eof) {
       const char = this.consumeChar()
       const nextChar = this.peekChar()
@@ -408,10 +423,10 @@ export class XMLStringLexer implements XMLLexer {
       const char = this.consumeChar()
       const nextChar = this.peekChar()
       if (char === '>') {
-        return new ElementToken(name, { }, false)
+        return new ElementToken(name, {}, false)
       } else if (char === '/' && nextChar === '>') {
         this.seek(1)
-        return new ElementToken(name, { }, true)
+        return new ElementToken(name, {}, true)
       } else if (XMLStringLexer.isSpace(char)) {
         break
       } else {
