@@ -2,7 +2,7 @@ import {
   Document, DOMImplementation, DocumentType, Element, Text,
   NodeFilter, NodeType, Node, HTMLCollection, DocumentFragment,
   NodeList, WhatToShow, Attr, ProcessingInstruction, Comment,
-  CDATASection
+  CDATASection, NodeIterator, TreeWalker
 } from './interfaces'
 import { NodeImpl } from './NodeImpl'
 import { DOMException } from './DOMException'
@@ -19,6 +19,8 @@ import { XMLSpec } from './util/XMLSpec'
 import { OrderedSet } from './util/OrderedSet'
 import { TreeQuery } from './util/TreeQuery'
 import { TreeMutation } from './util/TreeMutation'
+import { NodeIteratorImpl } from './NodeIteratorImpl'
+import { TreeWalkerImpl } from './TreeWalkerImpl'
 
 /**
  * Represents a document node.
@@ -373,25 +375,27 @@ export class DocumentImpl extends NodeImpl implements Document {
   }
 
   /**
-   * Creates a new NodeIterator object.
+   * Creates and returns a new `NodeIterator` object.
    * 
-   * This method is not supported by this module and will throw an
-   * exception.
+   * @param root - the node to which the iterator is attached.
+   * @param whatToShow - a filter on node type.
+   * @param filter - a user defined filter.
    */
-  createNodeIterator(root: Node, whatToShow: number = WhatToShow.All,
-    filter: NodeFilter | null = null): never {
-    throw DOMException.NotSupportedError
+  createNodeIterator(root: Node, whatToShow: WhatToShow = WhatToShow.All,
+    filter: NodeFilter | null = null): NodeIterator {
+    return new NodeIteratorImpl(root, whatToShow, filter)
   }
 
   /**
-   * Creates a new TreeWalker object.
+   * Creates and returns a new `TreeWalker` object.
    * 
-   * This method is not supported by this module and will throw an
-   * exception.
+   * @param root - the node to which the iterator is attached.
+   * @param whatToShow - a filter on node type.
+   * @param filter - a user defined filter.
    */
-  createTreeWalker(root: Node, whatToShow: number = WhatToShow.All,
-    filter: NodeFilter | null = null): never {
-    throw DOMException.NotSupportedError
+  createTreeWalker(root: Node, whatToShow: WhatToShow = WhatToShow.All,
+    filter: NodeFilter | null = null): TreeWalker {
+    return new TreeWalkerImpl(root, whatToShow, filter)
   }
 
   /**

@@ -257,7 +257,7 @@ export interface Node extends EventTarget {
   /** 
    * Returns the type of node. 
    */
-  readonly nodeType: number
+  readonly nodeType: NodeType
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -812,16 +812,16 @@ export interface Document extends Node, NonElementParentNode,
   createRange(): never
 
   /**
-   * Creates a new NodeIterator object.
+   * Creates a new `NodeIterator` object.
    */
-  createNodeIterator(root: Node, whatToShow?: number,
-    filter?: NodeFilter | null): never
+  createNodeIterator(root: Node, whatToShow?: WhatToShow,
+    filter?: NodeFilter | null): NodeIterator
 
   /**
-   * Creates a new TreeWalker object.
+   * Creates a new `TreeWalker` object.
    */
-  createTreeWalker(root: Node, whatToShow?: number,
-    filter?: NodeFilter | null): never
+  createTreeWalker(root: Node, whatToShow?: WhatToShow,
+    filter?: NodeFilter | null): TreeWalker
 
 }
 
@@ -1522,7 +1522,7 @@ export interface NodeFilter {
   /** 
    * Callback function.
    */
-  acceptNode(node: Node): number
+  acceptNode(node: Node): FilterResult
 }
 
 /**
@@ -1608,15 +1608,36 @@ export interface ProcessingInstruction extends CharacterData {
 }
 
 /**
- * Represents an object which can be used to iterate through the nodes
+ * Represents an object which can be used to traverse through the nodes
  * of a subtree.
  */
-export interface NodeIterator {
+export interface Traverser {
+  /**
+   * A flag to avoid recursive invocations.
+   */
+  active: boolean
+
   /**
    * Gets the root node of the subtree.
    */
   readonly root: Node
 
+  /**
+   * Gets the node types to match.
+   */
+  readonly whatToShow: WhatToShow
+
+  /**
+   * Gets the filter used to selected the nodes.
+   */
+  readonly filter: NodeFilter | null
+}
+
+/**
+ * Represents an object which can be used to iterate through the nodes
+ * of a subtree.
+ */
+export interface NodeIterator extends Traverser {
   /**
    * Gets the node to which the iterator is attached.
    */
@@ -1628,16 +1649,6 @@ export interface NodeIterator {
    * before the node, otherwise it is anchored after the node.
    */
   readonly pointerBeforeReferenceNode: boolean
-
-  /**
-   * Gets the node types to match
-   */
-  readonly whatToShow: number
-
-  /**
-   * Gets the filter used to selected the nodes.
-   */
-  readonly filter: NodeFilter | null
 
   /**
    * Returns the next node in the subtree, or `null` if there are none.
@@ -1659,22 +1670,7 @@ export interface NodeIterator {
 /**
  * Represents the nodes of a subtree and a position within them.
  */
-export interface TreeWalker {
-  /**
-   * Gets the root node of the subtree.
-   */
-  readonly root: Node
-
-  /**
-   * Gets the node types to match
-   */
-  readonly whatToShow: number
-
-  /**
-   * Gets the filter used to selected the nodes.
-   */
-  readonly filter: NodeFilter | null
-
+export interface TreeWalker extends Traverser {
   /**
    * Gets or sets the node to which the iterator is pointing at.
    */
@@ -1699,16 +1695,16 @@ export interface TreeWalker {
   lastChild(): Node | null
 
   /**
-   * Moves the iterator to the previous sibling of current node, and
-   * returns it. Returns `null` if no such node exists.
-   */
-  previousSibling(): Node | null
-
-  /**
    * Moves the iterator to the next sibling of current node, and
    * returns it. Returns `null` if no such node exists.
    */
   nextSibling(): Node | null
+
+  /**
+   * Moves the iterator to the previous sibling of current node, and
+   * returns it. Returns `null` if no such node exists.
+   */
+  previousSibling(): Node | null
 
   /**
    * Returns the next node in the subtree, or `null` if there are none.
