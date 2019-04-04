@@ -1,6 +1,8 @@
-import { NodeIterator, TreeWalker, Node, FilterResult } from "../interfaces"
+import { 
+  NodeIterator, TreeWalker, Node, FilterResult 
+} from "../interfaces"
 import { DOMException } from "../DOMException"
-import { TreeQuery } from "./TreeQuery";
+import { TreeQuery } from "./TreeQuery"
 
 /**
  * Includes methods for tree traversal.
@@ -107,18 +109,14 @@ export class Traverse {
     }
 
     if (iterator.pointerBeforeReferenceNode) {
-      let next: Node | null = null
-      for (const nextNode of TreeQuery.getFollowingNodes(toBeRemovedNode,
-        false, false, (node) => TreeQuery.isDescendantOf(iterator.root, node, true) &&
-          !TreeQuery.isDescendantOf(toBeRemovedNode, node, true))) {
-        next = nextNode
-        break
-      }
-
-      if (next) {
-        return [next, iterator.pointerBeforeReferenceNode]
-      } else {
-        return [iterator.referenceNode, false]
+      while (true) {
+        const nextNode = TreeQuery.getFollowingNode(iterator.root, toBeRemovedNode)
+        if (!nextNode) {
+          return [iterator.referenceNode, false]
+        } else if (TreeQuery.isDescendantOf(iterator.root, nextNode, true) &&
+          !TreeQuery.isDescendantOf(toBeRemovedNode, nextNode, true)) {
+          return [nextNode, iterator.pointerBeforeReferenceNode]
+        }
       }
     }
 
