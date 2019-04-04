@@ -89,28 +89,6 @@ export class TreeQuery {
   }
 
   /**
-   * Traverses through all nodes following `node` in depth-first preorder.
-   * 
-   * @param node - a node
-   * @param self - whether to include `node` in traversal
-   * @param shadow - whether to visit shadow tree nodes
-   * @param filter - a function to filter nodes
-   */
-  static *getFollowingNodes(node: Node, self: boolean = false,
-    shadow: boolean = false, filter?: (childNode: Node) => any): IterableIterator<Node> {
-
-    // traverse descendants
-    yield* TreeQuery.getDescendantNodes(node, self, shadow, filter)
-
-    // traverse siblings
-    let sibling = node.nextSibling
-    while (sibling) {
-      yield* TreeQuery.getFollowingNodes(node, true, shadow, filter)
-      sibling = node.nextSibling
-    }
-  }
-
-  /**
    * Returns the node following `node` in depth-first preorder.
    * 
    * @param root - root of the subtree
@@ -153,9 +131,6 @@ export class TreeQuery {
         return node
       }
     } else {
-      if (node === root) {
-        return null
-      }
       const parent: Node | null = node.parentNode
       if (!parent) {
         return null
