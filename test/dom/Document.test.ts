@@ -244,8 +244,21 @@ describe('Document', function () {
   test('Unsupported Methods', function () {
     expect(() => { doc.createEvent('mouseevent') }).toThrow()
     expect(() => { doc.createRange() }).toThrow()
-    expect(() => { doc.createNodeIterator(tele) }).toThrow()
-    expect(() => { doc.createTreeWalker(tele) }).toThrow()
+  })
+
+  test('createNodeIterator()', function () {
+    const ele = doc.getElementById('tele1')
+    if (!ele)
+      throw new Error("element is null")
+
+    const iter = doc.createNodeIterator(ele)
+    let str = ''
+    let node = iter.nextNode()
+    while(node) {
+      str += ':' + node.nodeName
+      node = iter.nextNode()
+    }
+    expect(str).toBe(':tagged:node_with_id:tagged:div:#text:shadow:my-custom-element')
   })
 
   test('implementation', function () {

@@ -1,4 +1,4 @@
-import { NodeIterator, Node, NodeFilter, WhatToShow } from "./interfaces"
+import { NodeIterator, Node, NodeFilter, WhatToShow, FilterResult } from "./interfaces"
 import { TraverserImpl } from "./TraverserImpl"
 import { Traverse } from "./util/Traverse"
 
@@ -18,7 +18,8 @@ export class NodeIteratorImpl extends TraverserImpl implements NodeIterator {
    * @param whatToShow - a filter on node type.
    * @param filter - a user defined filter.
    */
-  constructor(root: Node, whatToShow: WhatToShow, filter: NodeFilter | null) {
+  constructor(root: Node, whatToShow: WhatToShow, filter: NodeFilter | 
+    ((node: Node) => FilterResult) | null) {
     super(root, whatToShow, filter)
 
     this._reference = root
@@ -26,14 +27,14 @@ export class NodeIteratorImpl extends TraverserImpl implements NodeIterator {
   }
 
   /**
-   * Gets the node to which the iterator is attached.
+   * Gets the node current nofe of the.
    */
   get referenceNode(): Node { return this._reference }
 
   /**
-   * Gets a flag that indicates whether the iterator is anchored before
-   * or after  the anchor node. If is `true`, the iterator is anchored 
-   * before the node, otherwise it is anchored after the node.
+   * Gets a flag that indicates whether the iterator is before
+   * or after  the reference node. If is `true`, the iterator is 
+   * before the node, otherwise it is after the node.
    */
   get pointerBeforeReferenceNode(): boolean { return this._pointerBeforeReference }
 

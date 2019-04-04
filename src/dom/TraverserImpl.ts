@@ -1,5 +1,7 @@
-import { Traverser, Node, NodeFilter, WhatToShow, FilterResult } from "./interfaces"
-import { DOMException } from "./DOMException"
+import {
+  Traverser, Node, NodeFilter, WhatToShow, FilterResult
+} from "./interfaces"
+import { NodeFilterImpl } from "./NodeFilterImpl"
 
 /**
  * Represents an object which can be used to iterate through the nodes
@@ -17,11 +19,16 @@ export abstract class TraverserImpl implements Traverser {
    * @param whatToShow - a filter on node type.
    * @param filter - a user defined filter.
    */
-  constructor(root: Node, whatToShow: WhatToShow, filter: NodeFilter | null) {
+  constructor(root: Node, whatToShow: WhatToShow, filter: NodeFilter |
+    ((node: Node) => FilterResult) | null) {
     this.active = false
     this._root = root
     this._whatToShow = whatToShow
-    this._filter = filter
+    if (filter instanceof Function) {
+      this._filter = new NodeFilterImpl(filter)
+    } else {
+      this._filter = filter
+    }
   }
 
   /**

@@ -813,15 +813,21 @@ export interface Document extends Node, NonElementParentNode,
 
   /**
    * Creates a new `NodeIterator` object.
+   * @param root - the node to which the iterator is attached.
+   * @param whatToShow - a filter on node type.
+   * @param filter - a user defined filter.
    */
   createNodeIterator(root: Node, whatToShow?: WhatToShow,
-    filter?: NodeFilter | null): NodeIterator
+    filter?: NodeFilter | ((node: Node) => FilterResult) | null): NodeIterator
 
   /**
    * Creates a new `TreeWalker` object.
+   * @param root - the node to which the iterator is attached.
+   * @param whatToShow - a filter on node type.
+   * @param filter - a user defined filter.
    */
   createTreeWalker(root: Node, whatToShow?: WhatToShow,
-    filter?: NodeFilter | null): TreeWalker
+    filter?: NodeFilter | ((node: Node) => FilterResult) | null): TreeWalker
 
 }
 
@@ -1161,7 +1167,7 @@ export interface NonElementParentNode {
    * 
    * @param id - the value of the `id` attribute to match
    */
-  getElementById(id: string): Element | null,
+  getElementById(id: string): Element | null
 
 }
 
@@ -1639,13 +1645,13 @@ export interface Traverser {
  */
 export interface NodeIterator extends Traverser {
   /**
-   * Gets the node to which the iterator is attached.
+   * Gets the node current nofe of the.
    */
   readonly referenceNode: Node
 
   /**
    * Gets a flag that indicates whether the iterator is anchored before
-   * or after  the anchor node. If is `true`, the iterator is anchored 
+   * or after  the reference node. If is `true`, the iterator is anchored 
    * before the node, otherwise it is anchored after the node.
    */
   readonly pointerBeforeReferenceNode: boolean

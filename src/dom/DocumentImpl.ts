@@ -2,7 +2,7 @@ import {
   Document, DOMImplementation, DocumentType, Element, Text,
   NodeFilter, NodeType, Node, HTMLCollection, DocumentFragment,
   NodeList, WhatToShow, Attr, ProcessingInstruction, Comment,
-  CDATASection, NodeIterator, TreeWalker
+  CDATASection, NodeIterator, TreeWalker, FilterResult
 } from './interfaces'
 import { NodeImpl } from './NodeImpl'
 import { DOMException } from './DOMException'
@@ -382,7 +382,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * @param filter - a user defined filter.
    */
   createNodeIterator(root: Node, whatToShow: WhatToShow = WhatToShow.All,
-    filter: NodeFilter | null = null): NodeIterator {
+    filter: NodeFilter | ((node: Node) => FilterResult) | null = null): NodeIterator {
     return new NodeIteratorImpl(root, whatToShow, filter)
   }
 
@@ -394,7 +394,7 @@ export class DocumentImpl extends NodeImpl implements Document {
    * @param filter - a user defined filter.
    */
   createTreeWalker(root: Node, whatToShow: WhatToShow = WhatToShow.All,
-    filter: NodeFilter | null = null): TreeWalker {
+    filter: NodeFilter | ((node: Node) => FilterResult) | null = null): TreeWalker {
     return new TreeWalkerImpl(root, whatToShow, filter)
   }
 

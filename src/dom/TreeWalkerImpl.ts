@@ -16,7 +16,8 @@ export class TreeWalkerImpl extends TraverserImpl implements TreeWalker {
    * @param whatToShow - a filter on node type.
    * @param filter - a user defined filter.
    */
-  constructor(root: Node, whatToShow: WhatToShow, filter: NodeFilter | null) {
+  constructor(root: Node, whatToShow: WhatToShow, filter: NodeFilter | 
+    ((node: Node) => FilterResult) | null) {
     super(root, whatToShow, filter)
 
     this._current = root
@@ -161,10 +162,5 @@ export class TreeWalkerImpl extends TraverserImpl implements TreeWalker {
 
     return null
   }
-
-  /**
-   * This method is a no-op and is not used.
-   */
-  detach(): void { }
 
 }

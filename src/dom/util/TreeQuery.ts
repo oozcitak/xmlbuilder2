@@ -1,5 +1,5 @@
 import {
-  Node, CharacterData, ShadowRoot, Element, NodeType 
+  Node, CharacterData, ShadowRoot, Element, NodeType
 } from '../interfaces'
 
 /**
@@ -59,7 +59,7 @@ export class TreeQuery {
       (node) => { return node.nodeType === NodeType.Element })) {
       const ele = <Element><unknown>child
       if (!filter || !!filter(ele))
-        yield <Element><unknown>ele
+        yield ele
     }
   }
 
@@ -84,6 +84,83 @@ export class TreeQuery {
           }
         }
         child = child.nextSibling
+      }
+    }
+  }
+
+  /**
+   * Traverses through all nodes following `node` in depth-first preorder.
+   * 
+   * @param node - a node
+   * @param self - whether to include `node` in traversal
+   * @param shadow - whether to visit shadow tree nodes
+   * @param filter - a function to filter nodes
+   */
+  static *getFollowingNodes(node: Node, self: boolean = false,
+    shadow: boolean = false, filter?: (childNode: Node) => any): IterableIterator<Node> {
+
+    // traverse descendants
+    yield* TreeQuery.getDescendantNodes(node, self, shadow, filter)
+
+    // traverse siblings
+    let sibling = node.nextSibling
+    while (sibling) {
+      yield* TreeQuery.getFollowingNodes(node, true, shadow, filter)
+      sibling = node.nextSibling
+    }
+  }
+
+  /**
+   * Returns the node following `node` in depth-first preorder.
+   * 
+   * @param root - root of the subtree
+   * @param node - a node
+   */
+  static getFollowingNode(root: Node, node: Node): Node | null {
+    if (node.firstChild) {
+      return node.firstChild
+    } else if (node.nextSibling) {
+      return node.nextSibling
+    } else {
+      while (true) {
+        const parent: Node | null = node.parentNode
+        if (!parent || parent === root) {
+          return null
+        } else if (parent.nextSibling) {
+          return parent.nextSibling
+        } else {
+          node = parent
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns the node preceding `node` in depth-first preorder.
+   * 
+   * @param root - root of the subtree
+   * @param node - a node
+   */
+  static getPrecedingNode(root: Node, node: Node): Node | null {
+    if (node === root) {
+      return null
+    }
+    if (node.previousSibling) {
+      node = node.previousSibling
+      if (node.lastChild) {
+        return node.lastChild
+      } else {
+        return node
+      }
+    } else {
+      if (node === root) {
+        return null
+      }
+      const parent: Node | null = node.parentNode
+      if (!parent) {
+        return null
+      } else {
+        return parent
       }
     }
   }
@@ -227,9 +304,8 @@ export class TreeQuery {
    * 
    * @param node - a node
    * @param other - the node to check
-   * @param options - an object to set traversal settings.
-   * If `options.self` is truthy, traversal includes `node`
-   * itself. If `options.shadow` is truthy, traversal includes the 
+   * @param self - if `true`, traversal includes `node` itself
+   * @param shadow - if truthy, traversal includes the 
    * node's and its descendant's shadow trees as well.
    */
   static isDescendantOf(node: Node, other: Node,
@@ -250,9 +326,8 @@ export class TreeQuery {
    * 
    * @param node - a node
    * @param other - the node to check
-   * @param options - an object to set traversal settings.
-   * If `options.self` is truthy, traversal includes `node`
-   * itself. If `options.shadow` is truthy, traversal includes the 
+   * @param self - if `true`, traversal includes `node` itself
+   * @param shadow - if truthy, traversal includes the 
    * node's and its descendant's shadow trees as well.
    */
   static isAncestorOf(node: Node, other: Node,
@@ -268,11 +343,9 @@ export class TreeQuery {
    * 
    * @param node - a node
    * @param other - the node to check
-   * @param options - an object to set traversal settings.
-   * If `options.self` is truthy, traversal includes `node`
-   * itself.
+   * @param self - if `true`, traversal includes `node` itself
    */
-  static isSiblingOf(node: Node, other: Node, 
+  static isSiblingOf(node: Node, other: Node,
     self: boolean = false): boolean {
 
     if (node === other) {

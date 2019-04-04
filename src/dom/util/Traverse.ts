@@ -1,5 +1,6 @@
 import { NodeIterator, TreeWalker, Node, FilterResult } from "../interfaces"
 import { DOMException } from "../DOMException"
+import { TreeQuery } from "./TreeQuery";
 
 /**
  * Includes methods for tree traversal.
@@ -32,6 +33,8 @@ export class Traverse {
     } catch (err) {
       traverser.active = false
       throw err
+    } finally {
+      traverser.active = false
     }
 
     return result
@@ -53,15 +56,29 @@ export class Traverse {
     while (true) {
       if (forward) {
         if (!beforeNode) {
-          // set node to the first node following node in iterator’s iterator collection. If there is no such node, then return null.
+          // set node to the first node following node in iterator's
+          // iterator collection. If there is no such node, then return null.
+          const nextNode = TreeQuery.getFollowingNode(iterator.root, node)
+          if (nextNode) {
+            node = nextNode
+          } else {
+            return [null, iterator.referenceNode, false]
+          }
         } else {
-          beforeNode = true
+          beforeNode = false
         }
       } else {
         if (beforeNode) {
-          // set node to the first node preceding node in iterator’s iterator collection. If there is no such node, then return null.
+          // set node to the first node preceding node in iterator's
+          // iterator collection. If there is no such node, then return null.
+          const prevNode = TreeQuery.getPrecedingNode(iterator.root, node)
+          if (prevNode) {
+            node = prevNode
+          } else {
+            return [null, iterator.referenceNode, true]
+          }
         } else {
-          beforeNode = false
+          beforeNode = true
         }
       }
 
@@ -73,6 +90,52 @@ export class Traverse {
     }
 
     return [node, node, beforeNode]
+  }
+
+  /**
+   * Adjusts the iterator for removal of a node from its tree. Also
+   * returns the modified values for `referenceNode` and 
+   * `pointerBeforeReferenceNode`.
+   * 
+   * @param iterator - the `NodeIterator` instance
+   * @param toBeRemovedNode- node to remove
+   */
+  static preRemove(iterator: NodeIterator, toBeRemovedNode: Node): [Node, boolean] {
+    if (!TreeQuery.isAncestorOf(iterator.referenceNode, toBeRemovedNode, true) ||
+      toBeRemovedNode === iterator.root) {
+      return [iterator.referenceNode, iterator.pointerBeforeReferenceNode]
+    }
+
+    if (iterator.pointerBeforeReferenceNode) {
+      let next: Node | null = null
+      for (const nextNode of TreeQuery.getFollowingNodes(toBeRemovedNode,
+        false, false, (node) => TreeQuery.isDescendantOf(iterator.root, node, true) &&
+          !TreeQuery.isDescendantOf(toBeRemovedNode, node, true))) {
+        next = nextNode
+        break
+      }
+
+      if (next) {
+        return [next, iterator.pointerBeforeReferenceNode]
+      } else {
+        return [iterator.referenceNode, false]
+      }
+    }
+
+    const prevSibling = toBeRemovedNode.previousSibling
+    if (prevSibling) {
+      let referenceNode = prevSibling
+      for (const node of TreeQuery.getDescendantNodes(prevSibling, true)) {
+        referenceNode = node
+      }
+      return [referenceNode, iterator.pointerBeforeReferenceNode]
+    } else {
+      if (toBeRemovedNode.parentNode) {
+        return [toBeRemovedNode.parentNode, iterator.pointerBeforeReferenceNode]
+      } else {
+        throw DOMException.InvalidStateError
+      }
+    }
   }
 
   /**
@@ -110,7 +173,7 @@ export class Traverse {
         }
         node = parent
       }
-    }    
+    }
 
     return [null, walker.currentNode]
   }
@@ -151,6 +214,6 @@ export class Traverse {
       if (Traverse.filterNode(walker, node) === FilterResult.Accept) {
         return [null, walker.currentNode]
       }
-    }    
+    }
   }
 }
