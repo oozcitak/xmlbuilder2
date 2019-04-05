@@ -46,7 +46,7 @@ describe('TreeWalker', function () {
       str += ':' + node.nodeName
       node = iter.nextNode()
     }
-    expect(str).toBe(':root:node1:child1:#text:child2:#comment:node2:node3:child3_1:child3_1_1:child3_1_2:child3_2')
+    expect(str).toBe(':node1:child1:#text:child2:#comment:node2:node3:child3_1:child3_1_1:child3_1_2:child3_2')
   })
 
   test('nextNode() with type filter', function () {
@@ -57,12 +57,12 @@ describe('TreeWalker', function () {
       str += ':' + node.nodeName
       node = iter.nextNode()
     }
-    expect(str).toBe(':node1:child1:child2')
+    expect(str).toBe(':child1:child2')
   })
 
   test('nextNode() with user filter', function () {
     const iter = doc.createTreeWalker(node1, WhatToShow.Element, function(node): FilterResult {
-      return node.nodeName.startsWith('c') ? FilterResult.Accept : FilterResult.Reject
+      return node.nodeName.endsWith('1') ? FilterResult.Accept : FilterResult.Reject
     })
 
     let str = ''
@@ -71,7 +71,12 @@ describe('TreeWalker', function () {
       str += ':' + node.nodeName
       node = iter.nextNode()
     }
-    expect(str).toBe(':child1:child2')
+    expect(str).toBe(':child1')
+  })
+
+  test('nextNode() null check', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.ProcessingInstruction)
+    expect(iter.nextNode()).toBeNull()
   })
 
   test('previousNode()', function () {
@@ -81,7 +86,7 @@ describe('TreeWalker', function () {
     while(node) {
       node = iter.nextNode()
     }
-    node = iter.previousNode()
+    node = iter.currentNode
     while(node) {
       str += ':' + node.nodeName
       node = iter.previousNode()
@@ -89,4 +94,122 @@ describe('TreeWalker', function () {
     expect(str).toBe(':child3_2:child3_1_2:child3_1_1:child3_1:node3:node2:#comment:child2:#text:child1:node1:root')
   })
 
+  test('previousNode() with type filter', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element)
+    let str = ''
+    let node = iter.nextNode()
+    while(node) {
+      node = iter.nextNode()
+    }
+    node = iter.currentNode
+    while(node) {
+      str += ':' + node.nodeName
+      node = iter.previousNode()
+    }
+    expect(str).toBe(':child2:child1:node1')
+  })
+
+  test('previousNode() with user filter', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element, function(node): FilterResult {
+      return node.nodeName.endsWith('1') ? FilterResult.Accept : FilterResult.Reject
+    })
+
+    let str = ''
+    let node = iter.nextNode()
+    while(node) {
+      node = iter.nextNode()
+    }
+    node = iter.currentNode
+    while(node) {
+      str += ':' + node.nodeName
+      node = iter.previousNode()
+    }
+    expect(str).toBe(':child1:node1')
+  })
+
+  test('previousNode() null check', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.ProcessingInstruction)
+    iter.nextNode()
+    expect(iter.previousNode()).toBeNull()
+  })
+
+  test('currentNode getter', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element)
+    expect(iter.currentNode).toBe(node1)
+  })
+
+  test('currentNode setter', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element)
+    const child1 = node1.firstElementChild
+    if (!child1)
+      throw new Error("firstElementChild is null")
+    const child2 = child1.nextElementSibling
+    if (!child2)
+      throw new Error("nextElementSibling is null")
+    
+    iter.currentNode = child1
+    iter.nextNode()
+    expect(iter.currentNode).toBe(child2)
+  })
+
+  test('parentNode()', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element)
+    iter.nextNode()
+    expect(iter.parentNode()).toBe(node1)
+  })
+
+  test('parentNode() null check', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element)
+    expect(iter.parentNode()).toBeNull()
+  })
+
+  test('firstChild()', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element)
+    const child1 = node1.firstElementChild
+    if (!child1)
+      throw new Error("firstElementChild is null")
+    const child2 = child1.nextElementSibling
+    if (!child2)
+      throw new Error("nextElementSibling is null")
+
+    expect(iter.firstChild()).toBe(child1)
+  })
+
+  test('lastChild()', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element)
+    const child1 = node1.firstElementChild
+    if (!child1)
+      throw new Error("firstElementChild is null")
+    const child2 = child1.nextElementSibling
+    if (!child2)
+      throw new Error("nextElementSibling is null")
+
+    expect(iter.lastChild()).toBe(child2)
+  })
+
+  test('nextSibling()', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element)
+    const child1 = node1.firstElementChild
+    if (!child1)
+      throw new Error("firstElementChild is null")
+    const child2 = child1.nextElementSibling
+    if (!child2)
+      throw new Error("nextElementSibling is null")
+
+    iter.firstChild()
+    expect(iter.nextSibling()).toBe(child2)
+  })
+
+  test('previousSibling()', function () {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element)
+    const child1 = node1.firstElementChild
+    if (!child1)
+      throw new Error("firstElementChild is null")
+    const child2 = child1.nextElementSibling
+    if (!child2)
+      throw new Error("nextElementSibling is null")
+
+    iter.lastChild()
+    expect(iter.previousSibling()).toBe(child1)
+  })
 })

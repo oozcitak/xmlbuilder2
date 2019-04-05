@@ -16,7 +16,7 @@ export class TreeWalkerImpl extends TraverserImpl implements TreeWalker {
    * @param whatToShow - a filter on node type.
    * @param filter - a user defined filter.
    */
-  constructor(root: Node, whatToShow: WhatToShow, filter: NodeFilter | 
+  constructor(root: Node, whatToShow: WhatToShow, filter: NodeFilter |
     ((node: Node) => FilterResult) | null) {
     super(root, whatToShow, filter)
 
@@ -35,7 +35,7 @@ export class TreeWalkerImpl extends TraverserImpl implements TreeWalker {
    */
   parentNode(): Node | null {
     let node: Node | null = this._current
-    while (node && node != this.root) {
+    while (node && node !== this.root) {
       node = node.parentNode
       if (node && Traverse.filterNode(this, node) === FilterResult.Accept) {
         this._current = node
@@ -111,12 +111,14 @@ export class TreeWalkerImpl extends TraverserImpl implements TreeWalker {
         }
         sibling = temporary.nextSibling
         if (sibling) {
+          node = sibling
           break
         }
         temporary = temporary.parentNode
       }
 
-      if (Traverse.filterNode(this, node) === FilterResult.Accept) {
+      result = Traverse.filterNode(this, node)
+      if (result === FilterResult.Accept) {
         this._current = node
         return node
       }
@@ -140,7 +142,7 @@ export class TreeWalkerImpl extends TraverserImpl implements TreeWalker {
           result = Traverse.filterNode(this, node)
         }
 
-        if (result !== FilterResult.Accept) {
+        if (result === FilterResult.Accept) {
           this._current = node
           return node
         }
