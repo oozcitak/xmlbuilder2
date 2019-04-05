@@ -3,6 +3,11 @@ import { DOMParser, MimeType } from '../../src/parser/DOMParser'
 
 describe('DOMParser', function () {
 
+  test('HTML parser not yet supported', function () {
+    const parser = new DOMParser()
+    expect(() => parser.parseFromString('', MimeType.HTML)).toThrow()
+  })
+
   test('XML parser', function () {
     const xmlStr = $$.t`
       <?xml version="1.0"?>
