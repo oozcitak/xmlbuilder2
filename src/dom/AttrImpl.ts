@@ -13,7 +13,7 @@ export class AttrImpl extends NodeImpl implements Attr {
   _ownerElement: Element | null
 
   /** 
-   * Useless; always returns true 
+   * Useless; always returns true.
    */
   readonly specified: boolean = true
 

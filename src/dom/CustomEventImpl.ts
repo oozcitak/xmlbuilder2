@@ -1,7 +1,5 @@
-import {
-  CustomEvent, CustomEventInit, EventTarget
-} from './interfaces'
-import { EventImpl } from './EventImpl';
+import { CustomEvent, CustomEventInit } from './interfaces'
+import { EventImpl } from './EventImpl'
 
 /**
  * Represents a generic XML node.
