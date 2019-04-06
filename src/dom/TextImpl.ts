@@ -21,7 +21,7 @@ export class TextImpl extends CharacterDataImpl implements Text {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return NodeType.Text }
+  get nodeType(): NodeType { return NodeType.Text }
 
   /** 
    * Returns a string appropriate for the type of node. 

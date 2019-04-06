@@ -55,7 +55,7 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
   /** 
    * Returns the type of node. 
    */
-  abstract get nodeType(): number
+  abstract get nodeType(): NodeType
 
   /** 
    * Returns a string appropriate for the type of node. 
@@ -254,7 +254,7 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
    * Returns a bitmask indicating the position of the given `node`
    * relative to this node.
    */
-  compareDocumentPosition(node: Node): number {
+  compareDocumentPosition(node: Node): Position {
     if (node === this) return 0
 
     let node1: Node | null = node

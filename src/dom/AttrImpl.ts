@@ -42,7 +42,7 @@ export class AttrImpl extends NodeImpl implements Attr {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return NodeType.Attribute }
+  get nodeType(): NodeType { return NodeType.Attribute }
 
   /** 
    * Returns a string appropriate for the type of node. 

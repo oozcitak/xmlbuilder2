@@ -20,7 +20,7 @@ export class CommentImpl extends CharacterDataImpl implements Comment {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return NodeType.Comment }
+  get nodeType(): NodeType { return NodeType.Comment }
 
   /** 
    * Returns a string appropriate for the type of node. 

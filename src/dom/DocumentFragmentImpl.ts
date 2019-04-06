@@ -23,7 +23,7 @@ export class DocumentFragmentImpl extends NodeImpl implements DocumentFragment {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return NodeType.DocumentFragment }
+  get nodeType(): NodeType { return NodeType.DocumentFragment }
 
   /** 
    * Returns a string appropriate for the type of node. 

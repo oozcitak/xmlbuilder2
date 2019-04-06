@@ -33,7 +33,7 @@ export interface Event {
   /**
    * Returns the event's phase.
    */
-  readonly eventPhase: number
+  readonly eventPhase: EventPhase
 
   /**
    * Prevents event from reaching any objects other than the current 
@@ -379,7 +379,7 @@ export interface Node extends EventTarget {
    * Returns a bitmask indicating the position of the given `node`
    * relative to this node.
    */
-  compareDocumentPosition(node: Node): number
+  compareDocumentPosition(node: Node): Position
 
   /**
    * Returns `true` if given node is an inclusive descendant of this

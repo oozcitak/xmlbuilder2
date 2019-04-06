@@ -19,7 +19,7 @@ export class CDATASectionImpl extends TextImpl implements CDATASection {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return NodeType.CData }
+  get nodeType(): NodeType { return NodeType.CData }
 
   /** 
    * Returns a string appropriate for the type of node. 

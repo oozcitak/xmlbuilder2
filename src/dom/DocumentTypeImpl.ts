@@ -31,7 +31,7 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return NodeType.DocumentType }
+  get nodeType(): NodeType { return NodeType.DocumentType }
 
   /** 
    * Returns a string appropriate for the type of node. 

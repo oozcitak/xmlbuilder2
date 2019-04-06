@@ -1,5 +1,5 @@
 import {
-  Event, EventInit, EventTarget
+  Event, EventInit, EventTarget, EventPhase
 } from './interfaces'
 
 /**
@@ -16,7 +16,7 @@ export class EventImpl implements Event {
 
   protected _target: EventTarget | null = null
   protected _currentTarget: EventTarget | null = null
-  protected _eventPhase: number = 0
+  protected _eventPhase: EventPhase = EventPhase.None
   
   protected _bubbles: boolean = false
   protected _cancelable: boolean = false
@@ -79,7 +79,7 @@ export class EventImpl implements Event {
   /**
    * Returns the event's phase.
    */
-  get eventPhase(): number { return this._eventPhase }
+  get eventPhase(): EventPhase { return this._eventPhase }
 
   /**
    * Prevents event from reaching any objects other than the current 

@@ -26,7 +26,7 @@ export class ProcessingInstructionImpl extends CharacterDataImpl implements Proc
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return NodeType.ProcessingInstruction }
+  get nodeType(): NodeType { return NodeType.ProcessingInstruction }
 
   /** 
    * Returns a string appropriate for the type of node. 

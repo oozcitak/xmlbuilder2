@@ -47,7 +47,7 @@ export class ElementImpl extends NodeImpl implements Element {
   /** 
    * Returns the type of node. 
    */
-  get nodeType(): number { return NodeType.Element }
+  get nodeType(): NodeType { return NodeType.Element }
 
   /** 
    * Returns a string appropriate for the type of node. 
