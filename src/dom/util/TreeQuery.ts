@@ -131,12 +131,7 @@ export class TreeQuery {
         return node
       }
     } else {
-      const parent: Node | null = node.parentNode
-      if (!parent) {
-        return null
-      } else {
-        return parent
-      }
+      return node.parentNode
     }
   }
 
