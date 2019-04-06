@@ -11,18 +11,22 @@ describe('Traverse', function () {
 
   const node1 = doc.createElement('node1')
   root.appendChild(node1)
-  node1.appendChild(doc.createElement('child1'))
+  const child1 = doc.createElement('child1')
+  node1.appendChild(child1)
   node1.appendChild(doc.createTextNode('text'))
-  node1.appendChild(doc.createElement('child2'))
+  const child2 = doc.createElement('child2')
+  node1.appendChild(child2)
   node1.appendChild(doc.createComment('comment'))
-  root.appendChild(doc.createElement('node2'))
+  const node2 = doc.createElement('node2')
+  root.appendChild(node2)
   const node3 = doc.createElement('node3')
   root.appendChild(node3)
   const child31 = doc.createElement('child3_1')
   node3.appendChild(child31)
   child31.appendChild(doc.createElement('child3_1_1'))
   child31.appendChild(doc.createElement('child3_1_2'))
-  node3.appendChild(doc.createElement('child3_2'))
+  const child32 = doc.createElement('child3_2')
+  node3.appendChild(child32)
 
   expect($$.printTree(doc)).toBe($$.t`
     root
@@ -69,12 +73,95 @@ describe('Traverse', function () {
   test('traverse() backward', function () {
     const iter = doc.createNodeIterator(root, WhatToShow.Element)
 
-    iter.previousNode() // skip root
     let [node, ref, beforeNode] = Traverse.traverse(iter, false)
 
     expect(node).toBeNull()
     expect(ref).toBe(root)
     expect(beforeNode).toBeTruthy()
+  })
+
+  test('traverseChildren() first child', function () {
+    const iter = doc.createTreeWalker(root, WhatToShow.Element, function(node): FilterResult {
+      return node.nodeName.startsWith('c') ? FilterResult.Accept : FilterResult.Skip
+    })
+
+    let [node, ref] = Traverse.traverseChildren(iter, true)
+
+    expect(node).toBe(child1)
+    expect(ref).toBe(child1)
+  })
+
+  test('traverseChildren() sibling of first child', function () {
+    const iter = doc.createTreeWalker(root, WhatToShow.Element, function(node): FilterResult {
+      return node.nodeName.startsWith('c') && node.nodeName.endsWith('2') ? FilterResult.Accept : FilterResult.Skip
+    })
+
+    let [node, ref] = Traverse.traverseChildren(iter, true)
+
+    expect(node).toBe(child2)
+    expect(ref).toBe(child2)
+  })
+
+  test('traverseChildren() without matching children null', function () {
+    const iter = doc.createTreeWalker(root, WhatToShow.Element, function(node): FilterResult {
+      return node.nodeName.startsWith('x') ? FilterResult.Accept : FilterResult.Skip
+    })
+
+    let [node, ref] = Traverse.traverseChildren(iter, true)
+
+    expect(node).toBeNull()
+  })
+
+  test('traverseChildren() without children returns null', function () {
+    const iter = doc.createTreeWalker(child2)
+
+    let [node, ref] = Traverse.traverseChildren(iter, true)
+
+    expect(node).toBeNull()
+  })
+    
+  test('traverseSiblings() next sibling', function () {
+    const iter = doc.createTreeWalker(root, WhatToShow.Element)
+
+    iter.currentNode = node1
+    let [node, ref] = Traverse.traverseSiblings(iter, true)
+
+    expect(node).toBe(node2)
+  })
+
+  test('traverseSiblings() previous sibling', function () {
+    const iter = doc.createTreeWalker(root, WhatToShow.Element)
+
+    iter.currentNode = node2
+    let [node, ref] = Traverse.traverseSiblings(iter, false)
+
+    expect(node).toBe(node1)
+  })
+
+  test('traverseSiblings() at root returns null', function () {
+    const iter = doc.createTreeWalker(root)
+
+    let [node, ref] = Traverse.traverseSiblings(iter, true)
+
+    expect(node).toBeNull()
+  })
+
+  test('traverseSiblings() without siblings returns null', function () {
+    const iter = doc.createTreeWalker(root)
+
+    iter.currentNode = child32
+    let [node, ref] = Traverse.traverseSiblings(iter, true)
+
+    expect(node).toBeNull()
+  })
+
+  test('traverseSiblings() without siblings returns null', function () {
+    const iter = doc.createTreeWalker(root)
+
+    iter.currentNode = node3
+    let [node, ref] = Traverse.traverseSiblings(iter, true)
+
+    expect(node).toBeNull()
   })
 
 })
