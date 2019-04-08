@@ -25,10 +25,9 @@ export class EventImpl implements Event {
   protected _canceled: boolean = false
   protected _inPassiveListener: boolean = false
   protected _composed: boolean = false
-  protected _initialized: boolean = false
-  protected _dispatch: boolean = false
-
-  protected _isTrusted: boolean = false
+  public _initialized: boolean = false
+  public _dispatch: boolean = false
+  public _isTrusted: boolean = false
   protected _timeStamp: number
 
   /**

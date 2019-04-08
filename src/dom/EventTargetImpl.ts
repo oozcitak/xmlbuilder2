@@ -7,7 +7,7 @@ import {
  */
 export abstract class EventTargetImpl implements EventTarget {
 
-  protected _listeners: { [key: string]: Array<EventListenerEntry> } = { }
+  protected _listeners: { [key: string]: Array<EventListenerEntry> } = {}
 
   /**
    * Initializes a new instance of `EventTarget`.
@@ -22,14 +22,14 @@ export abstract class EventTargetImpl implements EventTarget {
    * @param options - object that specifies event characteristics.
    */
   addEventListener(type: string,
-    callback: | EventListener | null | ((event: Event) => void),
+    callback: EventListener | null | ((event: Event) => void),
     options?: { passive: false, once: false, capture: false } | boolean): void {
-      
+
     // flatten options
     let capture = false
     let passive = false
     let once = false
-    if(typeof options === "boolean") {
+    if (typeof options === "boolean") {
       capture = <boolean>options
     }
     else if (options) {
@@ -50,7 +50,7 @@ export abstract class EventTargetImpl implements EventTarget {
 
     // return if the listener is already defined
     for (const entry of this._listeners[type]) {
-      if (entry.type === type && entry.callback === listenerCallback 
+      if (entry.type === type && entry.callback === listenerCallback
         && entry.capture === capture) {
         return
       }
@@ -58,7 +58,7 @@ export abstract class EventTargetImpl implements EventTarget {
 
     // create an entry if it doesn't exist
     if (!(type in this._listeners)) {
-      this._listeners[type] = [ ]
+      this._listeners[type] = []
     }
 
     // add to listener array
@@ -68,24 +68,24 @@ export abstract class EventTargetImpl implements EventTarget {
       capture: capture,
       passive: passive,
       once: once,
-      removed: false    
+      removed: false
     })
   }
 
-   /**
-    * Removes an event listener.
-    * 
-    * @param type - event type to listen for.
-    * @param callback - object to receive a notification when an event occurs.
-    * @param options - object that specifies event characteristics.
-    */
+  /**
+   * Removes an event listener.
+   * 
+   * @param type - event type to listen for.
+   * @param callback - object to receive a notification when an event occurs.
+   * @param options - object that specifies event characteristics.
+   */
   removeEventListener(type: string,
-    callback: | EventListener | null | ((event: Event) => void),
+    callback: EventListener | null | ((event: Event) => void),
     options?: { capture: false } | boolean): void {
 
     // flatten options
     let capture = false
-    if(typeof options === "boolean") {
+    if (typeof options === "boolean") {
       capture = <boolean>options
     }
     else if (options) {
@@ -101,12 +101,12 @@ export abstract class EventTargetImpl implements EventTarget {
     } else {
       listenerCallback = { handleEvent: <((event: Event) => void)>callback }
     }
-    
+
     // check if the listener is defined
     let i = 0
     let index = -1
     for (const entry of this._listeners[type]) {
-      if (entry.type === type && entry.callback === listenerCallback 
+      if (entry.type === type && entry.callback === listenerCallback
         && entry.capture === capture) {
         index = i
         break
@@ -119,11 +119,13 @@ export abstract class EventTargetImpl implements EventTarget {
       this._listeners[type].slice(index, 1)
   }
 
-   /**
-    * Dispatches an event to this event target.
-    * 
-    * @param event - the event to dispatch.
-    */
+  /**
+   * Dispatches an event to this event target.
+   * 
+   * TODO: Implement method.
+   * 
+   * @param event - the event to dispatch.
+   */
   dispatchEvent(event: Event): boolean {
     return false
   }

@@ -1,5 +1,5 @@
-import { 
-  NodeIterator, TreeWalker, Node, FilterResult 
+import {
+  NodeIterator, TreeWalker, Node, FilterResult
 } from "../interfaces"
 import { DOMException } from "../DOMException"
 import { TreeQuery } from "./TreeQuery"

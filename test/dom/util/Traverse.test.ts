@@ -44,7 +44,7 @@ describe('Traverse', function () {
     `)
 
   test('filterNode()', function () {
-    const iter = doc.createTreeWalker(node1, WhatToShow.Element, function(node): FilterResult {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element, function (node): FilterResult {
       return node.nodeName.endsWith('1') ? FilterResult.Accept : FilterResult.Reject
     })
 
@@ -52,7 +52,7 @@ describe('Traverse', function () {
   })
 
   test('filterNode() recursion check', function () {
-    const iter = doc.createTreeWalker(node1, WhatToShow.Element, function(node): FilterResult {
+    const iter = doc.createTreeWalker(node1, WhatToShow.Element, function (node): FilterResult {
       return Traverse.filterNode(iter, node1)
     })
 
@@ -81,7 +81,7 @@ describe('Traverse', function () {
   })
 
   test('traverseChildren() first child', function () {
-    const iter = doc.createTreeWalker(root, WhatToShow.Element, function(node): FilterResult {
+    const iter = doc.createTreeWalker(root, WhatToShow.Element, function (node): FilterResult {
       return node.nodeName.startsWith('c') ? FilterResult.Accept : FilterResult.Skip
     })
 
@@ -92,7 +92,7 @@ describe('Traverse', function () {
   })
 
   test('traverseChildren() sibling of first child', function () {
-    const iter = doc.createTreeWalker(root, WhatToShow.Element, function(node): FilterResult {
+    const iter = doc.createTreeWalker(root, WhatToShow.Element, function (node): FilterResult {
       return node.nodeName.startsWith('c') && node.nodeName.endsWith('2') ? FilterResult.Accept : FilterResult.Skip
     })
 
@@ -103,7 +103,7 @@ describe('Traverse', function () {
   })
 
   test('traverseChildren() without matching children null', function () {
-    const iter = doc.createTreeWalker(root, WhatToShow.Element, function(node): FilterResult {
+    const iter = doc.createTreeWalker(root, WhatToShow.Element, function (node): FilterResult {
       return node.nodeName.startsWith('x') ? FilterResult.Accept : FilterResult.Skip
     })
 
@@ -119,7 +119,7 @@ describe('Traverse', function () {
 
     expect(node).toBeNull()
   })
-    
+
   test('traverseSiblings() next sibling', function () {
     const iter = doc.createTreeWalker(root, WhatToShow.Element)
 
