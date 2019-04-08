@@ -148,14 +148,10 @@ export class TreeQuery {
    *    * Optionally one Element node.
    *    * Zero or more nodes each of which is ProcessingInstruction
    *      or Comment.
-   *  - DocumentFragment
-   *  - Element
+   *  - DocumentFragment, Element
    *    * Zero or more nodes each of which is Element, Text, 
    *      ProcessingInstruction, or Comment.
-   *  - DocumentType
-   *  - Text
-   *  - ProcessingInstruction
-   *  - Comment
+   *  - DocumentType, Text, ProcessingInstruction, Comment
    *    * None.
    * 
    * @param node - the root of the tree
