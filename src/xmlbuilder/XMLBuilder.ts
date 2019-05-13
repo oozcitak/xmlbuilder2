@@ -181,10 +181,37 @@ export class XMLBuilder {
   }
 
   /**
+   * Creates a new raw text node and appends it to the list of child nodes.
+   * 
+   * @param content - node content
+   * 
+   * @returns current element node
+   */
+  raw(content: string): XMLBuilder {
+    const ele = this._asElement
+
+    const child = this._doc.createTextNode(content)
+    ele.appendChild(child)
+    
+    return this
+  }
+
+  /**
    * Returns the document node.
    */
   document(): XMLBuilder {
     return this._asBuilder(this._doc)
+  }
+
+  /**
+   * Returns the root element node.
+   */
+  root(): XMLBuilder {
+    const ele = this._doc.documentElement
+    if (!ele) {
+      throw new Error("Document root element is null. " + this._debugInfo)
+    }
+    return this._asBuilder(ele)
   }
 
   /**
@@ -193,9 +220,31 @@ export class XMLBuilder {
   up(): XMLBuilder {
     const parent = this._asNode.parentNode
     if (!parent) {
-      throw new Error("PArent node is null. " + this._debugInfo)
+      throw new Error("Parent node is null. " + this._debugInfo)
     }
     return this._asBuilder(parent)
+  }
+
+  /**
+   * Returns the previous sibling node.
+   */
+  prev(): XMLBuilder {
+    const node = this._asNode.previousSibling
+    if (!node) {
+      throw new Error("Previous sibling node is null. " + this._debugInfo)
+    }
+    return this._asBuilder(node)
+  }
+
+  /**
+   * Returns the next sibling node.
+   */
+  next(): XMLBuilder {
+    const node = this._asNode.nextSibling
+    if (!node) {
+      throw new Error("Next sibling node is null. " + this._debugInfo)
+    }
+    return this._asBuilder(node)
   }
 
   /**
