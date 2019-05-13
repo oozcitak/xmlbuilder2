@@ -127,18 +127,18 @@ export class ElementImpl extends NodeImpl implements Element {
   }
 
   /**
-   * Returns the value of the attribute with the given `qualifiedName`.
+   * Returns the value of the attribute with the given `name`.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - qualified name to search for
    */
-  getAttribute(qualifiedName: string): string | null {
-    const att = this.attributes.getNamedItem(qualifiedName)
+  getAttribute(name: string): string | null {
+    const att = this.attributes.getNamedItem(name)
     return (att ? att.value : null)
   }
 
   /**
    * Returns the value of the attribute with the given `namespace` and 
-   * `qualifiedName`.
+   * `localName`.
    * 
    * @param namespace - namespace to search for
    * @param localName - local name to search for
@@ -149,18 +149,18 @@ export class ElementImpl extends NodeImpl implements Element {
   }
 
   /**
-   * Sets the value of the attribute with the given `qualifiedName`.
+   * Sets the value of the attribute with the given `name`.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - qualified name to search for
    * @param value - attribute value to set
    */
-  setAttribute(qualifiedName: string, value: string): void {
-    let attr = this.attributes.getNamedItem(qualifiedName)
+  setAttribute(name: string, value: string): void {
+    let attr = this.attributes.getNamedItem(name)
 
     if (attr) {
       attr.value = value
     } else {
-      attr = new AttrImpl(this.ownerDocument, this, qualifiedName,
+      attr = new AttrImpl(this.ownerDocument, this, name,
         null, null, value)
       this.attributes.setNamedItem(attr)
     }
@@ -187,13 +187,13 @@ export class ElementImpl extends NodeImpl implements Element {
   }
 
   /**
-   * Removes the attribute with the given `qualifiedName`.
+   * Removes the attribute with the given `name`.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - qualified name to search for
    */
-  removeAttribute(qualifiedName: string): void {
+  removeAttribute(name: string): void {
     try {
-      this.attributes.removeNamedItem(qualifiedName)
+      this.attributes.removeNamedItem(name)
     } catch (e) {
       // ignore NotFoundError thrown by
       // NamedNodeMap.removeNamedItem()
@@ -201,8 +201,7 @@ export class ElementImpl extends NodeImpl implements Element {
   }
 
   /**
-   * Removes the attribute with the given `namespace` and 
-   * `qualifiedName`.
+   * Removes the attribute with the given `namespace` and `localName`.
    * 
    * @param namespace - namespace to search for
    * @param localName - local name to search for
@@ -217,14 +216,13 @@ export class ElementImpl extends NodeImpl implements Element {
   }
 
   /**
-   * Determines whether the attribute with the given `qualifiedName`
-   * exists.
+   * Determines whether the attribute with the given `name` exists.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - qualified name to search for
    */
-  hasAttribute(qualifiedName: string): boolean {
+  hasAttribute(name: string): boolean {
     for (const att of this.attributes) {
-      if (att.name === qualifiedName)
+      if (att.name === name)
         return true
     }
 
@@ -233,7 +231,7 @@ export class ElementImpl extends NodeImpl implements Element {
 
   /**
    * Determines whether the attribute with the given `namespace` and 
-   * `qualifiedName` exists.
+   * `localName` exists.
    * 
    * @param namespace - namespace to search for
    * @param localName - local name to search for
@@ -248,17 +246,17 @@ export class ElementImpl extends NodeImpl implements Element {
   }
 
   /**
-   * Returns the attribute with the given `qualifiedName`.
+   * Returns the attribute with the given `name`.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - qualified name to search for
    */
-  getAttributeNode(qualifiedName: string): Attr | null {
-    return this.attributes.getNamedItem(qualifiedName)
+  getAttributeNode(name: string): Attr | null {
+    return this.attributes.getNamedItem(name)
   }
 
   /**
    * Returns the attribute with the given `namespace` and 
-   * `qualifiedName`.
+   * `localName`.
    * 
    * @param namespace - namespace to search for
    * @param localName - local name to search for

@@ -1,3 +1,5 @@
+import { _applyMixin } from '..'
+
 // Import implementation classes
 import { AbstractRangeImpl } from './AbstractRangeImpl'
 import { AttrImpl } from './AttrImpl'
@@ -30,35 +32,26 @@ import { SlotableImpl } from './SlotableImpl'
 import { TextImpl } from './TextImpl'
 import { XMLDocumentImpl } from './XMLDocumentImpl'
 
-// Apply mixins
-const applyMixin = function (derivedCtor: any, baseCtor: any): void {
-  Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-    const propDesc = Object.getOwnPropertyDescriptor(baseCtor.prototype, name)
-    /* istanbul ignore else */
-    if (propDesc) 
-      Object.defineProperty(derivedCtor.prototype, name, propDesc)
-  })
-}
 // ChildNode
-applyMixin(ElementImpl, ChildNodeImpl)
-applyMixin(CharacterDataImpl, ChildNodeImpl)
-applyMixin(DocumentTypeImpl, ChildNodeImpl)
+_applyMixin(ElementImpl, ChildNodeImpl)
+_applyMixin(CharacterDataImpl, ChildNodeImpl)
+_applyMixin(DocumentTypeImpl, ChildNodeImpl)
 // DocumentOrShadowRoot
-applyMixin(DocumentImpl, DocumentOrShadowRootImpl)
-applyMixin(ShadowRootImpl, DocumentOrShadowRootImpl)
+_applyMixin(DocumentImpl, DocumentOrShadowRootImpl)
+_applyMixin(ShadowRootImpl, DocumentOrShadowRootImpl)
 // NonDocumentTypeChildNode
-applyMixin(ElementImpl, NonDocumentTypeChildNodeImpl)
-applyMixin(CharacterDataImpl, NonDocumentTypeChildNodeImpl)
+_applyMixin(ElementImpl, NonDocumentTypeChildNodeImpl)
+_applyMixin(CharacterDataImpl, NonDocumentTypeChildNodeImpl)
 // NonElementParentNode
-applyMixin(DocumentImpl, NonElementParentNodeImpl)
-applyMixin(DocumentFragmentImpl, NonElementParentNodeImpl)
+_applyMixin(DocumentImpl, NonElementParentNodeImpl)
+_applyMixin(DocumentFragmentImpl, NonElementParentNodeImpl)
 // ParentNode
-applyMixin(DocumentImpl, ParentNodeImpl)
-applyMixin(DocumentFragmentImpl, ParentNodeImpl)
-applyMixin(ElementImpl, ParentNodeImpl)
+_applyMixin(DocumentImpl, ParentNodeImpl)
+_applyMixin(DocumentFragmentImpl, ParentNodeImpl)
+_applyMixin(ElementImpl, ParentNodeImpl)
 // Slotable
-applyMixin(TextImpl, SlotableImpl)
-applyMixin(ElementImpl, SlotableImpl)
+_applyMixin(TextImpl, SlotableImpl)
+_applyMixin(ElementImpl, SlotableImpl)
 
 // Export classes and drop `Impl`
 export { AbstractRangeImpl as AbstractRange }

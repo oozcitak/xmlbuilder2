@@ -928,15 +928,15 @@ export interface Element extends Node, ParentNode,
   getAttributeNames(): string[]
 
   /**
-   * Returns the value of the attribute with the given `qualifiedName`.
+   * Returns the value of the attribute with the given `name`.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - attribute name
    */
-  getAttribute(qualifiedName: string): string | null
+  getAttribute(name: string): string | null
 
   /**
    * Returns the value of the attribute with the given `namespace` and 
-   * `qualifiedName`.
+   * `localName`.
    * 
    * @param namespace - namespace to search for
    * @param localName - local name to search for
@@ -944,12 +944,12 @@ export interface Element extends Node, ParentNode,
   getAttributeNS(namespace: string | null, localName: string): string | null
 
   /**
-   * Sets the value of the attribute with the given `qualifiedName`.
+   * Sets the value of the attribute with the given `name`.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - attribute name
    * @param value - attribute value to set
    */
-  setAttribute(qualifiedName: string, value: string): void
+  setAttribute(name: string, value: string): void
 
   /**
    * Sets the value of the attribute with the given `namespace` and 
@@ -963,15 +963,14 @@ export interface Element extends Node, ParentNode,
     value: string): void
 
   /**
-   * Removes the attribute with the given `qualifiedName`.
+   * Removes the attribute with the given `name`.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - attribute name
    */
-  removeAttribute(qualifiedName: string): void
+  removeAttribute(name: string): void
 
   /**
-   * Removes the attribute with the given `namespace` and 
-   * `qualifiedName`.
+   * Removes the attribute with the given `namespace` and  `localName`.
    * 
    * @param namespace - namespace to search for
    * @param localName - local name to search for
@@ -979,16 +978,15 @@ export interface Element extends Node, ParentNode,
   removeAttributeNS(namespace: string | null, localName: string): void
 
   /**
-   * Determines whether the attribute with the given `qualifiedName`
-   * exists.
+   * Determines whether the attribute with the given `name` exists.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - attribute name
    */
-  hasAttribute(qualifiedName: string): boolean
+  hasAttribute(name: string): boolean
 
   /**
    * Determines whether the attribute with the given `namespace` and 
-   * `qualifiedName` exists.
+   * `localName` exists.
    * 
    * @param namespace - namespace to search for
    * @param localName - local name to search for
@@ -996,15 +994,15 @@ export interface Element extends Node, ParentNode,
   hasAttributeNS(namespace: string | null, localName: string): boolean
 
   /**
-   * Returns the attribute with the given `qualifiedName`.
+   * Returns the attribute with the given `name`.
    * 
-   * @param qualifiedName - qualified name to search for
+   * @param name - attribute name
    */
-  getAttributeNode(qualifiedName: string): Attr | null
+  getAttributeNode(name: string): Attr | null
 
   /**
    * Returns the attribute with the given `namespace` and 
-   * `qualifiedName`.
+   * `localName`.
    * 
    * @param namespace - namespace to search for
    * @param localName - local name to search for
@@ -1360,7 +1358,7 @@ export interface DOMImplementation {
    * @param doctype - a {@link DocType} to assign to this document
    */
   createDocument(namespace: string | null, qualifiedName: string,
-    doctype: DocumentType | null): XMLDocument
+    doctype?: DocumentType | null): XMLDocument
 
   /**
    * Creates and returns a HTML document.
