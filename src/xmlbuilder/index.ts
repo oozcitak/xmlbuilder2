@@ -1,4 +1,4 @@
-import { _applyMixin } from '..'
+import { _applyMixin } from '../util'
 import { XMLBuilder } from './XMLBuilder'
 import { Element, XMLDocument } from '../dom'
 import { XMLBuilderOptions } from "./interfaces"

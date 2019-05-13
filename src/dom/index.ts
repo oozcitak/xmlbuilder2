@@ -1,4 +1,4 @@
-import { _applyMixin } from '..'
+import { _applyMixin } from '../util'
 
 // Import implementation classes
 import { AbstractRangeImpl } from './AbstractRangeImpl'
