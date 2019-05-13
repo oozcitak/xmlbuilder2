@@ -1,27 +1,29 @@
 import dedent from "dedent"
 
-import { DOMImplementation } from '../src/dom/index'
-import { Attr as AttrImpl } from '../src/dom/index'
-import { CDATASection as CDATASectionImpl } from '../src/dom/index'
-import { CharacterData as CharacterDataImpl } from '../src/dom/index'
-import { Comment as CommentImpl } from '../src/dom/index'
-import { DocumentFragment as DocumentFragmentImpl } from '../src/dom/index'
-import { Document as DocumentImpl } from '../src/dom/index'
-import { DocumentType as DocumentTypeImpl } from '../src/dom/index'
-import { DOMException as DOMExceptionImpl } from '../src/dom/index'
-import { DOMImplementation as DOMImplementationImpl } from '../src/dom/index'
-import { DOMTokenList as DOMTokenListImpl } from '../src/dom/index'
-import { Element as ElementImpl } from '../src/dom/index'
-import { HTMLCollection as HTMLCollectionImpl } from '../src/dom/index'
-import { NamedNodeMap as NamedNodeMapImpl } from '../src/dom/index'
-import { NodeFilter as NodeFilterImpl } from '../src/dom/index'
-import { Node as NodeImpl } from '../src/dom/index'
-import { NodeList as NodeListImpl } from '../src/dom/index'
-import { ProcessingInstruction as ProcessingInstructionImpl } from '../src/dom/index'
-import { ShadowRoot as ShadowRootImpl } from '../src/dom/index'
-import { Text as TextImpl } from '../src/dom/index'
-import { XMLDocument as XMLDocumentImpl } from '../src/dom/index'
-import { DOMImplementationInstance } from '../src/dom/index'
+import { DOMImplementation } from '../src/dom'
+import { Attr as AttrImpl } from '../src/dom'
+import { CDATASection as CDATASectionImpl } from '../src/dom'
+import { CharacterData as CharacterDataImpl } from '../src/dom'
+import { Comment as CommentImpl } from '../src/dom'
+import { DocumentFragment as DocumentFragmentImpl } from '../src/dom'
+import { Document as DocumentImpl } from '../src/dom'
+import { DocumentType as DocumentTypeImpl } from '../src/dom'
+import { DOMException as DOMExceptionImpl } from '../src/dom'
+import { DOMImplementation as DOMImplementationImpl } from '../src/dom'
+import { DOMTokenList as DOMTokenListImpl } from '../src/dom'
+import { Element as ElementImpl } from '../src/dom'
+import { HTMLCollection as HTMLCollectionImpl } from '../src/dom'
+import { NamedNodeMap as NamedNodeMapImpl } from '../src/dom'
+import { NodeFilter as NodeFilterImpl } from '../src/dom'
+import { Node as NodeImpl } from '../src/dom'
+import { NodeList as NodeListImpl } from '../src/dom'
+import { ProcessingInstruction as ProcessingInstructionImpl } from '../src/dom'
+import { ShadowRoot as ShadowRootImpl } from '../src/dom'
+import { Text as TextImpl } from '../src/dom'
+import { XMLDocument as XMLDocumentImpl } from '../src/dom'
+import { DOMImplementationInstance } from '../src/dom'
+
+import { create } from '../src/xmlbuilder'
 
 export default class TestHelpers {
   static Attr = AttrImpl
@@ -49,6 +51,11 @@ export default class TestHelpers {
    * Returns the dom implemention.
    */
   static dom: DOMImplementation = DOMImplementationInstance
+
+  /**
+   * Creates an XML document.
+   */
+  static create = create
 
   /**
    * De-indents template literals.
