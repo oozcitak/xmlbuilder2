@@ -32,6 +32,7 @@ import { SlotableImpl } from './SlotableImpl'
 import { TextImpl } from './TextImpl'
 import { XMLDocumentImpl } from './XMLDocumentImpl'
 
+// Apply mixins
 // ChildNode
 _applyMixin(ElementImpl, ChildNodeImpl)
 _applyMixin(CharacterDataImpl, ChildNodeImpl)

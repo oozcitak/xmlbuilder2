@@ -43,7 +43,7 @@
     ]
   },
   "scripts": {
-    "test": "jest",
+    "test": "tsc && jest",
     "cover": "jest --coverage"
   }
 }

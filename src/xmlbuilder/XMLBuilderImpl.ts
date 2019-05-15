@@ -1,107 +1,41 @@
-import { DOMImplementationInstance } from '../dom'
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
-import { XMLBuilderOptions } from "./interfaces"
+import { XMLBuilderOptions, XMLBuilder } from "./interfaces"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
  * chainable document builder methods.
  */
-export class XMLBuilder {
-
-  private static _domImpl = DOMImplementationInstance
+export class XMLBuilderImpl implements XMLBuilder {
 
   private _options: XMLBuilderOptions = { version: "1.0" }
- 
-  /**
-   * Initializes a new instance of `XMLBuilder`.
-   * 
-   * @param options - builder options
-   */
-  constructor(options?: XMLBuilderOptions) {
-    this._options = options || { version: "1.0" }
+
+  /** @inheritdoc */
+  get options(): XMLBuilderOptions {
+    return (<any>this._asBuilder(this._doc))._options
+  }
+  set options(value: XMLBuilderOptions) {
+    (<any>this._asBuilder(this._doc))._options = value
   }
 
-  /**
-   * Configures options for XML builder. Call this function without
-   * arguments to reset the options to their defaults.
-   * 
-   * @param options - builder options
-   * 
-   * @returns builder with the given options applied
-   */
-  withOptions(options?: XMLBuilderOptions): XMLBuilder {
-    this._options = options || { version: "1.0" }
-    return this
-  }
-
-  /**
-   * Creates a new XML document.
-   * 
-   * @param name - the qualified name of the document element
-   * @param namespace - the namespace of the document element
-   * 
-   * @returns root element node
-   */
-  create(name?: string, namespace?: string): XMLBuilder {
-    const doc = XMLBuilder._domImpl.createDocument('', '')
-    const builder = this._asBuilder(doc)
-    builder.withOptions(this._options)
-    
-    if (name) {
-      return builder.element(name)
-    } else {
-      return builder
-    }
-  }
-
-  /**
-   * Creates a new element node and appends it to the list of child nodes.
-   * 
-   * @param name - element name
-   * 
-   * @returns the new element node
-   */
+  /** @inheritdoc */
   element(name: string): XMLBuilder
 
-  /**
-   * Creates a new element node and appends it to the list of child nodes.
-   * 
-   * @param namespace - element namespace
-   * @param qualifiedName - qualified name
-   * 
-   * @returns the new element node
-   */
+  /** @inheritdoc */
   element(namespace: string, qualifiedName?: string): XMLBuilder {
     const node = this._asNode
-    const child = (qualifiedName ? 
+    const child = (qualifiedName ?
       this._doc.createElementNS(namespace, qualifiedName) :
       this._doc.createElement(namespace)
     )
     node.appendChild(child)
 
-    const builder = this._asBuilder(child)
-    return builder.withOptions(this._options)
+    return this._asBuilder(child)
   }
 
-  /**
-   * Creates or updates an element attribute.
-   * 
-   * @param name - attribute name
-   * @param value - attribute value
-   * 
-   * @returns current element node
-   */
+  /** @inheritdoc */
   attribute(name: string, value: string): XMLBuilder
-  
-  /**
-   * Creates or updates an element attribute.
-   * 
-   * @param namespace - attribute namespace
-   * @param qualifiedName - qualified name
-   * @param value - attribute value
-   * 
-   * @returns current element node
-   */
+
+  /** @inheritdoc */
   attribute(namespace: string, qualifiedName: string, value?: string): XMLBuilder {
     const ele = this._asElement
 
@@ -114,13 +48,7 @@ export class XMLBuilder {
     return this
   }
 
-  /**
-   * Creates a new text node and appends it to the list of child nodes.
-   * 
-   * @param content - node content
-   * 
-   * @returns current element node
-   */
+  /** @inheritdoc */
   text(content: string): XMLBuilder {
     const ele = this._asElement
 
@@ -130,13 +58,7 @@ export class XMLBuilder {
     return this
   }
 
-  /**
-   * Creates a new comment node and appends it to the list of child nodes.
-   * 
-   * @param content - node content
-   * 
-   * @returns current element node
-   */
+  /** @inheritdoc */
   comment(content: string): XMLBuilder {
     const ele = this._asElement
 
@@ -146,66 +68,42 @@ export class XMLBuilder {
     return this
   }
 
-  /**
-   * Creates a new CDATA node and appends it to the list of child nodes.
-   * 
-   * @param content - node content
-   * 
-   * @returns current element node
-   */
+  /** @inheritdoc */
   cdata(content: string): XMLBuilder {
     const ele = this._asElement
 
     const child = this._doc.createCDATASection(content)
     ele.appendChild(child)
-    
+
     return this
   }
 
-  /**
-   * Creates a new processing instruction node and appends it to the list of 
-   * child nodes.
-   * 
-   * @param target - instruction target
-   * @param content - node content
-   * 
-   * @returns current element node
-   */
-  instruction(target:string, content?: string): XMLBuilder {
+  /** @inheritdoc */
+  instruction(target: string, content?: string): XMLBuilder {
     const ele = this._asElement
 
     const child = this._doc.createProcessingInstruction(target, content || '')
     ele.appendChild(child)
-    
+
     return this
   }
 
-  /**
-   * Creates a new raw text node and appends it to the list of child nodes.
-   * 
-   * @param content - node content
-   * 
-   * @returns current element node
-   */
+  /** @inheritdoc */
   raw(content: string): XMLBuilder {
     const ele = this._asElement
 
     const child = this._doc.createTextNode(content)
     ele.appendChild(child)
-    
+
     return this
   }
 
-  /**
-   * Returns the document node.
-   */
+  /** @inheritdoc */
   document(): XMLBuilder {
     return this._asBuilder(this._doc)
   }
 
-  /**
-   * Returns the root element node.
-   */
+  /** @inheritdoc */
   root(): XMLBuilder {
     const ele = this._doc.documentElement
     if (!ele) {
@@ -214,9 +112,7 @@ export class XMLBuilder {
     return this._asBuilder(ele)
   }
 
-  /**
-   * Returns the parent node.
-   */
+  /** @inheritdoc */
   up(): XMLBuilder {
     const parent = this._asNode.parentNode
     if (!parent) {
@@ -225,9 +121,7 @@ export class XMLBuilder {
     return this._asBuilder(parent)
   }
 
-  /**
-   * Returns the previous sibling node.
-   */
+  /** @inheritdoc */
   prev(): XMLBuilder {
     const node = this._asNode.previousSibling
     if (!node) {
@@ -236,9 +130,7 @@ export class XMLBuilder {
     return this._asBuilder(node)
   }
 
-  /**
-   * Returns the next sibling node.
-   */
+  /** @inheritdoc */
   next(): XMLBuilder {
     const node = this._asNode.nextSibling
     if (!node) {
