@@ -897,7 +897,7 @@ export interface Element extends Node, ParentNode,
   id: string
 
   /** 
-   * Gets or sets the interface Iname of this element.
+   * Gets or sets the class name of this element.
    */
   className: string
 

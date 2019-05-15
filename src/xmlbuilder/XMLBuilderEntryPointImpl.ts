@@ -1,17 +1,17 @@
 import { 
-  XMLBuilderOptions, XMLBuilderDocument, XMLBuilderElement 
+  XMLBuilderOptions, XMLBuilderDocument, XMLBuilderElement, XMLBuilderEntryPoint 
 } from "./interfaces"
 import { DOMImplementationInstance } from '../dom'
 
 /**
  * Defines the entry point for the XML builder.
  */
-export class XMLBuilderEntryPointImpl {
+export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
 
   private _options: XMLBuilderOptions = { version: "1.0" }
 
   /**
-   * Initializes a new instance of `XMLBuilderConfig`.
+   * Initializes a new instance of `XMLBuilderEntryPointImpl`.
    * 
    * @param options - builder options
    */
@@ -19,51 +19,13 @@ export class XMLBuilderEntryPointImpl {
     this._options = options || { version: "1.0" }
   }
 
-  /**
-   * Configures options for XML builder.
-   * 
-   * @param options - builder options
-   * 
-   * @returns builder with the given options applied
-   */
+  /** @inheritdoc */
   withOptions(options?: XMLBuilderOptions): XMLBuilderEntryPointImpl {
     this._options = options || { version: "1.0" }
     return this
   }
 
-  /**
-   * Creates an empty XML document.
-   * 
-   * @returns document node
-   */
-  create(): XMLBuilderDocument
-  
-  /**
-   * Creates a new XML document with an element node.
-   * 
-   * @param name - document element name
-   * 
-   * @returns root element node
-   */
-  create(name: string): XMLBuilderElement
-  
-  /**
-   * Creates a new XML document with an element node.
-   * 
-   * @param name - name of the root node
-   * 
-   * @returns root element node
-   */
-  create(namespace: string, qualifiedName: string): XMLBuilderElement
-
-  /**
-   * Creates a new XML document.
-   * 
-   * @param namespace - document element namespace
-   * @param qualifiedName - document element qualified name
-   * 
-   * @returns root element node or document node
-   */
+  /** @inheritdoc */
   create(namespace?: string, qualifiedName?: string): XMLBuilderDocument | XMLBuilderElement {
     if (namespace && qualifiedName) {
       const doc = DOMImplementationInstance.createDocument(namespace, qualifiedName)

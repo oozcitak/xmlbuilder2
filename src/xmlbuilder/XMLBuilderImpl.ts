@@ -18,9 +18,6 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  element(name: string): XMLBuilder
-
-  /** @inheritdoc */
   element(namespace: string, qualifiedName?: string): XMLBuilder {
     const node = this._asNode
     const child = (qualifiedName ?
@@ -31,9 +28,6 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     return this._asBuilder(child)
   }
-
-  /** @inheritdoc */
-  attribute(name: string, value: string): XMLBuilder
 
   /** @inheritdoc */
   attribute(namespace: string, qualifiedName: string, value?: string): XMLBuilder {
