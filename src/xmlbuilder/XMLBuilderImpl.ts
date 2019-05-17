@@ -1,5 +1,6 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
-import { XMLBuilderOptions, XMLBuilder } from "./interfaces"
+import { XMLBuilderOptions, XMLBuilder, AttributesOrText, XMLStringifier } from "./interfaces"
+import { isString, isArray, isFunction, isObject, isEmpty, getValue } from "../util"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -8,35 +9,139 @@ import { XMLBuilderOptions, XMLBuilder } from "./interfaces"
 export class XMLBuilderImpl implements XMLBuilder {
 
   private _options: XMLBuilderOptions = { version: "1.0" }
+  private _namespace?: string
 
   /** @inheritdoc */
-  get options(): XMLBuilderOptions {
-    return (<any>this._asBuilder(this._doc))._options
-  }
-  set options(value: XMLBuilderOptions) {
-    (<any>this._asBuilder(this._doc))._options = value
-  }
-
-  /** @inheritdoc */
-  element(namespace: string, qualifiedName?: string): XMLBuilder {
-    const node = this._asNode
-    const child = (qualifiedName ?
-      this._doc.createElementNS(namespace, qualifiedName) :
-      this._doc.createElement(namespace)
-    )
-    node.appendChild(child)
-
-    return this._asBuilder(child)
+  namespace(namespace: string): XMLBuilder {
+    this._namespace = namespace
+    return this
   }
 
   /** @inheritdoc */
-  attribute(namespace: string, qualifiedName: string, value?: string): XMLBuilder {
-    const ele = this._asElement
+  element(name: string | { [key: string]: any } | [any] | 
+    ((...args: any) => any), attributes?: { [key: string]: any },
+    text?: string): XMLBuilder {
 
-    if (value) {
-      ele.setAttributeNS(namespace, qualifiedName, value)
+    let lastChild: XMLBuilder | null = null
+                
+    if (isArray(name)) {
+      // expand if array
+      for (let i = 0, len = name.length; i < len; i++) {
+        const item = name[i]
+        lastChild = this.element(item)
+      }
+    } else if (isFunction(name)) {
+      // evaluate if function
+      lastChild = this.element(name.apply(this))
+    } else if (isObject(name)) {
+      // expand if object
+      for (const key in name) {
+        if (!name.hasOwnProperty(key)) continue
+        let val = name[key]
+        if (isFunction(val)) {
+          // evaluate if function
+          val = val.apply()
+        }
+        if (!this.options.ignoreDecorators && this.stringify.convertAttKey && key.indexOf(this.stringify.convertAttKey) === 0) {
+          // assign attributes
+          lastChild = this.attribute(key.substr(this.stringify.convertAttKey.length), val)
+        } else if (!this.options.separateArrayItems && Array.isArray(val) && isEmpty(val)) {
+          // skip empty arrays
+          lastChild = this._dummy()
+        } else if (isObject(val) && isEmpty(val)) {
+          // empty objects produce one node
+          lastChild = this.element(key)
+        } else if (!this.options.keepNullNodes && (val == null)) {
+          // skip null and undefined nodes
+          lastChild = this._dummy()
+        
+        } else if (!this.options.separateArrayItems && Array.isArray(val)) {
+          // expand list by creating child nodes
+          for (let j = 0, len = val.length; j < len; j++) {
+            const item = val[j]
+            let childNode: { [key: string]: any } = { }
+            childNode[key] = item
+            lastChild = this.element(childNode)
+          }
+        
+        // expand child nodes under parent
+        } else if (isObject(val)) {
+          // if the key is #text expand child nodes under this node to support mixed content
+          if (!this.options.ignoreDecorators && this.stringify.convertTextKey && key.indexOf(this.stringify.convertTextKey) === 0) {
+            lastChild = this.element(val)
+          } else {
+            lastChild = this.element(key)
+            lastChild.element(val)
+          }
+        } else {
+          // text node
+          lastChild = this.element(key, val)
+        }
+      }
+    } else if (!this.options.keepNullNodes && text === null) {
+      // skip null nodes
+      lastChild = this._dummy()
+    } else if (text !== undefined) {
+      if (!this.options.ignoreDecorators && this.stringify.convertTextKey && name.indexOf(this.stringify.convertTextKey) === 0) {
+        // text node
+        lastChild = this.text(text);
+      } else if (!this.options.ignoreDecorators && this.stringify.convertCDataKey && name.indexOf(this.stringify.convertCDataKey) === 0) {
+        // cdata node
+        lastChild = this.cdata(text);
+      } else if (!this.options.ignoreDecorators && this.stringify.convertCommentKey && name.indexOf(this.stringify.convertCommentKey) === 0) {
+        // comment node
+        lastChild = this.comment(text);
+      } else if (!this.options.ignoreDecorators && this.stringify.convertRawKey && name.indexOf(this.stringify.convertRawKey) === 0) {
+        // raw text node
+        lastChild = this.raw(text);
+      } else if (!this.options.ignoreDecorators && this.stringify.convertPIKey && name.indexOf(this.stringify.convertPIKey) === 0) {
+        // processing instruction
+        lastChild = this.instruction(name.substr(this.stringify.convertPIKey.length), text);
+      } else {
+        // element node with text
+        lastChild = this._node(name, attributes, text);
+      }
     } else {
-      ele.setAttribute(namespace, qualifiedName)
+      // element node without text
+      lastChild = this._node(name, attributes, text);
+    }
+    
+    if (lastChild == null) {
+      throw new Error("Could not create any elements with: " + name.toString() + ". " + this._debugInfo)
+    }
+    
+    return lastChild
+    
+  }
+
+  /** @inheritdoc */
+  attribute(name: AttributesOrText, value?: string): XMLBuilder {
+
+    name = getValue(name)
+    
+    if (isObject(name)) {
+      // expand if object
+      for (const attName in name) {
+        if (name.hasOwnProperty(attName)) {
+          const attValue = name[attName]
+          this.attribute(attName, attValue)
+        }
+      }
+    } else {
+      if (isFunction(value)) {
+        value = value.apply(this)
+      }
+      if (this.options.keepNullAttributes && (value == null)) {
+        this.attribute(name, "")
+      } else if (value != null) {
+        const ele = this._asElement
+        if (this._namespace !== undefined) {
+          ele.setAttributeNS(this._namespace, name, value)
+          this._resetNamespace()
+        } else {
+          ele.setAttribute(name, value)
+        }        
+      }
     }
 
     return this
@@ -134,6 +239,72 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /**
+   * Resets the namespace to `undefined`.
+   */
+  private _resetNamespace(): void {
+    this._namespace = undefined
+  }
+
+  /**
+   * Creates a new element node and appends it to the list of child nodes.
+   * 
+   * @param name - element name
+   * @param attributes - a JS object with element attributes
+   * @param text - contents of a text child node
+   *  
+   * @returns the new element node
+   */
+  private _node(name: string, attributes?: AttributesOrText,
+    text?: AttributesOrText): XMLBuilder {
+
+    name = getValue(name)
+
+    // swap argument order: text <-> attributes
+    if (!isObject(attributes)) {
+      [text, attributes] = [attributes, text]
+    }
+
+    if (attributes) {
+      attributes = <{ [key: string]: any }>getValue(attributes)
+    }
+    if (text) {
+      text = <string>text
+    }
+
+    const node = this._asNode
+    let child: Element
+    if (this._namespace !== undefined) {
+      child = this._doc.createElementNS(this._namespace, name)
+      this._resetNamespace()
+    } else {
+      child = this._doc.createElement(name)
+    }
+
+    node.appendChild(child)
+    const builder = this._asBuilder(child)
+    
+    if (attributes) builder.attribute(attributes)
+    if (text) builder.text(text)
+
+    return builder
+  }
+
+  /**
+   * Creates a dummy element node without adding it to the list of child nodes.
+   * 
+   * Dummy nodes are special nodes representing a node with a `null` value. 
+   * Dummy nodes are created while recursively building the XML tree. Simply
+   * skipping `null` values doesn't work because that would break the recursive
+   * chain.
+   * 
+   * @returns the new dummy element node
+   */
+  private _dummy(): XMLBuilder {
+    const child = this._doc.createElement('## DUMMY ##')
+    return this._asBuilder(child)
+  }
+
+  /**
    * Returns the document owning this node.
    */
   private get _doc(): Document {
@@ -143,6 +314,24 @@ export class XMLBuilderImpl implements XMLBuilder {
       throw new Error("Document is null. " + this._debugInfo)
     }
     return doc
+  }
+
+  /**
+   * Gets builder options.
+   */
+  private get options(): XMLBuilderOptions {
+    return (<any>this._asBuilder(this._doc))._options
+  }
+
+  /**
+   * Gets the stringifier.
+   */
+  private get stringify(): XMLStringifier {
+    if (!this.options.stringify) {
+      throw new Error("Stringifier functions not found.")
+    }
+
+    return this.options.stringify
   }
 
   /**

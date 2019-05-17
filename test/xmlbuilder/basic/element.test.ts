@@ -24,4 +24,23 @@ describe('element()', () => {
       `)
   })
 
+  test('from JS object', () => {
+    const root = $$.create('root')
+    root.element({ 
+      'node1' : { 'node1-1': '', 'node1-2': '' },
+      'node2' : { 'node2-1': '', 'node2-2': '', 'node2-3': '' }
+    })
+
+    expect($$.printTree(root.document())).toBe($$.t`
+      root
+        node1
+          node1-1
+          node1-2
+        node2
+          node2-1
+          node2-2
+          node2-3
+      `)
+  })
+
 })

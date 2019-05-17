@@ -1,6 +1,6 @@
-import { Element } from '../dom'
+import { Element } from "../dom"
 import { 
-  XMLBuilderOptions, XMLBuilder, XMLBuilderElement 
+  XMLBuilder, XMLBuilderElement, ExpandObject, AttributesOrText 
 } from "./interfaces"
 
 /**
@@ -10,12 +10,11 @@ export class XMLBuilderElementImpl extends Element implements XMLBuilderElement 
 
   // MIXIN: XMLBuilder
   /* istanbul ignore next */
-  get options(): XMLBuilderOptions { throw new Error("Mixin: XMLBuilder not implemented.") }
-  set options(value: XMLBuilderOptions) { throw new Error("Mixin: XMLBuilder not implemented.") }
+  namespace(namespace: string): XMLBuilder { throw new Error("Mixin: XMLBuilder not implemented.") }
   /* istanbul ignore next */
-  element(namespace: string, qualifiedName?: string): XMLBuilder { throw new Error("Mixin: XMLBuilder not implemented.") }
+  element(name: string | ExpandObject, attributes?: AttributesOrText, text?: AttributesOrText): XMLBuilder { throw new Error("Mixin: XMLBuilder not implemented.") }
   /* istanbul ignore next */
-  attribute(namespace: string, qualifiedName: string, value?: string): XMLBuilder { throw new Error("Mixin: XMLBuilder not implemented.") }
+  attribute(name: AttributesOrText, value?: string): XMLBuilder { throw new Error("Mixin: XMLBuilder not implemented.") }
   /* istanbul ignore next */
   text(content: string): XMLBuilder { throw new Error("Mixin: XMLBuilder not implemented.") }
   /* istanbul ignore next */

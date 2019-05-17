@@ -5,7 +5,7 @@ export interface XMLBuilderOptions {
   /**
    * A version number string, e.g. `1.0`
    */
-  version?: string
+  version?: "1.0" | "1.1"
   /**
    * Encoding declaration, e.g. `UTF-8`
    */
@@ -49,10 +49,6 @@ export interface XMLBuilderOptions {
    */
   noDoubleEncoding?: boolean;
   /**
-   * Whether values will be validated and escaped or returned as is
-   */
-  noValidation?: boolean
-  /**
    * A set of functions to use for converting values to strings
    */
   stringify?: XMLStringifier
@@ -61,89 +57,89 @@ export interface XMLBuilderOptions {
 /**
  * Defines the functions used for converting values to strings.
  */
-interface XMLStringifier {
+export interface XMLStringifier {
   /**
    * Converts an element or attribute name to string
    */
-  name?: (v: any) => string;
+  name?: (v: any) => string
   /**
    * Converts the contents of a text node to string
    */
-  text?: (v: any) => string;
+  text?: (v: any) => string
   /**
    * Converts the contents of a CDATA node to string
    */
-  cdata?: (v: any) => string;
+  cdata?: (v: any) => string
   /**
    * Converts the contents of a comment node to string
    */
-  comment?: (v: any) => string;
+  comment?: (v: any) => string
   /**
    * Converts the contents of a raw text node to string
    */
-  raw?: (v: any) => string;
+  raw?: (v: any) => string
   /**
    * Converts attribute value to string
    */
-  attValue?: (v: any) => string;
+  attValue?: (v: any) => string
   /**
    * Converts processing instruction target to string
    */
-  insTarget?: (v: any) => string;
+  insTarget?: (v: any) => string
   /**
    * Converts processing instruction value to string
    */
-  insValue?: (v: any) => string;
+  insValue?: (v: any) => string
   /**
    * Converts XML version to string
    */
-  xmlVersion?: (v: any) => string;
+  xmlVersion?: (v: any) => string
   /**
    * Converts XML encoding to string
    */
-  xmlEncoding?: (v: any) => string;
+  xmlEncoding?: (v: any) => string
   /**
    * Converts standalone document declaration to string
    */
-  xmlStandalone?: (v: any) => string;
+  xmlStandalone?: (v: any) => string
   /**
    * Converts DocType public identifier to string
    */
-  dtdPubID?: (v: any) => string;
+  dtdPubID?: (v: any) => string
   /**
    * Converts DocType system identifier to string
    */
-  dtdSysID?: (v: any) => string;
+  dtdSysID?: (v: any) => string
   /**
    * Converts `!ELEMENT` node content inside Doctype to string
    */
-  dtdElementValue?: (v: any) => string;
+  dtdElementValue?: (v: any) => string
   /**
    * Converts `!ATTLIST` node type inside DocType to string
    */
-  dtdAttType?: (v: any) => string;
+  dtdAttType?: (v: any) => string
   /**
    * Converts `!ATTLIST` node default value inside DocType to string
    */
-  dtdAttDefault?: (v: any) => string;
+  dtdAttDefault?: (v: any) => string
   /**
    * Converts `!ENTITY` node content inside Doctype to string
    */
-  dtdEntityValue?: (v: any) => string;
+  dtdEntityValue?: (v: any) => string
   /**
    * Converts `!NOTATION` node content inside Doctype to string
    */
-  dtdNData?: (v: any) => string;
+  dtdNData?: (v: any) => string
   /** 
    * When prepended to a JS object key, converts the key-value pair 
    * to an attribute. 
    */
-  convertAttKey?: string;
+  convertAttKey?: string
   /** 
    * When prepended to a JS object key, converts the key-value pair 
    * to a processing instruction node. 
    */
-  convertPIKey?: string;
+  convertPIKey?: string
   /** 
    * When prepended to a JS object key, converts its value to a text node. 
    * 
@@ -151,30 +147,36 @@ interface XMLStringifier {
    * nodes can be created by adding some unique text after each object 
    * key. For example: `{ '#text1': 'some text', '#text2': 'more text' };`
    */
-  convertTextKey?: string;
+  convertTextKey?: string
   /** 
    * When prepended to a JS object key, converts its value to a CDATA 
    * node. 
    */
-  convertCDataKey?: string;
+  convertCDataKey?: string
   /** 
    * When prepended to a JS object key, converts its value to a 
    * comment node.
    */
-  convertCommentKey?: string;
+  convertCommentKey?: string
   /** 
    * When prepended to a JS object key, converts its value to a raw 
    * text node. 
    */
-  convertRawKey?: string;
+  convertRawKey?: string
   /**
    * Escapes special characters in text.
    */
-  textEscape?: (v: string) => string;
+  textEscape?: (v: string) => string
   /**
    * Escapes special characters in attribute values.
    */
-  attEscape?: (v: string) => string;
+  attEscape?: (v: string) => string
+
+  /**
+   * Index signature
+   */
+  [key: string]: undefined | string | ((v: any) => string) | 
+    ((v: string) => string) | XMLBuilderOptions
 }
 
 /**
@@ -228,55 +230,77 @@ export interface XMLBuilderEntryPoint {
 }
 
 /**
+ * Represents the type of a variable that can be expanded by `element` function 
+ * into nodes.
+ */
+export type ExpandObject = { [key: string]: any } | [any] | ((...args: any) => any)
+
+/**
+ * Represents the type of a variable that can either be a JS object defining
+ * attributes or the contents of a text node.
+ */
+export type AttributesOrText = { [key: string]: any } | string
+
+/**
  * Represents a mixin that extends XML nodes to implement easy to use and
  * chainable document builder methods.
  */
 export interface XMLBuilder {
 
   /**
-   * Gets or sets builder options.
+   * Defines the namespace to be used in next element node or attribute.
+   * 
+   * @param namespace - namespace
+   * 
+   * @returns current element node
    */
-  options: XMLBuilderOptions
+  namespace(namespace: string): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
    * @param name - element name
-   * 
+   * @param attributes - a JS object with element attributes
+   * @param text - contents of a text child node
+   *  
    * @returns the new element node
    */
-  element(name: string): XMLBuilder
+  element(name: string, attributes?: AttributesOrText,
+    text?: AttributesOrText): XMLBuilder
+
+  /**
+   * Creates new element nodes from the given JS object and appends it to the
+   * list of child nodes.
+   * 
+   * @param obj - a JS object representing nodes to insert
+   * 
+   * @returns the last top level element node
+   */
+  element(obj: ExpandObject): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
-   * @param namespace - element namespace
-   * @param qualifiedName - qualified name
+   * @param name - element name or a JS object representing nodes to insert
+   * @param attributes - a JS object with element attributes
+   * @param text - contents of a text child node
    * 
    * @returns the new element node
    */
-  element(namespace: string, qualifiedName?: string): XMLBuilder
-
+  element(name: string | ExpandObject, attributes?: AttributesOrText,
+    text?: AttributesOrText): XMLBuilder
+   
   /**
    * Creates or updates an element attribute.
    * 
-   * @param name - attribute name
+   * @param name - attribute name or a JS object with element attributes or
+   * a qualified name if a namespace was defined with the `namespace` function
+   * immediately before this call
    * @param value - attribute value
    * 
    * @returns current element node
    */
-  attribute(name: string, value: string): XMLBuilder
-
-  /**
-   * Creates or updates an element attribute.
-   * 
-   * @param namespace - attribute namespace
-   * @param qualifiedName - qualified name
-   * @param value - attribute value
-   * 
-   * @returns current element node
-   */
-  attribute(namespace: string, qualifiedName: string, value?: string): XMLBuilder
+  attribute(name: AttributesOrText, value?: string): XMLBuilder
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
