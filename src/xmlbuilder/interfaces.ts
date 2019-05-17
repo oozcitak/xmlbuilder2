@@ -248,7 +248,7 @@ export type AttributesOrText = { [key: string]: any } | string
 export interface XMLBuilder {
 
   /**
-   * Defines the namespace to be used in next element node or attribute.
+   * Defines the namespace to be used for the next element node or attribute.
    * 
    * @param namespace - namespace
    * 
@@ -262,7 +262,10 @@ export interface XMLBuilder {
    * @param name - element name
    * @param attributes - a JS object with element attributes
    * @param text - contents of a text child node
-   *  
+   * 
+   * @remarks `attributes` and `text` parameters are optional and 
+   * interchangeable.
+   * 
    * @returns the new element node
    */
   element(name: string, attributes?: AttributesOrText,
@@ -274,7 +277,7 @@ export interface XMLBuilder {
    * 
    * @param obj - a JS object representing nodes to insert
    * 
-   * @returns the last top level element node
+   * @returns the last top level element node created
    */
   element(obj: ExpandObject): XMLBuilder
 
@@ -285,7 +288,7 @@ export interface XMLBuilder {
    * @param attributes - a JS object with element attributes
    * @param text - contents of a text child node
    * 
-   * @returns the new element node
+   * @returns the last top level element node created
    */
   element(name: string | ExpandObject, attributes?: AttributesOrText,
     text?: AttributesOrText): XMLBuilder
