@@ -54,7 +54,7 @@ export class DeclarationToken extends XMLTokenBase {
 }
 
 /**
- * Represents an doctype token.
+ * Represents a DocType token.
  */
 export class DocTypeToken extends XMLTokenBase {
   name = ''
