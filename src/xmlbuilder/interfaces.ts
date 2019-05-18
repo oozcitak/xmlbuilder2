@@ -3,11 +3,11 @@
  */
 export interface XMLBuilderOptions {
   /**
-   * A version number string, e.g. `1.0`
+   * A version number string, e.g. `"1.0"`
    */
   version?: "1.0" | "1.1"
   /**
-   * Encoding declaration, e.g. `UTF-8`
+   * Encoding declaration, e.g. `"UTF-8"`
    */
   encoding?: string
   /**
@@ -145,7 +145,11 @@ export interface XMLStringifier {
    * 
    * _Note:_ Since JS objects cannot contain duplicate keys, multiple text 
    * nodes can be created by adding some unique text after each object 
-   * key. For example: `{ '#text1': 'some text', '#text2': 'more text' };`
+   * key. For example: 
+   * 
+   * @example
+   * 
+   * const textNodes = { '#text1': 'some text', '#text2': 'more text' };
    */
   convertTextKey?: string
   /** 
@@ -377,13 +381,25 @@ export interface XMLBuilder {
    */
   next(): XMLBuilder
 
+  // Function aliases
+  ns(namespace: string): XMLBuilder
+  ele(name: string, attributes?: AttributesOrText, text?: AttributesOrText): XMLBuilder
+  ele(obj: ExpandObject): XMLBuilder
+  ele(name: string | ExpandObject, attributes?: AttributesOrText, text?: AttributesOrText): XMLBuilder
+  att(name: AttributesOrText, value?: string): XMLBuilder
+  txt(content: string): XMLBuilder
+  com(content: string): XMLBuilder
+  dat(content: string): XMLBuilder
+  ins(target: string, content?: string): XMLBuilder
+  doc(): XMLBuilder
+
 }
 
 /**
  * Represents an XML document extended with the builder mixin.
  * 
- * This type actually extends `XMLDocument` but this is not listed in the
- * interface definition to keep the visible API simple.
+ * _Note:_ This type actually extends `XMLDocument` from DOM but this is not 
+ * listed in the interface definition to keep the visible API simple.
  */
 export interface XMLBuilderDocument extends XMLBuilder {
 
@@ -392,8 +408,8 @@ export interface XMLBuilderDocument extends XMLBuilder {
 /**
  * Represents an element node extended with the builder mixin.
  * 
- * This type actually extends `Element` but this is not listed in the
- * interface definition to keep the visible API simple.
+ * _Note:_ This type actually extends `Element` from DOM but this is not listed
+ * in the interface definition to keep the visible API simple.
  */
 export interface XMLBuilderElement extends XMLBuilder {
 

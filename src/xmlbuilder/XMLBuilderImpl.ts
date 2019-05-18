@@ -1,5 +1,5 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
-import { XMLBuilderOptions, XMLBuilder, AttributesOrText, XMLStringifier } from "./interfaces"
+import { XMLBuilderOptions, XMLBuilder, AttributesOrText, XMLStringifier, ExpandObject } from "./interfaces"
 import { isString, isArray, isFunction, isObject, isEmpty, getValue } from "../util"
 
 /**
@@ -18,9 +18,21 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  element(name: string | { [key: string]: any } | [any] | 
-    ((...args: any) => any), attributes?: { [key: string]: any },
-    text?: string): XMLBuilder {
+  element(name: string | ExpandObject, attributes?: AttributesOrText,
+    text?: AttributesOrText): XMLBuilder {
+
+    name = getValue(name)
+    // swap argument order: text <-> attributes
+    if (!isObject(attributes)) {
+      [text, attributes] = [attributes, text]
+    }
+
+    if (attributes) {
+      attributes = <{ [key: string]: any }>getValue(attributes)
+    }
+    if (text) {
+      text = <string>text
+    }
 
     let lastChild: XMLBuilder | null = null
                 
@@ -386,4 +398,30 @@ export class XMLBuilderImpl implements XMLBuilder {
   private get _debugInfo(): string {
     return ''
   }
+
+  // Function aliases
+  /** @inheritdoc */
+  ns(namespace: string): XMLBuilder { return this.namespace(namespace) }
+  /** @inheritdoc */
+  ele(name: string | ExpandObject, attributes?: AttributesOrText, 
+    text?: AttributesOrText): XMLBuilder{
+    return this.element(name, attributes, text) 
+  }
+  /** @inheritdoc */
+  att(name: AttributesOrText, value?: string): XMLBuilder {
+    return this.attribute(name, value)
+  }
+  /** @inheritdoc */
+  txt(content: string): XMLBuilder { return this.text(content) }
+  /** @inheritdoc */
+  com(content: string): XMLBuilder { return this.comment(content) }
+  /** @inheritdoc */
+  dat(content: string): XMLBuilder { return this.cdata(content) }
+  /** @inheritdoc */
+  ins(target: string, content?: string): XMLBuilder { 
+    return this.instruction(target, content) 
+  }
+  /** @inheritdoc */
+  doc(): XMLBuilder { return this.document() }
+
 }
