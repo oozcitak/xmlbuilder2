@@ -1,63 +1,65 @@
 import { _applyMixin } from '../util'
 
 // Import implementation classes
-import { XMLBuilderOptions, XMLBuilder } from './interfaces'
-import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
+import { XMLBuilderOptions, XMLBuilder, ExpandObject } from './interfaces'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
 import { XMLDocumentImpl } from '../dom/XMLDocumentImpl'
 import { ElementImpl } from '../dom/ElementImpl'
+import { DOMImplementationInstance } from '../dom';
+import { XMLStringifierImpl } from './XMLStringifierImpl';
+import { isString } from 'util';
+import { DOMParser, MimeType } from '../parser/DOMParser'
+
 
 // Apply mixins
 // XMLBuilder
 _applyMixin(XMLDocumentImpl, XMLBuilderImpl)
 _applyMixin(ElementImpl, XMLBuilderImpl)
 
+
 /**
- * Configures options for XML builder.
+ * Creates an XML document.
  * 
  * @param options - builder options
  * 
- * @returns builder with the given options applied
+ * @returns document node
  */
-export function withOptions(options?: XMLBuilderOptions): XMLBuilderEntryPointImpl {
-  return new XMLBuilderEntryPointImpl(options)
+export function create(options?: XMLBuilderOptions): XMLBuilder {
+  const doc = DOMImplementationInstance.createDocument('', '');
+  options = options || { version: "1.0" }
+  if (!options.stringify) {
+    options.stringify = new XMLStringifierImpl(options)
+  }
+  (<any>doc)._options = options
+  return <XMLBuilder><unknown>doc
 }
 
+
 /**
- * Creates an empty XML document.
+ * Creates an XML document by parsing the given document representation.
+ * 
+ * @param document - a string containing an XML document or a JS object 
+ * representing nodes to insert
+ * @param options - builder options
  * 
  * @returns document node
  */
-export function create(): XMLBuilder
+export function parse(document: string | ExpandObject, options?: XMLBuilderOptions): XMLBuilder {
+  options = options || { version: "1.0" }
+  if (!options.stringify) {
+    options.stringify = new XMLStringifierImpl(options)
+  }
 
-/**
- * Creates a new XML document with an element node.
- * 
- * @param name - document element name
- * 
- * @returns root element node
- */
-export function create(name: string): XMLBuilder
-
-/**
- * Creates a new XML document with an element node.
- * 
- * @param namespace - document element namespace
- * @param qualifiedName - document element qualified name
- * 
- * @returns root element node
- */
-export function create(namespace: string, qualifiedName: string): XMLBuilder
-
-/**
- * Creates a new XML document.
- * 
- * @param namespace - document element namespace
- * @param qualifiedName - document element qualified name
- * 
- * @returns root element node or document node
- */
-export function create(namespace?: string, qualifiedName?: string): XMLBuilder {
-  const builder = new XMLBuilderEntryPointImpl()
-  return builder.create(namespace, qualifiedName)
+  if (isString(document)) {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(document, MimeType.XML);
+    (<any>doc)._options = options
+    return <XMLBuilder><unknown>doc
+  } else {
+    const doc = DOMImplementationInstance.createDocument('', '');
+    (<any>doc)._options = options
+    const builder = <XMLBuilder><unknown>doc
+    builder.element(document)
+    return builder
+  }
 }

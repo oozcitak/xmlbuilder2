@@ -186,57 +186,6 @@ export interface XMLStringifier {
 }
 
 /**
- * Defines the entry point for the XML builder.
- */
-export interface XMLBuilderEntryPoint {
-
-  /**
-   * Configures options for XML builder.
-   * 
-   * @param options - builder options
-   * 
-   * @returns builder with the given options applied
-   */
-  withOptions(options?: XMLBuilderOptions): XMLBuilderEntryPoint
-
-  /**
-   * Creates an empty XML document.
-   * 
-   * @returns document node
-   */
-  create(): XMLBuilder
-  
-  /**
-   * Creates a new XML document with an element node.
-   * 
-   * @param name - document element name
-   * 
-   * @returns root element node
-   */
-  create(name: string): XMLBuilder
-  
-  /**
-   * Creates a new XML document with an element node.
-   * 
-   * @param namespace - document element namespace
-   * @param qualifiedName - document element qualified name
-   * 
-   * @returns root element node
-   */
-  create(namespace: string, qualifiedName: string): XMLBuilder
-
-  /**
-   * Creates a new XML document.
-   * 
-   * @param namespace - document element namespace
-   * @param qualifiedName - document element qualified name
-   * 
-   * @returns root element node or document node
-   */
-  create(namespace?: string, qualifiedName?: string): XMLBuilder
-}
-
-/**
  * Represents the type of a variable that can be expanded by `element` function 
  * into nodes.
  */

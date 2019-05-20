@@ -23,7 +23,7 @@ import { Text as TextImpl } from '../src/dom'
 import { XMLDocument as XMLDocumentImpl } from '../src/dom'
 import { DOMImplementationInstance } from '../src/dom'
 
-import { create } from '../src/xmlbuilder'
+import { create, parse } from '../src/xmlbuilder'
 
 export default class TestHelpers {
   static Attr = AttrImpl
@@ -56,6 +56,7 @@ export default class TestHelpers {
    * Creates an XML document.
    */
   static create = create
+  static parse = parse
 
   /**
    * De-indents template literals.

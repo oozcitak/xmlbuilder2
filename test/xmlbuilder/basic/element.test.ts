@@ -3,7 +3,7 @@ import $$ from '../../TestHelpers'
 describe('element()', () => {
 
   test('string name', () => {
-    const root = $$.create('root')
+    const root = $$.create().element('root')
     const node1 = root.element('node1')
     node1.element('node1-1')
     node1.element('node1-2')
@@ -25,7 +25,7 @@ describe('element()', () => {
   })
 
   test('from JS object', () => {
-    const root = $$.create('root')
+    const root = $$.create().element('root')
     root.element({
       'node1': { 'node1-1': '', 'node1-2': '' },
       'node2': { 'node2-1': '', 'node2-2': '', 'node2-3': '' }
