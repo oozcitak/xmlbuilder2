@@ -1,6 +1,8 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
-import { XMLBuilderOptions, XMLBuilder, AttributesOrText, XMLStringifier, ExpandObject } from "./interfaces"
-import { isString, isArray, isFunction, isObject, isEmpty, getValue } from "../util"
+import { 
+  XMLBuilderOptions, XMLBuilder, AttributesOrText, XMLStringifier, ExpandObject 
+} from "./interfaces"
+import { isArray, isFunction, isObject, isEmpty, getValue } from "../util"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
