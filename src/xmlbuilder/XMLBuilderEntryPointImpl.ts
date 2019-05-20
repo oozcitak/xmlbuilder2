@@ -1,5 +1,5 @@
 import { 
-  XMLBuilderOptions, XMLBuilderDocument, XMLBuilderElement, XMLBuilderEntryPoint 
+  XMLBuilderOptions, XMLBuilderEntryPoint, XMLBuilder 
 } from "./interfaces"
 import { DOMImplementationInstance } from '../dom'
 import { XMLStringifierImpl } from "./XMLStringifierImpl"
@@ -29,19 +29,19 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   }
 
   /** @inheritdoc */
-  create(namespace?: string, qualifiedName?: string): XMLBuilderDocument | XMLBuilderElement {
+  create(namespace?: string, qualifiedName?: string): XMLBuilder {
     if (namespace && qualifiedName) {
       const doc = DOMImplementationInstance.createDocument(namespace, qualifiedName);
       (<any>doc)._options = this._options
-      return <XMLBuilderElement><unknown>doc.documentElement
+      return <XMLBuilder><unknown>doc.documentElement
     } else if (namespace) {
       const doc = DOMImplementationInstance.createDocument('', namespace);
       (<any>doc)._options = this._options
-      return <XMLBuilderElement><unknown>doc.documentElement
+      return <XMLBuilder><unknown>doc.documentElement
     } else {
       const doc = DOMImplementationInstance.createDocument('', '');
       (<any>doc)._options = this._options
-      return <XMLBuilderDocument><unknown>doc
+      return <XMLBuilder><unknown>doc
     }
   }
 }

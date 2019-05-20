@@ -1,3 +1,5 @@
+import { Element, XMLDocument } from "../dom/interfaces";
+
 /**
  * Defines the options used while creating an XML document.
  */
@@ -202,7 +204,7 @@ export interface XMLBuilderEntryPoint {
    * 
    * @returns document node
    */
-  create(): XMLBuilderDocument
+  create(): XMLBuilder
   
   /**
    * Creates a new XML document with an element node.
@@ -211,16 +213,17 @@ export interface XMLBuilderEntryPoint {
    * 
    * @returns root element node
    */
-  create(name: string): XMLBuilderElement
+  create(name: string): XMLBuilder
   
   /**
    * Creates a new XML document with an element node.
    * 
-   * @param name - name of the root node
+   * @param namespace - document element namespace
+   * @param qualifiedName - document element qualified name
    * 
    * @returns root element node
    */
-  create(namespace: string, qualifiedName: string): XMLBuilderElement
+  create(namespace: string, qualifiedName: string): XMLBuilder
 
   /**
    * Creates a new XML document.
@@ -230,7 +233,7 @@ export interface XMLBuilderEntryPoint {
    * 
    * @returns root element node or document node
    */
-  create(namespace?: string, qualifiedName?: string): XMLBuilderDocument | XMLBuilderElement
+  create(namespace?: string, qualifiedName?: string): XMLBuilder
 }
 
 /**
@@ -392,25 +395,5 @@ export interface XMLBuilder {
   dat(content: string): XMLBuilder
   ins(target: string, content?: string): XMLBuilder
   doc(): XMLBuilder
-
-}
-
-/**
- * Represents an XML document extended with the builder mixin.
- * 
- * _Note:_ This type actually extends `XMLDocument` from DOM but this is not 
- * listed in the interface definition to keep the visible API simple.
- */
-export interface XMLBuilderDocument extends XMLBuilder {
-
-}
-
-/**
- * Represents an element node extended with the builder mixin.
- * 
- * _Note:_ This type actually extends `Element` from DOM but this is not listed
- * in the interface definition to keep the visible API simple.
- */
-export interface XMLBuilderElement extends XMLBuilder {
 
 }

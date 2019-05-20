@@ -1,9 +1,7 @@
 import { _applyMixin } from '../util'
 
 // Import implementation classes
-import {
-  XMLBuilderOptions, XMLBuilderDocument, XMLBuilderElement
-} from './interfaces'
+import { XMLBuilderOptions, XMLBuilder } from './interfaces'
 import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
 import { XMLDocumentImpl } from '../dom/XMLDocumentImpl'
@@ -30,7 +28,7 @@ export function withOptions(options?: XMLBuilderOptions): XMLBuilderEntryPointIm
  * 
  * @returns document node
  */
-export function create(): XMLBuilderDocument
+export function create(): XMLBuilder
 
 /**
  * Creates a new XML document with an element node.
@@ -39,7 +37,7 @@ export function create(): XMLBuilderDocument
  * 
  * @returns root element node
  */
-export function create(name: string): XMLBuilderElement
+export function create(name: string): XMLBuilder
 
 /**
  * Creates a new XML document with an element node.
@@ -49,7 +47,7 @@ export function create(name: string): XMLBuilderElement
  * 
  * @returns root element node
  */
-export function create(namespace: string, qualifiedName: string): XMLBuilderElement
+export function create(namespace: string, qualifiedName: string): XMLBuilder
 
 /**
  * Creates a new XML document.
@@ -59,13 +57,7 @@ export function create(namespace: string, qualifiedName: string): XMLBuilderElem
  * 
  * @returns root element node or document node
  */
-export function create(namespace?: string, qualifiedName?: string): XMLBuilderDocument | XMLBuilderElement {
+export function create(namespace?: string, qualifiedName?: string): XMLBuilder {
   const builder = new XMLBuilderEntryPointImpl()
-  if (namespace && qualifiedName) {
-    return builder.create(namespace, qualifiedName)
-  } else if (namespace) {
-    return builder.create(namespace)
-  } else {
-    return builder.create()
-  }
+  return builder.create(namespace, qualifiedName)
 }
