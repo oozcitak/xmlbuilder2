@@ -52,14 +52,14 @@ export function parse(document: string | ExpandObject, options?: XMLBuilderOptio
 
   if (isString(document)) {
     const parser = new DOMParser()
-    const doc = parser.parseFromString(document, MimeType.XML);
-    (<any>doc)._options = options
+    const doc = parser.parseFromString(document, MimeType.XML) as any
+    doc._options = options
     return <XMLBuilder><unknown>doc
   } else {
-    const doc = DOMImplementationInstance.createDocument('', '');
-    (<any>doc)._options = options
+    const doc = DOMImplementationInstance.createDocument('', '') as any
+    doc._options = options
     const builder = <XMLBuilder><unknown>doc
-    builder.element(document)
+    doc.element(document)
     return builder
   }
 }

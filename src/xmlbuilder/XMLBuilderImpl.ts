@@ -211,7 +211,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   document(): XMLBuilder {
-    return this._asBuilder(this._doc)
+    return XMLBuilderImpl.FromNode(this._doc)
   }
 
   /** @inheritdoc */
@@ -220,7 +220,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (!ele) {
       throw new Error("Document root element is null. " + this._debugInfo)
     }
-    return this._asBuilder(ele)
+    return XMLBuilderImpl.FromNode(ele)
   }
 
   /** @inheritdoc */
@@ -229,7 +229,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (!parent) {
       throw new Error("Parent node is null. " + this._debugInfo)
     }
-    return this._asBuilder(parent)
+    return XMLBuilderImpl.FromNode(parent)
   }
 
   /** @inheritdoc */
@@ -238,7 +238,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (!node) {
       throw new Error("Previous sibling node is null. " + this._debugInfo)
     }
-    return this._asBuilder(node)
+    return XMLBuilderImpl.FromNode(node)
   }
 
   /** @inheritdoc */
@@ -247,7 +247,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (!node) {
       throw new Error("Next sibling node is null. " + this._debugInfo)
     }
-    return this._asBuilder(node)
+    return XMLBuilderImpl.FromNode(node)
   }
 
   /**
@@ -293,7 +293,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
 
     node.appendChild(child)
-    const builder = this._asBuilder(child)
+    const builder = XMLBuilderImpl.FromNode(child)
     
     if (attributes) builder.attribute(attributes)
     if (text) builder.text(text)
@@ -313,7 +313,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    */
   private _dummy(): XMLBuilder {
     const child = this._doc.createElement('## DUMMY ##')
-    return this._asBuilder(child)
+    return XMLBuilderImpl.FromNode(child)
   }
 
   /**
@@ -332,7 +332,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * Gets builder options.
    */
   private get options(): XMLBuilderOptions {
-    return (<any>this._asBuilder(this._doc))._options
+    return this._options
   }
 
   /**
@@ -388,7 +388,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /**
    * Converts a node to an xml builder.
    */
-  private _asBuilder(node: Node): XMLBuilder {
+  private static FromNode(node: Node): XMLBuilder {
     return <XMLBuilder><unknown>node
   }
 
