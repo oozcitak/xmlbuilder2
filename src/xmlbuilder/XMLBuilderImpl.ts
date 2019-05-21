@@ -347,7 +347,12 @@ export class XMLBuilderImpl implements XMLBuilder {
    * Gets builder options.
    */
   private get options(): XMLBuilderOptions {
-    return this._options
+    const node = this._asNode
+    if(node.nodeType === NodeType.Document) {
+      return this._options
+    } else {
+      return (<any>this.document())._options
+    }
   }
 
   /**
