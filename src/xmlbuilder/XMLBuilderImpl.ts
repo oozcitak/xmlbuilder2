@@ -162,6 +162,19 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
+  removeAttribute(name: string | [string]): XMLBuilder {
+    if (isArray(name)) {
+      for (const attName of name) {
+        this.removeAttribute(attName)
+      }
+    } else {
+      (<any>this)._removeAttribute(name)
+    }
+
+    return this
+  }
+
+  /** @inheritdoc */
   text(content: string): XMLBuilder {
     const ele = this._asElement
 
