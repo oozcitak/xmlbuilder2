@@ -8,7 +8,7 @@ describe('create()', () => {
   })
 
   test('Document with root element', () => {
-    const ele = $$.create().element('root')
+    const ele = $$.create().ele('root')
     expect($$.printTree(ele)).toBe('root')
   })
 

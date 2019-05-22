@@ -23,13 +23,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  namespace(namespace: string): XMLBuilder {
-    this._namespace = namespace
-    return this
-  }
-
-  /** @inheritdoc */
-  element(name: string | ExpandObject, attributes?: AttributesOrText,
+  ele(name: string | ExpandObject, attributes?: AttributesOrText,
     text?: AttributesOrText): XMLBuilder {
 
     name = getValue(name)
@@ -51,11 +45,11 @@ export class XMLBuilderImpl implements XMLBuilder {
       // expand if array
       for (let i = 0, len = name.length; i < len; i++) {
         const item = name[i]
-        lastChild = this.element(item)
+        lastChild = this.ele(item)
       }
     } else if (isFunction(name)) {
       // evaluate if function
-      lastChild = this.element(name.apply(this))
+      lastChild = this.ele(name.apply(this))
     } else if (isObject(name)) {
       // expand if object
       for (const key in name) {
@@ -67,13 +61,13 @@ export class XMLBuilderImpl implements XMLBuilder {
         }
         if (!this._options.ignoreDecorators && this._stringify.convertAttKey && key.indexOf(this._stringify.convertAttKey) === 0) {
           // assign attributes
-          lastChild = this.attribute(key.substr(this._stringify.convertAttKey.length), val)
+          lastChild = this.att(key.substr(this._stringify.convertAttKey.length), val)
         } else if (!this._options.separateArrayItems && Array.isArray(val) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
         } else if (isObject(val) && isEmpty(val)) {
           // empty objects produce one node
-          lastChild = this.element(key)
+          lastChild = this.ele(key)
         } else if (!this._options.keepNullNodes && (val == null)) {
           // skip null and undefined nodes
           lastChild = this._dummy()
@@ -84,21 +78,21 @@ export class XMLBuilderImpl implements XMLBuilder {
             const item = val[j]
             let childNode: { [key: string]: any } = { }
             childNode[key] = item
-            lastChild = this.element(childNode)
+            lastChild = this.ele(childNode)
           }
         
         // expand child nodes under parent
         } else if (isObject(val)) {
           // if the key is #text expand child nodes under this node to support mixed content
           if (!this._options.ignoreDecorators && this._stringify.convertTextKey && key.indexOf(this._stringify.convertTextKey) === 0) {
-            lastChild = this.element(val)
+            lastChild = this.ele(val)
           } else {
-            lastChild = this.element(key)
-            lastChild.element(val)
+            lastChild = this.ele(key)
+            lastChild.ele(val)
           }
         } else {
           // text node
-          lastChild = this.element(key, val)
+          lastChild = this.ele(key, val)
         }
       }
     } else if (!this._options.keepNullNodes && text === null) {
@@ -107,19 +101,19 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else if (text !== undefined) {
       if (!this._options.ignoreDecorators && this._stringify.convertTextKey && name.indexOf(this._stringify.convertTextKey) === 0) {
         // text node
-        lastChild = this.text(text);
+        lastChild = this.txt(text);
       } else if (!this._options.ignoreDecorators && this._stringify.convertCDataKey && name.indexOf(this._stringify.convertCDataKey) === 0) {
         // cdata node
-        lastChild = this.cdata(text);
+        lastChild = this.dat(text);
       } else if (!this._options.ignoreDecorators && this._stringify.convertCommentKey && name.indexOf(this._stringify.convertCommentKey) === 0) {
         // comment node
-        lastChild = this.comment(text);
+        lastChild = this.com(text);
       } else if (!this._options.ignoreDecorators && this._stringify.convertRawKey && name.indexOf(this._stringify.convertRawKey) === 0) {
         // raw text node
         lastChild = this.raw(text);
       } else if (!this._options.ignoreDecorators && this._stringify.convertPIKey && name.indexOf(this._stringify.convertPIKey) === 0) {
         // processing instruction
-        lastChild = this.instruction(name.substr(this._stringify.convertPIKey.length), text);
+        lastChild = this.ins(name.substr(this._stringify.convertPIKey.length), text);
       } else {
         // element node with text
         lastChild = this._node(name, attributes, text);
@@ -138,14 +132,14 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  removeElement(): XMLBuilder {
+  removeEle(): XMLBuilder {
     const parent = this.parent
     this._asAny.remove()
     return parent
   }
 
   /** @inheritdoc */
-  attribute(name: AttributesOrText, value?: string): XMLBuilder {
+  att(name: AttributesOrText, value?: string): XMLBuilder {
 
     name = getValue(name)
     
@@ -154,7 +148,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       for (const attName in name) {
         if (name.hasOwnProperty(attName)) {
           const attValue = name[attName]
-          this.attribute(attName, attValue)
+          this.att(attName, attValue)
         }
       }
     } else {
@@ -162,7 +156,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         value = value.apply(this)
       }
       if (this._options.keepNullAttributes && (value == null)) {
-        this.attribute(name, "")
+        this.att(name, "")
       } else if (value != null) {
         const ele = this._asElement
         if (this._namespace !== undefined) {
@@ -191,7 +185,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  text(content: string): XMLBuilder {
+  txt(content: string): XMLBuilder {
     const ele = this._asElement
 
     const child = this._doc.createTextNode(content)
@@ -201,7 +195,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  comment(content: string): XMLBuilder {
+  com(content: string): XMLBuilder {
     const ele = this._asElement
 
     const child = this._doc.createComment(content)
@@ -211,7 +205,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  cdata(content: string): XMLBuilder {
+  dat(content: string): XMLBuilder {
     const ele = this._asElement
 
     const child = this._doc.createCDATASection(content)
@@ -221,7 +215,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  instruction(target: string, content?: string): XMLBuilder {
+  ins(target: string, content?: string): XMLBuilder {
     const ele = this._asElement
 
     const child = this._doc.createProcessingInstruction(target, content || '')
@@ -241,7 +235,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  document(): XMLBuilder {
+  doc(): XMLBuilder {
     return XMLBuilderImpl.FromNode(this._doc)
   }
 
@@ -275,6 +269,15 @@ export class XMLBuilderImpl implements XMLBuilder {
       throw new Error("Next sibling node is null. " + this._debugInfo())
     }
     return XMLBuilderImpl.FromNode(node)
+  }
+
+  /**
+   * Sets the namespace.
+   * 
+   * @param namespace - namespace
+   */
+  private _setNamespace(namespace: string): void {
+    this._namespace = namespace
   }
 
   /**
@@ -322,8 +325,8 @@ export class XMLBuilderImpl implements XMLBuilder {
     node.appendChild(child)
     const builder = XMLBuilderImpl.FromNode(child)
     
-    if (attributes) builder.attribute(attributes)
-    if (text) builder.text(text)
+    if (attributes) builder.att(attributes)
+    if (text) builder.txt(text)
 
     return builder
   }
@@ -363,7 +366,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if(node.nodeType === NodeType.Document) {
       return this._builderOptions || { version : "1.0" }
     } else {
-      return (<XMLBuilderImpl>this.document())._asAny._builderOptions
+      return (<XMLBuilderImpl>this.doc())._asAny._builderOptions
     }
   }
   private set _options(options: XMLBuilderOptions) {
@@ -371,7 +374,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if(node.nodeType === NodeType.Document) {
       this._builderOptions = options
     } else {
-      (<XMLBuilderImpl>this.document())._asAny._builderOptions = options
+      (<XMLBuilderImpl>this.doc())._asAny._builderOptions = options
     }
   }
 
@@ -461,30 +464,5 @@ export class XMLBuilderImpl implements XMLBuilder {
       return "node: <" + name + ">, parent: <" + parentName + ">"
     }
   }
-
-  // Function aliases
-  /** @inheritdoc */
-  ns(namespace: string): XMLBuilder { return this.namespace(namespace) }
-  /** @inheritdoc */
-  ele(name: string | ExpandObject, attributes?: AttributesOrText, 
-    text?: AttributesOrText): XMLBuilder{
-    return this.element(name, attributes, text) 
-  }
-  /** @inheritdoc */
-  att(name: AttributesOrText, value?: string): XMLBuilder {
-    return this.attribute(name, value)
-  }
-  /** @inheritdoc */
-  txt(content: string): XMLBuilder { return this.text(content) }
-  /** @inheritdoc */
-  com(content: string): XMLBuilder { return this.comment(content) }
-  /** @inheritdoc */
-  dat(content: string): XMLBuilder { return this.cdata(content) }
-  /** @inheritdoc */
-  ins(target: string, content?: string): XMLBuilder { 
-    return this.instruction(target, content) 
-  }
-  /** @inheritdoc */
-  doc(): XMLBuilder { return this.document() }
 
 }

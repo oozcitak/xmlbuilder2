@@ -61,7 +61,7 @@ export function parse(document: string | ExpandObject, options?: XMLBuilderOptio
     const doc = DOMImplementationInstance.createDocument('', '') as any
     doc._options = options
     const builder = <XMLBuilder><unknown>doc
-    doc.element(document)
+    builder.ele(document)
     return builder
   }
 }

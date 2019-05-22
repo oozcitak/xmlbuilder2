@@ -207,15 +207,6 @@ export interface XMLBuilder {
   readonly parent: XMLBuilder
 
   /**
-   * Defines the namespace to be used for the next element node or attribute.
-   * 
-   * @param namespace - namespace
-   * 
-   * @returns current element node
-   */
-  namespace(namespace: string): XMLBuilder
-
-  /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
    * @param name - element name
@@ -227,7 +218,7 @@ export interface XMLBuilder {
    * 
    * @returns the new element node
    */
-  element(name: string, attributes?: AttributesOrText,
+  ele(name: string, attributes?: AttributesOrText,
     text?: AttributesOrText): XMLBuilder
 
   /**
@@ -238,7 +229,7 @@ export interface XMLBuilder {
    * 
    * @returns the last top level element node created
    */
-  element(obj: ExpandObject): XMLBuilder
+  ele(obj: ExpandObject): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -249,7 +240,7 @@ export interface XMLBuilder {
    * 
    * @returns the last top level element node created
    */
-  element(name: string | ExpandObject, attributes?: AttributesOrText,
+  ele(name: string | ExpandObject, attributes?: AttributesOrText,
     text?: AttributesOrText): XMLBuilder
    
   /**
@@ -257,19 +248,17 @@ export interface XMLBuilder {
    * 
    * @returns parent element node
    */
-  removeElement(): XMLBuilder
+  removeEle(): XMLBuilder
 
   /**
    * Creates or updates an element attribute.
    * 
-   * @param name - attribute name or a JS object with element attributes or
-   * a qualified name if a namespace was defined with the `namespace` function
-   * immediately before this call
+   * @param name - attribute name or a JS object with element attributes
    * @param value - attribute value
    * 
    * @returns current element node
    */
-  attribute(name: AttributesOrText, value?: string): XMLBuilder
+  att(name: AttributesOrText, value?: string): XMLBuilder
 
   /**
    * Removes an attribute or a list of attributes.
@@ -287,7 +276,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  text(content: string): XMLBuilder
+  txt(content: string): XMLBuilder
 
   /**
    * Creates a new comment node and appends it to the list of child nodes.
@@ -296,7 +285,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  comment(content: string): XMLBuilder
+  com(content: string): XMLBuilder
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.
@@ -305,7 +294,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  cdata(content: string): XMLBuilder
+  dat(content: string): XMLBuilder
 
   /**
    * Creates a new processing instruction node and appends it to the list of 
@@ -316,7 +305,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  instruction(target: string, content?: string): XMLBuilder
+  ins(target: string, content?: string): XMLBuilder
 
   /**
    * Creates a new raw text node and appends it to the list of child nodes.
@@ -330,7 +319,7 @@ export interface XMLBuilder {
   /**
    * Returns the document node.
    */
-  document(): XMLBuilder
+  doc(): XMLBuilder
 
   /**
    * Returns the root element node.
@@ -351,17 +340,5 @@ export interface XMLBuilder {
    * Returns the next sibling node.
    */
   next(): XMLBuilder
-
-  // Function aliases
-  ns(namespace: string): XMLBuilder
-  ele(name: string, attributes?: AttributesOrText, text?: AttributesOrText): XMLBuilder
-  ele(obj: ExpandObject): XMLBuilder
-  ele(name: string | ExpandObject, attributes?: AttributesOrText, text?: AttributesOrText): XMLBuilder
-  att(name: AttributesOrText, value?: string): XMLBuilder
-  txt(content: string): XMLBuilder
-  com(content: string): XMLBuilder
-  dat(content: string): XMLBuilder
-  ins(target: string, content?: string): XMLBuilder
-  doc(): XMLBuilder
 
 }

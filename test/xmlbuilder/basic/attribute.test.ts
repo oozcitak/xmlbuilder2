@@ -1,14 +1,14 @@
 import $$ from '../../TestHelpers'
 
-describe('attribute()', () => {
+describe('att()', () => {
 
   test('add attribute', () => {
-    const root = $$.create().element('root')
-    const node1 = root.element('node1')
-    node1.attribute('att1', 'val1').attribute('att2', 'val2').element('node1-2')
-    const node2 = root.element('node2')
+    const root = $$.create().ele('root')
+    const node1 = root.ele('node1')
+    node1.att('att1', 'val1').att('att2', 'val2').ele('node1-2')
+    const node2 = root.ele('node2')
 
-    expect($$.printTree(root.document())).toBe($$.t`
+    expect($$.printTree(root.doc())).toBe($$.t`
       root
         node1 att1="val1" att2="val2"
           node1-2
@@ -17,12 +17,12 @@ describe('attribute()', () => {
   })
 
   test('replace attribute', () => {
-    const root = $$.create().element('root')
-    const node1 = root.element('node1')
-    node1.attribute('att1', 'val1').attribute('att1', 'val2').element('node1-2')
-    const node2 = root.element('node2')
+    const root = $$.create().ele('root')
+    const node1 = root.ele('node1')
+    node1.att('att1', 'val1').att('att1', 'val2').ele('node1-2')
+    const node2 = root.ele('node2')
 
-    expect($$.printTree(root.document())).toBe($$.t`
+    expect($$.printTree(root.doc())).toBe($$.t`
       root
         node1 att1="val2"
           node1-2
@@ -31,18 +31,18 @@ describe('attribute()', () => {
   })
 
   test('remove attribute', () => {
-    const root = $$.create().element('root')
-    const node1 = root.element('node1')
-    node1.attribute('att1', 'val1')
-      .attribute('att2', 'val2')
-      .attribute('att3', 'val3')
-      .attribute('att4', 'val4')
-    node1.element('node1-2')
-    const node2 = root.element('node2')
+    const root = $$.create().ele('root')
+    const node1 = root.ele('node1')
+    node1.att('att1', 'val1')
+      .att('att2', 'val2')
+      .att('att3', 'val3')
+      .att('att4', 'val4')
+    node1.ele('node1-2')
+    const node2 = root.ele('node2')
     node1.removeAtt('att2')
     node1.removeAtt(['att1', 'att2', 'att4'])
 
-    expect($$.printTree(root.document())).toBe($$.t`
+    expect($$.printTree(root.doc())).toBe($$.t`
       root
         node1 att3="val3"
           node1-2

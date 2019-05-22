@@ -1,18 +1,18 @@
 import $$ from '../../TestHelpers'
 
-describe('element()', () => {
+describe('ele()', () => {
 
   test('string name', () => {
-    const root = $$.create().element('root')
-    const node1 = root.element('node1')
-    node1.element('node1-1')
-    node1.element('node1-2')
-    const node2 = root.element('node2')
-    node2.element('node2-1')
-    node2.element('node2-2')
-    node2.element('node2-3')
+    const root = $$.create().ele('root')
+    const node1 = root.ele('node1')
+    node1.ele('node1-1')
+    node1.ele('node1-2')
+    const node2 = root.ele('node2')
+    node2.ele('node2-1')
+    node2.ele('node2-2')
+    node2.ele('node2-3')
 
-    expect($$.printTree(root.document())).toBe($$.t`
+    expect($$.printTree(root.doc())).toBe($$.t`
       root
         node1
           node1-1
@@ -25,13 +25,13 @@ describe('element()', () => {
   })
 
   test('from JS object', () => {
-    const root = $$.create().element('root')
-    root.element({
+    const root = $$.create().ele('root')
+    root.ele({
       'node1': { 'node1-1': '', 'node1-2': '' },
       'node2': { 'node2-1': '', 'node2-2': '', 'node2-3': '' }
     })
 
-    expect($$.printTree(root.document())).toBe($$.t`
+    expect($$.printTree(root.doc())).toBe($$.t`
       root
         node1
           node1-1

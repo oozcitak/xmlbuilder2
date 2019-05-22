@@ -1,15 +1,15 @@
 import $$ from '../../TestHelpers'
 
-describe('instruction()', () => {
+describe('ins()', () => {
 
   test('basic', () => {
-    const root = $$.create().element('root')
-    const node1 = root.element('node1')
-    node1.instruction('target1', 'content').element('node1-2')
-    const node2 = root.element('node2')
-    node2.instruction('target2')
+    const root = $$.create().ele('root')
+    const node1 = root.ele('node1')
+    node1.ins('target1', 'content').ele('node1-2')
+    const node2 = root.ele('node2')
+    node2.ins('target2')
 
-    expect($$.printTree(root.document())).toBe($$.t`
+    expect($$.printTree(root.doc())).toBe($$.t`
       root
         node1
           ? target1 content
