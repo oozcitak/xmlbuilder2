@@ -6,13 +6,7 @@
  */
 export function _applyMixin(baseClass: any, mixinClass: any): void {
   Object.getOwnPropertyNames(mixinClass.prototype).forEach(name => {
-    const basePropDesc = Object.getOwnPropertyDescriptor(baseClass.prototype, name)
     const propDesc = Object.getOwnPropertyDescriptor(mixinClass.prototype, name)
-    /* istanbul ignore else */
-    if (basePropDesc) {
-      // store a reference to the original function
-      Object.defineProperty(baseClass.prototype, "_" + name, basePropDesc)
-    }
     /* istanbul ignore else */
     if (propDesc) {
       Object.defineProperty(baseClass.prototype, name, propDesc)

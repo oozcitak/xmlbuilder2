@@ -39,8 +39,8 @@ describe('attribute()', () => {
       .attribute('att4', 'val4')
     node1.element('node1-2')
     const node2 = root.element('node2')
-    node1.removeAttribute('att2')
-    node1.removeAttribute(['att1', 'att2', 'att4'])
+    node1.removeAtt('att2')
+    node1.removeAtt(['att1', 'att2', 'att4'])
 
     expect($$.printTree(root.document())).toBe($$.t`
       root

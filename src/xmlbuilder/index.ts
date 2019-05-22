@@ -3,12 +3,14 @@ import { _applyMixin } from '../util'
 // Import implementation classes
 import { XMLBuilderOptions, XMLBuilder, ExpandObject } from './interfaces'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
-import { XMLDocumentImpl } from '../dom/XMLDocumentImpl'
-import { ElementImpl } from '../dom/ElementImpl'
-import { DOMImplementationInstance } from '../dom';
-import { XMLStringifierImpl } from './XMLStringifierImpl';
-import { isString } from 'util';
-import { DOMParser, MimeType } from '../parser/DOMParser'
+import { XMLStringifierImpl } from './XMLStringifierImpl'
+import { isString } from 'util'
+import { 
+  DOMImplementationInstance, 
+  XMLDocument as XMLDocumentImpl, 
+  Element as ElementImpl 
+} from '../dom'
+import { DOMParser, MimeType } from '../parser'
 
 
 // Apply mixins

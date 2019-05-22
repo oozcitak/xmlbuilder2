@@ -14,6 +14,15 @@ export class XMLBuilderImpl implements XMLBuilder {
   private _namespace?: string
 
   /** @inheritdoc */
+  get parent(): XMLBuilder {
+    const parent = this._asNode.parentNode
+    if (!parent) {
+      throw new Error("Parent node is null. " + this._debugInfo())
+    }
+    return XMLBuilderImpl.FromNode(parent)
+  }
+
+  /** @inheritdoc */
   namespace(namespace: string): XMLBuilder {
     this._namespace = namespace
     return this
@@ -121,11 +130,18 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
     
     if (lastChild == null) {
-      throw new Error("Could not create any elements with: " + name.toString() + ". " + this._debugInfo)
+      throw new Error("Could not create any elements with: " + name.toString() + ". " + this._debugInfo())
     }
     
     return lastChild
     
+  }
+
+  /** @inheritdoc */
+  removeNode(): XMLBuilder {
+    const parent = this.parent
+    this._asAny.remove()
+    return parent
   }
 
   /** @inheritdoc */
@@ -162,13 +178,13 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  removeAttribute(name: string | [string]): XMLBuilder {
+  removeAtt(name: string | [string]): XMLBuilder {
     if (isArray(name)) {
       for (const attName of name) {
-        this.removeAttribute(attName)
+        this.removeAtt(attName)
       }
     } else {
-      (<any>this)._removeAttribute(name)
+      this._asElement.removeAttribute(name)
     }
 
     return this
@@ -233,25 +249,21 @@ export class XMLBuilderImpl implements XMLBuilder {
   root(): XMLBuilder {
     const ele = this._doc.documentElement
     if (!ele) {
-      throw new Error("Document root element is null. " + this._debugInfo)
+      throw new Error("Document root element is null. " + this._debugInfo())
     }
     return XMLBuilderImpl.FromNode(ele)
   }
 
   /** @inheritdoc */
   up(): XMLBuilder {
-    const parent = this._asNode.parentNode
-    if (!parent) {
-      throw new Error("Parent node is null. " + this._debugInfo)
-    }
-    return XMLBuilderImpl.FromNode(parent)
+    return this.parent
   }
 
   /** @inheritdoc */
   prev(): XMLBuilder {
     const node = this._asNode.previousSibling
     if (!node) {
-      throw new Error("Previous sibling node is null. " + this._debugInfo)
+      throw new Error("Previous sibling node is null. " + this._debugInfo())
     }
     return XMLBuilderImpl.FromNode(node)
   }
@@ -260,7 +272,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   next(): XMLBuilder {
     const node = this._asNode.nextSibling
     if (!node) {
-      throw new Error("Next sibling node is null. " + this._debugInfo)
+      throw new Error("Next sibling node is null. " + this._debugInfo())
     }
     return XMLBuilderImpl.FromNode(node)
   }
@@ -338,7 +350,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const node = this._asNode
     const doc = node.ownerDocument
     if (!doc) {
-      throw new Error("Document is null. " + this._debugInfo)
+      throw new Error("Document is null. " + this._debugInfo())
     }
     return doc
   }
@@ -351,7 +363,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if(node.nodeType === NodeType.Document) {
       return this._builderOptions || { version : "1.0" }
     } else {
-      return (<any>this.document())._builderOptions
+      return (<XMLBuilderImpl>this.document())._asAny._builderOptions
     }
   }
   private set _options(options: XMLBuilderOptions) {
@@ -359,7 +371,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if(node.nodeType === NodeType.Document) {
       this._builderOptions = options
     } else {
-      (<any>this.document())._builderOptions = options
+      (<XMLBuilderImpl>this.document())._asAny._builderOptions = options
     }
   }
 
@@ -372,6 +384,13 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
 
     return this._options.stringify
+  }
+
+  /**
+   * Cast to `any` to call methods without a TypeScript interface definition.
+   */
+  protected get _asAny(): any {
+    return <any>this
   }
 
   /**
@@ -422,9 +441,25 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /**
    * Returns debug information for this node.
+   * 
+   * @param name - node name
    */
-  private get _debugInfo(): string {
-    return ''
+  private _debugInfo(name?: string): string {
+    const node = this._asNode
+    const parentNode = this._asNode.parentNode
+
+    name = name || node.nodeName
+    const parentName = parentNode ? parentNode.nodeName : ''
+
+    if (!name && !parentName) {
+      return ""
+    } else if (!name) {
+      return "parent: <" + parentName + ">"
+    } else if (!parentName) {
+      return "node: <" + name + ">"
+    } else {
+      return "node: <" + name + ">, parent: <" + parentName + ">"
+    }
   }
 
   // Function aliases

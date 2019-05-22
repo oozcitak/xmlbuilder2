@@ -202,6 +202,11 @@ export type AttributesOrText = { [key: string]: any } | string
 export interface XMLBuilder {
 
   /**
+   * Gets the parent node.
+   */
+  readonly parent: XMLBuilder
+
+  /**
    * Defines the namespace to be used for the next element node or attribute.
    * 
    * @param namespace - namespace
@@ -248,6 +253,13 @@ export interface XMLBuilder {
     text?: AttributesOrText): XMLBuilder
    
   /**
+   * Removes this node from the XML document.
+   * 
+   * @returns parent element node
+   */
+  removeNode(): XMLBuilder
+
+  /**
    * Creates or updates an element attribute.
    * 
    * @param name - attribute name or a JS object with element attributes or
@@ -266,7 +278,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  removeAttribute(name: string | Array<string>): XMLBuilder
+  removeAtt(name: string | Array<string>): XMLBuilder
 
   /**
    * Creates a new text node and appends it to the list of child nodes.

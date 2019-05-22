@@ -1,5 +1,5 @@
 // Import implementation classes
-import { DOMParser } from './DOMParser'
+import { DOMParser, MimeType } from './DOMParser'
 
 // Export classes
-export { DOMParser }
+export { DOMParser, MimeType }
