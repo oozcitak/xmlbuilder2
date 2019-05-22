@@ -207,6 +207,38 @@ export interface XMLBuilder {
   readonly parent: XMLBuilder
 
   /**
+   * Resets the namespace for the following element or attribute creation 
+   * functions.
+   * 
+   * @requires - current node
+   */
+  ns(): XMLBuilder
+
+  /**
+   * Sets the namespace for the following element or attribute creation 
+   * functions. The given namespace will be applied to all new nodes until
+   * manually reset with another call.
+   * 
+   * @param namespace - namespace
+   * 
+   * @requires - current node
+   */
+  ns(namespace: string): XMLBuilder
+
+  /**
+   * Sets the namespace for the following element or attribute creation 
+   * functions.
+   * 
+   * @param namespace - namespace
+   * @param reset - if `true` resets the namespace immediately after the next 
+   * element or attribute creation function; otherwise the given namespace will
+   * be applied to all new nodes until manually reset with another call.
+   * 
+   * @requires - current node
+   */
+  ns(namespace?: string, reset?: boolean): XMLBuilder
+
+  /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
    * @param name - element name

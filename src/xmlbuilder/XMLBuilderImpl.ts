@@ -12,6 +12,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   private _builderOptions: XMLBuilderOptions | null = null
   private _namespace?: string
+  private _resetNamespace?: boolean
 
   /** @inheritdoc */
   get parent(): XMLBuilder {
@@ -20,6 +21,18 @@ export class XMLBuilderImpl implements XMLBuilder {
       throw new Error("Parent node is null. " + this._debugInfo())
     }
     return XMLBuilderImpl.FromNode(parent)
+  }
+
+  /** @inheritdoc */
+  ns(namespace?: string, reset?: boolean): XMLBuilder {
+    if (namespace) {
+      this._namespace = namespace
+      this._resetNamespace = reset
+    } else {
+      this._namespace = undefined
+    }
+
+    return this
   }
 
   /** @inheritdoc */
@@ -161,7 +174,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         const ele = this._asElement
         if (this._namespace !== undefined) {
           ele.setAttributeNS(this._namespace, name, value)
-          this._resetNamespace()
+          if (this._resetNamespace) this.ns()
         } else {
           ele.setAttribute(name, value)
         }        
@@ -272,22 +285,6 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /**
-   * Sets the namespace.
-   * 
-   * @param namespace - namespace
-   */
-  private _setNamespace(namespace: string): void {
-    this._namespace = namespace
-  }
-
-  /**
-   * Resets the namespace to `undefined`.
-   */
-  private _resetNamespace(): void {
-    this._namespace = undefined
-  }
-
-  /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
    * @param name - element name
@@ -317,7 +314,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     let child: Element
     if (this._namespace !== undefined) {
       child = this._doc.createElementNS(this._namespace, name)
-      this._resetNamespace()
+      if (this._resetNamespace) this.ns()
     } else {
       child = this._doc.createElement(name)
     }
