@@ -207,38 +207,6 @@ export interface XMLBuilder {
   readonly parent: XMLBuilder
 
   /**
-   * Resets the namespace for the following element or attribute creation 
-   * functions.
-   * 
-   * @requires - current node
-   */
-  ns(): XMLBuilder
-
-  /**
-   * Sets the namespace for the following element or attribute creation 
-   * functions. The given namespace will be applied to all new nodes until
-   * manually reset with another call.
-   * 
-   * @param namespace - namespace
-   * 
-   * @requires - current node
-   */
-  ns(namespace: string): XMLBuilder
-
-  /**
-   * Sets the namespace for the following element or attribute creation 
-   * functions.
-   * 
-   * @param namespace - namespace
-   * @param reset - if `true` resets the namespace immediately after the next 
-   * element or attribute creation function; otherwise the given namespace will
-   * be applied to all new nodes until manually reset with another call.
-   * 
-   * @requires - current node
-   */
-  ns(namespace?: string, reset?: boolean): XMLBuilder
-
-  /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
    * @param name - element name
@@ -275,6 +243,46 @@ export interface XMLBuilder {
   ele(name: string | ExpandObject, attributes?: AttributesOrText,
     text?: AttributesOrText): XMLBuilder
    
+    /**
+   * Creates a new element node and appends it to the list of child nodes.
+   * 
+   * @param namespace - namespace
+   * @param name - element name
+   * @param attributes - a JS object with element attributes
+   * @param text - contents of a text child node
+   * 
+   * @remarks `attributes` and `text` parameters are optional and 
+   * interchangeable.
+   * 
+   * @returns the new element node
+   */
+  eleNS(namespace: string, name: string, attributes?: AttributesOrText,
+    text?: AttributesOrText): XMLBuilder
+
+  /**
+   * Creates new element nodes from the given JS object and appends it to the
+   * list of child nodes.
+   * 
+   * @param namespace - namespace
+   * @param obj - a JS object representing nodes to insert
+   * 
+   * @returns the last top level element node created
+   */
+  eleNS(namespace: string, obj: ExpandObject): XMLBuilder
+
+  /**
+   * Creates a new element node and appends it to the list of child nodes.
+   * 
+   * @param namespace - namespace
+   * @param name - element name or a JS object representing nodes to insert
+   * @param attributes - a JS object with element attributes
+   * @param text - contents of a text child node
+   * 
+   * @returns the last top level element node created
+   */
+  eleNS(namespace: string, name: string | ExpandObject, 
+    attributes?: AttributesOrText, text?: AttributesOrText): XMLBuilder
+
   /**
    * Removes this node from the XML document.
    * 
@@ -285,12 +293,25 @@ export interface XMLBuilder {
   /**
    * Creates or updates an element attribute.
    * 
-   * @param name - attribute name or a JS object with element attributes
+   * @param name - attribute name or a JS object with element attributes and 
+   * values
    * @param value - attribute value
    * 
    * @returns current element node
    */
   att(name: AttributesOrText, value?: string): XMLBuilder
+
+  /**
+   * Creates or updates an element attribute with the following namespace.
+   * 
+   * @param namespace - namespace
+   * @param qualifiedName - attribute name or a JS object with element 
+   * attributes and values
+   * @param value - attribute value
+   * 
+   * @returns - current node
+   */
+  attNS(namespace: string, qualifiedName: AttributesOrText, value?: string): XMLBuilder
 
   /**
    * Removes an attribute or a list of attributes.
@@ -300,6 +321,16 @@ export interface XMLBuilder {
    * @returns current element node
    */
   removeAtt(name: string | Array<string>): XMLBuilder
+
+  /**
+   * Removes an attribute or a list of attributes with the given namespace.
+   * 
+   * @param namespace - namespace
+   * @param name - attribute name or an array with attribute names
+   * 
+   * @returns current element node
+   */
+  removeAttNS(namespace: string, name: string | Array<string>): XMLBuilder
 
   /**
    * Creates a new text node and appends it to the list of child nodes.

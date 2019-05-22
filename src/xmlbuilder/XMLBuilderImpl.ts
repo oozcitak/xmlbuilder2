@@ -12,7 +12,6 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   private _builderOptions: XMLBuilderOptions | null = null
   private _namespace?: string
-  private _resetNamespace?: boolean
 
   /** @inheritdoc */
   get parent(): XMLBuilder {
@@ -21,18 +20,6 @@ export class XMLBuilderImpl implements XMLBuilder {
       throw new Error("Parent node is null. " + this._debugInfo())
     }
     return XMLBuilderImpl.FromNode(parent)
-  }
-
-  /** @inheritdoc */
-  ns(namespace?: string, reset?: boolean): XMLBuilder {
-    if (namespace) {
-      this._namespace = namespace
-      this._resetNamespace = reset
-    } else {
-      this._namespace = undefined
-    }
-
-    return this
   }
 
   /** @inheritdoc */
@@ -145,6 +132,16 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
+  eleNS(namespace: string, name: string | ExpandObject, 
+    attributes?: AttributesOrText, text?: AttributesOrText): XMLBuilder {
+
+    this._setNamespace(namespace)
+    const builder = this.ele(name, attributes, text)
+    this._resetNamespace()
+    return builder
+  }
+
+  /** @inheritdoc */
   removeEle(): XMLBuilder {
     const parent = this.parent
     this._asAny.remove()
@@ -174,7 +171,6 @@ export class XMLBuilderImpl implements XMLBuilder {
         const ele = this._asElement
         if (this._namespace !== undefined) {
           ele.setAttributeNS(this._namespace, name, value)
-          if (this._resetNamespace) this.ns()
         } else {
           ele.setAttribute(name, value)
         }        
@@ -185,16 +181,36 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  removeAtt(name: string | [string]): XMLBuilder {
+  attNS(namespace: string, qualifiedName: AttributesOrText, value?: string): XMLBuilder {
+    this._setNamespace(namespace)
+    const builder = this.att(qualifiedName, value)
+    this._resetNamespace()
+    return builder
+  }
+
+  /** @inheritdoc */
+  removeAtt(name: string | Array<string>): XMLBuilder {
     if (isArray(name)) {
       for (const attName of name) {
         this.removeAtt(attName)
       }
     } else {
-      this._asElement.removeAttribute(name)
+      if (this._namespace !== undefined) {
+        this._asElement.removeAttributeNS(this._namespace, name)
+      } else {
+        this._asElement.removeAttribute(name)
+      }
     }
 
     return this
+  }
+
+  /** @inheritdoc */
+  removeAttNS(namespace: string, name: string | Array<string>): XMLBuilder {
+    this._setNamespace(namespace)
+    const builder = this.removeAtt(name)
+    this._resetNamespace()
+    return builder
   }
 
   /** @inheritdoc */
@@ -314,7 +330,6 @@ export class XMLBuilderImpl implements XMLBuilder {
     let child: Element
     if (this._namespace !== undefined) {
       child = this._doc.createElementNS(this._namespace, name)
-      if (this._resetNamespace) this.ns()
     } else {
       child = this._doc.createElement(name)
     }
@@ -387,9 +402,25 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /**
+   * Sets the namespace for the next function call.
+   * 
+   * @param namespace - namespace
+   */
+  private _setNamespace(namespace: string): void {
+    this._namespace = namespace
+  }
+
+  /**
+   * Resets the namespace for the next function call.
+   */
+  private _resetNamespace(): void {
+    this._namespace = undefined
+  }
+
+  /**
    * Cast to `any` to call methods without a TypeScript interface definition.
    */
-  protected get _asAny(): any {
+  private get _asAny(): any {
     return <any>this
   }
 
