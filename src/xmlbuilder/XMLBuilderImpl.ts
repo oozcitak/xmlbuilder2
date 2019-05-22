@@ -10,7 +10,7 @@ import { isArray, isFunction, isObject, isEmpty, getValue } from "../util"
  */
 export class XMLBuilderImpl implements XMLBuilder {
 
-  private _options: XMLBuilderOptions = { version: "1.0" }
+  private _builderOptions: XMLBuilderOptions | null = null
   private _namespace?: string
 
   /** @inheritdoc */
@@ -56,20 +56,20 @@ export class XMLBuilderImpl implements XMLBuilder {
           // evaluate if function
           val = val.apply()
         }
-        if (!this.options.ignoreDecorators && this.stringify.convertAttKey && key.indexOf(this.stringify.convertAttKey) === 0) {
+        if (!this._options.ignoreDecorators && this._stringify.convertAttKey && key.indexOf(this._stringify.convertAttKey) === 0) {
           // assign attributes
-          lastChild = this.attribute(key.substr(this.stringify.convertAttKey.length), val)
-        } else if (!this.options.separateArrayItems && Array.isArray(val) && isEmpty(val)) {
+          lastChild = this.attribute(key.substr(this._stringify.convertAttKey.length), val)
+        } else if (!this._options.separateArrayItems && Array.isArray(val) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
         } else if (isObject(val) && isEmpty(val)) {
           // empty objects produce one node
           lastChild = this.element(key)
-        } else if (!this.options.keepNullNodes && (val == null)) {
+        } else if (!this._options.keepNullNodes && (val == null)) {
           // skip null and undefined nodes
           lastChild = this._dummy()
         
-        } else if (!this.options.separateArrayItems && Array.isArray(val)) {
+        } else if (!this._options.separateArrayItems && Array.isArray(val)) {
           // expand list by creating child nodes
           for (let j = 0, len = val.length; j < len; j++) {
             const item = val[j]
@@ -81,7 +81,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         // expand child nodes under parent
         } else if (isObject(val)) {
           // if the key is #text expand child nodes under this node to support mixed content
-          if (!this.options.ignoreDecorators && this.stringify.convertTextKey && key.indexOf(this.stringify.convertTextKey) === 0) {
+          if (!this._options.ignoreDecorators && this._stringify.convertTextKey && key.indexOf(this._stringify.convertTextKey) === 0) {
             lastChild = this.element(val)
           } else {
             lastChild = this.element(key)
@@ -92,25 +92,25 @@ export class XMLBuilderImpl implements XMLBuilder {
           lastChild = this.element(key, val)
         }
       }
-    } else if (!this.options.keepNullNodes && text === null) {
+    } else if (!this._options.keepNullNodes && text === null) {
       // skip null nodes
       lastChild = this._dummy()
     } else if (text !== undefined) {
-      if (!this.options.ignoreDecorators && this.stringify.convertTextKey && name.indexOf(this.stringify.convertTextKey) === 0) {
+      if (!this._options.ignoreDecorators && this._stringify.convertTextKey && name.indexOf(this._stringify.convertTextKey) === 0) {
         // text node
         lastChild = this.text(text);
-      } else if (!this.options.ignoreDecorators && this.stringify.convertCDataKey && name.indexOf(this.stringify.convertCDataKey) === 0) {
+      } else if (!this._options.ignoreDecorators && this._stringify.convertCDataKey && name.indexOf(this._stringify.convertCDataKey) === 0) {
         // cdata node
         lastChild = this.cdata(text);
-      } else if (!this.options.ignoreDecorators && this.stringify.convertCommentKey && name.indexOf(this.stringify.convertCommentKey) === 0) {
+      } else if (!this._options.ignoreDecorators && this._stringify.convertCommentKey && name.indexOf(this._stringify.convertCommentKey) === 0) {
         // comment node
         lastChild = this.comment(text);
-      } else if (!this.options.ignoreDecorators && this.stringify.convertRawKey && name.indexOf(this.stringify.convertRawKey) === 0) {
+      } else if (!this._options.ignoreDecorators && this._stringify.convertRawKey && name.indexOf(this._stringify.convertRawKey) === 0) {
         // raw text node
         lastChild = this.raw(text);
-      } else if (!this.options.ignoreDecorators && this.stringify.convertPIKey && name.indexOf(this.stringify.convertPIKey) === 0) {
+      } else if (!this._options.ignoreDecorators && this._stringify.convertPIKey && name.indexOf(this._stringify.convertPIKey) === 0) {
         // processing instruction
-        lastChild = this.instruction(name.substr(this.stringify.convertPIKey.length), text);
+        lastChild = this.instruction(name.substr(this._stringify.convertPIKey.length), text);
       } else {
         // element node with text
         lastChild = this._node(name, attributes, text);
@@ -145,7 +145,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       if (isFunction(value)) {
         value = value.apply(this)
       }
-      if (this.options.keepNullAttributes && (value == null)) {
+      if (this._options.keepNullAttributes && (value == null)) {
         this.attribute(name, "")
       } else if (value != null) {
         const ele = this._asElement
@@ -344,26 +344,34 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /**
-   * Gets builder options.
+   * Gets or sets builder options.
    */
-  private get options(): XMLBuilderOptions {
+  private get _options(): XMLBuilderOptions {
     const node = this._asNode
     if(node.nodeType === NodeType.Document) {
-      return this._options
+      return this._builderOptions || { version : "1.0" }
     } else {
-      return (<any>this.document())._options
+      return (<any>this.document())._builderOptions
+    }
+  }
+  private set _options(options: XMLBuilderOptions) {
+    const node = this._asNode
+    if(node.nodeType === NodeType.Document) {
+      this._builderOptions = options
+    } else {
+      (<any>this.document())._builderOptions = options
     }
   }
 
   /**
    * Gets the stringifier.
    */
-  private get stringify(): XMLStringifier {
-    if (!this.options.stringify) {
+  private get _stringify(): XMLStringifier {
+    if (!this._options.stringify) {
       throw new Error("Stringifier functions not found.")
     }
 
-    return this.options.stringify
+    return this._options.stringify
   }
 
   /**
