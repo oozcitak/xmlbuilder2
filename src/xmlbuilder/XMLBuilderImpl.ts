@@ -138,7 +138,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  removeNode(): XMLBuilder {
+  removeElement(): XMLBuilder {
     const parent = this.parent
     this._asAny.remove()
     return parent

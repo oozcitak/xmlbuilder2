@@ -257,7 +257,7 @@ export interface XMLBuilder {
    * 
    * @returns parent element node
    */
-  removeNode(): XMLBuilder
+  removeElement(): XMLBuilder
 
   /**
    * Creates or updates an element attribute.
