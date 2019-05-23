@@ -3,7 +3,7 @@ import {
   ShadowRoot, NodeType, Node, Element,
   HTMLCollection, NodeList, ShadowRootMode
 } from './interfaces'
-import { HTMLSpec } from './util/HTMLSpec'
+import { HTMLSpec } from './spec'
 import { TextImpl } from './TextImpl'
 import { NodeImpl } from './NodeImpl'
 import { AttrImpl } from './AttrImpl'
@@ -11,7 +11,7 @@ import { HTMLCollectionImpl } from './HTMLCollectionImpl'
 import { NamedNodeMapImpl } from './NamedNodeMapImpl'
 import { DOMTokenListImpl } from './DOMTokenListImpl'
 import { DOMException } from './DOMException'
-import { Namespace } from './util/Namespace'
+import { Namespace } from './spec/Namespace'
 import { OrderedSet } from './util/OrderedSet'
 import { TreeMutation } from './util/TreeMutation'
 import { ShadowRootImpl } from './ShadowRootImpl'

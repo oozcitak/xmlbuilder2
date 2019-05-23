@@ -7,7 +7,7 @@ import { DocumentImpl } from "./DocumentImpl"
 import { XMLDocumentImpl } from "./XMLDocumentImpl"
 import { TextImpl } from "./TextImpl"
 import { ElementImpl } from "./ElementImpl"
-import { Namespace } from './util/Namespace'
+import { Namespace } from './spec'
 
 /**
  * Represents an object providing methods which are not dependent on 
