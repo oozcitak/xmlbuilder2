@@ -10,7 +10,7 @@ import {
   XMLDocument as XMLDocumentImpl, 
   Element as ElementImpl 
 } from '../dom'
-import { DOMParser, MimeType } from '../parser'
+import { DOMParser, MimeType } from '../dom/parser'
 
 
 // Apply mixins

@@ -1,7 +1,7 @@
 import { XMLStringLexer } from "./XMLStringLexer"
 import { TokenType } from './interfaces'
-import { DocumentImpl } from '../dom/DocumentImpl'
-import { Document, Node } from "../dom/interfaces"
+import { DocumentImpl } from '../DocumentImpl'
+import { Document, Node } from "../interfaces"
 import {
   DocTypeToken, CDATAToken, CommentToken, TextToken, PIToken,
   ElementToken, ClosingTagToken

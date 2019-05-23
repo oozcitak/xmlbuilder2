@@ -20,7 +20,7 @@ export function _applyMixin(baseClass: any, mixinClass: any): void {
  * @param x - a variable to type check
  */
 export function isNumber(x: any): x is number {
-  return typeof x === "number";
+  return typeof x === "number"
 }
 
 /**
@@ -29,7 +29,7 @@ export function isNumber(x: any): x is number {
  * @param x - a variable to type check
  */
 export function isString(x: any): x is string {
-  return typeof x === "string";
+  return typeof x === "string"
 }
 
 /**

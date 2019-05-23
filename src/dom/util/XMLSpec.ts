@@ -45,7 +45,7 @@ export class XMLSpec {
    *   .addRange(0xFFFE, 0xFFFF)
    * ```
    */
-  static readonly Char_11 = /[\0\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/;
+  static readonly Char_11 = /[\0\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/
 
   /**
    * Determines if the given string is valid for a `"Name"` construct.

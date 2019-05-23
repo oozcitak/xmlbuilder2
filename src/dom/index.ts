@@ -80,3 +80,4 @@ export { ShadowRootImpl as ShadowRoot }
 export { TextImpl as Text }
 export { XMLDocumentImpl as XMLDocument }
 export { DOMImplementationInstance }
+export { DOMParser, MimeType } from './parser'
