@@ -28,7 +28,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     name = getValue(name)
     // swap argument order: text <-> attributes
-    if (!isObject(attributes)) {
+    if (attributes && !isObject(attributes)) {
       [text, attributes] = [attributes, text]
     }
 
@@ -315,7 +315,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     name = getValue(name)
 
     // swap argument order: text <-> attributes
-    if (!isObject(attributes)) {
+    if (attributes && !isObject(attributes)) {
       [text, attributes] = [attributes, text]
     }
 

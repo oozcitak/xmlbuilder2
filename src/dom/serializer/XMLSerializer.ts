@@ -3,7 +3,6 @@ import {
   DocumentFragment, Text, Element
 } from "../interfaces"
 import { Namespace, XMLSpec, HTMLSpec } from "../spec"
-import { TreeQuery } from "../util/TreeQuery"
 
 /**
  * Represents an XML serializer.
@@ -11,8 +10,6 @@ import { TreeQuery } from "../util/TreeQuery"
  * Implements: https://www.w3.org/TR/DOM-Parsing/#serializing
  */
 export class XMLSerializer {
-
-
 
   private _xmlVersion: "1.0" | "1.1"
   private _prefixIndex: number
@@ -96,7 +93,7 @@ export class XMLSerializer {
       markup += this._serializeDocumentType(node.doctype)
     }
 
-    for (const childNode of TreeQuery.getDescendantNodes(node)) {
+    for (const childNode of node.childNodes) {
       markup += this._serializeNode(childNode, namespace, map)
     }
 
@@ -193,7 +190,7 @@ export class XMLSerializer {
 
     let markup = ""
 
-    for (const childNode of TreeQuery.getDescendantNodes(node)) {
+    for (const childNode of node.childNodes) {
       markup += this._serializeNode(childNode, namespace, map)
     }
 
@@ -302,13 +299,13 @@ export class XMLSerializer {
       // TODO: Template element. 
       // Append to markup the result of running the XML serialization algorithm 
       // on the template element's template contents (a DocumentFragment).
-      // This allows template content to round-trip , given the rules for 
+      // This allows template content to round-trip, given the rules for 
       // parsing XHTML documents [HTML5].
       // markup += this._serializeNode((<HTMLTemplateElement>node).content, inheritedNS, map)
     }
 
     // serialize child-nodes
-    for (const childNode of TreeQuery.getDescendantNodes(node)) {
+    for (const childNode of node.childNodes) {
       markup += this._serializeNode(childNode, inheritedNS, map)
     }
 

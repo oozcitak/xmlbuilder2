@@ -18,7 +18,6 @@ describe('XMLSerializer', function () {
       .doc()
 
     const serializer = new XMLSerializer()
-
     expect(serializer.serializeToString(<Document><unknown>doc)).toBe(
       '<root>' + 
         '<node att="val"/>' + 
