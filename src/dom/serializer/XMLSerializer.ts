@@ -2,7 +2,7 @@ import {
   Node, NodeType, Document, DocumentType, Comment, ProcessingInstruction,
   DocumentFragment, Text, Element
 } from "../interfaces"
-import { Namespace, XMLSpec } from "../spec"
+import { Namespace, XMLSpec, HTMLSpec } from "../spec"
 import { TreeQuery } from "../util/TreeQuery"
 
 /**
@@ -11,6 +11,8 @@ import { TreeQuery } from "../util/TreeQuery"
  * Implements: https://www.w3.org/TR/DOM-Parsing/#serializing
  */
 export class XMLSerializer {
+
+
 
   private _xmlVersion: "1.0" | "1.1"
   private _prefixIndex: number
@@ -176,7 +178,7 @@ export class XMLSerializer {
       throw new Error("Processing instruction data contains invalid characters (well-formed required).")
     }
 
-    return `<? ${node.target} ${node.data}?>`
+    return `<?${node.target} ${node.data}?>`
   }
 
   /**
@@ -218,19 +220,99 @@ export class XMLSerializer {
     let skipEndTag = false
     let ignoreNamespaceDefinitionAttribute = false
     let map = Object.assign({}, prefixMap)
-    let elementPrefixes: Array<string> = []
+    let elementPrefixesList: Array<string> = []
     this._duplicatePrefixDefinition = null
     let localDefaultNamespace = this._recordNamespaceInformation(node, map,
-      elementPrefixes)
+      elementPrefixesList)
     let inheritedNS = namespace
     let ns = node.namespaceURI
 
-    // Continue from 12. If inherited ns is equal to ns, then:
-    /*
-    for (const childNode of TreeQuery.getDescendantNodes(node)) {
-      markup += this._serializeNode(childNode, namespace, prefixMap)
-    }*/
+    if (!ns || inheritedNS === ns) {
+      if (localDefaultNamespace) {
+        ignoreNamespaceDefinitionAttribute = true
+      }
+      if (ns === Namespace.XML) {
+        qualifiedName = `xml:${node.localName}`
+      } else {
+        qualifiedName = node.localName
+      }
+      markup += qualifiedName
+    } else {
+      // inherited ns is not equal to ns (the node's own namespace is different
+      // from the context namespace of its parent
+      let prefix = node.prefix
+      let candidatePrefix = (map[ns] || null)
+      if (candidatePrefix) {
+        // there exists on this node or the node's ancestry a namespace prefix
+        // definition that defines the node's namespace
+        qualifiedName = `${candidatePrefix}:${node.localName}`
+        if (localDefaultNamespace) {
+          inheritedNS = ns
+        }
+        markup += qualifiedName
+      } else if (prefix && !localDefaultNamespace) {
+        if (elementPrefixesList.includes(prefix)) {
+          prefix = this._generatePrefix(map, ns)
+        } else {
+          map[ns] = prefix
+        }
+        qualifiedName = `${prefix}:${node.localName}`
+        markup += qualifiedName
+        // serialize the new namespace/prefix association just added to the map
+        markup += ` xmlns:${prefix}="${this._serializeAttributeValue(ns)}"`
+      } else if (!localDefaultNamespace || localDefaultNamespace !== ns) {
+        ignoreNamespaceDefinitionAttribute = true
+        qualifiedName = node.localName
+        // the new default namespace will be used in the serialization to 
+        // define this node's namespace and act as the context namespace for 
+        // its children
+        inheritedNS = ns
+        markup += qualifiedName
+        // serialize the new (or replacement) default namespace definition
+        markup += ` xmlns="${this._serializeAttributeValue(ns)}"`
+      } else {
+        // node has a local default namespace that matches ns
+        qualifiedName = node.localName
+        inheritedNS = ns
+        markup += qualifiedName
+      }
+    }
 
+    markup += this._serializeAttributes(node, map, ignoreNamespaceDefinitionAttribute)
+
+    if (ns === Namespace.HTML && !node.hasChildNodes() &&
+      // self-closing html tags
+      HTMLSpec.isVoidElementName(node.localName)) {
+      markup += " /"
+      skipEndTag = true
+    } else if (ns !== Namespace.HTML && !node.hasChildNodes()) {
+      // xml element without child nodes also self close
+      markup += "/"
+      skipEndTag = true
+    }
+
+    markup += ">"
+
+    if (skipEndTag) {
+      // leaf-node, no need to process child nodes
+      return markup
+    }
+
+    if (ns === Namespace.HTML && node.localName === "template") {
+      // TODO: Template element. 
+      // Append to markup the result of running the XML serialization algorithm 
+      // on the template element's template contents (a DocumentFragment).
+      // This allows template content to round-trip , given the rules for 
+      // parsing XHTML documents [HTML5].
+      // markup += this._serializeNode((<HTMLTemplateElement>node).content, inheritedNS, map)
+    }
+
+    // serialize child-nodes
+    for (const childNode of TreeQuery.getDescendantNodes(node)) {
+      markup += this._serializeNode(childNode, inheritedNS, map)
+    }
+
+    markup += `</${qualifiedName}>`
     return markup
   }
 
@@ -241,22 +323,20 @@ export class XMLSerializer {
    * @param map - namespace prefix map
    * @param ignoreNamespaceDefinitionAttribute - whether to ignore namespace
    * definition attribute
-   * @param duplicatePrefixDefinition - a duplicate namespace prefix definition
    */
   private _serializeAttributes(node: Element, map: { [key: string]: string },
-    ignoreNamespaceDefinitionAttribute: boolean, 
-    duplicatePrefixDefinition: string): string {
+    ignoreNamespaceDefinitionAttribute: boolean): string {
 
     // Contains unique attribute namespaceURI and localName pairs
     // This set is used to [optionally] enforce the well-formed constraint that 
     // an element cannot have two attributes with the same namespaceURI and 
     // localName. This can occur when two otherwise identical attributes on the
     // same element differ only by their prefix values.    
-    let localNameSet: { [key:string]: string } = {}
+    let localNameSet: { [key: string]: string } = {}
 
     let result = ""
     for (const attr of node.attributes) {
-      if (this._requireWellFormed && attr.namespaceURI && 
+      if (this._requireWellFormed && attr.namespaceURI &&
         localNameSet[attr.namespaceURI] === attr.localName) {
         throw new Error("Element contains two attributes with the same namespaceURI and localName (well-formed required).")
       }
@@ -269,9 +349,10 @@ export class XMLSerializer {
       let candidatePrefix: string | null = null
       if (attributeNamespace) {
         let prefix = ""
-        if (attributeNamespace === Namespace.XMLNS && 
-          ((!attr.prefix && ignoreNamespaceDefinitionAttribute) || (attr.prefix && attr.localName === duplicatePrefixDefinition))) {
-            continue
+        if (attributeNamespace === Namespace.XMLNS &&
+          ((!attr.prefix && ignoreNamespaceDefinitionAttribute) ||
+            (attr.prefix && attr.localName === this._duplicatePrefixDefinition))) {
+          continue
         } else if (prefix = map[attributeNamespace]) {
           candidatePrefix = prefix
         } else {
@@ -287,7 +368,7 @@ export class XMLSerializer {
       }
 
       if (this._requireWellFormed && (attr.localName.includes(":") ||
-        !XMLSpec.isName(attr.localName) || 
+        !XMLSpec.isName(attr.localName) ||
         ((/xmlns/i).test(attr.localName) && !attributeNamespace))) {
         throw new Error("Attribute local name contains invalid characters (well-formed required).")
       }
@@ -329,8 +410,7 @@ export class XMLSerializer {
    * @param map - namespace prefix map
    * @param list - element prefixes list
    * 
-   * @returns a tuple containing the default namespace attribute value and
-   * duplicate namespace prefix definition.
+   * @returns default namespace attribute value
    */
   private _recordNamespaceInformation(element: Element,
     map: { [key: string]: string }, list: Array<string>): string | null {
@@ -363,12 +443,12 @@ export class XMLSerializer {
   }
 
   /**
-   * Generates a new perfix for the given namespace.
+   * Generates a new prefix for the given namespace.
    * 
    * @param map - namespace prefix map map
    * @param newNamespace - a namespace to generate prefix for
    */
-  private _generatePrefix(map: { [key: string]: string }, 
+  private _generatePrefix(map: { [key: string]: string },
     newNamespace: string): string {
 
     let generatedPrefix = "ns" + this._prefixIndex
