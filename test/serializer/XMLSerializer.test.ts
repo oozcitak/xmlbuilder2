@@ -14,18 +14,20 @@ describe('XMLSerializer', function () {
       .up()
       .ins('kidding', 'itwas="different"')
       .ins('for', 'real')
+      .dat('<greeting>Hello, world!</greeting>')
       .ele('text', 'alien\'s pinky toe')
       .doc()
 
     const serializer = new XMLSerializer()
     expect(serializer.serializeToString(<Document><unknown>doc)).toBe(
-      '<root>' + 
-        '<node att="val"/>' + 
-        '<!--same node below-->' + 
-        '<node att="val" att2="val2"/>' + 
-        '<?kidding itwas="different"?>' + 
-        '<?for real?>' + 
-        '<text>alien\'s pinky toe</text>' + 
+      '<root>' +
+        '<node att="val"/>' +
+        '<!--same node below-->' +
+        '<node att="val" att2="val2"/>' +
+        '<?kidding itwas="different"?>' +
+        '<?for real?>' +
+        '<![CDATA[<greeting>Hello, world!</greeting>]]>' +
+        '<text>alien\'s pinky toe</text>' +
       '</root>'
     )
   })

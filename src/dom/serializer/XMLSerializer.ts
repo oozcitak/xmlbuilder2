@@ -1,6 +1,6 @@
 import {
   Node, NodeType, Document, DocumentType, Comment, ProcessingInstruction,
-  DocumentFragment, Text, Element
+  DocumentFragment, Text, Element, CDATASection
 } from "../interfaces"
 import { Namespace, XMLSpec, HTMLSpec } from "../spec"
 
@@ -66,6 +66,8 @@ export class XMLSerializer {
         return this._serializeText(<Text>node)
       case NodeType.ProcessingInstruction:
         return this._serializeProcessingInstruction(<ProcessingInstruction>node)
+      case NodeType.CData:
+        return this._serializeCData(<CDATASection>node)
       case NodeType.DocumentFragment:
         return this._serializeDocumentFragment(<DocumentFragment>node, namespace, map)
       default:
@@ -176,6 +178,20 @@ export class XMLSerializer {
     }
 
     return `<?${node.target} ${node.data}?>`
+  }
+
+  /**
+   * Produces an XML serialization of a CDATA node.
+   * 
+   * @param node - processing instruction node to serialize
+   */
+  private _serializeCData(node: CDATASection): string {
+
+    if (this._requireWellFormed && (node.data.includes("]]>"))) {
+      throw new Error("CDATA contains invalid characters (well-formed required).")
+    }
+
+    return `<![CDATA[${node.data}]]>`
   }
 
   /**
