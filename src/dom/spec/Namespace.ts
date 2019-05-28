@@ -12,6 +12,7 @@ export class Namespace {
   static readonly MathML = "http://www.w3.org/1998/Math/MathML"
   static readonly SVG = "http://www.w3.org/2000/svg"
   static readonly XLink = "http://www.w3.org/1999/xlink"
+
   /**
    * Validates the given qualified name.
    * 
@@ -24,8 +25,9 @@ export class Namespace {
     if (!XMLSpec.isQName(qualifiedName))
       throw DOMException.InvalidCharacterError
   }
+
   /**
-   * Validates and extracts a namespace, prefix, and localName from the
+   * Validates and extracts a namespace, prefix and localName from the
    * given namespace and qualified name.
    * 
    * @param namespace - namespace
@@ -36,11 +38,10 @@ export class Namespace {
    */
   static extractNames(namespace: string | null, qualifiedName: string): { namespace: string | null, prefix: string | null, localName: string } {
     if (!namespace) namespace = null
-    Namespace.validateQName(qualifiedName)
 
-    const parts = qualifiedName.split(':')
-    const prefix = (parts.length === 2 ? parts[0] : null)
-    const localName = (parts.length === 2 ? parts[1] : qualifiedName)
+    const parts = Namespace.extractQName(qualifiedName)
+    const prefix = parts.prefix
+    const localName = parts.localName
 
     if (prefix && !namespace)
       throw DOMException.NamespaceError
@@ -62,4 +63,24 @@ export class Namespace {
       'localName': localName
     }
   }
+
+  /**
+   * Extracts a prefix and localName from the given qualified name.
+   * 
+   * @param qualifiedName - qualified name
+   * 
+   * @returns an object with `prefix`, and `localName` keys.
+   */
+  static extractQName(qualifiedName: string): { prefix: string | null, localName: string } {
+    Namespace.validateQName(qualifiedName)
+
+    const parts = qualifiedName.split(':')
+    const prefix = (parts.length === 2 ? parts[0] : null)
+    const localName = (parts.length === 2 ? parts[1] : qualifiedName)
+
+    return {
+      'prefix': prefix,
+      'localName': localName
+    }
+  }  
 }

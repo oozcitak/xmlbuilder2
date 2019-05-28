@@ -1,14 +1,16 @@
 import { XMLStringLexer } from "./XMLStringLexer"
 import { TokenType } from './interfaces'
 import { DocumentImpl } from '../DocumentImpl'
-import { Document, Node } from "../interfaces"
+import { Document, Node, Element } from "../interfaces"
 import {
   DocTypeToken, CDATAToken, CommentToken, TextToken, PIToken,
   ElementToken, ClosingTagToken
 } from "./XMLToken"
+import { Namespace } from "../spec";
 
 /**
  * Represents a parser for XML and HTML content.
+ * See: https://www.ibm.com/support/knowledgecenter/en/SS6SG3_4.2.0/com.ibm.entcobol.doc_4.2/PGandLR/ref/rpxml26e.htm
  */
 export class DOMParser {
   /**
@@ -57,11 +59,26 @@ export class DOMParser {
             break
           case TokenType.Element:
             const element = <ElementToken>token
-            const elementNode = doc.createElement(element.name)
-            for (let [attName, attValue] of Object.entries(element.attributes)) {
-              elementNode.setAttribute(attName, attValue)
-            }
+
+            let qName = Namespace.extractQName(element.name)
+            let namespace = context.lookupNamespaceURI(qName.prefix)
+
+            const elementNode = (namespace ?
+              doc.createElementNS(namespace, element.name) :
+              doc.createElement(element.name))
+
             context.appendChild(elementNode)
+
+            for (let [attName, attValue] of Object.entries(element.attributes)) {
+              qName = Namespace.extractQName(attName)
+              let namespace = elementNode.lookupNamespaceURI(qName.prefix)
+              if (namespace) {
+                elementNode.setAttributeNS(namespace, attName, attValue)
+              } else {
+                elementNode.setAttribute(attName, attValue)
+              }
+            }
+
             if (!element.selfClosing) {
               context = <Node>elementNode
             }
