@@ -3,6 +3,10 @@
  */
 export interface XMLBuilderOptions {
   /**
+   * Namespace URI of the document.
+   */
+  namespace?: string
+  /**
    * A version number string, e.g. `"1.0"`
    */
   version?: "1.0" | "1.1"

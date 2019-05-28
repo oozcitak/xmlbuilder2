@@ -27,12 +27,14 @@ _applyMixin(ElementImpl, XMLBuilderImpl)
  * @returns document node
  */
 export function create(options?: XMLBuilderOptions): XMLBuilder {
-  const doc = DOMImplementationInstance.createDocument('', '');
   options = options || { version: "1.0" }
+  const namespace = options.namespace || null
   if (!options.stringify) {
     options.stringify = new XMLStringifierImpl(options)
   }
-  (<any>doc)._options = options
+
+  const doc = DOMImplementationInstance.createDocument(namespace, '') as any
+  doc._options = options
   return <XMLBuilder><unknown>doc
 }
 
@@ -48,6 +50,7 @@ export function create(options?: XMLBuilderOptions): XMLBuilder {
  */
 export function parse(document: string | ExpandObject, options?: XMLBuilderOptions): XMLBuilder {
   options = options || { version: "1.0" }
+  const namespace = options.namespace || null
   if (!options.stringify) {
     options.stringify = new XMLStringifierImpl(options)
   }
@@ -58,7 +61,7 @@ export function parse(document: string | ExpandObject, options?: XMLBuilderOptio
     doc._options = options
     return <XMLBuilder><unknown>doc
   } else {
-    const doc = DOMImplementationInstance.createDocument('', '') as any
+    const doc = DOMImplementationInstance.createDocument(namespace, '') as any
     doc._options = options
     const builder = <XMLBuilder><unknown>doc
     builder.ele(document)
