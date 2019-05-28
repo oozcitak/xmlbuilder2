@@ -10,7 +10,6 @@ import { Namespace } from "../spec";
 
 /**
  * Represents a parser for XML and HTML content.
- * See: https://www.ibm.com/support/knowledgecenter/en/SS6SG3_4.2.0/com.ibm.entcobol.doc_4.2/PGandLR/ref/rpxml26e.htm
  */
 export class DOMParser {
   /**
