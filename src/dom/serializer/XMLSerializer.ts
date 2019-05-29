@@ -35,7 +35,7 @@ export class XMLSerializer {
    * @param root - node to serialize
    */
   serializeToString(root: Node): string {
-    const map = new Map<string, string>()
+    const map = new Map<string | null, string>()
 
     map.set(Namespace.XML, "xml")
     this._prefixIndex = 1
@@ -52,7 +52,7 @@ export class XMLSerializer {
    * @param map - namespace prefix map
    */
   private _serializeNode(node: Node, namespace: string | null,
-    map: Map<string, string>): string {
+    map: Map<string | null, string>): string {
 
     switch (node.nodeType) {
       case NodeType.Document:
@@ -82,7 +82,7 @@ export class XMLSerializer {
    * @param map - namespace prefix map
    */
   private _serializeDocument(node: Document, namespace: string | null,
-    map: Map<string, string>): string {
+    map: Map<string | null, string>): string {
 
     if (this._requireWellFormed && !node.documentElement) {
       throw new Error("Missing document element (well-formed required).")
@@ -187,7 +187,7 @@ export class XMLSerializer {
    * @param map - namespace prefix map
    */
   private _serializeDocumentFragment(node: DocumentFragment,
-    namespace: string | null, map: Map<string, string>): string {
+    namespace: string | null, map: Map<string | null, string>): string {
 
     let markup = ""
 
@@ -206,7 +206,7 @@ export class XMLSerializer {
    * @param prefixMap - namespace prefix map
    */
   private _serializeElement(node: Element,
-    namespace: string | null, prefixMap: Map<string, string>): string {
+    namespace: string | null, prefixMap: Map<string | null, string>): string {
 
     if (this._requireWellFormed && (node.localName.includes(":") ||
       !XMLSpec.isLegalChar(node.localName, this._xmlVersion))) {
@@ -217,7 +217,7 @@ export class XMLSerializer {
     let qualifiedName = ''
     let skipEndTag = false
     let ignoreNamespaceDefinitionAttribute = false
-    let map = new Map<string, string>(prefixMap)
+    let map = new Map<string | null, string>(prefixMap)
     let elementPrefixesList: string[] = []
     this._duplicatePrefixDefinition = null
     let localDefaultNamespace = this._recordNamespaceInformation(node, map,
@@ -225,7 +225,7 @@ export class XMLSerializer {
     let inheritedNS = namespace
     let ns = node.namespaceURI
 
-    if (!ns || inheritedNS === ns) {
+    if (inheritedNS === ns) {
       if (localDefaultNamespace !== null) {
         ignoreNamespaceDefinitionAttribute = true
       }
@@ -240,7 +240,7 @@ export class XMLSerializer {
       // from the context namespace of its parent
       let prefix = node.prefix
       let candidatePrefix = map.get(ns) || null
-      if (candidatePrefix) {
+      if (candidatePrefix !== null) {
         // there exists on this node or the node's ancestry a namespace prefix
         // definition that defines the node's namespace
         qualifiedName = `${candidatePrefix}:${node.localName}`
@@ -248,7 +248,7 @@ export class XMLSerializer {
           inheritedNS = ns
         }
         markup += qualifiedName
-      } else if (prefix && !localDefaultNamespace) {
+      } else if (prefix !== null && localDefaultNamespace === null) {
         if (elementPrefixesList.includes(prefix)) {
           prefix = this._generatePrefix(map, ns)
         } else {
@@ -258,7 +258,8 @@ export class XMLSerializer {
         markup += qualifiedName
         // serialize the new namespace/prefix association just added to the map
         markup += ` xmlns:${prefix}="${this._serializeAttributeValue(ns)}"`
-      } else if (!localDefaultNamespace || localDefaultNamespace !== ns) {
+      } else if (localDefaultNamespace === null || 
+        (localDefaultNamespace !== null && localDefaultNamespace !== ns)) {
         ignoreNamespaceDefinitionAttribute = true
         qualifiedName = node.localName
         // the new default namespace will be used in the serialization to 
@@ -322,7 +323,7 @@ export class XMLSerializer {
    * @param ignoreNamespaceDefinitionAttribute - whether to ignore namespace
    * definition attribute
    */
-  private _serializeAttributes(node: Element, map: Map<string, string>,
+  private _serializeAttributes(node: Element, map: Map<string | null, string>,
     ignoreNamespaceDefinitionAttribute: boolean): string {
 
     // Contains unique attribute namespaceURI and localName pairs
@@ -342,11 +343,10 @@ export class XMLSerializer {
 
       let attributeNamespace = attr.namespaceURI
       let candidatePrefix: string | null = null
-      if (attributeNamespace) {
-        let prefix = ""
+      if (attributeNamespace !== null) {
         if (attributeNamespace === Namespace.XMLNS &&
-          ((!attr.prefix && ignoreNamespaceDefinitionAttribute) ||
-            (attr.prefix && attr.localName === this._duplicatePrefixDefinition))) {
+          ((attr.prefix === null && ignoreNamespaceDefinitionAttribute) ||
+          (attr.prefix !== null && attr.localName === this._duplicatePrefixDefinition))) {
           continue
         } else if (map.has(attributeNamespace)) {
           candidatePrefix = map.get(attributeNamespace) || null
@@ -386,7 +386,7 @@ export class XMLSerializer {
       throw new Error("Attribute value contains invalid characters (well-formed required).")
     }
 
-    if (!attributeValue) {
+    if (attributeValue === null) {
       return ''
     } else {
       // Although XML spec allows ">" in attribute values, we replace ">" 
@@ -408,7 +408,7 @@ export class XMLSerializer {
    * @returns default namespace attribute value
    */
   private _recordNamespaceInformation(element: Element,
-    map: Map<string, string>, list: string[]): string | null {
+    map: Map<string | null, string>, list: string[]): string | null {
 
     let defaultNamespaceAttrValue: string | null = null
     for (const attr of element.attributes) {
@@ -442,8 +442,8 @@ export class XMLSerializer {
    * @param map - namespace prefix map map
    * @param newNamespace - a namespace to generate prefix for
    */
-  private _generatePrefix(map: Map<string, string>,
-    newNamespace: string): string {
+  private _generatePrefix(map: Map<string | null, string>,
+    newNamespace: string | null): string {
 
     let generatedPrefix = "ns" + this._prefixIndex
     this._prefixIndex++

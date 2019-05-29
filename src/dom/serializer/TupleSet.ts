@@ -34,6 +34,7 @@ export class TupleSet<T1, T2> implements Iterable<[T1, T2]> {
     let subSet = this._storage.get(val[0])
     if (!subSet) {
       subSet = new Set<T2>()
+      this._storage.set(val[0], subSet)
     }
     subSet.add(val[1])
   }
