@@ -23,6 +23,7 @@ describe('XMLSerializer', function () {
         '<node att="val" att2="val2"/>' + 
         '<?kidding itwas="different"?>' + 
         '<?for real?>' + 
+        '<![CDATA[<greeting>Hello, world!</greeting>]]>' +
         '<text>alien\'s pinky toe</text>' + 
       '</root>'
     )
