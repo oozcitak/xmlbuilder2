@@ -467,9 +467,9 @@ export class DocumentImpl extends NodeImpl implements Document {
   /* istanbul ignore next */
   get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
   /* istanbul ignore next */
-  prepend(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
+  prepend(...nodes: (Node | string)[]): void { throw new Error("Mixin: ParentNode not implemented.") }
   /* istanbul ignore next */
-  append(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
+  append(...nodes: (Node | string)[]): void { throw new Error("Mixin: ParentNode not implemented.") }
   /* istanbul ignore next */
   querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
   /* istanbul ignore next */

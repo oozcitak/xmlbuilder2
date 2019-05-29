@@ -630,9 +630,9 @@ export class ElementImpl extends NodeImpl implements Element {
   /* istanbul ignore next */
   get childElementCount(): number { throw new Error("Mixin: ParentNode not implemented.") }
   /* istanbul ignore next */
-  prepend(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
+  prepend(...nodes: (Node | string)[]): void { throw new Error("Mixin: ParentNode not implemented.") }
   /* istanbul ignore next */
-  append(...nodes: Array<Node | string>): void { throw new Error("Mixin: ParentNode not implemented.") }
+  append(...nodes: (Node | string)[]): void { throw new Error("Mixin: ParentNode not implemented.") }
   /* istanbul ignore next */
   querySelector(selectors: string): Element | null { throw new Error("Mixin: ParentNode not implemented.") }
   /* istanbul ignore next */
@@ -646,11 +646,11 @@ export class ElementImpl extends NodeImpl implements Element {
 
   // MIXIN: ChildNode
   /* istanbul ignore next */
-  before(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  before(...nodes: (Node | string)[]): void { throw new Error("Mixin: ChildNode not implemented.") }
   /* istanbul ignore next */
-  after(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  after(...nodes: (Node | string)[]): void { throw new Error("Mixin: ChildNode not implemented.") }
   /* istanbul ignore next */
-  replaceWith(...nodes: Array<Node | string>): void { throw new Error("Mixin: ChildNode not implemented.") }
+  replaceWith(...nodes: (Node | string)[]): void { throw new Error("Mixin: ChildNode not implemented.") }
   /* istanbul ignore next */
   remove(): void { throw new Error("Mixin: ChildNode not implemented.") }
 

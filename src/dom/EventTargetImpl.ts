@@ -7,7 +7,7 @@ import {
  */
 export abstract class EventTargetImpl implements EventTarget {
 
-  protected _listeners: { [key: string]: Array<EventListenerEntry> } = {}
+  protected _listeners: { [key: string]: EventListenerEntry[] } = {}
 
   /**
    * Initializes a new instance of `EventTarget`.

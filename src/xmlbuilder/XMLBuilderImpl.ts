@@ -189,7 +189,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  removeAtt(name: string | Array<string>): XMLBuilder {
+  removeAtt(name: string | string[]): XMLBuilder {
     if (isArray(name)) {
       for (const attName of name) {
         this.removeAtt(attName)
@@ -206,7 +206,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  removeAttNS(namespace: string, name: string | Array<string>): XMLBuilder {
+  removeAttNS(namespace: string, name: string | string[]): XMLBuilder {
     this._setNamespace(namespace)
     const builder = this.removeAtt(name)
     this._resetNamespace()

@@ -28,7 +28,7 @@ export interface Event {
    * invoked). This does not include nodes in shadow trees if the 
    * shadow root was created with its `mode` `"closed"`.
    */
-  composedPath(): Array<EventTarget>
+  composedPath(): EventTarget[]
 
   /**
    * Returns the event's phase.
@@ -145,7 +145,7 @@ export interface MutationObserver {
   /**
    * Returns the list of mutations.
    */
-  takeRecords(): Array<MutationRecord>
+  takeRecords(): MutationRecord[]
 }
 
 /**
@@ -1211,7 +1211,7 @@ export interface ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  prepend(...nodes: Array<Node | string>): void
+  prepend(...nodes: (Node | string)[]): void
 
   /**
    * Appends the list of nodes or strings after the last child node.
@@ -1219,7 +1219,7 @@ export interface ParentNode {
    * 
    * @param nodes - the array of nodes or strings
    */
-  append(...nodes: Array<Node | string>): void
+  append(...nodes: (Node | string)[]): void
 
   /**
    * Returns the first element that is a descendant of node that
@@ -1249,19 +1249,19 @@ export interface ChildNode {
    * Inserts nodes just before this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  before(...nodes: Array<Node | string>): void
+  before(...nodes: (Node | string)[]): void
 
   /**
    * Inserts nodes just after this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  after(...nodes: Array<Node | string>): void
+  after(...nodes: (Node | string)[]): void
 
   /**
    * Replaces nodes with this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
-  replaceWith(...nodes: Array<Node | string>): void
+  replaceWith(...nodes: (Node | string)[]): void
 
   /**
    * Removes this node form its tree.
@@ -1403,14 +1403,14 @@ export interface DOMTokenList extends Iterable<string> {
    * 
    * @param tokens - the list of tokens to add
    */
-  add(...tokens: Array<string>): void
+  add(...tokens: string[]): void
 
   /**
    * Removes the given tokens from the set.
    * 
    * @param tokens - the list of tokens to remove
    */
-  remove(...tokens: Array<string>): void
+  remove(...tokens: string[]): void
 
   /**
    * Removes a given token from the set and returns `false` if it exists,
@@ -2015,10 +2015,10 @@ export interface MutationObserverInit {
   subtree: boolean
   attributeOldValue: boolean
   characterDataOldValue: boolean
-  attributeFilter: Array<string>
+  attributeFilter: string[]
 }
 
-export type MutationCallback = (mutations: Array<MutationRecord>, observer: MutationObserver) => void
+export type MutationCallback = (mutations: MutationRecord[], observer: MutationObserver) => void
 
 /**
  * Defines the mode of a shadow root.

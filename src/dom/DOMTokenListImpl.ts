@@ -58,7 +58,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * 
    * @param tokens - the list of tokens to add
    */
-  add(...tokens: Array<string>): void {
+  add(...tokens: string[]): void {
     const set = Convert.attValueToSet(this._ownerElement, this._localName)
     for (const token of tokens) {
       set.add(token)
@@ -71,7 +71,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * 
    * @param tokens - the list of tokens to remove
    */
-  remove(...tokens: Array<string>): void {
+  remove(...tokens: string[]): void {
     const set = Convert.attValueToSet(this._ownerElement, this._localName)
     for (const token of tokens) {
       if (!token)

@@ -187,7 +187,7 @@ export interface XMLStringifier {
  * Represents the type of a variable that can be expanded by `element` function 
  * into nodes.
  */
-export type ExpandObject = { [key: string]: any } | Array<any> | ((...args: any) => any)
+export type ExpandObject = { [key: string]: any } | any[] | ((...args: any) => any)
 
 /**
  * Represents the type of a variable that can either be a JS object defining
@@ -320,7 +320,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  removeAtt(name: string | Array<string>): XMLBuilder
+  removeAtt(name: string | string[]): XMLBuilder
 
   /**
    * Removes an attribute or a list of attributes with the given namespace.
@@ -330,7 +330,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  removeAttNS(namespace: string, name: string | Array<string>): XMLBuilder
+  removeAttNS(namespace: string, name: string | string[]): XMLBuilder
 
   /**
    * Creates a new text node and appends it to the list of child nodes.

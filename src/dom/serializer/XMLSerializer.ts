@@ -217,7 +217,7 @@ export class XMLSerializer {
     let skipEndTag = false
     let ignoreNamespaceDefinitionAttribute = false
     let map = Object.assign({}, prefixMap)
-    let elementPrefixesList: Array<string> = []
+    let elementPrefixesList: string[] = []
     this._duplicatePrefixDefinition = null
     let localDefaultNamespace = this._recordNamespaceInformation(node, map,
       elementPrefixesList)
@@ -410,7 +410,7 @@ export class XMLSerializer {
    * @returns default namespace attribute value
    */
   private _recordNamespaceInformation(element: Element,
-    map: { [key: string]: string }, list: Array<string>): string | null {
+    map: { [key: string]: string }, list: string[]): string | null {
 
     let defaultNamespaceAttrValue: string | null = null
     for (const attr of element.attributes) {

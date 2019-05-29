@@ -70,7 +70,7 @@ export class EventImpl implements Event {
    * invoked). This does not include nodes in shadow trees if the 
    * shadow root was created with its `mode` `"closed"`.
    */
-  composedPath(): Array<EventTarget> {
+  composedPath(): EventTarget[] {
     // TODO: Implementation
     return []
   }
