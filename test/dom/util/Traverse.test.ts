@@ -4,7 +4,7 @@ import { Traverse } from '../../../src/dom/util/Traverse'
 
 describe('Traverse', function () {
 
-  const doc = $$.dom.createDocument('', 'root')
+  const doc = $$.dom.createDocument(null, 'root')
   const root = doc.documentElement
   if (!root)
     throw new Error("documentElement is null")

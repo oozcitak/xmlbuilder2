@@ -296,7 +296,7 @@ describe('Node', function () {
     expect(aae.lastChild).toBe(newText)
 
     expect($$.printTree(aadoc)).toBe($$.t`
-      doc
+      doc (ns:ns)
         node1
         node2
         node3
@@ -310,7 +310,7 @@ describe('Node', function () {
     expect(aae.childNodes.length).toBe(5)
 
     expect($$.printTree(aadoc)).toBe($$.t`
-      doc
+      doc (ns:ns)
         node1
         node2
         node3

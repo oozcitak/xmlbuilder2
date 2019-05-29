@@ -27,12 +27,13 @@ _applyMixin(ElementImpl, XMLBuilderImpl)
  * @returns document node
  */
 export function create(options?: XMLBuilderOptions): XMLBuilder {
-  const doc = DOMImplementationInstance.createDocument('', '');
   options = options || { version: "1.0" }
   if (!options.stringify) {
     options.stringify = new XMLStringifierImpl(options)
   }
-  (<any>doc)._options = options
+
+  const doc = DOMImplementationInstance.createDocument('', '') as any
+  doc._options = options
   return <XMLBuilder><unknown>doc
 }
 

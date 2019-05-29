@@ -36,7 +36,7 @@ export class DOMImplementationImpl implements DOMImplementation {
    * @param qualifiedName - the qualified name of the document element
    * @param doctype - a {@link DocType} to assign to this document
    */
-  createDocument(namespace: string, qualifiedName: string,
+  createDocument(namespace: string | null, qualifiedName: string,
     doctype: DocumentType | null = null): XMLDocument {
     const document = new XMLDocumentImpl()
 
@@ -64,7 +64,7 @@ export class DOMImplementationImpl implements DOMImplementation {
    * 
    * @param title - document title
    */
-  createHTMLDocument(title: string | undefined = undefined): Document {
+  createHTMLDocument(title?: string): Document {
     const document = new DocumentImpl()
     document._contentType = 'text/html'
 

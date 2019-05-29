@@ -275,7 +275,7 @@ describe('Element', function () {
   })
 
   test('insertAdjacentElement()', function () {
-    const iaedoc = $$.dom.createDocument('', 'root')
+    const iaedoc = $$.dom.createDocument(null, 'root')
 
     if (!iaedoc.documentElement)
       throw new Error("documentElement is null")
@@ -299,7 +299,7 @@ describe('Element', function () {
   })
 
   test('insertAdjacentElement() with null parent', function () {
-    const iaedoc = $$.dom.createDocument('', 'root')
+    const iaedoc = $$.dom.createDocument(null, 'root')
 
     if (!iaedoc.documentElement)
       throw new Error("documentElement is null")
@@ -320,7 +320,7 @@ describe('Element', function () {
   })
 
   test('insertAdjacentText()', function () {
-    const iaedoc = $$.dom.createDocument('', 'root')
+    const iaedoc = $$.dom.createDocument(null, 'root')
 
     if (!iaedoc.documentElement)
       throw new Error("documentElement is null")
@@ -344,7 +344,7 @@ describe('Element', function () {
   })
 
   test('insertAdjacentText() with null parent', function () {
-    const iaedoc = $$.dom.createDocument('', 'root')
+    const iaedoc = $$.dom.createDocument(null, 'root')
 
     if (!iaedoc.documentElement)
       throw new Error("documentElement is null")

@@ -32,14 +32,14 @@ describe('Document', function () {
   test('constructor()', function () {
     expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE qname PUBLIC pubid SYSTEM sysid
-      n:root
+      n:root (ns:myns)
         tagged id="tele1"
         node_with_id id="uniq"
         tagged id="tele2"
-        div id="div1" class="para"
+        div id="div1" class="para" (ns:http://www.w3.org/1999/xhtml)
           # contents
         shadow
-          my-custom-element
+          my-custom-element (ns:http://www.w3.org/1999/xhtml)
       `)
     expect(doc.URL).toBe('about:blank')
     expect(doc.documentURI).toBe('about:blank')
@@ -58,7 +58,7 @@ describe('Document', function () {
 
   test('doctype', function () {
     expect(doc.doctype).toBe(doctype)
-    const emptyDoc = $$.dom.createDocument('', 'root')
+    const emptyDoc = $$.dom.createDocument(null, 'root')
     expect(emptyDoc.doctype).toBe(null)
   })
 
@@ -230,14 +230,14 @@ describe('Document', function () {
   test('lookupPrefix()', function () {
     expect(doc.lookupPrefix('myns')).toBe('n')
     expect(doc.lookupPrefix(null)).toBeNull()
-    const emptyDoc = $$.dom.createDocument('', '')
+    const emptyDoc = $$.dom.createDocument(null, '')
     expect(emptyDoc.lookupPrefix('myns')).toBeNull()
   })
 
   test('lookupNamespaceURI()', function () {
     expect(doc.lookupNamespaceURI('n')).toBe('myns')
     expect(doc.lookupNamespaceURI(null)).toBeNull()
-    const emptyDoc = $$.dom.createDocument('', '')
+    const emptyDoc = $$.dom.createDocument(null, '')
     expect(emptyDoc.lookupNamespaceURI(null)).toBeNull()
   })
 

@@ -30,7 +30,7 @@ describe('ChildNode', function () {
     expect($$.printTree(doc)).toBe($$.t`
       ! comment1
       !DOCTYPE qname PUBLIC pubid SYSTEM sysid
-      n:root
+      n:root (ns:myns)
         node1
         # text1
         # text2
@@ -60,7 +60,7 @@ describe('ChildNode', function () {
     txt.before('text2')
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         # text1
         ele
         # text2
@@ -85,7 +85,7 @@ describe('ChildNode', function () {
     ele4.before(ele3, ele2, ele1)
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         ele3
         ele2
         ele1
@@ -112,7 +112,7 @@ describe('ChildNode', function () {
     ele4.before(ele1)
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         ele1
         ele2
         ele3
@@ -147,7 +147,7 @@ describe('ChildNode', function () {
     expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE qname PUBLIC pubid SYSTEM sysid
       ! comment1
-      n:root
+      n:root (ns:myns)
         ele
         node1
         # text1
@@ -180,7 +180,7 @@ describe('ChildNode', function () {
     ele1.after(ele4, ele3, ele2)
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         ele1
         ele4
         ele3
@@ -207,7 +207,7 @@ describe('ChildNode', function () {
     ele4.after(ele1)
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         ele1
         ele2
         ele3
@@ -241,7 +241,7 @@ describe('ChildNode', function () {
 
     expect($$.printTree(doc)).toBe($$.t`
       ! comment1
-      n:root
+      n:root (ns:myns)
         node1
         # text1
         # text2
@@ -272,7 +272,7 @@ describe('ChildNode', function () {
     ele1.replaceWith(ele4, ele3, ele2)
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         ele4
         ele3
         ele2
@@ -296,7 +296,7 @@ describe('ChildNode', function () {
     ele1.replaceWith(ele4, ele3, ele2, ele1)
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         ele4
         ele3
         ele2
@@ -323,7 +323,7 @@ describe('ChildNode', function () {
     ele4.replaceWith(ele1)
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         ele1
         ele2
         ele3
@@ -346,7 +346,7 @@ describe('ChildNode', function () {
     doctype.remove()
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
       `)
   })
 
@@ -369,7 +369,7 @@ describe('ChildNode', function () {
     ele4.remove()
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         ele1
         ele2
         ele3

@@ -57,7 +57,7 @@ describe('ParentNode', function () {
       doc.createElement('node2'))
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         node1
         # text1
         # text2
@@ -99,7 +99,7 @@ describe('ParentNode', function () {
 
     expect($$.printTree(doc)).toBe($$.t`
       ! comment1
-      n:root
+      n:root (ns:myns)
       `)
   })
 
@@ -120,7 +120,7 @@ describe('ParentNode', function () {
       doc.createElement('node2'))
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
         # txt
         ele
         node1
@@ -161,7 +161,7 @@ describe('ParentNode', function () {
     doc.append(doc.createComment('comment1'))
 
     expect($$.printTree(doc)).toBe($$.t`
-      n:root
+      n:root (ns:myns)
       ! comment1
       `)
   })

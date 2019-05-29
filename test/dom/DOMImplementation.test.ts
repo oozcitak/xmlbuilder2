@@ -22,7 +22,7 @@ describe('DOMImplementation', function () {
 
     expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE qname PUBLIC pubid SYSTEM sysid
-      qname
+      qname (ns:myns)
       `)
 
     const xhtml = $$.dom.createDocument('http://www.w3.org/1999/xhtml', 'html')
@@ -36,11 +36,11 @@ describe('DOMImplementation', function () {
     expect(doc.contentType).toBe('application/xhtml+xml')
     expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE html
-      html
-        head
-          title
+      html (ns:http://www.w3.org/1999/xhtml)
+        head (ns:http://www.w3.org/1999/xhtml)
+          title (ns:http://www.w3.org/1999/xhtml)
             # htmldoc
-        body
+        body (ns:http://www.w3.org/1999/xhtml)
       `)
   })
 
@@ -49,9 +49,9 @@ describe('DOMImplementation', function () {
     expect(doc.contentType).toBe('application/xhtml+xml')
     expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE html
-      html
-        head
-        body
+      html (ns:http://www.w3.org/1999/xhtml)
+        head (ns:http://www.w3.org/1999/xhtml)
+        body (ns:http://www.w3.org/1999/xhtml)
       `)
   })
 

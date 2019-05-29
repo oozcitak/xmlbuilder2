@@ -79,6 +79,12 @@ export default class TestHelpers {
         str = `${indent}${node.tagName}`
         for (const attr of node.attributes) {
           str += ` ${attr.name}="${attr.value}"`
+          if(attr.namespaceURI) {
+            str += ` (ns:${attr.namespaceURI})`
+          }
+        }
+        if(node.namespaceURI) {
+          str += ` (ns:${node.namespaceURI})`
         }
         str += `\n`
         break
