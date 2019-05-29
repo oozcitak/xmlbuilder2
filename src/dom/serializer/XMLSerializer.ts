@@ -5,6 +5,7 @@ import {
 } from "../interfaces"
 import { Namespace, XMLSpec, HTMLSpec } from "../spec"
 import { TupleSet } from "./TupleSet"
+import { DOMException } from ".."
 
 /**
  * Represents an XML serializer.
@@ -14,9 +15,6 @@ import { TupleSet } from "./TupleSet"
 export class XMLSerializerImpl implements XMLSerializer {
 
   private _xmlVersion: "1.0" | "1.1"
-  private _prefixIndex: number
-  private _requireWellFormed: boolean
-  private _duplicatePrefixDefinition: string | null
 
   /**
    * Initializes a new instance of `XMLSerializer`.
@@ -25,9 +23,6 @@ export class XMLSerializerImpl implements XMLSerializer {
    */
   constructor(xmlVersion: "1.0" | "1.1" = "1.0") {
     this._xmlVersion = xmlVersion
-    this._prefixIndex = 1
-    this._requireWellFormed = false
-    this._duplicatePrefixDefinition = null
   }
 
   /**
@@ -36,13 +31,27 @@ export class XMLSerializerImpl implements XMLSerializer {
    * @param root - node to serialize
    */
   serializeToString(root: Node): string {
-    const map = new Map<string | null, string>()
+    return this._produceXMLSerialization(root, false)
+  }
 
-    map.set(Namespace.XML, "xml")
-    this._prefixIndex = 1
-    this._requireWellFormed = false
+  /**
+   * Produces an XML serialization of `root`.
+   * 
+   * @param root - node to serialize
+   * @param requireWellFormed - whether to check conformance
+   */
+  _produceXMLSerialization(node: Node, requireWellFormed: boolean): string {
 
-    return this._serializeNode(root, null, map)
+    const namespacePrefixMap = new Map<string | null, string>()
+    namespacePrefixMap.set(Namespace.XML, "xml")
+
+    try {
+      return this._serializeNode(node, null, 
+        { prefixMap: namespacePrefixMap, prefixIndex: 1 },
+        requireWellFormed)
+    } catch {
+      throw DOMException.InvalidStateError
+    }
   }
 
   /**
@@ -50,169 +59,33 @@ export class XMLSerializerImpl implements XMLSerializer {
    * 
    * @param node - node to serialize
    * @param namespace - context namespace
-   * @param map - namespace prefix map
+   * @param refs - reference parameters
+   * @param requireWellFormed - whether to check conformance
    */
   private _serializeNode(node: Node, namespace: string | null,
-    map: Map<string | null, string>): string {
+    refs: { prefixMap: Map<string | null, string>, prefixIndex: number },
+    requireWellFormed: boolean): string {
 
     switch (node.nodeType) {
-      case NodeType.Document:
-        return this._serializeDocument(<Document>node, namespace, map)
-      case NodeType.DocumentType:
-        return this._serializeDocumentType(<DocumentType>node)
       case NodeType.Element:
-        return this._serializeElement(<Element>node, namespace, map)
+        return this._serializeElement(<Element>node, namespace, refs, requireWellFormed)
+      case NodeType.Document:
+        return this._serializeDocument(<Document>node, namespace, refs, requireWellFormed)
       case NodeType.Comment:
-        return this._serializeComment(<Comment>node)
+        return this._serializeComment(<Comment>node, requireWellFormed)
       case NodeType.Text:
-        return this._serializeText(<Text>node)
-      case NodeType.ProcessingInstruction:
-        return this._serializeProcessingInstruction(<ProcessingInstruction>node)
-      case NodeType.CData:
-        return this._serializeCData(<CDATASection>node)
+        return this._serializeText(<Text>node, requireWellFormed)
       case NodeType.DocumentFragment:
-        return this._serializeDocumentFragment(<DocumentFragment>node, namespace, map)
+          return this._serializeDocumentFragment(<DocumentFragment>node, namespace, refs, requireWellFormed)
+      case NodeType.DocumentType:
+          return this._serializeDocumentType(<DocumentType>node, requireWellFormed)
+      case NodeType.ProcessingInstruction:
+        return this._serializeProcessingInstruction(<ProcessingInstruction>node, requireWellFormed)
+      case NodeType.CData:
+        return this._serializeCData(<CDATASection>node, requireWellFormed)
       default:
         throw new Error("Invalid node type.")
     }
-  }
-
-  /**
-   * Produces an XML serialization of a document node.
-   * 
-   * @param node - document node to serialize
-   * @param namespace - context namespace
-   * @param map - namespace prefix map
-   */
-  private _serializeDocument(node: Document, namespace: string | null,
-    map: Map<string | null, string>): string {
-
-    if (this._requireWellFormed && !node.documentElement) {
-      throw new Error("Missing document element (well-formed required).")
-    }
-
-    let markup = ""
-
-    if (node.doctype) {
-      markup += this._serializeDocumentType(node.doctype)
-    }
-
-    for (const childNode of node.childNodes) {
-      markup += this._serializeNode(childNode, namespace, map)
-    }
-
-    return markup
-  }
-
-  /**
-   * Produces an XML serialization of a document type node.
-   * 
-   * @param node - document type node to serialize
-   */
-  private _serializeDocumentType(node: DocumentType): string {
-
-    if (this._requireWellFormed && node.publicId && !XMLSpec.isPubidChar(node.publicId)) {
-      throw new Error("DocType public identifier does not match PubidChar construct (well-formed required).")
-    }
-
-    if (this._requireWellFormed && node.systemId &&
-      (!XMLSpec.isLegalChar(node.systemId, this._xmlVersion)) ||
-      (node.systemId.includes('"') && node.systemId.includes("'"))) {
-      throw new Error("DocType system identifier contains invalid characters (well-formed required).")
-    }
-
-    if (node.publicId && node.systemId) {
-      return `<!DOCTYPE ${node.name} PUBLIC "${node.publicId}" "${node.systemId}">`
-    } else if (node.publicId) {
-      return `<!DOCTYPE ${node.name} PUBLIC "${node.publicId}">`
-    } else if (node.systemId) {
-      return `<!DOCTYPE ${node.name} SYSTEM "${node.systemId}">`
-    } else {
-      return `<!DOCTYPE ${node.name}>`
-    }
-  }
-
-  /**
-   * Produces an XML serialization of a comment node.
-   * 
-   * @param node - comment node to serialize
-   */
-  private _serializeComment(node: Comment): string {
-
-    if (this._requireWellFormed && (!XMLSpec.isLegalChar(node.data, this._xmlVersion) ||
-      node.data.includes("--") || node.data.endsWith("-"))) {
-      throw new Error("Comment data contains invalid characters (well-formed required).")
-    }
-
-    return `<!--${node.data}-->`
-  }
-
-  /**
-   * Produces an XML serialization of a text node.
-   * 
-   * @param node - text node to serialize
-   */
-  private _serializeText(node: Text): string {
-
-    if (this._requireWellFormed && !XMLSpec.isLegalChar(node.data, this._xmlVersion)) {
-      throw new Error("Text data contains invalid characters (well-formed required).")
-    }
-
-    return node.data.replace("&", "&amp;")
-      .replace("<", "&lt;")
-      .replace(">", "&gt;")
-  }
-
-  /**
-   * Produces an XML serialization of a processing instruction node.
-   * 
-   * @param node - processing instruction node to serialize
-   */
-  private _serializeProcessingInstruction(node: ProcessingInstruction): string {
-
-    if (this._requireWellFormed && (node.target.includes(":") || (/xml/i).test(node.target))) {
-      throw new Error("Processing instruction target contains invalid characters (well-formed required).")
-    }
-
-    if (this._requireWellFormed && (!XMLSpec.isLegalChar(node.data, this._xmlVersion) ||
-      node.data.includes("?>"))) {
-      throw new Error("Processing instruction data contains invalid characters (well-formed required).")
-    }
-
-    return `<?${node.target} ${node.data}?>`
-  }
-
-  /**
-   * Produces an XML serialization of a CDATA node.
-   * 
-   * @param node - processing instruction node to serialize
-   */
-  private _serializeCData(node: CDATASection): string {
-
-    if (this._requireWellFormed && (node.data.includes("]]>"))) {
-      throw new Error("CDATA contains invalid characters (well-formed required).")
-    }
-
-    return `<![CDATA[${node.data}]]>`
-  }
-
-  /**
-   * Produces an XML serialization of a document fragment node.
-   * 
-   * @param node - document fragment node to serialize
-   * @param namespace - context namespace
-   * @param map - namespace prefix map
-   */
-  private _serializeDocumentFragment(node: DocumentFragment,
-    namespace: string | null, map: Map<string | null, string>): string {
-
-    let markup = ""
-
-    for (const childNode of node.childNodes) {
-      markup += this._serializeNode(childNode, namespace, map)
-    }
-
-    return markup
   }
 
   /**
@@ -220,13 +93,15 @@ export class XMLSerializerImpl implements XMLSerializer {
    * 
    * @param node - element node to serialize
    * @param namespace - context namespace
-   * @param prefixMap - namespace prefix map
+   * @param refs - reference parameters
+   * @param requireWellFormed - whether to check conformance
    */
-  private _serializeElement(node: Element,
-    namespace: string | null, prefixMap: Map<string | null, string>): string {
+  private _serializeElement(node: Element, namespace: string | null,
+    refs: { prefixMap: Map<string | null, string>, prefixIndex: number },
+    requireWellFormed: boolean): string {
 
-    if (this._requireWellFormed && (node.localName.includes(":") ||
-      !XMLSpec.isLegalChar(node.localName, this._xmlVersion))) {
+    if (requireWellFormed && (node.localName.includes(":") ||
+      !XMLSpec.isName(node.localName))) {
       throw new Error("Element local name contains invalid characters (well-formed required).")
     }
 
@@ -234,11 +109,12 @@ export class XMLSerializerImpl implements XMLSerializer {
     let qualifiedName = ''
     let skipEndTag = false
     let ignoreNamespaceDefinitionAttribute = false
-    let map = new Map<string | null, string>(prefixMap)
+    let map = new Map<string | null, string>(refs.prefixMap)
     let elementPrefixesList: string[] = []
-    this._duplicatePrefixDefinition = null
-    let localDefaultNamespace = this._recordNamespaceInformation(node, map,
-      elementPrefixesList)
+    let duplicatePrefixDefinition: string | null = null
+    let localDefaultNamespace = this._recordNamespaceInformation(node, 
+      { map: map, list: elementPrefixesList, 
+        duplicatePrefixDefinition: duplicatePrefixDefinition })
     let inheritedNS = namespace
     let ns = node.namespaceURI
 
@@ -261,20 +137,22 @@ export class XMLSerializerImpl implements XMLSerializer {
         // there exists on this node or the node's ancestry a namespace prefix
         // definition that defines the node's namespace
         qualifiedName = `${candidatePrefix}:${node.localName}`
-        if (localDefaultNamespace) {
+        if (localDefaultNamespace !== null) {
           inheritedNS = ns
         }
         markup += qualifiedName
       } else if (prefix !== null && localDefaultNamespace === null) {
         if (elementPrefixesList.includes(prefix)) {
-          prefix = this._generatePrefix(map, ns)
+          const generateRefs = { map: map, prefixIndex: refs.prefixIndex }
+          prefix = this._generatePrefix(ns, generateRefs)
+          refs.prefixIndex = generateRefs.prefixIndex
         } else {
           map.set(ns, prefix)
         }
         qualifiedName = `${prefix}:${node.localName}`
         markup += qualifiedName
         // serialize the new namespace/prefix association just added to the map
-        markup += ` xmlns:${prefix}="${this._serializeAttributeValue(ns)}"`
+        markup += ` xmlns:${prefix}="${this._serializeAttributeValue(ns, requireWellFormed)}"`
       } else if (localDefaultNamespace === null || 
         (localDefaultNamespace !== null && localDefaultNamespace !== ns)) {
         ignoreNamespaceDefinitionAttribute = true
@@ -285,7 +163,7 @@ export class XMLSerializerImpl implements XMLSerializer {
         inheritedNS = ns
         markup += qualifiedName
         // serialize the new (or replacement) default namespace definition
-        markup += ` xmlns="${this._serializeAttributeValue(ns)}"`
+        markup += ` xmlns="${this._serializeAttributeValue(ns, requireWellFormed)}"`
       } else {
         // node has a local default namespace that matches ns
         qualifiedName = node.localName
@@ -294,14 +172,19 @@ export class XMLSerializerImpl implements XMLSerializer {
       }
     }
 
-    markup += this._serializeAttributes(node, map, ignoreNamespaceDefinitionAttribute)
+    const attRefs = { namespacePrefixMap: map, prefixIndex: refs.prefixIndex }
+    markup += this._serializeAttributes(node, attRefs, 
+      ignoreNamespaceDefinitionAttribute, duplicatePrefixDefinition, 
+      requireWellFormed)
+    refs.prefixIndex = attRefs.prefixIndex
 
     if (ns === Namespace.HTML && !node.hasChildNodes() &&
       HTMLSpec.isVoidElementName(node.localName)) {
       // self-closing html tags
       markup += " /"
       skipEndTag = true
-    } else if (ns !== Namespace.HTML && !node.hasChildNodes()) {
+    }
+    if (ns !== Namespace.HTML && !node.hasChildNodes()) {
       // xml element without child nodes also self close
       markup += "/"
       skipEndTag = true
@@ -321,11 +204,13 @@ export class XMLSerializerImpl implements XMLSerializer {
       // This allows template content to round-trip, given the rules for 
       // parsing XHTML documents [HTML5].
       // markup += this._serializeNode((<HTMLTemplateElement>node).content, inheritedNS, map)
-    }
-
-    // serialize child-nodes
-    for (const childNode of node.childNodes) {
-      markup += this._serializeNode(childNode, inheritedNS, map)
+    } else {
+      // serialize child-nodes
+      for (const childNode of node.childNodes) {
+        const childRefs = { prefixMap: map, prefixIndex: refs.prefixIndex }
+        markup += this._serializeNode(childNode, inheritedNS, childRefs, requireWellFormed)
+        refs.prefixIndex = childRefs.prefixIndex
+      }
     }
 
     markup += `</${qualifiedName}>`
@@ -333,15 +218,172 @@ export class XMLSerializerImpl implements XMLSerializer {
   }
 
   /**
+   * Produces an XML serialization of a document node.
+   * 
+   * @param node - document node to serialize
+   * @param namespace - context namespace
+   * @param refs - reference parameters
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeDocument(node: Document, namespace: string | null,
+    refs: { prefixMap: Map<string | null, string>, prefixIndex: number },
+    requireWellFormed: boolean): string {
+
+    if (requireWellFormed && node.documentElement === null) {
+      throw new Error("Missing document element (well-formed required).")
+    }
+
+    let markup = ""
+
+    if (node.doctype !== null) {
+      markup += this._serializeDocumentType(node.doctype, requireWellFormed)
+    }
+
+    for (const childNode of node.childNodes) {
+      markup += this._serializeNode(childNode, namespace, refs, requireWellFormed)
+    }
+
+    return markup
+  }
+
+  /**
+   * Produces an XML serialization of a document type node.
+   * 
+   * @param node - document type node to serialize
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeDocumentType(node: DocumentType, requireWellFormed: boolean): string {
+
+    if (requireWellFormed && !XMLSpec.isPubidChar(node.publicId)) {
+      throw new Error("DocType public identifier does not match PubidChar construct (well-formed required).")
+    }
+
+    if (requireWellFormed &&
+      (!XMLSpec.isLegalChar(node.systemId, this._xmlVersion) ||
+      (node.systemId.includes('"') && node.systemId.includes("'")))) {
+      throw new Error("DocType system identifier contains invalid characters (well-formed required).")
+    }
+
+    if (node.publicId && node.systemId) {
+      return `<!DOCTYPE ${node.name} PUBLIC "${node.publicId}" "${node.systemId}">`
+    } else if (node.publicId) {
+      return `<!DOCTYPE ${node.name} PUBLIC "${node.publicId}">`
+    } else if (node.systemId) {
+      return `<!DOCTYPE ${node.name} SYSTEM "${node.systemId}">`
+    } else {
+      return `<!DOCTYPE ${node.name}>`
+    }
+  }
+
+  /**
+   * Produces an XML serialization of a comment node.
+   * 
+   * @param node - comment node to serialize
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeComment(node: Comment, requireWellFormed: boolean): string {
+
+    if (requireWellFormed && (!XMLSpec.isLegalChar(node.data, this._xmlVersion) ||
+      node.data.includes("--") || node.data.endsWith("-"))) {
+      throw new Error("Comment data contains invalid characters (well-formed required).")
+    }
+
+    return `<!--${node.data}-->`
+  }
+
+  /**
+   * Produces an XML serialization of a text node.
+   * 
+   * @param node - text node to serialize
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeText(node: Text, requireWellFormed: boolean): string {
+
+    if (requireWellFormed && !XMLSpec.isLegalChar(node.data, this._xmlVersion)) {
+      throw new Error("Text data contains invalid characters (well-formed required).")
+    }
+
+    return node.data.replace("&", "&amp;")
+      .replace("<", "&lt;")
+      .replace(">", "&gt;")
+  }
+
+  /**
+   * Produces an XML serialization of a processing instruction node.
+   * 
+   * @param node - processing instruction node to serialize
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeProcessingInstruction(node: ProcessingInstruction,
+    requireWellFormed: boolean): string {
+
+    if (requireWellFormed && (node.target.includes(":") || (/xml/i).test(node.target))) {
+      throw new Error("Processing instruction target contains invalid characters (well-formed required).")
+    }
+
+    if (requireWellFormed && (!XMLSpec.isLegalChar(node.data, this._xmlVersion) ||
+      node.data.includes("?>"))) {
+      throw new Error("Processing instruction data contains invalid characters (well-formed required).")
+    }
+
+    return `<?${node.target} ${node.data}?>`
+  }
+
+  /**
+   * Produces an XML serialization of a CDATA node.
+   * 
+   * @param node - processing instruction node to serialize
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeCData(node: CDATASection, requireWellFormed: boolean): string {
+
+    if (requireWellFormed && (node.data.includes("]]>"))) {
+      throw new Error("CDATA contains invalid characters (well-formed required).")
+    }
+
+    return `<![CDATA[${node.data}]]>`
+  }
+
+  /**
+   * Produces an XML serialization of a document fragment node.
+   * 
+   * @param node - document fragment node to serialize
+   * @param namespace - context namespace
+   * @param refs - reference parameters
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeDocumentFragment(node: DocumentFragment,
+    namespace: string | null,
+    refs: { prefixMap: Map<string | null, string>, prefixIndex: number },
+    requireWellFormed: boolean): string {
+
+    let markup = ""
+
+    for (const childNode of node.childNodes) {
+      markup += this._serializeNode(childNode, namespace, refs, requireWellFormed)
+    }
+
+    return markup
+  }
+
+  /**
    * Produces an XML serialization of the attributes of an element node.
    * 
    * @param node - element node whose attributes to serialize
-   * @param map - namespace prefix map
+   * @param refs - reference parameters
    * @param ignoreNamespaceDefinitionAttribute - whether to ignore namespace
+   * @param duplicatePrefixDefinition - duplicate prefix definition
    * definition attribute
+   * @param requireWellFormed - whether to check conformance
    */
-  private _serializeAttributes(node: Element, map: Map<string | null, string>,
-    ignoreNamespaceDefinitionAttribute: boolean): string {
+  private _serializeAttributes(node: Element,
+    refs: { namespacePrefixMap: Map<string | null, string>,
+      prefixIndex: number },
+    ignoreNamespaceDefinitionAttribute: boolean, 
+    duplicatePrefixDefinition: string | null,
+    requireWellFormed: boolean): string {
+
+    let result = ""
 
     // Contains unique attribute namespaceURI and localName pairs
     // This set is used to [optionally] enforce the well-formed constraint that 
@@ -350,9 +392,8 @@ export class XMLSerializerImpl implements XMLSerializer {
     // same element differ only by their prefix values.    
     const localNameSet = new TupleSet<string | null, string>()
 
-    let result = ""
     for (const attr of node.attributes) {
-      if (this._requireWellFormed && localNameSet.has([attr.namespaceURI, attr.localName])) {
+      if (requireWellFormed && localNameSet.has([attr.namespaceURI, attr.localName])) {
         throw new Error("Element contains two attributes with the same namespaceURI and localName (well-formed required).")
       }
 
@@ -363,29 +404,31 @@ export class XMLSerializerImpl implements XMLSerializer {
       if (attributeNamespace !== null) {
         if (attributeNamespace === Namespace.XMLNS &&
           ((attr.prefix === null && ignoreNamespaceDefinitionAttribute) ||
-          (attr.prefix !== null && attr.localName === this._duplicatePrefixDefinition))) {
+          (attr.prefix !== null && attr.localName === duplicatePrefixDefinition))) {
           continue
-        } else if (map.has(attributeNamespace)) {
-          candidatePrefix = map.get(attributeNamespace) || null
+        } else if (refs.namespacePrefixMap.has(attributeNamespace)) {
+          candidatePrefix = refs.namespacePrefixMap.get(attributeNamespace) || null
         } else {
-          candidatePrefix = this._generatePrefix(map, attributeNamespace)
+          const generateRefs = { map: refs.namespacePrefixMap, prefixIndex: refs.prefixIndex }
+          candidatePrefix = this._generatePrefix(attributeNamespace, generateRefs)
+          refs.prefixIndex = generateRefs.prefixIndex
 
-          result += ` xmlns:${candidatePrefix}="${this._serializeAttributeValue(attributeNamespace)}"`
+          result += ` xmlns:${candidatePrefix}="${this._serializeAttributeValue(attributeNamespace, requireWellFormed)}"`
         }
       }
 
       result += " "
-      if (candidatePrefix) {
+      if (candidatePrefix !== null) {
         result += `${candidatePrefix}:`
       }
 
-      if (this._requireWellFormed && (attr.localName.includes(":") ||
+      if (requireWellFormed && (attr.localName.includes(":") ||
         !XMLSpec.isName(attr.localName) ||
         ((/xmlns/i).test(attr.localName) && !attributeNamespace))) {
         throw new Error("Attribute local name contains invalid characters (well-formed required).")
       }
 
-      result += `${attr.localName}="${this._serializeAttributeValue(attr.value)}"`
+      result += `${attr.localName}="${this._serializeAttributeValue(attr.value, requireWellFormed)}"`
     }
 
     return result
@@ -395,10 +438,12 @@ export class XMLSerializerImpl implements XMLSerializer {
    * Produces an XML serialization of an attribute node value.
    * 
    * @param attributeValue - attribute value
+   * @param requireWellFormed - whether to check conformance
    */
-  private _serializeAttributeValue(attributeValue: string | null): string {
+  private _serializeAttributeValue(attributeValue: string | null,
+    requireWellFormed: boolean): string {
 
-    if (this._requireWellFormed && attributeValue &&
+    if (requireWellFormed && attributeValue &&
       !XMLSpec.isLegalChar(attributeValue, this._xmlVersion)) {
       throw new Error("Attribute value contains invalid characters (well-formed required).")
     }
@@ -416,23 +461,23 @@ export class XMLSerializerImpl implements XMLSerializer {
   }
 
   /**
-   * Records namespace information for the given element.
+   * Records namespace information for the given element and returns the 
+   * default namespace attribute value.
    * 
    * @param element - element node to process
-   * @param map - namespace prefix map
-   * @param list - element prefixes list
-   * 
-   * @returns default namespace attribute value
+   * @param refs - reference parameters
+   * @param requireWellFormed - whether to check conformance
    */
-  private _recordNamespaceInformation(element: Element,
-    map: Map<string | null, string>, list: string[]): string | null {
+  private _recordNamespaceInformation(element: Element,     
+    refs: { map: Map<string | null, string>, list: string[], 
+    duplicatePrefixDefinition: string | null }): string | null {
 
     let defaultNamespaceAttrValue: string | null = null
     for (const attr of element.attributes) {
       let attributeNamespace = attr.namespaceURI
       let attributePrefix = attr.prefix
       if (attributeNamespace === Namespace.XMLNS) {
-        if (!attributePrefix) {
+        if (attributePrefix === null) {
           // default namespace declaration
           defaultNamespaceAttrValue = attr.value
           continue
@@ -440,12 +485,13 @@ export class XMLSerializerImpl implements XMLSerializer {
           // attribute is a namespace prefix definition
           let prefixDefinition = attr.localName
           let namespaceDefinition = attr.value
-          if (map.has(namespaceDefinition) && map.get(namespaceDefinition) === prefixDefinition) {
-            this._duplicatePrefixDefinition = prefixDefinition
+          if (refs.map.has(namespaceDefinition) && 
+            refs.map.get(namespaceDefinition) === prefixDefinition) {
+            refs.duplicatePrefixDefinition = prefixDefinition
           } else {
-            map.set(namespaceDefinition, prefixDefinition)
+            refs.map.set(namespaceDefinition, prefixDefinition)
           }
-          list.push(prefixDefinition)
+          refs.list.push(prefixDefinition)
         }
       }
     }
@@ -456,15 +502,15 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Generates a new prefix for the given namespace.
    * 
-   * @param map - namespace prefix map map
    * @param newNamespace - a namespace to generate prefix for
+   * @param refs - reference parameters
    */
-  private _generatePrefix(map: Map<string | null, string>,
-    newNamespace: string | null): string {
+  private _generatePrefix(newNamespace: string | null,
+    refs: { map: Map<string | null, string>, prefixIndex: number }): string {
 
-    let generatedPrefix = "ns" + this._prefixIndex
-    this._prefixIndex++
-    map.set(newNamespace, generatedPrefix)
+    let generatedPrefix = "ns" + refs.prefixIndex
+    refs.prefixIndex++
+    refs.map.set(newNamespace, generatedPrefix)
     return generatedPrefix
   }
 
