@@ -37,9 +37,9 @@ export class EOFToken extends XMLTokenBase {
  * Represents an XML declaration token.
  */
 export class DeclarationToken extends XMLTokenBase {
-  version = ''
-  encoding = ''
-  standalone = ''
+  version: string
+  encoding: string
+  standalone: string
 
   /**
    * Initializes a new instance of `DeclarationToken`.
@@ -57,9 +57,9 @@ export class DeclarationToken extends XMLTokenBase {
  * Represents a DocType token.
  */
 export class DocTypeToken extends XMLTokenBase {
-  name = ''
-  pubId = ''
-  sysId = ''
+  name: string
+  pubId: string
+  sysId: string
 
   /**
    * Initializes a new instance of `DocTypeToken`.
@@ -77,7 +77,7 @@ export class DocTypeToken extends XMLTokenBase {
  * Represents a character data token.
  */
 abstract class CharacterDataToken extends XMLTokenBase {
-  data = ''
+  data: string
   
   /**
    * Initializes a new instance of `CharacterDataToken`.
@@ -136,7 +136,7 @@ export class TextToken extends CharacterDataToken {
  * Represents a processing instruction token.
  */
 export class PIToken extends CharacterDataToken {
-  target = ''
+  target: string
   
   /**
    * Initializes a new instance of `PIToken`.
@@ -152,9 +152,9 @@ export class PIToken extends CharacterDataToken {
  * Represents an element token.
  */
 export class ElementToken extends XMLTokenBase {
-  name = ''
-  attributes: { [key:string]: string } = { }
-  selfClosing = false
+  name: string
+  attributes: { [key:string]: string }
+  selfClosing: boolean
   
   /**
    * Initializes a new instance of `ElementToken`.
@@ -173,7 +173,7 @@ export class ElementToken extends XMLTokenBase {
  * Represents a closing tag token.
  */
 export class ClosingTagToken extends XMLTokenBase {
-  name = ''
+  name: string
   
   /**
    * Initializes a new instance of `ClosingTagToken`.
