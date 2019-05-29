@@ -1,2 +1,2 @@
 // Export classes
-export { XMLSerializer } from './XMLSerializer'
+export { XMLSerializerImpl as XMLSerializer } from './XMLSerializer'

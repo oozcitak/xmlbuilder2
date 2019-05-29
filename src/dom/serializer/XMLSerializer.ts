@@ -1,3 +1,4 @@
+import { XMLSerializer } from "./interfaces"
 import {
   Node, NodeType, Document, DocumentType, Comment, ProcessingInstruction,
   DocumentFragment, Text, Element, CDATASection
@@ -10,7 +11,7 @@ import { TupleSet } from "./TupleSet"
  * 
  * Implements: https://www.w3.org/TR/DOM-Parsing/#serializing
  */
-export class XMLSerializer {
+export class XMLSerializerImpl implements XMLSerializer {
 
   private _xmlVersion: "1.0" | "1.1"
   private _prefixIndex: number
