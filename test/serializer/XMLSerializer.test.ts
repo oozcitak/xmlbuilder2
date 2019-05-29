@@ -1,6 +1,4 @@
 import $$ from '../TestHelpers'
-import { XMLSerializer } from '../../src/dom/serializer'
-import { Document } from '../../src/dom/interfaces'
 
 describe('XMLSerializer', function () {
 
@@ -17,8 +15,7 @@ describe('XMLSerializer', function () {
       .ele('text', 'alien\'s pinky toe')
       .doc()
 
-    const serializer = new XMLSerializer()
-    expect(serializer.serializeToString(<Document><unknown>doc)).toBe(
+    expect($$.serialize(doc)).toBe(
       '<root>' + 
         '<node att="val"/>' + 
         '<!--same node below-->' + 
@@ -31,7 +28,7 @@ describe('XMLSerializer', function () {
   })
 
   test('XML serializer + parser', function () {
-    const xmlStr= 
+    const xmlStr = 
       '<section xmlns="http://www.ibm.com/events"' +
         ' xmlns:bk="urn:loc.gov:books"' +
         ' xmlns:pi="urn:personalInformation"' +
@@ -44,9 +41,52 @@ describe('XMLSerializer', function () {
         '</signing>' +
       '</section>'
 
-    const doc = $$.parse(xmlStr)
-    const serializer = new XMLSerializer()
-    expect(serializer.serializeToString(<Document><unknown>doc)).toBe(xmlStr)
+    expect($$.serialize($$.parse(xmlStr))).toBe(xmlStr)
+  })
+
+  test('XML serializer: default namespace', function () {
+    const ns = 'uri:myns'
+    const doc = $$.dom.createDocument(ns, 'root')
+    const node1 = doc.createElementNS(ns, 'node1')
+    if (doc.documentElement) {
+      doc.documentElement.appendChild(node1)
+    }
+    const node2 = doc.createElementNS(ns, 'node2')
+    node1.appendChild(node2)
+    node2.appendChild(doc.createTextNode('text'))
+
+    expect($$.serialize(doc)).toBe(
+      '<root xmlns="uri:myns"><node1><node2>text</node2></node1></root>'
+    )
+    expect($$.printTree(doc)).toBe($$.t`
+      root (ns:uri:myns)
+        node1 (ns:uri:myns)
+          node2 (ns:uri:myns)
+            # text
+      `)
+  })
+
+  test('XML serializer: namespace prefix', function () {
+    const ns = 'uri:myns'
+    const doc = $$.dom.createDocument(ns, 'root')
+    const node1 = doc.createElementNS(ns, 'node1')
+    if (doc.documentElement) {
+      doc.documentElement.setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'xsi:schemaLocation', 'uri:myschema.xsd')
+      doc.documentElement.appendChild(node1)
+    }
+    const node2 = doc.createElementNS(ns, 'node2')
+    node1.appendChild(node2)
+    node2.appendChild(doc.createTextNode('text'))
+
+    expect($$.serialize(doc)).toBe(
+      '<root xmlns="uri:myns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="uri:myschema.xsd"><node1><node2>text</node2></node1></root>'
+    )
+    expect($$.printTree(doc)).toBe($$.t`
+      root (ns:uri:myns) xsi:schemaLocation="uri:myschema.xsd" (ns:http://www.w3.org/2001/XMLSchema-instance)
+        node1 (ns:uri:myns)
+          node2 (ns:uri:myns)
+            # text
+      `)
   })
 
 })

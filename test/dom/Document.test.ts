@@ -36,7 +36,7 @@ describe('Document', function () {
         tagged id="tele1"
         node_with_id id="uniq"
         tagged id="tele2"
-        div id="div1" class="para" (ns:http://www.w3.org/1999/xhtml)
+        div (ns:http://www.w3.org/1999/xhtml) id="div1" class="para"
           # contents
         shadow
           my-custom-element (ns:http://www.w3.org/1999/xhtml)

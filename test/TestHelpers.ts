@@ -22,6 +22,7 @@ import { ShadowRoot as ShadowRootImpl } from '../src/dom'
 import { Text as TextImpl } from '../src/dom'
 import { XMLDocument as XMLDocumentImpl } from '../src/dom'
 import { DOMImplementationInstance } from '../src/dom'
+import { XMLSerializer } from '../src/dom/serializer'
 
 import { create, parse } from '../src/xmlbuilder'
 
@@ -57,6 +58,10 @@ export default class TestHelpers {
    */
   static create = create
   static parse = parse
+  static serialize(node: any): string {
+    const serializer = new XMLSerializer()
+    return serializer.serializeToString(node)
+  }
 
   /**
    * De-indents template literals.
@@ -77,14 +82,14 @@ export default class TestHelpers {
     switch (node.nodeType) {
       case 1: // Element
         str = `${indent}${node.tagName}`
+        if(node.namespaceURI) {
+          str += ` (ns:${node.namespaceURI})`
+        }
         for (const attr of node.attributes) {
           str += ` ${attr.name}="${attr.value}"`
           if(attr.namespaceURI) {
             str += ` (ns:${attr.namespaceURI})`
           }
-        }
-        if(node.namespaceURI) {
-          str += ` (ns:${node.namespaceURI})`
         }
         str += `\n`
         break
