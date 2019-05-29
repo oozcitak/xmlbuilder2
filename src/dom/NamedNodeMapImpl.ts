@@ -7,11 +7,11 @@ import { DOMException } from "./DOMException"
 export class NamedNodeMapImpl implements NamedNodeMap {
 
   protected _ownerElement: Element
-  protected _items: Array<Attr>
+  protected _items: Attr[]
 
   constructor(ownerElement: Element) {
     this._ownerElement = ownerElement
-    this._items = new Array<Attr>()
+    this._items = []
   }
 
   /** 

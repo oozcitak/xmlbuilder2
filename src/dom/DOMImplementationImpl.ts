@@ -64,7 +64,7 @@ export class DOMImplementationImpl implements DOMImplementation {
    * 
    * @param title - document title
    */
-  createHTMLDocument(title: string | undefined = undefined): Document {
+  createHTMLDocument(title?: string): Document {
     const document = new DocumentImpl()
     document._contentType = 'text/html'
 

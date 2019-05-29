@@ -58,7 +58,7 @@ export function isObject(x: any): x is { [key: string]: any } {
  * 
  * @param x - a variable to type check
  */
-export function isArray(x: any): x is Array<any> {
+export function isArray(x: any): x is any[] {
   return Array.isArray(x)
 }
 

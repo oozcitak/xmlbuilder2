@@ -134,7 +134,7 @@ describe('TreeMutation', function () {
     TreeMutation.preInsert(ele1, de, ele1)
 
     expect($$.printTree(doc)).toBe($$.t`
-      root
+      root (ns:my ns)
         element1
         element2
       `)

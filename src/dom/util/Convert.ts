@@ -14,7 +14,7 @@ export class Convert {
    * 
    * @param nodes - the array of nodes or strings
    */
-  static nodesIntoNode(nodes: Array<Node | string>, document: Document): Node {
+  static nodesIntoNode(nodes: (Node | string)[], document: Document): Node {
     if (nodes.length === 1) {
       if (typeof nodes[0] === 'string')
         return new TextImpl(document, <string>nodes[0])

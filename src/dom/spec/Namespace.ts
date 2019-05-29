@@ -37,6 +37,7 @@ export class Namespace {
    * keys.
    */
   static extractNames(namespace: string | null, qualifiedName: string): { namespace: string | null, prefix: string | null, localName: string } {
+
     if (!namespace) namespace = null
 
     const parts = Namespace.extractQName(qualifiedName)
@@ -72,6 +73,7 @@ export class Namespace {
    * @returns an object with `prefix`, and `localName` keys.
    */
   static extractQName(qualifiedName: string): { prefix: string | null, localName: string } {
+
     Namespace.validateQName(qualifiedName)
 
     const parts = qualifiedName.split(':')
@@ -82,5 +84,5 @@ export class Namespace {
       'prefix': prefix,
       'localName': localName
     }
-  }  
+  }
 }

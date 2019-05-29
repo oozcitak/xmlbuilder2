@@ -3,7 +3,7 @@ import { WhatToShow, FilterResult } from '../../src/dom/interfaces'
 
 describe('TreeWalker', function () {
 
-  const doc = $$.dom.createDocument('', 'root')
+  const doc = $$.dom.createDocument(null, 'root')
   const root = doc.documentElement
   if (!root)
     throw new Error("documentElement is null")
