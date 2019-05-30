@@ -81,13 +81,41 @@ describe('XMLSerializer', function () {
     node2.appendChild(doc.createTextNode('text'))
 
     expect($$.serialize(doc)).toBe(
-      '<root xmlns="uri:myns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="uri:myschema.xsd"><node1><node2>text</node2></node1></root>'
+      '<root xmlns="uri:myns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="uri:myschema.xsd">' +
+        '<node1><node2>text</node2></node1>' +
+      '</root>'
     )
     expect($$.printTree(doc)).toBe($$.t`
       root (ns:uri:myns) xsi:schemaLocation="uri:myschema.xsd" (ns:http://www.w3.org/2001/XMLSchema-instance)
         node1 (ns:uri:myns)
           node2 (ns:uri:myns)
             # text
+      `)
+  })
+
+  test('XML serializer: explicit namespace declaration', function () {
+    const svgNs = 'http://www.w3.org/2000/svg';
+    const xlinkNs = 'http://www.w3.org/1999/xlink';
+    
+    const doc = $$.dom.createDocument(svgNs, 'svg');
+    if (doc.documentElement) {
+      doc.documentElement.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xlink', xlinkNs);
+    
+      const script = doc.createElementNS(svgNs, 'script');
+      script.setAttributeNS(null, 'type', 'text/ecmascript');
+      script.setAttributeNS(xlinkNs, 'xlink:href', 'foo.js');
+    
+      doc.documentElement.appendChild(script);
+    }
+
+    expect($$.serialize(doc)).toBe(
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+        '<script type="text/ecmascript" xlink:href="foo.js"/>' + 
+      '</svg>'
+    )
+    expect($$.printTree(doc)).toBe($$.t`
+      svg (ns:http://www.w3.org/2000/svg) xmlns:xlink="http://www.w3.org/1999/xlink"
+        script (ns:uri:myns) type="text/ecmascript"
       `)
   })
 
