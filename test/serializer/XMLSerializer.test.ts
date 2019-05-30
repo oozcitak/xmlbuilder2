@@ -114,8 +114,8 @@ describe('XMLSerializer', function () {
       '</svg>'
     )
     expect($$.printTree(doc)).toBe($$.t`
-      svg (ns:http://www.w3.org/2000/svg) xmlns:xlink="http://www.w3.org/1999/xlink"
-        script (ns:uri:myns) type="text/ecmascript"
+      svg (ns:http://www.w3.org/2000/svg) xmlns:xlink="http://www.w3.org/1999/xlink" (ns:http://www.w3.org/2000/xmlns/)
+        script (ns:http://www.w3.org/2000/svg) type="text/ecmascript" xlink:href="foo.js" (ns:http://www.w3.org/1999/xlink)
       `)
   })
 

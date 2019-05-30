@@ -40,7 +40,7 @@ export class XMLSerializerImpl implements XMLSerializer {
    * @param root - node to serialize
    * @param requireWellFormed - whether to check conformance
    */
-  _produceXMLSerialization(node: Node, requireWellFormed: boolean): string {
+  private _produceXMLSerialization(node: Node, requireWellFormed: boolean): string {
 
     const namespacePrefixMap = new Map<string | null, string>()
     namespacePrefixMap.set(Namespace.XML, "xml")
@@ -419,8 +419,10 @@ export class XMLSerializerImpl implements XMLSerializer {
           }
 
           refs.namespacePrefixMap.set(attributeNamespace, candidatePrefix)
-          localNameSet.add([attributeNamespace, candidatePrefix])
-          result += ` xmlns:${candidatePrefix}="${this._serializeAttributeValue(attributeNamespace, requireWellFormed)}"`
+          if (candidatePrefix !== "xmlns") {
+            localNameSet.add([attributeNamespace, candidatePrefix])
+            result += ` xmlns:${candidatePrefix}="${this._serializeAttributeValue(attributeNamespace, requireWellFormed)}"`
+          }
         }
       }
 
