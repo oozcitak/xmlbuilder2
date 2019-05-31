@@ -26,11 +26,11 @@ export class TupleSet<T1, T2> implements Iterable<[T1, T2]> {
   }
 
   /**
-   * Adds a new tuple to the set.
+   * Adds or replaces a tuple.
    * 
    * @param val - tuple to add
    */
-  add(val: [T1, T2]): void {
+  set(val: [T1, T2]): void {
     let subSet = this._storage.get(val[0])
     if (!subSet) {
       subSet = new Set<T2>()

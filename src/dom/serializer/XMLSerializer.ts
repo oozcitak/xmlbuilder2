@@ -4,7 +4,7 @@ import {
   DocumentFragment, Text, Element, CDATASection
 } from "../interfaces"
 import { Namespace, XMLSpec, HTMLSpec } from "../spec"
-import { TupleSet } from "./TupleSet"
+import { TupleSet } from "../../util"
 import { DOMException } from ".."
 
 /**
@@ -397,7 +397,7 @@ export class XMLSerializerImpl implements XMLSerializer {
         throw new Error("Element contains two attributes with the same namespaceURI and localName (well-formed required).")
       }
 
-      localNameSet.add([attr.namespaceURI, attr.localName])
+      localNameSet.set([attr.namespaceURI, attr.localName])
 
       let attributeNamespace = attr.namespaceURI
       let candidatePrefix: string | null = null
@@ -421,7 +421,7 @@ export class XMLSerializerImpl implements XMLSerializer {
 
           refs.namespacePrefixMap.set(attributeNamespace, candidatePrefix)
           if (candidatePrefix !== "xmlns") {
-            localNameSet.add([attributeNamespace, candidatePrefix])
+            localNameSet.set([attributeNamespace, candidatePrefix])
             result += ` xmlns:${candidatePrefix}="${this._serializeAttributeValue(attributeNamespace, requireWellFormed)}"`
           }
         }
