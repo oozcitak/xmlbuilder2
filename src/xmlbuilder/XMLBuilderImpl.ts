@@ -199,13 +199,22 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  removeAtt(name: string | string[], namespace?: string): XMLBuilder {
+  removeAtt(namespace: string | string[], name?: string | string[]): XMLBuilder {
+    if (name === undefined) {
+      name = namespace
+      namespace = ""
+    }
+
+    if(isArray(namespace)) {
+      throw new TypeError("namespace parameter must be a string")
+    }
+
     if (isArray(name)) {
       for (const attName of name) {
-        this.removeAtt(attName, namespace)
+        this.removeAtt(namespace, attName)
       }
     } else {
-      if (namespace !== undefined) {
+      if (namespace) {
         this._asElement.removeAttributeNS(namespace, name)
       } else {
         this._asElement.removeAttribute(name)

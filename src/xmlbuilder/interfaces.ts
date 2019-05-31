@@ -286,7 +286,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  removeAtt(name: string | string[], namespace?: string): XMLBuilder
+  removeAtt(namespace: string, name: string | string[]): XMLBuilder
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
