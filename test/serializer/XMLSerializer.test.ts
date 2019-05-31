@@ -2,7 +2,7 @@ import $$ from '../TestHelpers'
 
 describe('XMLSerializer', function () {
 
-  test('XML serializer', function () {
+  test('basic', function () {
     const doc = $$.create()
       .ele('root')
       .ele('node', { att: 'val' })
@@ -29,7 +29,7 @@ describe('XMLSerializer', function () {
     )
   })
 
-  test('XML serializer + parser', function () {
+  test('serializer + parser', function () {
     const xmlStr =
       '<section xmlns="http://www.ibm.com/events"' +
       ' xmlns:bk="urn:loc.gov:books"' +
@@ -46,7 +46,7 @@ describe('XMLSerializer', function () {
     expect($$.serialize($$.parse(xmlStr))).toBe(xmlStr)
   })
 
-  test('XML serializer: default namespace', function () {
+  test('default namespace', function () {
     const ns = 'uri:myns'
     const doc = $$.dom.createDocument(ns, 'root')
     const node1 = doc.createElementNS(ns, 'node1')
@@ -68,7 +68,7 @@ describe('XMLSerializer', function () {
       `)
   })
 
-  test('XML serializer: namespace prefix', function () {
+  test('namespace prefix', function () {
     const ns = 'uri:myns'
     const doc = $$.dom.createDocument(ns, 'root')
     const node1 = doc.createElementNS(ns, 'node1')
@@ -93,7 +93,7 @@ describe('XMLSerializer', function () {
       `)
   })
 
-  test('XML serializer: explicit namespace declaration', function () {
+  test('explicit namespace declaration', function () {
     const svgNs = 'http://www.w3.org/2000/svg';
     const xlinkNs = 'http://www.w3.org/1999/xlink';
 
@@ -119,7 +119,7 @@ describe('XMLSerializer', function () {
       `)
   })
 
-  test('XML serializer: empty default namespace', function () {
+  test('empty default namespace', function () {
     const svgNs = 'http://www.w3.org/2000/svg';
 
     const doc = $$.dom.createDocument(svgNs, 'svg');
@@ -139,7 +139,7 @@ describe('XMLSerializer', function () {
       `)
   })
 
-  test('XML serializer: default namespace override', function () {
+  test('default namespace override', function () {
     const svgNs = 'http://www.w3.org/2000/svg';
     const xlinkNs = 'http://www.w3.org/1999/xlink';
 
@@ -160,7 +160,7 @@ describe('XMLSerializer', function () {
       `)
   })
 
-  test('XML serializer: prefixed namespace override', function () {
+  test('prefixed namespace override', function () {
     const ns1 = 'uri:my ns1';
     const ns2 = 'uri:my ns2';
 
