@@ -409,6 +409,7 @@ export class XMLSerializerImpl implements XMLSerializer {
         } else if (refs.namespacePrefixMap.has(attributeNamespace)) {
           candidatePrefix = refs.namespacePrefixMap.get(attributeNamespace) || null
         } else if (candidatePrefix === null) {
+          // we deviate from the spec here
           // see: https://github.com/w3c/DOM-Parsing/pull/30
           if(attr.prefix === null || refs.namespacePrefixMap.has(attributeNamespace)) {
             const generateRefs = { map: refs.namespacePrefixMap, prefixIndex: refs.prefixIndex }
