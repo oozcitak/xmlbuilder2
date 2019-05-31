@@ -59,22 +59,49 @@ export class DOMParser {
           case TokenType.Element:
             const element = <ElementToken>token
 
-            let qName = Namespace.extractQName(element.name)
+            // inherit namespace from parent
+            const qName = Namespace.extractQName(element.name)
             let namespace = context.lookupNamespaceURI(qName.prefix)
 
-            const elementNode = (namespace ?
+            // override namespace if there is a namespace declaration
+            // attribute
+            for (let [attName, attValue] of Object.entries(element.attributes)) {
+              if (attName === "xmlns")
+              {
+                namespace = attValue
+              } else {
+                const attQName = Namespace.extractQName(attName)
+                if (attQName.prefix === "xmlns" && attQName.localName === qName.prefix) {
+                  namespace = attValue
+                }
+              }
+            }
+
+            // create the DOM element node
+            const elementNode = (namespace != null ?
               doc.createElementNS(namespace, element.name) :
               doc.createElement(element.name))
 
             context.appendChild(elementNode)
 
+            // assign attributes
             for (let [attName, attValue] of Object.entries(element.attributes)) {
-              qName = Namespace.extractQName(attName)
-              let namespace = elementNode.lookupNamespaceURI(qName.prefix)
-              if (namespace) {
-                elementNode.setAttributeNS(namespace, attName, attValue)
+              // skip the default namespace declaration attribute
+              if (attName === "xmlns") {
+                continue
+              }
+              
+              const attQName = Namespace.extractQName(attName)
+              if (attQName.prefix === "xmlns") {
+                // prefixed namespace declaration attribute
+                elementNode.setAttributeNS(Namespace.XMLNS, attName, attValue)
               } else {
-                elementNode.setAttribute(attName, attValue)
+                const attNamespace = elementNode.lookupNamespaceURI(attQName.prefix)
+                if (attNamespace != null && !elementNode.isDefaultNamespace(attNamespace)) {
+                  elementNode.setAttributeNS(attNamespace, attName, attValue)
+                } else {
+                  elementNode.setAttribute(attName, attValue)
+                }
               }
             }
 
