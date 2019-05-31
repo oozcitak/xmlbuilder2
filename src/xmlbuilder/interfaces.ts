@@ -3,10 +3,6 @@
  */
 export interface XMLBuilderOptions {
   /**
-   * Namespace URI of the document.
-   */
-  namespace?: string
-  /**
    * A version number string, e.g. `"1.0"`
    */
   version?: "1.0" | "1.1"
@@ -197,7 +193,15 @@ export type ExpandObject = { [key: string]: any } | any[] | ((...args: any) => a
  * Represents the type of a variable that can either be a JS object defining
  * attributes or the contents of a text node.
  */
-export type AttributesOrText = { [key: string]: any } | string
+export type AttributesOrText = {
+  /**
+   * Default namespace
+   */
+  xmlns?: string | null, 
+  /**
+   * Attribute key/value pairs
+   */
+  [key: string]: any } | string
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -246,46 +250,6 @@ export interface XMLBuilder {
    */
   ele(name: string | ExpandObject, attributes?: AttributesOrText,
     text?: AttributesOrText): XMLBuilder
-   
-    /**
-   * Creates a new element node and appends it to the list of child nodes.
-   * 
-   * @param namespace - namespace
-   * @param name - element name
-   * @param attributes - a JS object with element attributes
-   * @param text - contents of a text child node
-   * 
-   * @remarks `attributes` and `text` parameters are optional and 
-   * interchangeable.
-   * 
-   * @returns the new element node
-   */
-  eleNS(namespace: string, name: string, attributes?: AttributesOrText,
-    text?: AttributesOrText): XMLBuilder
-
-  /**
-   * Creates new element nodes from the given JS object and appends it to the
-   * list of child nodes.
-   * 
-   * @param namespace - namespace
-   * @param obj - a JS object representing nodes to insert
-   * 
-   * @returns the last top level element node created
-   */
-  eleNS(namespace: string, obj: ExpandObject): XMLBuilder
-
-  /**
-   * Creates a new element node and appends it to the list of child nodes.
-   * 
-   * @param namespace - namespace
-   * @param name - element name or a JS object representing nodes to insert
-   * @param attributes - a JS object with element attributes
-   * @param text - contents of a text child node
-   * 
-   * @returns the last top level element node created
-   */
-  eleNS(namespace: string, name: string | ExpandObject, 
-    attributes?: AttributesOrText, text?: AttributesOrText): XMLBuilder
 
   /**
    * Removes this node from the XML document.
@@ -306,18 +270,6 @@ export interface XMLBuilder {
   att(name: AttributesOrText, value?: string): XMLBuilder
 
   /**
-   * Creates or updates an element attribute with the following namespace.
-   * 
-   * @param namespace - namespace
-   * @param qualifiedName - attribute name or a JS object with element 
-   * attributes and values
-   * @param value - attribute value
-   * 
-   * @returns - current node
-   */
-  attNS(namespace: string, qualifiedName: AttributesOrText, value?: string): XMLBuilder
-
-  /**
    * Removes an attribute or a list of attributes.
    * 
    * @param name - attribute name or an array with attribute names
@@ -327,14 +279,14 @@ export interface XMLBuilder {
   removeAtt(name: string | string[]): XMLBuilder
 
   /**
-   * Removes an attribute or a list of attributes with the given namespace.
+   * Removes an attribute or a list of attributes.
    * 
-   * @param namespace - namespace
    * @param name - attribute name or an array with attribute names
+   * @param namespace - namespace of the attribute to remove
    * 
    * @returns current element node
    */
-  removeAttNS(namespace: string, name: string | string[]): XMLBuilder
+  removeAtt(name: string | string[], namespace?: string): XMLBuilder
 
   /**
    * Creates a new text node and appends it to the list of child nodes.

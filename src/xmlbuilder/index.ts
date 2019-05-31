@@ -1,6 +1,4 @@
 import { _applyMixin } from '../util'
-
-// Import implementation classes
 import { XMLBuilderOptions, XMLBuilder, ExpandObject } from './interfaces'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
 import { XMLStringifierImpl } from './XMLStringifierImpl'
@@ -28,12 +26,11 @@ _applyMixin(ElementImpl, XMLBuilderImpl)
  */
 export function create(options?: XMLBuilderOptions): XMLBuilder {
   options = options || { version: "1.0" }
-  const namespace = options.namespace || null
   if (!options.stringify) {
     options.stringify = new XMLStringifierImpl(options)
   }
 
-  const doc = DOMImplementationInstance.createDocument(namespace, '') as any
+  const doc = DOMImplementationInstance.createDocument(null, '') as any
   doc._options = options
   return <XMLBuilder><unknown>doc
 }
@@ -50,7 +47,6 @@ export function create(options?: XMLBuilderOptions): XMLBuilder {
  */
 export function parse(document: string | ExpandObject, options?: XMLBuilderOptions): XMLBuilder {
   options = options || { version: "1.0" }
-  const namespace = options.namespace || null
   if (!options.stringify) {
     options.stringify = new XMLStringifierImpl(options)
   }
@@ -61,7 +57,7 @@ export function parse(document: string | ExpandObject, options?: XMLBuilderOptio
     doc._options = options
     return <XMLBuilder><unknown>doc
   } else {
-    const doc = DOMImplementationInstance.createDocument(namespace, '') as any
+    const doc = DOMImplementationInstance.createDocument(null, '') as any
     doc._options = options
     const builder = <XMLBuilder><unknown>doc
     builder.ele(document)
