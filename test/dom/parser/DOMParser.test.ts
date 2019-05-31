@@ -1,5 +1,5 @@
-import $$ from '../TestHelpers'
-import { DOMParser, MimeType } from '../../src/dom/parser'
+import $$ from '../../TestHelpers'
+import { DOMParser, MimeType } from '../../../src/dom/parser'
 
 describe('DOMParser - XML', function () {
 
