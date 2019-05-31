@@ -3,9 +3,9 @@ import { DOMException } from "../DOMException"
 
 /**
  * Includes methods for namespaces.
- * A tree is a finite hierarchical tree structure.
  */
 export class Namespace {
+
   static readonly HTML = "http://www.w3.org/1999/xhtml"
   static readonly XML = "http://www.w3.org/XML/1998/namespace"
   static readonly XMLNS = "http://www.w3.org/2000/xmlns/"
