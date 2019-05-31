@@ -47,7 +47,7 @@ export interface XMLBuilderOptions {
   /**
    * Whether existing html entities are encoded
    */
-  noDoubleEncoding?: boolean;
+  noDoubleEncoding?: boolean
   /**
    * A set of functions to use for converting values to strings
    */
@@ -149,7 +149,7 @@ export interface XMLStringifier {
    * 
    * @example
    * 
-   * const textNodes = { '#text1': 'some text', '#text2': 'more text' };
+   * const textNodes = { '#text1': 'some text', '#text2': 'more text' }
    */
   convertTextKey?: string
   /** 

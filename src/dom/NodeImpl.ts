@@ -212,7 +212,7 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
    * ({@link parentNode} returns `null`).
    *
    * @param deep - if `true`, recursively clone the subtree under the 
-   * specified node; if `false`, clone only the node itself (and its 
+   * specified node. If `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
   abstract cloneNode(deep?: boolean): Node

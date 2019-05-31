@@ -1,5 +1,5 @@
 import { XMLStringifier, XMLBuilderOptions } from "./interfaces"
-import { XMLSpec } from "../dom/spec";
+import { XMLSpec } from "../dom/spec"
 
 /**
  * Converts values to strings.

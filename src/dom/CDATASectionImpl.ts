@@ -32,7 +32,7 @@ export class CDATASectionImpl extends TextImpl implements CDATASection {
    * ({@link parentNode} returns `null`).
    *
    * @param deep - if `true`, recursively clone the subtree under the 
-   * specified node; if `false`, clone only the node itself (and its 
+   * specified node. If `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {

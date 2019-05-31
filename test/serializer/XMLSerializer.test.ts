@@ -94,18 +94,18 @@ describe('XMLSerializer', function () {
   })
 
   test('explicit namespace declaration', function () {
-    const svgNs = 'http://www.w3.org/2000/svg';
-    const xlinkNs = 'http://www.w3.org/1999/xlink';
+    const svgNs = 'http://www.w3.org/2000/svg'
+    const xlinkNs = 'http://www.w3.org/1999/xlink'
 
-    const doc = $$.dom.createDocument(svgNs, 'svg');
+    const doc = $$.dom.createDocument(svgNs, 'svg')
     if (doc.documentElement) {
-      doc.documentElement.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xlink', xlinkNs);
+      doc.documentElement.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xlink', xlinkNs)
 
-      const script = doc.createElementNS(svgNs, 'script');
-      script.setAttributeNS(null, 'type', 'text/ecmascript');
-      script.setAttributeNS(xlinkNs, 'xlink:href', 'foo.js');
+      const script = doc.createElementNS(svgNs, 'script')
+      script.setAttributeNS(null, 'type', 'text/ecmascript')
+      script.setAttributeNS(xlinkNs, 'xlink:href', 'foo.js')
 
-      doc.documentElement.appendChild(script);
+      doc.documentElement.appendChild(script)
     }
 
     expect($$.serialize(doc)).toBe(
@@ -120,12 +120,12 @@ describe('XMLSerializer', function () {
   })
 
   test('empty default namespace', function () {
-    const svgNs = 'http://www.w3.org/2000/svg';
+    const svgNs = 'http://www.w3.org/2000/svg'
 
-    const doc = $$.dom.createDocument(svgNs, 'svg');
+    const doc = $$.dom.createDocument(svgNs, 'svg')
     if (doc.documentElement) {
-      const script = doc.createElementNS(null, 'script');
-      doc.documentElement.appendChild(script);
+      const script = doc.createElementNS(null, 'script')
+      doc.documentElement.appendChild(script)
     }
 
     expect($$.serialize(doc)).toBe(
@@ -140,13 +140,13 @@ describe('XMLSerializer', function () {
   })
 
   test('default namespace override', function () {
-    const svgNs = 'http://www.w3.org/2000/svg';
-    const xlinkNs = 'http://www.w3.org/1999/xlink';
+    const svgNs = 'http://www.w3.org/2000/svg'
+    const xlinkNs = 'http://www.w3.org/1999/xlink'
 
-    const doc = $$.dom.createDocument(svgNs, 'svg');
+    const doc = $$.dom.createDocument(svgNs, 'svg')
     if (doc.documentElement) {
-      const script = doc.createElementNS(xlinkNs, 'script');
-      doc.documentElement.appendChild(script);
+      const script = doc.createElementNS(xlinkNs, 'script')
+      doc.documentElement.appendChild(script)
     }
 
     expect($$.serialize(doc)).toBe(
@@ -161,22 +161,20 @@ describe('XMLSerializer', function () {
   })
 
   test('prefixed namespace override', function () {
-    const ns1 = 'uri:my ns1';
-    const ns2 = 'uri:my ns2';
+    const ns1 = 'uri:my ns1'
+    const ns2 = 'uri:my ns2'
 
-    const doc = $$.dom.createDocument(ns1, 'p:root');
+    const doc = $$.dom.createDocument(ns1, 'p:root')
     if (doc.documentElement) {
-      const node1 = doc.createElementNS(ns1, 'p:node');
-      doc.documentElement.appendChild(node1);
-      node1.appendChild(doc.createElementNS(ns1, 'p:child'));
-
-      const node2 = doc.createElementNS(ns2, 'p:node');
-      doc.documentElement.appendChild(node2);
-      node2.appendChild(doc.createElementNS(ns2, 'p:child'));
-
-      const node3 = doc.createElementNS(ns1, 'p:node');
-      doc.documentElement.appendChild(node3);
-      node3.appendChild(doc.createElementNS(ns1, 'p:child'));
+      const node1 = doc.createElementNS(ns1, 'p:node')
+      doc.documentElement.appendChild(node1)
+      node1.appendChild(doc.createElementNS(ns1, 'p:child'))
+      const node2 = doc.createElementNS(ns2, 'p:node')
+      doc.documentElement.appendChild(node2)
+      node2.appendChild(doc.createElementNS(ns2, 'p:child'))
+      const node3 = doc.createElementNS(ns1, 'p:node')
+      doc.documentElement.appendChild(node3)
+      node3.appendChild(doc.createElementNS(ns1, 'p:child'))
     }
 
     expect($$.serialize(doc)).toBe(

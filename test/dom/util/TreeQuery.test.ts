@@ -125,79 +125,79 @@ describe('TreeQuery', function () {
   })
 
   test('isConstrained() - two doctypes', function () {
-    const doctype1 = $$.dom.createDocumentType('root', 'pub', 'sys');
-    const doctype2 = $$.dom.createDocumentType('root', 'pub', 'sys');
-    const doc = $$.dom.createDocument('ns', '');
-    (<any>doctype1)._parentNode = doc;
-    (<any>doctype2)._parentNode = doc;
-    (<any>doc)._firstChild = doctype1;
-    (<any>doctype1)._nextSibling = doctype2;
-    (<any>doc)._lastChild = doctype2;
+    const doctype1 = $$.dom.createDocumentType('root', 'pub', 'sys') as any
+    const doctype2 = $$.dom.createDocumentType('root', 'pub', 'sys') as any
+    const doc = $$.dom.createDocument('ns', '') as any
+    doctype1._parentNode = doc
+    doctype2._parentNode = doc
+    doc._firstChild = doctype1
+    doctype1._nextSibling = doctype2
+    doc._lastChild = doctype2
     expect(TreeQuery.isConstrained(doc)).toBeFalsy()
   })
 
   test('isConstrained() - doctype after element', function () {
-    const doctype = $$.dom.createDocumentType('root', 'pub', 'sys');
-    const doc = $$.dom.createDocument('ns', '');
-    const ele = doc.createElement('root');
-    (<any>doctype)._parentNode = doc;
-    (<any>ele)._parentNode = doc;
-    (<any>doc)._firstChild = ele;
-    (<any>ele)._nextSibling = doctype;
-    (<any>doc)._lastChild = doctype;
+    const doctype = $$.dom.createDocumentType('root', 'pub', 'sys') as any
+    const doc = $$.dom.createDocument('ns', '') as any
+    const ele = doc.createElement('root') as any
+    doctype._parentNode = doc
+    ele._parentNode = doc
+    doc._firstChild = ele
+    ele._nextSibling = doctype
+    doc._lastChild = doctype
     expect(TreeQuery.isConstrained(doc)).toBeFalsy()
   })
 
   test('isConstrained() - two document elements', function () {
-    const doc = $$.dom.createDocument('ns', '');
-    const ele1 = doc.createElement('root');
-    const ele2 = doc.createElement('root');
-    (<any>ele1)._parentNode = doc;
-    (<any>ele2)._parentNode = doc;
-    (<any>doc)._firstChild = ele1;
-    (<any>ele1)._nextSibling = ele2;
-    (<any>doc)._lastChild = ele2;
+    const doc = $$.dom.createDocument('ns', '') as any
+    const ele1 = doc.createElement('root') as any
+    const ele2 = doc.createElement('root') as any
+    ele1._parentNode = doc
+    ele2._parentNode = doc
+    doc._firstChild = ele1
+    ele1._nextSibling = ele2
+    doc._lastChild = ele2
     expect(TreeQuery.isConstrained(doc)).toBeFalsy()
   })
 
   test('isConstrained() - text at root level', function () {
-    const doc = $$.dom.createDocument('ns', '');
-    const node = doc.createTextNode('root');
-    (<any>node)._parentNode = doc;
-    (<any>doc)._firstChild = node;
-    (<any>doc)._lastChild = node;
+    const doc = $$.dom.createDocument('ns', '') as any
+    const node = doc.createTextNode('root') as any
+    node._parentNode = doc
+    doc._firstChild = node
+    doc._lastChild = node
     expect(TreeQuery.isConstrained(doc)).toBeFalsy()
   })
 
   test('isConstrained() - CDATA at root level', function () {
-    const doc = $$.dom.createDocument('ns', '');
-    const node = doc.createCDATASection('root');
-    (<any>node)._parentNode = doc;
-    (<any>doc)._firstChild = node;
-    (<any>doc)._lastChild = node;
+    const doc = $$.dom.createDocument('ns', '') as any
+    const node = doc.createCDATASection('root') as any
+    node._parentNode = doc
+    doc._firstChild = node
+    doc._lastChild = node
     expect(TreeQuery.isConstrained(doc)).toBeFalsy()
   })
 
   test('isConstrained() - doctype in fragment', function () {
-    const doctype = $$.dom.createDocumentType('root', 'pub', 'sys');
-    const doc = $$.dom.createDocument('ns', '');
-    const ele = doc.createDocumentFragment();
-    (<any>doctype)._parentNode = ele;
-    (<any>ele)._firstChild = doctype;
-    (<any>ele)._lastChild = doctype;
+    const doctype = $$.dom.createDocumentType('root', 'pub', 'sys') as any
+    const doc = $$.dom.createDocument('ns', '') as any
+    const ele = doc.createDocumentFragment() as any
+    doctype._parentNode = ele
+    ele._firstChild = doctype
+    ele._lastChild = doctype
     expect(TreeQuery.isConstrained(ele)).toBeFalsy()
   })
 
   test('isConstrained() - doctype inside element node', function () {
-    const doctype = $$.dom.createDocumentType('root', 'pub', 'sys');
-    const doc = $$.dom.createDocument('ns', '');
-    const de = doc.createElement('root');
-    const ele = doc.createElement('root');
-    doc.appendChild(de);
-    de.appendChild(ele);
-    (<any>doctype)._parentNode = ele;
-    (<any>ele)._firstChild = doctype;
-    (<any>ele)._lastChild = doctype;
+    const doctype = $$.dom.createDocumentType('root', 'pub', 'sys') as any
+    const doc = $$.dom.createDocument('ns', '') as any
+    const de = doc.createElement('root') as any
+    const ele = doc.createElement('root') as any
+    doc.appendChild(de)
+    de.appendChild(ele)
+    doctype._parentNode = ele
+    ele._firstChild = doctype
+    ele._lastChild = doctype
     expect(TreeQuery.isConstrained(doc)).toBeFalsy()
   })
 

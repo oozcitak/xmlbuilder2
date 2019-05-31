@@ -6,7 +6,7 @@ import {
   DocTypeToken, CDATAToken, CommentToken, TextToken, PIToken,
   ElementToken, ClosingTagToken
 } from "./XMLToken"
-import { Namespace } from "../spec";
+import { Namespace } from "../spec"
 
 /**
  * Represents a parser for XML and HTML content.

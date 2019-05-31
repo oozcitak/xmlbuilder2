@@ -13,7 +13,7 @@ export class AttrImpl extends NodeImpl implements Attr {
   _ownerElement: Element | null
 
   /** 
-   * Useless; always returns true.
+   * Always returns true.
    */
   readonly specified: boolean = true
 
@@ -104,7 +104,7 @@ export class AttrImpl extends NodeImpl implements Attr {
    * ({@link parentNode} returns `null`).
    *
    * @param deep - if `true`, recursively clone the subtree under the 
-   * specified node; if `false`, clone only the node itself (and its 
+   * specified node. If `false`, clone only the node itself (and its 
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {

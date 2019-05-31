@@ -90,7 +90,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * 
    * @param token - the token to toggle
    * @param force - if `false` the token will only be removed but not
-   * added again; otherwise if `true` the token will only be added but
+   * added again. Otherwise, if `true` the token will only be added but
    * not removed again.
    * 
    * @returns `false` if the token is not in the list after the call, 
