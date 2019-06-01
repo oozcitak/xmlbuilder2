@@ -207,6 +207,48 @@ export type AttributesOrText = {
  * Represents a mixin that extends XML nodes to implement easy to use and
  * chainable document builder methods.
  */
+
+/**
+ * Serves as an entry point to builder functions.
+ */
+export interface XMLBuilderEntryPoint {
+
+  /**
+   * Creates a new XML document without a document element and returns it.
+   * 
+   * @returns the XML document node
+   */
+  create(): XMLBuilder
+
+  /**
+   * Creates a new XML document and returns the document element node for
+   * chain building the document tree.
+   * 
+   * @param name - element name
+   * @param attributes - a JS object with element attributes
+   * @param text - contents of a text child node
+   * 
+   * @remarks `attributes` and `text` parameters are optional and 
+   * interchangeable.
+   * 
+   * @returns document element node
+   */
+  create(name: string | ExpandObject, attributes?: AttributesOrText,
+    text?: AttributesOrText): XMLBuilder
+  
+  /**
+   * Creates an XML document by parsing the given document representation.
+   * 
+   * @param document - a string containing an XML document or a JS object 
+   * representing nodes to insert
+   * @param options - builder options
+   * 
+   * @returns document element node
+   */
+  parse(document: string | ExpandObject): XMLBuilder
+
+}
+
 export interface XMLBuilder {
 
   /**

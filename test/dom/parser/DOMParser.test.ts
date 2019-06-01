@@ -22,10 +22,9 @@ describe('DOMParser - XML', function () {
         <text>alien's pinky toe</text>
       </root>
       `
-
     const doc = $$.parse(xmlStr)
 
-    expect($$.printTree(doc)).toBe($$.t`
+    expect($$.printTree(doc.doc())).toBe($$.t`
       !DOCTYPE root PUBLIC pubid SYSTEM sysid
       root
         node att="val"

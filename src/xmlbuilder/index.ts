@@ -1,40 +1,44 @@
 import { _applyMixin } from '../util'
-import { XMLBuilderOptions, XMLBuilder, ExpandObject } from './interfaces'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
-import { XMLStringifierImpl } from './XMLStringifierImpl'
-import { isString } from 'util'
+import { XMLDocument, Element } from '../dom'
+import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
 import { 
-  DOMImplementationInstance, 
-  XMLDocument as XMLDocumentImpl, 
-  Element as ElementImpl 
-} from '../dom'
-import { DOMParser, MimeType } from '../dom/parser'
-
+  XMLBuilderOptions, XMLBuilderEntryPoint, XMLBuilder, ExpandObject, AttributesOrText 
+} from './interfaces'
 
 // Apply mixins
 // XMLBuilder
-_applyMixin(XMLDocumentImpl, XMLBuilderImpl)
-_applyMixin(ElementImpl, XMLBuilderImpl)
-
+_applyMixin(XMLDocument, XMLBuilderImpl)
+_applyMixin(Element, XMLBuilderImpl)
 
 /**
- * Creates an XML document.
+ * Sets builder options.
  * 
  * @param options - builder options
- * 
- * @returns document node
  */
-export function create(options?: XMLBuilderOptions): XMLBuilder {
-  options = options || { version: "1.0" }
-  if (!options.stringify) {
-    options.stringify = new XMLStringifierImpl(options)
-  }
-
-  const doc = DOMImplementationInstance.createDocument(null, '') as any
-  doc._options = options
-  return <XMLBuilder><unknown>doc
+export function withOptions(options?: XMLBuilderOptions): XMLBuilderEntryPoint {
+  return new XMLBuilderEntryPointImpl(options)
 }
 
+/**
+ * Creates a new XML document and returns the document element node for
+ * chain building the document tree.
+ * 
+ * @param name - element name
+ * @param attributes - a JS object with element attributes
+ * @param text - contents of a text child node
+ * 
+ * @remarks `attributes` and `text` parameters are optional and 
+ * interchangeable.
+ * @remarks if `name` is omitted an XML document without a document element will
+ * be created and returned.
+ * 
+ * @returns document element node or document itself
+ */
+export function create(name?: string | ExpandObject, attributes?: AttributesOrText,
+  text?: AttributesOrText): XMLBuilder {
+  return new XMLBuilderEntryPointImpl().create(name, attributes, text)    
+}
 
 /**
  * Creates an XML document by parsing the given document representation.
@@ -43,24 +47,8 @@ export function create(options?: XMLBuilderOptions): XMLBuilder {
  * representing nodes to insert
  * @param options - builder options
  * 
- * @returns document node
+ * @returns document element node
  */
-export function parse(document: string | ExpandObject, options?: XMLBuilderOptions): XMLBuilder {
-  options = options || { version: "1.0" }
-  if (!options.stringify) {
-    options.stringify = new XMLStringifierImpl(options)
-  }
-
-  if (isString(document)) {
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(document, MimeType.XML) as any
-    doc._options = options
-    return <XMLBuilder><unknown>doc
-  } else {
-    const doc = DOMImplementationInstance.createDocument(null, '') as any
-    doc._options = options
-    const builder = <XMLBuilder><unknown>doc
-    builder.ele(document)
-    return builder
-  }
+export function parse(document: string | ExpandObject): XMLBuilder {
+  return new XMLBuilderEntryPointImpl().parse(document)    
 }
