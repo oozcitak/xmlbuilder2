@@ -8,8 +8,19 @@ describe('create()', () => {
   })
 
   test('Document with root element', () => {
-    const ele = $$.create().ele('root')
-    expect($$.printTree(ele)).toBe('root')
+    const ele = $$.withOptions().create('root', { att: "val" }, "text")
+    expect($$.printTree(ele)).toBe($$.t`
+      root att="val"
+        # text
+      `)
+  })
+
+  test('Document with root element - reverse argument order', () => {
+    const ele = $$.withOptions().create('root', "text", { att: "val" })
+    expect($$.printTree(ele)).toBe($$.t`
+      root att="val"
+        # text
+      `)
   })
 
 })
