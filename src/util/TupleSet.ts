@@ -78,7 +78,7 @@ export class TupleSet<T1, T2> implements Iterable<[T1, T2]> {
    * @param thisArg - value to use as `this` when executing callback 
    */
   forEach(callback: (tuple: [T1, T2], set: TupleSet<T1, T2>) => any,
-    thisArg: any): void {
+    thisArg?: any): void {
     for (const val of this) {
       callback.call(thisArg, val, this)
     }
