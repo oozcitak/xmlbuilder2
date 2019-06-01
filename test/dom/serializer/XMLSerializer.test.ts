@@ -1,4 +1,5 @@
 import $$ from '../../TestHelpers'
+import { XMLSerializer } from '../../../src/dom/serializer'
 
 describe('XMLSerializer', function () {
 
@@ -193,6 +194,181 @@ describe('XMLSerializer', function () {
         p:node (ns:uri:my ns1)
           p:child (ns:uri:my ns1)
       `)
+  })
+
+  test('fragment', function () {
+    const ns = 'uri:myns'
+    const doc = $$.dom.createDocument(ns, 'root')
+    const frag = doc.createDocumentFragment()
+    frag.appendChild(doc.createElementNS(ns, 'node1'))
+    frag.appendChild(doc.createElementNS(ns, 'node2'))
+
+    expect($$.serialize(frag)).toBe(
+      '<node1 xmlns="uri:myns"/><node2 xmlns="uri:myns"/>'
+    )
+  })
+
+  test('document type pubId, sysId', function () {
+    const ns = 'uri:myns'
+    const doctype = $$.dom.createDocumentType('root', 'pubId', 'sysId')
+    const doc = $$.dom.createDocument(ns, 'root', doctype)
+
+    expect($$.serialize(doc)).toBe(
+      '<!DOCTYPE root PUBLIC "pubId" "sysId"><root xmlns="uri:myns"/>'
+    )
+  })
+
+  test('document type pubId', function () {
+    const ns = 'uri:myns'
+    const doctype = $$.dom.createDocumentType('root', 'pubId', '')
+    const doc = $$.dom.createDocument(ns, 'root', doctype)
+
+    expect($$.serialize(doc)).toBe(
+      '<!DOCTYPE root PUBLIC "pubId"><root xmlns="uri:myns"/>'
+    )
+  })
+
+  test('document type sysId', function () {
+    const ns = 'uri:myns'
+    const doctype = $$.dom.createDocumentType('root', '', 'sysId')
+    const doc = $$.dom.createDocument(ns, 'root', doctype)
+
+    expect($$.serialize(doc)).toBe(
+      '<!DOCTYPE root SYSTEM "sysId"><root xmlns="uri:myns"/>'
+    )
+  })
+
+  test('document type', function () {
+    const ns = 'uri:myns'
+    const doctype = $$.dom.createDocumentType('root', '', '')
+    const doc = $$.dom.createDocument(ns, 'root', doctype)
+
+    expect($$.serialize(doc)).toBe(
+      '<!DOCTYPE root><root xmlns="uri:myns"/>'
+    )
+  })
+
+  test('invalid document type pubId', function () {
+    const doctype = $$.dom.createDocumentType('root', 'pubId\x09', 'sysId')
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(doctype, true)).toThrow()
+  })
+
+  test('invalid document type sysId', function () {
+    const doctype = $$.dom.createDocumentType('root', 'pubId', 'sysId\x00')
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(doctype, true)).toThrow()
+  })
+
+  test('invalid document type sysId', function () {
+    const doctype = $$.dom.createDocumentType('root', 'pubId', '"sysId\'')
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(doctype, true)).toThrow()
+  })
+
+  test('invalid element name', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createElement('name') as any
+    ele._localName = "invalid:name"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid element name', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createElement('name') as any
+    ele._localName = "invalidname\0"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid comment', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createComment('name') as any
+    ele._data = "invalid\0"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid comment', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createComment('name') as any
+    ele._data = "comment--invalid"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid comment', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createComment('name') as any
+    ele._data = "comment-invalid-"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid text', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createTextNode('name') as any
+    ele._data = "invalid\0"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid processing instruction', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createProcessingInstruction('name', 'value') as any
+    ele._target = "invalid:target"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid processing instruction', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createProcessingInstruction('name', 'value') as any
+    ele._target = "xml"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid processing instruction', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createProcessingInstruction('name', 'value') as any
+    ele._data = "value\0"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid processing instruction', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createProcessingInstruction('name', 'value') as any
+    ele._data = "value?>"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid processing instruction', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const ele = doc.createCDATASection('name') as any
+    ele._data = "value]]>"
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
+  })
+
+  test('invalid node type', function () {
+    const doc = $$.dom.createDocument(null, 'root')
+    const invalid = doc.createElement('node')
+    if (doc.documentElement) {
+      doc.documentElement.appendChild(invalid)
+    }
+    Object.defineProperty(invalid, "nodeType", { value: 0 })
+
+    expect(() => $$.serialize(doc)).toThrow()
+  })
+
+  test('null document element', function () {
+    const doc = $$.dom.createDocument(null, '')
+    const serializer = new XMLSerializer() as any
+    expect(() => serializer._produceXMLSerialization(doc, true)).toThrow()
   })
 
 })

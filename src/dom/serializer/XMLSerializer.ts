@@ -235,10 +235,6 @@ export class XMLSerializerImpl implements XMLSerializer {
 
     let markup = ""
 
-    if (node.doctype !== null) {
-      markup += this._serializeDocumentType(node.doctype, requireWellFormed)
-    }
-
     for (const childNode of node.childNodes) {
       markup += this._serializeNode(childNode, namespace, refs, requireWellFormed)
     }
