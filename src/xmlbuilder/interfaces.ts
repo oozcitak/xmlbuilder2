@@ -323,8 +323,8 @@ export interface XMLBuilder {
   /**
    * Removes an attribute or a list of attributes.
    * 
-   * @param name - attribute name or an array with attribute names
    * @param namespace - namespace of the attribute to remove
+   * @param name - attribute name or an array with attribute names
    * 
    * @returns current element node
    */
