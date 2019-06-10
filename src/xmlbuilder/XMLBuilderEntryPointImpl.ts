@@ -39,6 +39,13 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   }
 
   /** @inheritdoc */
+  fragment(): XMLBuilder {
+    const doc = DOMImplementationInstance.createDocument(null, '') as any
+    doc._options = this._options
+    return <XMLBuilder><unknown>doc.createDocumentFragment()
+  }
+
+  /** @inheritdoc */
   parse(document: string | ExpandObject): XMLBuilder {
     if (isString(document)) {
       const parser = new DOMParser()

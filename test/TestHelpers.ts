@@ -24,7 +24,7 @@ import { XMLDocument as XMLDocumentImpl } from '../src/dom'
 import { DOMImplementationInstance } from '../src/dom'
 import { XMLSerializer } from '../src/dom/serializer'
 
-import { withOptions, create, parse } from '../src/xmlbuilder'
+import { withOptions, create, parse, fragment } from '../src/xmlbuilder'
 
 export default class TestHelpers {
   static Attr = AttrImpl
@@ -58,6 +58,7 @@ export default class TestHelpers {
    */
   static withOptions = withOptions
   static create = create
+  static fragment = fragment
   static parse = parse
   static serialize(node: any): string {
     const serializer = new XMLSerializer()

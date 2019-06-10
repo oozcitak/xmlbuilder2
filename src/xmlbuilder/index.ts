@@ -1,14 +1,15 @@
 import { _applyMixin } from '../util'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
-import { XMLDocument, Element } from '../dom'
+import { XMLDocument, Element, DocumentFragment } from '../dom'
 import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
-import { 
-  XMLBuilderOptions, XMLBuilderEntryPoint, XMLBuilder, ExpandObject, AttributesOrText 
+import {
+  XMLBuilderOptions, XMLBuilderEntryPoint, XMLBuilder, ExpandObject, AttributesOrText
 } from './interfaces'
 
 // Apply mixins
 // XMLBuilder
 _applyMixin(XMLDocument, XMLBuilderImpl)
+_applyMixin(DocumentFragment, XMLBuilderImpl)
 _applyMixin(Element, XMLBuilderImpl)
 
 /**
@@ -37,7 +38,16 @@ export function withOptions(options?: XMLBuilderOptions): XMLBuilderEntryPoint {
  */
 export function create(name?: string | ExpandObject, attributes?: AttributesOrText,
   text?: AttributesOrText): XMLBuilder {
-  return new XMLBuilderEntryPointImpl().create(name, attributes, text)    
+  return new XMLBuilderEntryPointImpl().create(name, attributes, text)
+}
+
+/**
+ * Creates and returns a new document fragment.
+ * 
+ * @returns document fragment node
+ */
+export function fragment(): XMLBuilder {
+  return new XMLBuilderEntryPointImpl().fragment()
 }
 
 /**
@@ -50,5 +60,5 @@ export function create(name?: string | ExpandObject, attributes?: AttributesOrTe
  * @returns document element node
  */
 export function parse(document: string | ExpandObject): XMLBuilder {
-  return new XMLBuilderEntryPointImpl().parse(document)    
+  return new XMLBuilderEntryPointImpl().parse(document)
 }

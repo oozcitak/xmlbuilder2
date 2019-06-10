@@ -237,6 +237,13 @@ export interface XMLBuilderEntryPoint {
     text?: AttributesOrText): XMLBuilder
   
   /**
+   * Creates and returns a new document fragment.
+   * 
+   * @returns document fragment node
+   */
+  fragment(): XMLBuilder
+
+  /**
    * Creates an XML document by parsing the given document representation.
    * 
    * @param document - a string containing an XML document or a JS object 
@@ -249,6 +256,10 @@ export interface XMLBuilderEntryPoint {
 
 }
 
+/**
+ * Represents a mixin that extends XML nodes to implement easy to use and
+ * chainable document builder methods.
+ */
 export interface XMLBuilder {
 
   /**
