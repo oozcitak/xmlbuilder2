@@ -179,8 +179,8 @@ export interface XMLStringifier {
   /**
    * Index signature
    */
-  [key: string]: undefined | string | ((v: any) => string) | 
-    ((v: string) => string) | XMLBuilderOptions
+  [key: string]: undefined | string | ((v: any) => string) |
+  ((v: string) => string) | XMLBuilderOptions
 }
 
 /**
@@ -193,20 +193,16 @@ export type ExpandObject = { [key: string]: any } | any[] | ((...args: any) => a
  * Represents the type of a variable that can either be a JS object defining
  * attributes or the contents of a text node.
  */
-export type AttributesOrText = {
+export type AttributesOrText = string | {
   /**
    * Default namespace
    */
-  xmlns?: string | null, 
+  xmlns?: string | null,
   /**
    * Attribute key/value pairs
    */
-  [key: string]: any } | string
-
-/**
- * Represents a mixin that extends XML nodes to implement easy to use and
- * chainable document builder methods.
- */
+  [key: string]: any
+}
 
 /**
  * Serves as an entry point to builder functions.
@@ -235,7 +231,7 @@ export interface XMLBuilderEntryPoint {
    */
   create(name: string | ExpandObject, attributes?: AttributesOrText,
     text?: AttributesOrText): XMLBuilder
-  
+
   /**
    * Creates and returns a new document fragment.
    * 
