@@ -10,7 +10,7 @@ export class XMLStringifierImpl implements XMLStringifier {
   /**
    * Initializes a new instance of `XMLStringifier`
    * 
-   * @param options 
+   * @param options - builder options
    */
   constructor(options: XMLBuilderOptions) {
     this._options = options || { version: "1.0" }
@@ -36,18 +36,18 @@ export class XMLStringifierImpl implements XMLStringifier {
 
   /** @inheritdoc */
   name(val: any): string {
-    return this.assertLegalName('' + val || '')
+    return this._assertLegalName('' + val || '')
   }
 
   /** @inheritdoc */
   text(val: any): string {
-    return this.assertLegalChar(this.textEscape('' + val || ''))
+    return this._assertLegalChar(this.textEscape('' + val || ''))
   }
   /** @inheritdoc */
   cdata(val: any): string {
     val = '' + val || ''
     val = val.replace(']]>', ']]]]><![CDATA[>')
-    return this.assertLegalChar(val)
+    return this._assertLegalChar(val)
   }
   /** @inheritdoc */
   comment(val: any): string {
@@ -55,7 +55,7 @@ export class XMLStringifierImpl implements XMLStringifier {
     if (val.match(/--/)) {
       throw new Error("Comment text cannot contain double-hypen: " + val)
     }
-    return this.assertLegalChar(val)
+    return this._assertLegalChar(val)
   }
   /** @inheritdoc */
   raw(val: any): string {
@@ -63,11 +63,11 @@ export class XMLStringifierImpl implements XMLStringifier {
   }
   /** @inheritdoc */
   attValue(val: any): string {
-    return this.assertLegalChar(this.attEscape(val = '' + val || ''))
+    return this._assertLegalChar(this.attEscape(val = '' + val || ''))
   }
   /** @inheritdoc */
   insTarget(val: any): string {
-    return this.assertLegalChar('' + val || '')
+    return this._assertLegalChar('' + val || '')
   }
   /** @inheritdoc */
   insValue(val: any): string {
@@ -75,60 +75,13 @@ export class XMLStringifierImpl implements XMLStringifier {
     if (val.match(/\?>/)) {
       throw new Error("Invalid processing instruction value: " + val)
     }
-    return this.assertLegalChar(val)
-  }
-  /** @inheritdoc */
-  xmlVersion(val: any): string {
-    val = '' + val || ''
-    if (!val.match(/1\.[0-9]+/)) {
-      throw new Error("Invalid version number: " + val)
-    }
-    return val
-  }
-  /** @inheritdoc */
-  xmlEncoding(val: any): string {
-    val = '' + val || ''
-    if (!val.match(/^[A-Za-z](?:[A-Za-z0-9._-])*$/)) {
-      throw new Error("Invalid encoding: " + val)
-    }
-    return this.assertLegalChar(val)
-  }
-  /** @inheritdoc */
-  xmlStandalone(val: any): string {
-    return (val ? "yes" : "no")
-  }
-  /** @inheritdoc */
-  dtdPubID(val: any): string {
-    return this.assertLegalChar('' + val || '')
-  }
-  /** @inheritdoc */
-  dtdSysID(val: any): string {
-    return this.assertLegalChar('' + val || '')
-  }
-  /** @inheritdoc */
-  dtdElementValue(val: any): string {
-    return this.assertLegalChar('' + val || '')
-  }
-  /** @inheritdoc */
-  dtdAttType(val: any): string {
-    return this.assertLegalChar('' + val || '')
-  }
-  /** @inheritdoc */
-  dtdAttDefault(val: any): string {
-    return this.assertLegalChar('' + val || '')
-  }
-  /** @inheritdoc */
-  dtdEntityValue(val: any): string {
-    return this.assertLegalChar('' + val || '')
-  }
-  /** @inheritdoc */
-  dtdNData(val: any): string {
-    return this.assertLegalChar('' + val || '')
+    return this._assertLegalChar(val)
   }
 
   /** @inheritdoc */
   textEscape(str: string): string {
     const ampregex = (this._options.noDoubleEncoding ? /(?!&\S+;)&/g : /&/g)
+    // TODO: Check if we need to escape \r
     return str.replace(ampregex, '&amp;')
        .replace(/</g, '&lt;')
        .replace(/>/g, '&gt;')
@@ -138,8 +91,10 @@ export class XMLStringifierImpl implements XMLStringifier {
   /** @inheritdoc */
   attEscape(str: string): string {
     const ampregex = (this._options.noDoubleEncoding ? /(?!&\S+;)&/g : /&/g)
+    // TODO: Check if we need to escape \t, \n, \r
     return str.replace(ampregex, '&amp;')
        .replace(/</g, '&lt;')
+       .replace(/>/g, '&gt;')
        .replace(/"/g, '&quot;')
        .replace(/\t/g, '&#x9;')
        .replace(/\n/g, '&#xA;')
@@ -149,7 +104,7 @@ export class XMLStringifierImpl implements XMLStringifier {
   /** 
    * Validates characters according to the XML spec.
    */
-  private assertLegalChar(str: string): string {
+  private _assertLegalChar(str: string): string {
     if (!XMLSpec.isLegalChar(str, this._options.version)) {
       throw new Error(`Invalid character in string: ${str}.`)
     }
@@ -159,8 +114,8 @@ export class XMLStringifierImpl implements XMLStringifier {
   /** 
    * Validates a name according to the XML spec.
    */  
-  private assertLegalName(str: string): string {
-    this.assertLegalChar(str)
+  private _assertLegalName(str: string): string {
+    this._assertLegalChar(str)
     if (!XMLSpec.isName(str)) {
       throw new Error(`Invalid character in name: ${str}.`)
     }

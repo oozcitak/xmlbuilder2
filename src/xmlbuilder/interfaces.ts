@@ -94,54 +94,19 @@ export interface XMLStringifier {
    * Converts XML version to string
    */
   xmlVersion?: (v: any) => string
-  /**
-   * Converts XML encoding to string
-   */
-  xmlEncoding?: (v: any) => string
-  /**
-   * Converts standalone document declaration to string
-   */
-  xmlStandalone?: (v: any) => string
-  /**
-   * Converts DocType public identifier to string
-   */
-  dtdPubID?: (v: any) => string
-  /**
-   * Converts DocType system identifier to string
-   */
-  dtdSysID?: (v: any) => string
-  /**
-   * Converts `!ELEMENT` node content inside Doctype to string
-   */
-  dtdElementValue?: (v: any) => string
-  /**
-   * Converts `!ATTLIST` node type inside DocType to string
-   */
-  dtdAttType?: (v: any) => string
-  /**
-   * Converts `!ATTLIST` node default value inside DocType to string
-   */
-  dtdAttDefault?: (v: any) => string
-  /**
-   * Converts `!ENTITY` node content inside Doctype to string
-   */
-  dtdEntityValue?: (v: any) => string
-  /**
-   * Converts `!NOTATION` node content inside Doctype to string
-   */
-  dtdNData?: (v: any) => string
   /** 
    * When prepended to a JS object key, converts the key-value pair 
-   * to an attribute. 
+   * to an attribute. Defaults to `"@"`.
    */
   convertAttKey?: string
   /** 
    * When prepended to a JS object key, converts the key-value pair 
-   * to a processing instruction node. 
+   * to a processing instruction node. Defaults to `"?"`.
    */
   convertPIKey?: string
   /** 
    * When prepended to a JS object key, converts its value to a text node. 
+   * Defaults to `"#text"`.
    * 
    * _Note:_ Since JS objects cannot contain duplicate keys, multiple text 
    * nodes can be created by adding some unique text after each object 
@@ -154,28 +119,46 @@ export interface XMLStringifier {
   convertTextKey?: string
   /** 
    * When prepended to a JS object key, converts its value to a CDATA 
-   * node. 
+   * node. Defaults to `"#cdata"`.
    */
   convertCDataKey?: string
   /** 
    * When prepended to a JS object key, converts its value to a 
-   * comment node.
+   * comment node. Defaults to `"#comment"`.
    */
   convertCommentKey?: string
   /** 
    * When prepended to a JS object key, converts its value to a raw 
-   * text node. 
+   * text node. Defaults to `"#raw"`.
    */
   convertRawKey?: string
   /**
-   * Escapes special characters in text.
+   * Escapes special characters in text. Following characters are escaped by
+   * default:
+   * 
+   * Char | Escaped
+   * ---- | -------
+   * `&`  | `&amp;`
+   * `<`  | `&lt;`
+   * `>`  | `&gt;`
+   * `\r` | `&#xD;`
    */
   textEscape?: (v: string) => string
   /**
-   * Escapes special characters in attribute values.
+   * Escapes special characters in attribute values. Following characters are 
+   * escaped by default:
+   * 
+   * Char | Escaped
+   * ---- | -------
+   * `&`  | `&amp;`
+   * `<`  | `&lt;`
+   * `>`  | `&gt;`
+   * `"`  | `&quot;`
+   * `\t` | `&#x9;`
+   * `\n` | `&#xA;`
+   * `\r` | `&#xD;`
    */
   attEscape?: (v: string) => string
-
   /**
    * Index signature
    */
