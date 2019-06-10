@@ -1,5 +1,3 @@
-import { Node } from "../dom/interfaces"
-
 /**
  * Defines the options used while creating an XML document.
  */
@@ -186,7 +184,7 @@ export interface XMLStringifier {
 }
 
 /**
- * Represents the type of a variable that can be expanded by `element` function 
+ * Represents the type of a variable that can be expanded by the `ele` function 
  * into nodes.
  */
 export type ExpandObject = { [key: string]: any } | any[] | ((...args: any) => any)
@@ -246,7 +244,6 @@ export interface XMLBuilderEntryPoint {
    * 
    * @param document - a string containing an XML document or a JS object 
    * representing nodes to insert
-   * @param options - builder options
    * 
    * @returns document element node
    */
@@ -401,7 +398,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  import(node: Node | XMLBuilder): XMLBuilder
+  import(node: XMLBuilder): XMLBuilder
 
   /**
    * Returns the document node.

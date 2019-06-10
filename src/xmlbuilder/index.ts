@@ -55,7 +55,6 @@ export function fragment(): XMLBuilder {
  * 
  * @param document - a string containing an XML document or a JS object 
  * representing nodes to insert
- * @param options - builder options
  * 
  * @returns document element node
  */

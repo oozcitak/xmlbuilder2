@@ -275,18 +275,18 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  import(node: Node | XMLBuilder): XMLBuilder {
+  import(node: XMLBuilder): XMLBuilder {
     const hostNode = this._asNode
     const hostDoc = hostNode.ownerDocument
     if (hostDoc === null) {
       throw new Error("Owner document is null. " + this._debugInfo())
     }
 
-    const importedNode = <Node>node
+    const importedNode = (<XMLBuilderImpl>node)._asNode
 
     if (importedNode.nodeType === NodeType.Document) {
       // import document node
-      const elementNode = (<Document>node).documentElement
+      const elementNode = (<Document>importedNode).documentElement
       if (elementNode === null) {
         throw new Error("Imported document has no document node. " + this._debugInfo())
       }
