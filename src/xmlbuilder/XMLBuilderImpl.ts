@@ -205,7 +205,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       namespace = ""
     }
 
-    if(isArray(namespace)) {
+    if (isArray(namespace)) {
       throw new TypeError("namespace parameter must be a string")
     }
 
@@ -270,6 +270,39 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     const child = this._doc.createTextNode(content)
     ele.appendChild(child)
+
+    return this
+  }
+
+  /** @inheritdoc */
+  import(node: Node | XMLBuilder): XMLBuilder {
+    const hostNode = this._asNode
+    const hostDoc = hostNode.ownerDocument
+    if (hostDoc === null) {
+      throw new Error("Owner document is null. " + this._debugInfo())
+    }
+
+    const importedNode = <Node>node
+
+    if (importedNode.nodeType === NodeType.Document) {
+      // import document node
+      const elementNode = (<Document>node).documentElement
+      if (elementNode === null) {
+        throw new Error("Imported document has no document node. " + this._debugInfo())
+      }
+      const clone = hostDoc.importNode(elementNode, true)
+      hostNode.appendChild(clone)
+    } else if (importedNode.nodeType === NodeType.DocumentFragment) {
+      // import child nodes
+      for (const childNode of importedNode.childNodes) {
+        const clone = hostDoc.importNode(childNode, true)
+        hostNode.appendChild(clone)
+      }
+    } else {
+      // import node
+      const clone = hostDoc.importNode(importedNode, true)
+      hostNode.appendChild(clone)
+    }
 
     return this
   }
