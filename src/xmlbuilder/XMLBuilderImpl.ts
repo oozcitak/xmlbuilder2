@@ -140,9 +140,9 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  removeEle(): XMLBuilder {
+  remove(): XMLBuilder {
     const parent = this.up()
-    this._asAny.remove()
+    this._asAny._remove()
     return parent
   }
 
@@ -356,47 +356,6 @@ export class XMLBuilderImpl implements XMLBuilder {
       throw new Error("Last child node is null. " + this._debugInfo())
     }
     return XMLBuilderImpl._FromNode(node)
-  }
-
-  /** @inheritdoc */
-  *children(): IterableIterator<XMLBuilder> {
-    let child = this._asNode.firstChild
-    while (child) {
-      yield XMLBuilderImpl._FromNode(child)
-      child = child.nextSibling
-    }
-  }
-
-  /** @inheritdoc */
-  *siblings(): IterableIterator<XMLBuilder> {
-    const node = this._asNode
-    const parent = node.parentNode
-    if (parent === null) {
-      throw new Error("Parent node is null. " + this._debugInfo())
-    }
-    let sibling = parent.firstChild
-    while (sibling) {
-      if (sibling !== node) {
-        yield XMLBuilderImpl._FromNode(sibling)
-      }
-      sibling = sibling.nextSibling
-    }
-  }
-
-  /** @inheritdoc */
-  *descendants(): IterableIterator<XMLBuilder> {
-    for (const node of TreeQuery.getDescendantNodes(this._asNode, false, false)) {
-      yield XMLBuilderImpl._FromNode(node)
-    }
-  }
-
-  /** @inheritdoc */
-  *ancestors(): IterableIterator<XMLBuilder> {
-    let parent = this._asNode.parentNode
-    while (parent) {
-      yield XMLBuilderImpl._FromNode(parent)
-      parent = parent.parentNode
-    }
   }
 
   /**

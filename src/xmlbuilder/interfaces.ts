@@ -286,7 +286,7 @@ export interface XMLBuilder {
    * 
    * @returns parent element node
    */
-  removeEle(): XMLBuilder
+  remove(): XMLBuilder
 
   /**
    * Creates or updates an element attribute.
@@ -416,24 +416,4 @@ export interface XMLBuilder {
    * Returns the last child node.
    */
   last(): XMLBuilder
-
-  /**
-   * Iterates over child nodes.
-   */
-  children(): IterableIterator<XMLBuilder>
-
-  /**
-   * Iterates over sibling nodes.
-   */
-  siblings(): IterableIterator<XMLBuilder>
-
-  /**
-   * Iterates over descendant nodes.
-   */
-  descendants(): IterableIterator<XMLBuilder>
-
-  /**
-   * Iterates over ancestor nodes.
-   */
-  ancestors(): IterableIterator<XMLBuilder>
 }

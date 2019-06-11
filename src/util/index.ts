@@ -5,9 +5,19 @@ export { TupleSet } from './TupleSet'
  * 
  * @param baseClass - class to recieve te mixin
  * @param mixinClass - mixin class
+ * @param overrides - an array with names of function overrides. Base class 
+ * functions whose names are in this array will be kept by prepending an
+ * underscore to their names.
  */
-export function _applyMixin(baseClass: any, mixinClass: any): void {
+export function applyMixin(baseClass: any, mixinClass: any, ...overrides: string[]): void {
   Object.getOwnPropertyNames(mixinClass.prototype).forEach(name => {
+    if (overrides.includes(name)) {
+      const orgPropDesc = Object.getOwnPropertyDescriptor(baseClass.prototype, name)
+      /* istanbul ignore else */
+      if (orgPropDesc) {
+        Object.defineProperty(baseClass.prototype, "_" + name, orgPropDesc)
+      }
+    }
     const propDesc = Object.getOwnPropertyDescriptor(mixinClass.prototype, name)
     /* istanbul ignore else */
     if (propDesc) {

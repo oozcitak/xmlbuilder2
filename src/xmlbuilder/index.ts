@@ -1,5 +1,8 @@
-import { _applyMixin } from '../util'
-import { Node } from '../dom'
+import { applyMixin } from '../util'
+import { 
+  CDATASection, Comment, DocumentFragment, Document, 
+  DocumentType, Element, ProcessingInstruction, Text, CharacterData, Node, XMLDocument
+} from '../dom'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
 import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
 import {
@@ -8,7 +11,19 @@ import {
 } from './interfaces'
 
 // Apply XMLBuilder mixin
-_applyMixin(Node, XMLBuilderImpl)
+applyMixin(Node, XMLBuilderImpl, "remove")
+applyMixin(Element, XMLBuilderImpl, "remove")
+
+applyMixin(CharacterData, XMLBuilderImpl, "remove")
+applyMixin(CDATASection, XMLBuilderImpl, "remove")
+applyMixin(Comment, XMLBuilderImpl, "remove")
+applyMixin(Text, XMLBuilderImpl, "remove")
+applyMixin(ProcessingInstruction, XMLBuilderImpl, "remove")
+
+applyMixin(DocumentType, XMLBuilderImpl, "remove")
+applyMixin(DocumentFragment, XMLBuilderImpl, "remove")
+applyMixin(Document, XMLBuilderImpl, "remove")
+applyMixin(XMLDocument, XMLBuilderImpl, "remove")
 
 /**
  * Sets builder options.

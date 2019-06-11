@@ -1,4 +1,4 @@
-import { _applyMixin } from '../util'
+import { applyMixin } from '../util'
 
 // Import implementation classes
 import { AbstractRangeImpl } from './AbstractRangeImpl'
@@ -34,25 +34,25 @@ import { XMLDocumentImpl } from './XMLDocumentImpl'
 
 // Apply mixins
 // ChildNode
-_applyMixin(ElementImpl, ChildNodeImpl)
-_applyMixin(CharacterDataImpl, ChildNodeImpl)
-_applyMixin(DocumentTypeImpl, ChildNodeImpl)
+applyMixin(ElementImpl, ChildNodeImpl)
+applyMixin(CharacterDataImpl, ChildNodeImpl)
+applyMixin(DocumentTypeImpl, ChildNodeImpl)
 // DocumentOrShadowRoot
-_applyMixin(DocumentImpl, DocumentOrShadowRootImpl)
-_applyMixin(ShadowRootImpl, DocumentOrShadowRootImpl)
+applyMixin(DocumentImpl, DocumentOrShadowRootImpl)
+applyMixin(ShadowRootImpl, DocumentOrShadowRootImpl)
 // NonDocumentTypeChildNode
-_applyMixin(ElementImpl, NonDocumentTypeChildNodeImpl)
-_applyMixin(CharacterDataImpl, NonDocumentTypeChildNodeImpl)
+applyMixin(ElementImpl, NonDocumentTypeChildNodeImpl)
+applyMixin(CharacterDataImpl, NonDocumentTypeChildNodeImpl)
 // NonElementParentNode
-_applyMixin(DocumentImpl, NonElementParentNodeImpl)
-_applyMixin(DocumentFragmentImpl, NonElementParentNodeImpl)
+applyMixin(DocumentImpl, NonElementParentNodeImpl)
+applyMixin(DocumentFragmentImpl, NonElementParentNodeImpl)
 // ParentNode
-_applyMixin(DocumentImpl, ParentNodeImpl)
-_applyMixin(DocumentFragmentImpl, ParentNodeImpl)
-_applyMixin(ElementImpl, ParentNodeImpl)
+applyMixin(DocumentImpl, ParentNodeImpl)
+applyMixin(DocumentFragmentImpl, ParentNodeImpl)
+applyMixin(ElementImpl, ParentNodeImpl)
 // Slotable
-_applyMixin(TextImpl, SlotableImpl)
-_applyMixin(ElementImpl, SlotableImpl)
+applyMixin(TextImpl, SlotableImpl)
+applyMixin(ElementImpl, SlotableImpl)
 
 // Export classes and drop `Impl`
 export { AbstractRangeImpl as AbstractRange }

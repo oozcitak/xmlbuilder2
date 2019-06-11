@@ -1,10 +1,10 @@
 import $$ from '../../TestHelpers'
 
-describe('removeEle()', () => {
+describe('remove()', () => {
 
   test('remove element node', () => {
     const root = $$.create().ele('root')
-    root.ele('node1').up().ele('node2').removeEle().ele('node3')
+    root.ele('node1').up().ele('node2').remove().ele('node3')
 
     expect($$.printTree(root.doc())).toBe($$.t`
       root
