@@ -7,6 +7,11 @@ import { XMLSpec } from "../dom/spec"
 export class XMLStringifierImpl implements XMLStringifier {
   private _options: XMLBuilderOptions
 
+  /** @inheritdoc */
+  ignoreDecorators = false
+  /** @inheritdoc */
+  noDoubleEncoding = false
+
   /**
    * Initializes a new instance of `XMLStringifier`
    * 
@@ -80,7 +85,7 @@ export class XMLStringifierImpl implements XMLStringifier {
 
   /** @inheritdoc */
   textEscape(str: string): string {
-    const ampregex = (this._options.noDoubleEncoding ? /(?!&\S+;)&/g : /&/g)
+    const ampregex = (this.noDoubleEncoding ? /(?!&\S+;)&/g : /&/g)
     // TODO: Check if we need to escape \r
     return str.replace(ampregex, '&amp;')
        .replace(/</g, '&lt;')
@@ -90,7 +95,7 @@ export class XMLStringifierImpl implements XMLStringifier {
 
   /** @inheritdoc */
   attEscape(str: string): string {
-    const ampregex = (this._options.noDoubleEncoding ? /(?!&\S+;)&/g : /&/g)
+    const ampregex = (this.noDoubleEncoding ? /(?!&\S+;)&/g : /&/g)
     // TODO: Check if we need to escape \t, \n, \r
     return str.replace(ampregex, '&amp;')
        .replace(/</g, '&lt;')
@@ -125,6 +130,6 @@ export class XMLStringifierImpl implements XMLStringifier {
   /**
    * Index signature
    */
-  [key: string]: undefined | string | ((v: any) => string) | 
-    ((v: string) => string) | XMLBuilderOptions
+  [key: string]: undefined | boolean | string | ((v: any) => string) |
+    ((v: string) => string) | XMLBuilderOptions  
 }

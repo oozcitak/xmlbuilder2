@@ -51,10 +51,10 @@ export class XMLBuilderImpl implements XMLBuilder {
           // evaluate if function
           val = val.apply()
         }
-        if (!this._options.ignoreDecorators && this._stringify.convertAttKey && key.indexOf(this._stringify.convertAttKey) === 0) {
+        if (!this._stringify.ignoreDecorators && this._stringify.convertAttKey && key.indexOf(this._stringify.convertAttKey) === 0) {
           // assign attributes
           lastChild = this.att(key.substr(this._stringify.convertAttKey.length), val)
-        } else if (!this._options.separateArrayItems && Array.isArray(val) && isEmpty(val)) {
+        } else if (!this._stringify.separateArrayItems && Array.isArray(val) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
         } else if (isObject(val) && isEmpty(val)) {
@@ -63,7 +63,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         } else if (!this._options.keepNullNodes && (val == null)) {
           // skip null and undefined nodes
           lastChild = this._dummy()
-        } else if (!this._options.separateArrayItems && Array.isArray(val)) {
+        } else if (Array.isArray(val)) {
           // expand list by creating child nodes
           for (let j = 0, len = val.length; j < len; j++) {
             const item = val[j]
@@ -75,12 +75,12 @@ export class XMLBuilderImpl implements XMLBuilder {
           // expand child nodes under parent
         } else if (isObject(val)) {
           // if the key is #text expand child nodes under this node to support mixed content
-          if (!this._options.ignoreDecorators && this._stringify.convertTextKey && key.indexOf(this._stringify.convertTextKey) === 0) {
+          if (!this._stringify.ignoreDecorators && this._stringify.convertTextKey && key.indexOf(this._stringify.convertTextKey) === 0) {
             lastChild = this.ele(val)
           } else {
             // check for a default namespace declaration attribute
             let namespace: string | null = null
-            if (!this._options.ignoreDecorators && this._stringify.convertAttKey && isObject(val)) {
+            if (!this._stringify.ignoreDecorators && this._stringify.convertAttKey && isObject(val)) {
               const nsKey = this._stringify.convertAttKey + "xmlns"
               const attValue = val[nsKey]
               if (attValue === null || isString(attValue)) {
@@ -107,19 +107,19 @@ export class XMLBuilderImpl implements XMLBuilder {
       // skip null nodes
       lastChild = this._dummy()
     } else if (text !== undefined) {
-      if (!this._options.ignoreDecorators && this._stringify.convertTextKey && name.indexOf(this._stringify.convertTextKey) === 0) {
+      if (!this._stringify.ignoreDecorators && this._stringify.convertTextKey && name.indexOf(this._stringify.convertTextKey) === 0) {
         // text node
         lastChild = this.txt(text)
-      } else if (!this._options.ignoreDecorators && this._stringify.convertCDataKey && name.indexOf(this._stringify.convertCDataKey) === 0) {
+      } else if (!this._stringify.ignoreDecorators && this._stringify.convertCDataKey && name.indexOf(this._stringify.convertCDataKey) === 0) {
         // cdata node
         lastChild = this.dat(text)
-      } else if (!this._options.ignoreDecorators && this._stringify.convertCommentKey && name.indexOf(this._stringify.convertCommentKey) === 0) {
+      } else if (!this._stringify.ignoreDecorators && this._stringify.convertCommentKey && name.indexOf(this._stringify.convertCommentKey) === 0) {
         // comment node
         lastChild = this.com(text)
-      } else if (!this._options.ignoreDecorators && this._stringify.convertRawKey && name.indexOf(this._stringify.convertRawKey) === 0) {
+      } else if (!this._stringify.ignoreDecorators && this._stringify.convertRawKey && name.indexOf(this._stringify.convertRawKey) === 0) {
         // raw text node
         lastChild = this.raw(text)
-      } else if (!this._options.ignoreDecorators && this._stringify.convertPIKey && name.indexOf(this._stringify.convertPIKey) === 0) {
+      } else if (!this._stringify.ignoreDecorators && this._stringify.convertPIKey && name.indexOf(this._stringify.convertPIKey) === 0) {
         // processing instruction
         lastChild = this.ins(name.substr(this._stringify.convertPIKey.length), text)
       } else {

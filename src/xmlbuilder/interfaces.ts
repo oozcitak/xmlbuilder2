@@ -23,10 +23,6 @@ export interface XMLBuilderOptions {
    */
   sysID?: string
   /**
-   * Whether XML declaration and doctype will be included
-   */
-  headless?: boolean
-  /**
    * Whether child nodes inherit their parent namespace
    */
   inheritNS?: boolean
@@ -38,20 +34,6 @@ export interface XMLBuilderOptions {
    * Whether attributes with `null` values will be kept or ignored
    */
   keepNullAttributes?: boolean
-  /** 
-   * Whether decorator strings will be ignored when converting JS 
-   * objects
-   */
-  ignoreDecorators?: boolean
-  /** 
-   * Whether array items are created as separate nodes when passed 
-   * as an object value
-   */
-  separateArrayItems?: boolean
-  /**
-   * Whether existing html entities are encoded
-   */
-  noDoubleEncoding?: boolean
   /**
    * A set of functions to use for converting values to strings
    */
@@ -62,6 +44,16 @@ export interface XMLBuilderOptions {
  * Defines the functions used for converting values to strings.
  */
 export interface XMLStringifier {
+  /** 
+   * Whether decorator strings will be ignored when converting JS 
+   * objects
+   */
+  ignoreDecorators?: boolean
+  /**
+   * Whether existing html entities are encoded
+   */
+  noDoubleEncoding?: boolean
+
   /**
    * Converts an element or attribute name to string
    */
@@ -163,11 +155,12 @@ export interface XMLStringifier {
    * `\r` | `&#xD;`
    */
   attEscape?: (v: string) => string
+  
   /**
    * Index signature
    */
-  [key: string]: undefined | string | ((v: any) => string) |
-  ((v: string) => string) | XMLBuilderOptions
+  [key: string]: undefined | boolean | string | ((v: any) => string) |
+    ((v: string) => string) | XMLBuilderOptions
 }
 
 /**
