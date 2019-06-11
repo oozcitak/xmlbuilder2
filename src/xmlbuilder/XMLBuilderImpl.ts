@@ -421,9 +421,11 @@ export class XMLBuilderImpl implements XMLBuilder {
     // inherit namespace from parent
     const qName = Namespace.extractQName(name)
     let namespace: string | null = null
-    const parent = this._asNode.parentNode
-    if (parent) {
-      namespace = parent.lookupNamespaceURI(qName.prefix)
+    if (this._options.inheritNS) {
+      const parent = this._asNode.parentNode
+      if (parent) {
+        namespace = parent.lookupNamespaceURI(qName.prefix)
+      }
     }
 
     // override namespace if there is a namespace declaration

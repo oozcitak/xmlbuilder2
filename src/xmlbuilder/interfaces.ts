@@ -27,6 +27,10 @@ export interface XMLBuilderOptions {
    */
   headless?: boolean
   /**
+   * Whether child nodes inherit their parent namespace
+   */
+  inheritNS?: boolean
+  /**
    * Whether nodes with `null` values will be kept or ignored
    */
   keepNullNodes?: boolean

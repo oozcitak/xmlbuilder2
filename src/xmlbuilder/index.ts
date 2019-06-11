@@ -15,7 +15,7 @@ _applyMixin(Node, XMLBuilderImpl)
  * 
  * @param options - builder options
  */
-export function withOptions(options?: XMLBuilderOptions): XMLBuilderEntryPoint {
+export function withOptions(options: XMLBuilderOptions): XMLBuilderEntryPoint {
   return new XMLBuilderEntryPointImpl(options)
 }
 

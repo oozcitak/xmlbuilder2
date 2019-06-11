@@ -10,6 +10,18 @@ describe('namespaces', () => {
     const doc = $$.create('root', { xmlns: ns1 })
       .ele('foo').ele('bar', 'foobar').doc() as any
 
+    expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1"><foo xmlns=""><bar>foobar</bar></foo></root>')
+
+    expect(doc.documentElement.namespaceURI).toBe(ns1)
+    expect(doc.getElementsByTagName("foo")[0].namespaceURI).toBeNull()
+    expect(doc.getElementsByTagName("bar")[0].namespaceURI).toBeNull()
+  })
+
+  test('inherit parent namespace', () => {
+    const ns1 = 'http://example.com/ns1'
+    const doc = $$.withOptions({ inheritNS: true }).create('root', { xmlns: ns1 })
+      .ele('foo').ele('bar', 'foobar').doc() as any
+
     expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1"><foo><bar>foobar</bar></foo></root>')
 
     expect(doc.documentElement.namespaceURI).toBe(ns1)
@@ -22,7 +34,7 @@ describe('namespaces', () => {
     const ns1 = 'http://example.com/ns1'
     const xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
-    const doc = $$.create('root', { xmlns: ns1,
+    const doc = $$.withOptions({ inheritNS: true }).create('root', { xmlns: ns1,
       "xmlns:xsi": xsi,
       "xsi:schemaLocation": "http://example.com/n1 schema.xsd" })
       .ele('foo').ele('bar', 'foobar').doc() as any
@@ -48,7 +60,7 @@ describe('namespaces', () => {
     const svgNs = 'http://www.w3.org/2000/svg'
     const xlinkNs = 'http://www.w3.org/1999/xlink'
 
-    const doc = $$.create('svg', { xmlns: svgNs,
+    const doc = $$.withOptions({ inheritNS: true }).create('svg', { xmlns: svgNs,
       "xmlns:xlink": xlinkNs })
       .ele('script', { type: "text/ecmascript", "xlink:href": "foo.js" })
       .doc() as any
