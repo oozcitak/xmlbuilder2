@@ -14,15 +14,6 @@ export class XMLBuilderImpl implements XMLBuilder {
   private _builderOptions: XMLBuilderOptions | null = null
 
   /** @inheritdoc */
-  get parent(): XMLBuilder {
-    const parent = this._asNode.parentNode
-    if (!parent) {
-      throw new Error("Parent node is null. " + this._debugInfo())
-    }
-    return XMLBuilderImpl._FromNode(parent)
-  }
-
-  /** @inheritdoc */
   ele(name: string | ExpandObject, attributes?: AttributesOrText,
     text?: AttributesOrText): XMLBuilder {
 
@@ -149,7 +140,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   removeEle(): XMLBuilder {
-    const parent = this.parent
+    const parent = this.up()
     this._asAny.remove()
     return parent
   }
@@ -323,7 +314,11 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   up(): XMLBuilder {
-    return this.parent
+    const parent = this._asNode.parentNode
+    if (!parent) {
+      throw new Error("Parent node is null. " + this._debugInfo())
+    }
+    return XMLBuilderImpl._FromNode(parent)
   }
 
   /** @inheritdoc */

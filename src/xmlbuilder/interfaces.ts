@@ -241,11 +241,6 @@ export interface XMLBuilderEntryPoint {
 export interface XMLBuilder {
 
   /**
-   * Gets the parent node.
-   */
-  readonly parent: XMLBuilder
-
-  /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
    * @param name - element name
