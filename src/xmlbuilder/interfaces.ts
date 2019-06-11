@@ -403,4 +403,33 @@ export interface XMLBuilder {
    */
   next(): XMLBuilder
 
+  /**
+   * Returns the first child node.
+   */
+  first(): XMLBuilder
+
+  /**
+   * Returns the last child node.
+   */
+  last(): XMLBuilder
+
+  /**
+   * Iterates over child nodes.
+   */
+  children(): IterableIterator<XMLBuilder>
+
+  /**
+   * Iterates over sibling nodes.
+   */
+  siblings(): IterableIterator<XMLBuilder>
+
+  /**
+   * Iterates over descendant nodes.
+   */
+  descendants(): IterableIterator<XMLBuilder>
+
+  /**
+   * Iterates over ancestor nodes.
+   */
+  ancestors(): IterableIterator<XMLBuilder>
 }

@@ -1,16 +1,14 @@
 import { _applyMixin } from '../util'
+import { Node } from '../dom'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
-import { XMLDocument, Element, DocumentFragment } from '../dom'
 import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
 import {
-  XMLBuilderOptions, XMLBuilderEntryPoint, XMLBuilder, ExpandObject, AttributesOrText
+  XMLBuilderOptions, XMLBuilderEntryPoint, XMLBuilder, 
+  ExpandObject, AttributesOrText
 } from './interfaces'
 
-// Apply mixins
-// XMLBuilder
-_applyMixin(XMLDocument, XMLBuilderImpl)
-_applyMixin(DocumentFragment, XMLBuilderImpl)
-_applyMixin(Element, XMLBuilderImpl)
+// Apply XMLBuilder mixin
+_applyMixin(Node, XMLBuilderImpl)
 
 /**
  * Sets builder options.

@@ -4,6 +4,7 @@ import {
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
 import { Namespace } from "../dom/spec"
+import { TreeQuery } from "../dom/util/TreeQuery"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -337,6 +338,65 @@ export class XMLBuilderImpl implements XMLBuilder {
       throw new Error("Next sibling node is null. " + this._debugInfo())
     }
     return XMLBuilderImpl._FromNode(node)
+  }
+
+  /** @inheritdoc */
+  first(): XMLBuilder {
+    const node = this._asNode.firstChild
+    if (!node) {
+      throw new Error("First child node is null. " + this._debugInfo())
+    }
+    return XMLBuilderImpl._FromNode(node)
+  }
+
+  /** @inheritdoc */
+  last(): XMLBuilder {
+    const node = this._asNode.lastChild
+    if (!node) {
+      throw new Error("Last child node is null. " + this._debugInfo())
+    }
+    return XMLBuilderImpl._FromNode(node)
+  }
+
+  /** @inheritdoc */
+  *children(): IterableIterator<XMLBuilder> {
+    let child = this._asNode.firstChild
+    while (child) {
+      yield XMLBuilderImpl._FromNode(child)
+      child = child.nextSibling
+    }
+  }
+
+  /** @inheritdoc */
+  *siblings(): IterableIterator<XMLBuilder> {
+    const node = this._asNode
+    const parent = node.parentNode
+    if (parent === null) {
+      throw new Error("Parent node is null. " + this._debugInfo())
+    }
+    let sibling = parent.firstChild
+    while (sibling) {
+      if (sibling !== node) {
+        yield XMLBuilderImpl._FromNode(sibling)
+      }
+      sibling = sibling.nextSibling
+    }
+  }
+
+  /** @inheritdoc */
+  *descendants(): IterableIterator<XMLBuilder> {
+    for (const node of TreeQuery.getDescendantNodes(this._asNode, false, false)) {
+      yield XMLBuilderImpl._FromNode(node)
+    }
+  }
+
+  /** @inheritdoc */
+  *ancestors(): IterableIterator<XMLBuilder> {
+    let parent = this._asNode.parentNode
+    while (parent) {
+      yield XMLBuilderImpl._FromNode(parent)
+      parent = parent.parentNode
+    }
   }
 
   /**
