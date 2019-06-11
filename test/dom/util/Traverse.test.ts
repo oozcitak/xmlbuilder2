@@ -1,4 +1,4 @@
-import $$ from '../../TestHelpers'
+import $$ from '../TestHelpers'
 import { WhatToShow, FilterResult } from '../../../src/dom/interfaces'
 import { Traverse } from '../../../src/dom/util/Traverse'
 

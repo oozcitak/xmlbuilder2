@@ -1,11 +1,10 @@
-import $$ from '../../TestHelpers'
-import { DOMParser, MimeType } from '../../../src/dom/parser'
+import $$ from '../TestHelpers'
 
 describe('DOMParser - XML', function () {
 
   test('HTML parser not yet supported', function () {
-    const parser = new DOMParser()
-    expect(() => parser.parseFromString('', MimeType.HTML)).toThrow()
+    const parser = new $$.DOMParser()
+    expect(() => parser.parseFromString('', $$.MimeType.HTML)).toThrow()
   })
 
   test('basic', function () {
@@ -22,9 +21,10 @@ describe('DOMParser - XML', function () {
         <text>alien's pinky toe</text>
       </root>
       `
-    const doc = $$.parse(xmlStr)
+    const parser = new $$.DOMParser()
+    const doc = parser.parseFromString(xmlStr, $$.MimeType.XML)
 
-    expect($$.printTree(doc.doc())).toBe($$.t`
+    expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE root PUBLIC pubid SYSTEM sysid
       root
         node att="val"
@@ -45,12 +45,17 @@ describe('DOMParser - XML', function () {
       </notroot>
       `
 
-    expect(() => $$.parse(xmlStr)).toThrow()
+    const parser = new $$.DOMParser()
+    expect(() => parser.parseFromString(xmlStr, $$.MimeType.XML)).toThrow()
   })
 
   test('default namespace', function () {
     const xmlStr = '<root xmlns="uri:myns"><node1><node2>text</node2></node1></root>'
-    expect($$.printTree($$.parse(xmlStr))).toBe($$.t`
+
+    const parser = new $$.DOMParser()
+    const doc = parser.parseFromString(xmlStr, $$.MimeType.XML)
+
+    expect($$.printTree(doc)).toBe($$.t`
       root (ns:uri:myns)
         node1 (ns:uri:myns)
           node2 (ns:uri:myns)
@@ -64,7 +69,10 @@ describe('DOMParser - XML', function () {
       '<node1><node2>text</node2></node1>' +
       '</root>'
 
-    expect($$.printTree($$.parse(xmlStr))).toBe($$.t`
+    const parser = new $$.DOMParser()
+    const doc = parser.parseFromString(xmlStr, $$.MimeType.XML)
+  
+    expect($$.printTree(doc)).toBe($$.t`
       root (ns:uri:myns) xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" (ns:http://www.w3.org/2000/xmlns/) xsi:schemaLocation="uri:myschema.xsd" (ns:http://www.w3.org/2001/XMLSchema-instance)
         node1 (ns:uri:myns)
           node2 (ns:uri:myns)
@@ -77,7 +85,11 @@ describe('DOMParser - XML', function () {
       '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
       '<script type="text/ecmascript" xlink:href="foo.js"/>' +
       '</svg>'
-    expect($$.printTree($$.parse(xmlStr))).toBe($$.t`
+
+    const parser = new $$.DOMParser()
+    const doc = parser.parseFromString(xmlStr, $$.MimeType.XML)
+  
+    expect($$.printTree(doc)).toBe($$.t`
       svg (ns:http://www.w3.org/2000/svg) xmlns:xlink="http://www.w3.org/1999/xlink" (ns:http://www.w3.org/2000/xmlns/)
         script (ns:http://www.w3.org/2000/svg) type="text/ecmascript" xlink:href="foo.js" (ns:http://www.w3.org/1999/xlink)
       `)
@@ -88,7 +100,11 @@ describe('DOMParser - XML', function () {
       '<svg xmlns="http://www.w3.org/2000/svg">' +
       '<script xmlns=""/>' +
       '</svg>'
-    expect($$.printTree($$.parse(xmlStr))).toBe($$.t`
+
+    const parser = new $$.DOMParser()
+    const doc = parser.parseFromString(xmlStr, $$.MimeType.XML)
+  
+    expect($$.printTree(doc)).toBe($$.t`
       svg (ns:http://www.w3.org/2000/svg)
         script
       `)
@@ -99,7 +115,11 @@ describe('DOMParser - XML', function () {
       '<svg xmlns="http://www.w3.org/2000/svg">' +
       '<script xmlns="http://www.w3.org/1999/xlink"/>' +
       '</svg>'
-    expect($$.printTree($$.parse(xmlStr))).toBe($$.t`
+
+    const parser = new $$.DOMParser()
+    const doc = parser.parseFromString(xmlStr, $$.MimeType.XML)
+  
+    expect($$.printTree(doc)).toBe($$.t`
       svg (ns:http://www.w3.org/2000/svg)
         script (ns:http://www.w3.org/1999/xlink)
       `)
@@ -112,7 +132,11 @@ describe('DOMParser - XML', function () {
       '<p:node xmlns:p="uri:my ns2"><p:child/></p:node>' +
       '<p:node><p:child/></p:node>' +
       '</p:root>'
-    expect($$.printTree($$.parse(xmlStr))).toBe($$.t`
+
+    const parser = new $$.DOMParser()
+    const doc = parser.parseFromString(xmlStr, $$.MimeType.XML)
+  
+    expect($$.printTree(doc)).toBe($$.t`
       p:root (ns:uri:my ns1) xmlns:p="uri:my ns1" (ns:http://www.w3.org/2000/xmlns/)
         p:node (ns:uri:my ns1)
           p:child (ns:uri:my ns1)

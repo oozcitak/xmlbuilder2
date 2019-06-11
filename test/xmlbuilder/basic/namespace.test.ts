@@ -1,4 +1,4 @@
-import $$ from '../../TestHelpers'
+import $$ from '../TestHelpers'
 
 // samples taken from:
 // https://blogs.msmvps.com/martin-honnen/2009/04/13/creating-xml-with-namespaces-with-javascript-and-the-w3c-dom/

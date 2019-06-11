@@ -1,4 +1,4 @@
-import $$ from '../TestHelpers'
+import $$ from './TestHelpers'
 
 describe('NonDocumentTypeChildNode', function () {
 

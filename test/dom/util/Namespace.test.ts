@@ -1,4 +1,3 @@
-import $$ from '../../TestHelpers'
 import { Namespace } from '../../../src/dom/spec/Namespace'
 
 describe('Namespace', function () {

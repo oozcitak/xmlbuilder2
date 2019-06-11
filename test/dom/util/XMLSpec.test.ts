@@ -1,4 +1,3 @@
-import $$ from '../../TestHelpers'
 import { XMLSpec } from '../../../src/dom/spec/XMLSpec'
 
 describe('XMLSpec', function () {

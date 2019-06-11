@@ -1,4 +1,4 @@
-import $$ from '../../TestHelpers'
+import $$ from '../TestHelpers'
 
 describe('create()', () => {
 
@@ -8,7 +8,7 @@ describe('create()', () => {
   })
 
   test('Document with root element', () => {
-    const ele = $$.withOptions().create('root', { att: "val" }, "text")
+    const ele = $$.create('root', { att: "val" }, "text")
     expect($$.printTree(ele)).toBe($$.t`
       root att="val"
         # text
@@ -16,7 +16,7 @@ describe('create()', () => {
   })
 
   test('Document with root element - reverse argument order', () => {
-    const ele = $$.withOptions().create('root', "text", { att: "val" })
+    const ele = $$.create('root', "text", { att: "val" })
     expect($$.printTree(ele)).toBe($$.t`
       root att="val"
         # text

@@ -1,4 +1,4 @@
-import $$ from '../../TestHelpers'
+import $$ from '../TestHelpers'
 import { List } from '../../../src/dom/util/List'
 
 describe('List', function () {

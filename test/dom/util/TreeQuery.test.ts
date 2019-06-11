@@ -1,4 +1,4 @@
-import $$ from '../../TestHelpers'
+import $$ from '../TestHelpers'
 import { TreeQuery } from '../../../src/dom/util/TreeQuery'
 
 describe('TreeQuery', function () {

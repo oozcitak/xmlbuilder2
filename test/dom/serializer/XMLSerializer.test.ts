@@ -1,23 +1,30 @@
-import $$ from '../../TestHelpers'
+import $$ from '../TestHelpers'
 import { XMLSerializer } from '../../../src/dom/serializer'
 
 describe('XMLSerializer', function () {
 
   test('basic', function () {
-    const doc = $$.create()
-      .ele('root')
-      .ele('node', { att: 'val' })
-      .up()
-      .com('same node below')
-      .ele('node', { att: 'val', att2: 'val2' })
-      .up()
-      .ins('kidding', 'itwas="different"')
-      .ins('for', 'real')
-      .dat('<greeting>Hello, world!</greeting>')
-      .ele('text', 'alien\'s pinky toe')
-      .doc()
+    const doc = $$.dom.createDocument(null, 'root')
+    const de = doc.documentElement
+    if (de) {
+      const node1 = doc.createElement('node')
+      node1.setAttribute('att', 'val')
+      de.appendChild(node1)
+      de.appendChild(doc.createComment('same node below'))
+      const node2 = doc.createElement('node')
+      node2.setAttribute('att', 'val')
+      node2.setAttribute('att2', 'val2')
+      de.appendChild(node2)
+      de.appendChild(doc.createProcessingInstruction('kidding', 'itwas="different"'))
+      de.appendChild(doc.createProcessingInstruction('for', 'real'))
+      de.appendChild(doc.createCDATASection('<greeting>Hello, world!</greeting>'))
+      const node3 = doc.createElement('text')
+      node3.appendChild(doc.createTextNode('alien\'s pinky toe'))
+      de.appendChild(node3)
+    }
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<root>' +
       '<node att="val"/>' +
       '<!--same node below-->' +
@@ -44,7 +51,9 @@ describe('XMLSerializer', function () {
       '</signing>' +
       '</section>'
 
-    expect($$.serialize($$.parse(xmlStr))).toBe(xmlStr)
+      const serializer = new $$.XMLSerializer()
+      const parser = new $$.DOMParser()
+      expect(serializer.serializeToString(parser.parseFromString(xmlStr, $$.MimeType.XML))).toBe(xmlStr)
   })
 
   test('default namespace', function () {
@@ -58,7 +67,8 @@ describe('XMLSerializer', function () {
     node1.appendChild(node2)
     node2.appendChild(doc.createTextNode('text'))
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<root xmlns="uri:myns"><node1><node2>text</node2></node1></root>'
     )
     expect($$.printTree(doc)).toBe($$.t`
@@ -81,7 +91,8 @@ describe('XMLSerializer', function () {
     node1.appendChild(node2)
     node2.appendChild(doc.createTextNode('text'))
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<root xmlns="uri:myns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="uri:myschema.xsd">' +
       '<node1><node2>text</node2></node1>' +
       '</root>'
@@ -109,7 +120,8 @@ describe('XMLSerializer', function () {
       doc.documentElement.appendChild(script)
     }
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
       '<script type="text/ecmascript" xlink:href="foo.js"/>' +
       '</svg>'
@@ -129,7 +141,8 @@ describe('XMLSerializer', function () {
       doc.documentElement.appendChild(script)
     }
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<svg xmlns="http://www.w3.org/2000/svg">' +
       '<script xmlns=""/>' +
       '</svg>'
@@ -150,7 +163,8 @@ describe('XMLSerializer', function () {
       doc.documentElement.appendChild(script)
     }
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<svg xmlns="http://www.w3.org/2000/svg">' +
       '<script xmlns="http://www.w3.org/1999/xlink"/>' +
       '</svg>'
@@ -178,7 +192,8 @@ describe('XMLSerializer', function () {
       node3.appendChild(doc.createElementNS(ns1, 'p:child'))
     }
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<p:root xmlns:p="uri:my ns1">' +
       '<p:node><p:child/></p:node>' +
       '<p:node xmlns:p="uri:my ns2"><p:child/></p:node>' +
@@ -203,7 +218,8 @@ describe('XMLSerializer', function () {
     frag.appendChild(doc.createElementNS(ns, 'node1'))
     frag.appendChild(doc.createElementNS(ns, 'node2'))
 
-    expect($$.serialize(frag)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(frag)).toBe(
       '<node1 xmlns="uri:myns"/><node2 xmlns="uri:myns"/>'
     )
   })
@@ -213,7 +229,8 @@ describe('XMLSerializer', function () {
     const doctype = $$.dom.createDocumentType('root', 'pubId', 'sysId')
     const doc = $$.dom.createDocument(ns, 'root', doctype)
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<!DOCTYPE root PUBLIC "pubId" "sysId"><root xmlns="uri:myns"/>'
     )
   })
@@ -223,7 +240,8 @@ describe('XMLSerializer', function () {
     const doctype = $$.dom.createDocumentType('root', 'pubId', '')
     const doc = $$.dom.createDocument(ns, 'root', doctype)
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<!DOCTYPE root PUBLIC "pubId"><root xmlns="uri:myns"/>'
     )
   })
@@ -233,7 +251,8 @@ describe('XMLSerializer', function () {
     const doctype = $$.dom.createDocumentType('root', '', 'sysId')
     const doc = $$.dom.createDocument(ns, 'root', doctype)
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<!DOCTYPE root SYSTEM "sysId"><root xmlns="uri:myns"/>'
     )
   })
@@ -243,26 +262,27 @@ describe('XMLSerializer', function () {
     const doctype = $$.dom.createDocumentType('root', '', '')
     const doc = $$.dom.createDocument(ns, 'root', doctype)
 
-    expect($$.serialize(doc)).toBe(
+    const serializer = new $$.XMLSerializer()
+    expect(serializer.serializeToString(doc)).toBe(
       '<!DOCTYPE root><root xmlns="uri:myns"/>'
     )
   })
 
   test('invalid document type pubId', function () {
     const doctype = $$.dom.createDocumentType('root', 'pubId\x09', 'sysId')
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(doctype, true)).toThrow()
   })
 
   test('invalid document type sysId', function () {
     const doctype = $$.dom.createDocumentType('root', 'pubId', 'sysId\x00')
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(doctype, true)).toThrow()
   })
 
   test('invalid document type sysId', function () {
     const doctype = $$.dom.createDocumentType('root', 'pubId', '"sysId\'')
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(doctype, true)).toThrow()
   })
 
@@ -270,7 +290,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createElement('name') as any
     ele._localName = "invalid:name"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -278,7 +298,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createElement('name') as any
     ele._localName = "invalidname\0"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -286,7 +306,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createComment('name') as any
     ele._data = "invalid\0"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -294,7 +314,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createComment('name') as any
     ele._data = "comment--invalid"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -302,7 +322,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createComment('name') as any
     ele._data = "comment-invalid-"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -310,7 +330,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createTextNode('name') as any
     ele._data = "invalid\0"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -318,7 +338,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createProcessingInstruction('name', 'value') as any
     ele._target = "invalid:target"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -326,7 +346,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createProcessingInstruction('name', 'value') as any
     ele._target = "xml"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -334,7 +354,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createProcessingInstruction('name', 'value') as any
     ele._data = "value\0"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -342,7 +362,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createProcessingInstruction('name', 'value') as any
     ele._data = "value?>"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -350,7 +370,7 @@ describe('XMLSerializer', function () {
     const doc = $$.dom.createDocument(null, 'root')
     const ele = doc.createCDATASection('name') as any
     ele._data = "value]]>"
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(ele, true)).toThrow()
   })
 
@@ -362,12 +382,13 @@ describe('XMLSerializer', function () {
     }
     Object.defineProperty(invalid, "nodeType", { value: 0 })
 
-    expect(() => $$.serialize(doc)).toThrow()
+    const serializer = new $$.XMLSerializer()
+    expect(() => serializer.serializeToString(doc)).toThrow()
   })
 
   test('null document element', function () {
     const doc = $$.dom.createDocument(null, '')
-    const serializer = new XMLSerializer() as any
+    const serializer = new $$.XMLSerializer() as any
     expect(() => serializer._produceXMLSerialization(doc, true)).toThrow()
   })
 

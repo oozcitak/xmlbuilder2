@@ -1,4 +1,3 @@
-import $$ from '../../TestHelpers'
 import { OrderedSet } from '../../../src/dom/util/OrderedSet'
 
 describe('OrderedSet', function () {

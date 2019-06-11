@@ -1,4 +1,4 @@
-import $$ from '../../TestHelpers'
+import $$ from '../TestHelpers'
 import { XMLStringLexer } from '../../../src/dom/parser/XMLStringLexer'
 import * as Token from '../../../src/dom/parser/XMLToken'
 
