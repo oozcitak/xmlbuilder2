@@ -1,10 +1,9 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
-  XMLBuilderOptions, XMLBuilder, AttributesOrText, XMLStringifier, ExpandObject
+  XMLBuilderOptions, XMLBuilder, AttributesObject, XMLStringifier, ExpandObject
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
 import { Namespace } from "../dom/spec"
-import { TreeQuery } from "../dom/util/TreeQuery"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -15,8 +14,8 @@ export class XMLBuilderImpl implements XMLBuilder {
   private _builderOptions: XMLBuilderOptions | null = null
 
   /** @inheritdoc */
-  ele(name: string | ExpandObject, attributes?: AttributesOrText,
-    text?: AttributesOrText): XMLBuilder {
+  ele(name: string | ExpandObject, attributes?: AttributesObject | string,
+    text?: AttributesObject | string): XMLBuilder {
 
     name = getValue(name)
     // swap argument order: text <-> attributes
@@ -144,7 +143,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  att(name: AttributesOrText, value?: string): XMLBuilder {
+  att(name: AttributesObject | string, value?: string): XMLBuilder {
 
     name = getValue(name)
 
@@ -354,8 +353,8 @@ export class XMLBuilderImpl implements XMLBuilder {
    *  
    * @returns the new element node
    */
-  private _node(name: string, attributes?: AttributesOrText,
-    text?: AttributesOrText): XMLBuilder {
+  private _node(name: string, attributes?: AttributesObject | string,
+    text?: AttributesObject | string): XMLBuilder {
 
     name = getValue(name)
 

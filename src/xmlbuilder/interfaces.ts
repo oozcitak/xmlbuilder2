@@ -161,10 +161,10 @@ export interface XMLStringifier {
 export type ExpandObject = { [key: string]: any } | any[] | ((...args: any) => any)
 
 /**
- * Represents the type of a variable that can either be a JS object defining
- * attributes or the contents of a text node.
+ * Represents the type of a variable that is a JS object defining
+ * attributes.
  */
-export type AttributesOrText = string | {
+export type AttributesObject = {
   /**
    * Default namespace
    */
@@ -200,8 +200,8 @@ export interface XMLBuilderEntryPoint {
    * 
    * @returns document element node
    */
-  create(name: string | ExpandObject, attributes?: AttributesOrText,
-    text?: AttributesOrText): XMLBuilder
+  create(name: string | ExpandObject, attributes?: AttributesObject | string,
+    text?: AttributesObject | string): XMLBuilder
 
   /**
    * Creates and returns a new document fragment.
@@ -240,8 +240,8 @@ export interface XMLBuilder {
    * 
    * @returns the new element node
    */
-  ele(name: string, attributes?: AttributesOrText,
-    text?: AttributesOrText): XMLBuilder
+  ele(name: string, attributes?: AttributesObject | string,
+    text?: AttributesObject | string): XMLBuilder
 
   /**
    * Creates new element nodes from the given JS object and appends it to the
@@ -262,8 +262,8 @@ export interface XMLBuilder {
    * 
    * @returns the last top level element node created
    */
-  ele(name: string | ExpandObject, attributes?: AttributesOrText,
-    text?: AttributesOrText): XMLBuilder
+  ele(name: string | ExpandObject, attributes?: AttributesObject | string,
+    text?: AttributesObject | string): XMLBuilder
 
   /**
    * Removes this node from the XML document.
@@ -281,7 +281,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  att(name: AttributesOrText, value?: string): XMLBuilder
+  att(name: AttributesObject | string, value?: string): XMLBuilder
 
   /**
    * Removes an attribute or a list of attributes.

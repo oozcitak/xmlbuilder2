@@ -7,7 +7,7 @@ import { XMLBuilderImpl } from './XMLBuilderImpl'
 import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
 import {
   XMLBuilderOptions, XMLBuilderEntryPoint, XMLBuilder, 
-  ExpandObject, AttributesOrText
+  ExpandObject, AttributesObject
 } from './interfaces'
 
 // Apply XMLBuilder mixin
@@ -49,8 +49,9 @@ export function withOptions(options: XMLBuilderOptions): XMLBuilderEntryPoint {
  * 
  * @returns document element node or document itself
  */
-export function create(name?: string | ExpandObject, attributes?: AttributesOrText,
-  text?: AttributesOrText): XMLBuilder {
+export function create(name?: string | ExpandObject, 
+  attributes?: AttributesObject | string,
+  text?: AttributesObject | string): XMLBuilder {
   return new XMLBuilderEntryPointImpl().create(name, attributes, text)
 }
 

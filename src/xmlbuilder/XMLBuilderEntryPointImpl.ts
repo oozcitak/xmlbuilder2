@@ -1,6 +1,6 @@
 import {
   XMLBuilderOptions, XMLBuilderEntryPoint, ExpandObject,
-  AttributesOrText, XMLBuilder
+  AttributesObject, XMLBuilder
 } from "./interfaces"
 import { XMLStringifierImpl } from "./XMLStringifierImpl"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
@@ -25,8 +25,8 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   }
 
   /** @inheritdoc */
-  create(name?: string | ExpandObject, attributes?: AttributesOrText,
-    text?: AttributesOrText): XMLBuilder {
+  create(name?: string | ExpandObject, attributes?: AttributesObject | string,
+    text?: AttributesObject | string): XMLBuilder {
 
     const doc = DOMImplementationInstance.createDocument(null, '') as any
     doc._options = this._options
