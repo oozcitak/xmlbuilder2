@@ -2,7 +2,6 @@ import {
   XMLBuilderOptions, XMLBuilderEntryPoint, ExpandObject,
   AttributesObject, XMLBuilder
 } from "./interfaces"
-import { XMLStringifierImpl } from "./XMLStringifierImpl"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { isString } from "util"
 

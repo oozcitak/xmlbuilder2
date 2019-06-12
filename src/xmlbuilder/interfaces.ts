@@ -1,3 +1,5 @@
+import { Node } from "../dom/interfaces"
+
 /**
  * Defines the options used while creating an XML document.
  */
@@ -38,7 +40,7 @@ export interface XMLBuilderOptions {
    * Whether decorator strings will be ignored when converting JS 
    * objects
    */
-  ignoreDecorators?: boolean  
+  ignoreDecorators?: boolean
   /** 
    * When prepended to a JS object key, converts the key-value pair 
    * to an attribute. Defaults to `"@"`.
@@ -75,42 +77,79 @@ export interface XMLBuilderOptions {
 }
 
 /**
- * Defines the functions used for converting values to strings.
+ * Defines the options passed to the XML writer.
  */
-export interface XMLStringifier {
+export interface WriterOptions {
   /**
-   * Whether existing html entities are encoded
+   * Whether to pretty-print the XML tree
    */
-  noDoubleEncoding?: boolean
+  prettyPrint?: boolean
+  /**
+   * Indentation level
+   */
+  level?: number
+  /**
+   * Indentation string for pretty printing. Defaults to two space characters.
+   */
+  indent?: string
+  /**
+   * Newline string for pretty printing. Defaults to `"\n"`.
+   */
+  newline?: string
+  /**
+   * Maximum column width. Defaults to `80`.
+   */
+  width?: number
+  /**
+   * Whether to output closing tags for empty element nodes
+   */
+  allowEmptyTags?: boolean
+  /**
+   * Whether to suppress pretty-printing for text nodes
+   */
+  dontPrettyPrintTextNodes?: boolean
+  /**
+   * Whether to insert a space character before closing slash character
+   */
+  spaceBeforeSlash?: boolean
+  /**
+   * Prevents existing html entities from being re-encoded
+   */
+  noDoubleEncoding: boolean
+}
 
+/**
+ * Defines the state of the XML writer.
+ */
+export enum WriterState {
   /**
-   * Converts an element or attribute name to string
+   * Writer state is unknown.
    */
-  name?: (v: any) => string
+  None = 0,
   /**
-   * Converts the contents of a text node to string
+   * Writer is at an opening tag, e.g. `<node>`.
    */
-  text?: (v: any) => string
+  OpenTag = 1,
   /**
-   * Converts the contents of a CDATA node to string
+   * Writer is inside an element.
    */
-  cdata?: (v: any) => string
+  InsideTag = 2,
   /**
-   * Converts the contents of a comment node to string
+   * Writer is at a closing tag, e.g. `</node>`.
    */
-  comment?: (v: any) => string
+  CloseTag = 3
+}
+
+/**
+ * Defines the functions used for serializing XML nodes.
+ */
+export interface XMLWriter<T> {
   /**
-   * Converts attribute value to string
+   * Produces an XML serialization of the given node.
+   * 
+   * @param root - node to serialize
    */
-  attValue?: (v: any) => string
-  /**
-   * Converts processing instruction target to string
-   */
-  insTarget?: (v: any) => string
-  /**
-   * Converts processing instruction value to string
-   */
-  insValue?: (v: any) => string
+  serialize?(node: Node, options: WriterOptions, state: WriterState, user: {}): T
 
   /**
    * Escapes special characters in text. Following characters are escaped by
@@ -123,7 +162,8 @@ export interface XMLStringifier {
    * `>`  | `&gt;`
    * `\r` | `&#xD;`
    */
-  textEscape?: (v: string) => string
+  textEscape?(v: string): string
+
   /**
    * Escapes special characters in attribute values. Following characters are 
    * escaped by default:
@@ -138,13 +178,13 @@ export interface XMLStringifier {
    * `\n` | `&#xA;`
    * `\r` | `&#xD;`
    */
-  attEscape?: (v: string) => string
-  
+  attEscape?(v: string): string
+
   /**
    * Index signature
    */
-  [key: string]: undefined | boolean | string | ((v: any) => string) |
-    ((v: string) => string) | XMLBuilderOptions
+  [key: string]: undefined | ((v: string) => string) |
+    ((node: Node, options: WriterOptions, state: WriterState, user: {}) => T)
 }
 
 /**
