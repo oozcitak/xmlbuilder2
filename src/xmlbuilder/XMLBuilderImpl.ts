@@ -1,9 +1,9 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
-  XMLBuilderOptions, XMLBuilder, AttributesObject, XMLStringifier, ExpandObject
+  XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
-import { Namespace } from "../dom/spec"
+import { Namespace, XMLSpec } from "../dom/spec"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -50,10 +50,10 @@ export class XMLBuilderImpl implements XMLBuilder {
           // evaluate if function
           val = val.apply()
         }
-        if (!this._stringify.ignoreDecorators && this._stringify.convertAttKey && key.indexOf(this._stringify.convertAttKey) === 0) {
+        if (!this._options.ignoreDecorators && this._options.convertAttKey && key.indexOf(this._options.convertAttKey) === 0) {
           // assign attributes
-          lastChild = this.att(key.substr(this._stringify.convertAttKey.length), val)
-        } else if (!this._stringify.separateArrayItems && Array.isArray(val) && isEmpty(val)) {
+          lastChild = this.att(key.substr(this._options.convertAttKey.length), val)
+        } else if (Array.isArray(val) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
         } else if (isObject(val) && isEmpty(val)) {
@@ -74,13 +74,13 @@ export class XMLBuilderImpl implements XMLBuilder {
           // expand child nodes under parent
         } else if (isObject(val)) {
           // if the key is #text expand child nodes under this node to support mixed content
-          if (!this._stringify.ignoreDecorators && this._stringify.convertTextKey && key.indexOf(this._stringify.convertTextKey) === 0) {
+          if (!this._options.ignoreDecorators && this._options.convertTextKey && key.indexOf(this._options.convertTextKey) === 0) {
             lastChild = this.ele(val)
           } else {
             // check for a default namespace declaration attribute
             let namespace: string | null = null
-            if (!this._stringify.ignoreDecorators && this._stringify.convertAttKey && isObject(val)) {
-              const nsKey = this._stringify.convertAttKey + "xmlns"
+            if (!this._options.ignoreDecorators && this._options.convertAttKey && isObject(val)) {
+              const nsKey = this._options.convertAttKey + "xmlns"
               const attValue = val[nsKey]
               if (attValue === null || isString(attValue)) {
                 namespace = attValue
@@ -106,18 +106,18 @@ export class XMLBuilderImpl implements XMLBuilder {
       // skip null nodes
       lastChild = this._dummy()
     } else if (text !== undefined) {
-      if (!this._stringify.ignoreDecorators && this._stringify.convertTextKey && name.indexOf(this._stringify.convertTextKey) === 0) {
+      if (!this._options.ignoreDecorators && this._options.convertTextKey && name.indexOf(this._options.convertTextKey) === 0) {
         // text node
         lastChild = this.txt(text)
-      } else if (!this._stringify.ignoreDecorators && this._stringify.convertCDataKey && name.indexOf(this._stringify.convertCDataKey) === 0) {
+      } else if (!this._options.ignoreDecorators && this._options.convertCDataKey && name.indexOf(this._options.convertCDataKey) === 0) {
         // cdata node
         lastChild = this.dat(text)
-      } else if (!this._stringify.ignoreDecorators && this._stringify.convertCommentKey && name.indexOf(this._stringify.convertCommentKey) === 0) {
+      } else if (!this._options.ignoreDecorators && this._options.convertCommentKey && name.indexOf(this._options.convertCommentKey) === 0) {
         // comment node
         lastChild = this.com(text)
-      } else if (!this._stringify.ignoreDecorators && this._stringify.convertPIKey && name.indexOf(this._stringify.convertPIKey) === 0) {
+      } else if (!this._options.ignoreDecorators && this._options.convertPIKey && name.indexOf(this._options.convertPIKey) === 0) {
         // processing instruction
-        lastChild = this.ins(name.substr(this._stringify.convertPIKey.length), text)
+        lastChild = this.ins(name.substr(this._options.convertPIKey.length), text)
       } else {
         // element node with text
         lastChild = this._node(name, attributes, text)
@@ -164,6 +164,10 @@ export class XMLBuilderImpl implements XMLBuilder {
       } else if (value != null) {
         const ele = this._asElement
 
+        // character validation
+        this._assertLegalName(name)
+        this._assertLegalChar(value)
+
         // skip the default namespace declaration attribute
         // it is already processed by the _node function
         if (name !== "xmlns") {
@@ -194,7 +198,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
 
     if (isArray(namespace)) {
-      throw new TypeError("namespace parameter must be a string")
+      throw new TypeError("namespace parameter must be a string" + this._debugInfo())
     }
 
     if (isArray(name)) {
@@ -216,6 +220,9 @@ export class XMLBuilderImpl implements XMLBuilder {
   txt(content: string): XMLBuilder {
     const ele = this._asElement
 
+    // character validation
+    this._assertLegalChar(content)
+
     const child = this._doc.createTextNode(content)
     ele.appendChild(child)
 
@@ -225,6 +232,12 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   com(content: string): XMLBuilder {
     const ele = this._asElement
+
+    // character validation
+    this._assertLegalChar(content)
+    if (content.includes("--") || content.endsWith("-")) {
+      throw new Error(`Comment content cannot contain double-hypen or end with a hypen: ${content}.` + this._debugInfo())
+    }
 
     const child = this._doc.createComment(content)
     ele.appendChild(child)
@@ -236,6 +249,12 @@ export class XMLBuilderImpl implements XMLBuilder {
   dat(content: string): XMLBuilder {
     const ele = this._asElement
 
+    // character validation
+    this._assertLegalChar(content)
+    if (content.includes("]]>")) {
+      throw new Error(`CDATA content cannot contain "]]>": ${content}.` + this._debugInfo())
+    }
+
     const child = this._doc.createCDATASection(content)
     ele.appendChild(child)
 
@@ -243,10 +262,20 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  ins(target: string, content?: string): XMLBuilder {
+  ins(target: string, content: string = ''): XMLBuilder {
     const ele = this._asElement
 
-    const child = this._doc.createProcessingInstruction(target, content || '')
+    // character validation
+    this._assertLegalName(target)
+    if (target.includes(":") || (/^xml$/i).test(target)) {
+      throw new Error(`Processing instruction target cannot contain ":" or cannot be "xml": ${target}.` + this._debugInfo())
+    }
+    this._assertLegalChar(content)
+    if (content.includes("?>")) {
+      throw new Error(`Processing instruction content cannot contain "?>": ${content}.` + this._debugInfo())
+    }
+
+    const child = this._doc.createProcessingInstruction(target, content)
     ele.appendChild(child)
 
     return this
@@ -389,6 +418,10 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
 
     const node = this._asNode
+
+    // character validation
+    this._assertLegalName(name)
+
     const child = (namespace !== null ?
       this._doc.createElementNS(namespace, name) :
       this._doc.createElement(name)
@@ -448,6 +481,18 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
   private set _options(options: XMLBuilderOptions) {
     const node = this._asNode
+
+    // character validation
+    if(options.pubID) {
+      this._assertLegalPubId(options.pubID)
+    }
+    if(options.sysID) {
+      this._assertLegalChar(options.sysID)
+      if (options.sysID.includes('"') && options.sysID.includes("'")) {
+        throw new Error(`System identifier cannot contain both a single and docule quote: ${options.sysID}.` + this._debugInfo())
+      }
+    }
+
     if (node.nodeType === NodeType.Document) {
       this._builderOptions = options
     } else {
@@ -455,15 +500,32 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
   }
 
-  /**
-   * Gets the stringifier.
+  /** 
+   * Validates characters according to the XML spec.
    */
-  private get _stringify(): XMLStringifier {
-    if (!this._options.stringify) {
-      throw new Error("Stringifier functions not found.")
+  private _assertLegalChar(str: string): void {
+    if (!XMLSpec.isLegalChar(str, this._options.version)) {
+      throw new Error(`Invalid character in string: ${str}.` + this._debugInfo())
     }
+  }
 
-    return this._options.stringify
+  /** 
+   * Validates a name according to the XML spec.
+   */  
+  private _assertLegalName(str: string): void {
+    this._assertLegalChar(str)
+    if (!XMLSpec.isName(str)) {
+      throw new Error(`Invalid character in XML name: ${str}.` + this._debugInfo())
+    }
+  }
+  
+  /** 
+   * Validates public identifier according to the XML spec.
+   */
+  private _assertLegalPubId(str: string): void {
+    if (!XMLSpec.isPubidChar(str)) {
+      throw new Error(`Invalid character in public identifier string: ${str}.` + this._debugInfo())
+    }
   }
 
   /**
@@ -480,7 +542,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const node = <Node><unknown>this
 
     if (!node.nodeType) {
-      throw new Error("This function can only be applied to a node.")
+      throw new Error("This function can only be applied to a node." + this._debugInfo())
     }
 
     return node
@@ -493,7 +555,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = <Element><unknown>this
 
     if (!ele.nodeType || ele.nodeType != NodeType.Element) {
-      throw new Error("This function can only be applied to an element node.")
+      throw new Error("This function can only be applied to an element node." + this._debugInfo())
     }
 
     return ele
@@ -506,7 +568,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const doc = <Document><unknown>this
 
     if (!doc.nodeType || doc.nodeType != NodeType.Document) {
-      throw new Error("This function can only be applied to a document node.")
+      throw new Error("This function can only be applied to a document node." + this._debugInfo())
     }
 
     return doc

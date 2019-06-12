@@ -34,54 +34,11 @@ export interface XMLBuilderOptions {
    * Whether attributes with `null` values will be kept or ignored
    */
   keepNullAttributes?: boolean
-  /**
-   * A set of functions to use for converting values to strings
-   */
-  stringify?: XMLStringifier
-}
-
-/**
- * Defines the functions used for converting values to strings.
- */
-export interface XMLStringifier {
   /** 
    * Whether decorator strings will be ignored when converting JS 
    * objects
    */
-  ignoreDecorators?: boolean
-  /**
-   * Whether existing html entities are encoded
-   */
-  noDoubleEncoding?: boolean
-
-  /**
-   * Converts an element or attribute name to string
-   */
-  name?: (v: any) => string
-  /**
-   * Converts the contents of a text node to string
-   */
-  text?: (v: any) => string
-  /**
-   * Converts the contents of a CDATA node to string
-   */
-  cdata?: (v: any) => string
-  /**
-   * Converts the contents of a comment node to string
-   */
-  comment?: (v: any) => string
-  /**
-   * Converts attribute value to string
-   */
-  attValue?: (v: any) => string
-  /**
-   * Converts processing instruction target to string
-   */
-  insTarget?: (v: any) => string
-  /**
-   * Converts processing instruction value to string
-   */
-  insValue?: (v: any) => string
+  ignoreDecorators?: boolean  
   /** 
    * When prepended to a JS object key, converts the key-value pair 
    * to an attribute. Defaults to `"@"`.
@@ -115,6 +72,46 @@ export interface XMLStringifier {
    * comment node. Defaults to `"#comment"`.
    */
   convertCommentKey?: string
+}
+
+/**
+ * Defines the functions used for converting values to strings.
+ */
+export interface XMLStringifier {
+  /**
+   * Whether existing html entities are encoded
+   */
+  noDoubleEncoding?: boolean
+
+  /**
+   * Converts an element or attribute name to string
+   */
+  name?: (v: any) => string
+  /**
+   * Converts the contents of a text node to string
+   */
+  text?: (v: any) => string
+  /**
+   * Converts the contents of a CDATA node to string
+   */
+  cdata?: (v: any) => string
+  /**
+   * Converts the contents of a comment node to string
+   */
+  comment?: (v: any) => string
+  /**
+   * Converts attribute value to string
+   */
+  attValue?: (v: any) => string
+  /**
+   * Converts processing instruction target to string
+   */
+  insTarget?: (v: any) => string
+  /**
+   * Converts processing instruction value to string
+   */
+  insValue?: (v: any) => string
+
   /**
    * Escapes special characters in text. Following characters are escaped by
    * default:

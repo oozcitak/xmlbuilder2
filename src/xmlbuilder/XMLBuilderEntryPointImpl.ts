@@ -11,17 +11,20 @@ import { isString } from "util"
  */
 export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
 
-  private _options: XMLBuilderOptions = { version: "1.0" }
+  private _options: XMLBuilderOptions
 
   /** 
    * Initializes a new instance of  `XMLBuilderEntryPointImpl`
   */
   constructor(options?: XMLBuilderOptions) {
-    options = options || { version: "1.0" }
-    if (!options.stringify) {
-      options.stringify = new XMLStringifierImpl(options)
+    this._options = options || { 
+      version: "1.0",
+      convertAttKey: '@',
+      convertPIKey: '?',
+      convertTextKey: '#text',
+      convertCDataKey: '#cdata',
+      convertCommentKey: '#comment'
     }
-    this._options = options
   }
 
   /** @inheritdoc */

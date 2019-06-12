@@ -313,7 +313,7 @@ export class XMLSerializerImpl implements XMLSerializer {
   private _serializeProcessingInstruction(node: ProcessingInstruction,
     requireWellFormed: boolean): string {
 
-    if (requireWellFormed && (node.target.includes(":") || (/xml/i).test(node.target))) {
+    if (requireWellFormed && (node.target.includes(":") || (/^xml$/i).test(node.target))) {
       throw new Error("Processing instruction target contains invalid characters (well-formed required).")
     }
 
