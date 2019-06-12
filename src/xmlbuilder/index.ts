@@ -9,6 +9,7 @@ import {
   XMLBuilderOptions, XMLBuilderEntryPoint, XMLBuilder, 
   ExpandObject, AttributesObject
 } from './interfaces'
+import { XMLBuilderDocumentImpl } from './XMLBuilderDocumentImpl'
 
 // Apply XMLBuilder mixin
 applyMixin(Node, XMLBuilderImpl, "remove")
@@ -22,8 +23,8 @@ applyMixin(ProcessingInstruction, XMLBuilderImpl, "remove")
 
 applyMixin(DocumentType, XMLBuilderImpl, "remove")
 applyMixin(DocumentFragment, XMLBuilderImpl, "remove")
-applyMixin(Document, XMLBuilderImpl, "remove")
-applyMixin(XMLDocument, XMLBuilderImpl, "remove")
+applyMixin(Document, XMLBuilderDocumentImpl, "remove")
+applyMixin(XMLDocument, XMLBuilderDocumentImpl, "remove")
 
 /**
  * Sets builder options.

@@ -30,9 +30,8 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   create(name?: string | ExpandObject, attributes?: AttributesObject | string,
     text?: AttributesObject | string): XMLBuilder {
 
-    const doc = DOMImplementationInstance.createDocument(null, '') as any
-    doc._options = this._options
-    const builder = <XMLBuilder><unknown>doc
+    const builder = <XMLBuilder><unknown>DOMImplementationInstance.createDocument(null, '')
+    builder.options = this._options
     if (name !== undefined) {
       return builder.ele(name, attributes, text)
     } else {
@@ -42,8 +41,9 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
 
   /** @inheritdoc */
   fragment(): XMLBuilder {
-    const doc = DOMImplementationInstance.createDocument(null, '') as any
-    doc._options = this._options
+    const doc = DOMImplementationInstance.createDocument(null, '')
+    const builder = <XMLBuilder><unknown>doc
+    builder.options = this._options
     return <XMLBuilder><unknown>doc.createDocumentFragment()
   }
 
@@ -51,15 +51,14 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   parse(document: string | ExpandObject): XMLBuilder {
     if (isString(document)) {
       const parser = new DOMParser()
-      const doc = parser.parseFromString(document, MimeType.XML) as any
-      doc._options = this._options
-      return <XMLBuilder><unknown>doc.documentElement
+      const builder = <XMLBuilder><unknown>parser.parseFromString(document, MimeType.XML)
+      builder.options = this._options
+      return builder.root()
     } else {
-      const doc = DOMImplementationInstance.createDocument(null, '') as any
-      doc._options = this._options
-      const builder = <XMLBuilder><unknown>doc
+      const builder = <XMLBuilder><unknown>DOMImplementationInstance.createDocument(null, '')
+      builder.options = this._options
       builder.ele(document)
-      return <XMLBuilder><unknown>doc.documentElement
+      return builder.root()
     }
   }
 

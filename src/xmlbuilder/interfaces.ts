@@ -263,6 +263,11 @@ export interface XMLBuilderEntryPoint {
 export interface XMLBuilder {
 
   /**
+   * Gets or sets builder options.
+   */
+  options: XMLBuilderOptions
+
+  /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
    * @param name - element name

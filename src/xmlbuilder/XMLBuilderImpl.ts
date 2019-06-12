@@ -11,7 +11,24 @@ import { Namespace, XMLSpec } from "../dom/spec"
  */
 export class XMLBuilderImpl implements XMLBuilder {
 
-  private _builderOptions: XMLBuilderOptions | null = null
+  /** @inheritdoc */
+  get options(): XMLBuilderOptions {
+    return this.doc().options
+  }
+  set options(options: XMLBuilderOptions) {
+    // character validation
+    if(options.pubID) {
+      this._assertLegalPubId(options.pubID)
+    }
+    if(options.sysID) {
+      this._assertLegalChar(options.sysID)
+      if (options.sysID.includes('"') && options.sysID.includes("'")) {
+        throw new Error(`System identifier cannot contain both a single and double quote: ${options.sysID}.` + this._debugInfo())
+      }
+    }
+
+    this.doc().options = options
+  }
 
   /** @inheritdoc */
   ele(name: string | ExpandObject, attributes?: AttributesObject | string,
@@ -50,16 +67,16 @@ export class XMLBuilderImpl implements XMLBuilder {
           // evaluate if function
           val = val.apply()
         }
-        if (!this._options.ignoreDecorators && this._options.convertAttKey && key.indexOf(this._options.convertAttKey) === 0) {
+        if (!this.options.ignoreDecorators && this.options.convertAttKey && key.indexOf(this.options.convertAttKey) === 0) {
           // assign attributes
-          lastChild = this.att(key.substr(this._options.convertAttKey.length), val)
+          lastChild = this.att(key.substr(this.options.convertAttKey.length), val)
         } else if (Array.isArray(val) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
         } else if (isObject(val) && isEmpty(val)) {
           // empty objects produce one node
           lastChild = this.ele(key)
-        } else if (!this._options.keepNullNodes && (val == null)) {
+        } else if (!this.options.keepNullNodes && (val == null)) {
           // skip null and undefined nodes
           lastChild = this._dummy()
         } else if (Array.isArray(val)) {
@@ -74,13 +91,13 @@ export class XMLBuilderImpl implements XMLBuilder {
           // expand child nodes under parent
         } else if (isObject(val)) {
           // if the key is #text expand child nodes under this node to support mixed content
-          if (!this._options.ignoreDecorators && this._options.convertTextKey && key.indexOf(this._options.convertTextKey) === 0) {
+          if (!this.options.ignoreDecorators && this.options.convertTextKey && key.indexOf(this.options.convertTextKey) === 0) {
             lastChild = this.ele(val)
           } else {
             // check for a default namespace declaration attribute
             let namespace: string | null = null
-            if (!this._options.ignoreDecorators && this._options.convertAttKey && isObject(val)) {
-              const nsKey = this._options.convertAttKey + "xmlns"
+            if (!this.options.ignoreDecorators && this.options.convertAttKey && isObject(val)) {
+              const nsKey = this.options.convertAttKey + "xmlns"
               const attValue = val[nsKey]
               if (attValue === null || isString(attValue)) {
                 namespace = attValue
@@ -102,22 +119,22 @@ export class XMLBuilderImpl implements XMLBuilder {
           lastChild = this.ele(key, val)
         }
       }
-    } else if (!this._options.keepNullNodes && text === null) {
+    } else if (!this.options.keepNullNodes && text === null) {
       // skip null nodes
       lastChild = this._dummy()
     } else if (text !== undefined) {
-      if (!this._options.ignoreDecorators && this._options.convertTextKey && name.indexOf(this._options.convertTextKey) === 0) {
+      if (!this.options.ignoreDecorators && this.options.convertTextKey && name.indexOf(this.options.convertTextKey) === 0) {
         // text node
         lastChild = this.txt(text)
-      } else if (!this._options.ignoreDecorators && this._options.convertCDataKey && name.indexOf(this._options.convertCDataKey) === 0) {
+      } else if (!this.options.ignoreDecorators && this.options.convertCDataKey && name.indexOf(this.options.convertCDataKey) === 0) {
         // cdata node
         lastChild = this.dat(text)
-      } else if (!this._options.ignoreDecorators && this._options.convertCommentKey && name.indexOf(this._options.convertCommentKey) === 0) {
+      } else if (!this.options.ignoreDecorators && this.options.convertCommentKey && name.indexOf(this.options.convertCommentKey) === 0) {
         // comment node
         lastChild = this.com(text)
-      } else if (!this._options.ignoreDecorators && this._options.convertPIKey && name.indexOf(this._options.convertPIKey) === 0) {
+      } else if (!this.options.ignoreDecorators && this.options.convertPIKey && name.indexOf(this.options.convertPIKey) === 0) {
         // processing instruction
-        lastChild = this.ins(name.substr(this._options.convertPIKey.length), text)
+        lastChild = this.ins(name.substr(this.options.convertPIKey.length), text)
       } else {
         // element node with text
         lastChild = this._node(name, attributes, text)
@@ -159,7 +176,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       if (isFunction(value)) {
         value = value.apply(this)
       }
-      if (this._options.keepNullAttributes && (value == null)) {
+      if (this.options.keepNullAttributes && (value == null)) {
         this.att(name, "")
       } else if (value != null) {
         const ele = this._asElement
@@ -395,7 +412,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     // inherit namespace from parent
     const qName = Namespace.extractQName(name)
     let namespace: string | null = null
-    if (this._options.inheritNS) {
+    if (this.options.inheritNS) {
       const parent = this._asNode.parentNode
       if (parent) {
         namespace = parent.lookupNamespaceURI(qName.prefix)
@@ -468,43 +485,11 @@ export class XMLBuilderImpl implements XMLBuilder {
     return doc
   }
 
-  /**
-   * Gets or sets builder options.
-   */
-  private get _options(): XMLBuilderOptions {
-    const node = this._asNode
-    if (node.nodeType === NodeType.Document) {
-      return this._builderOptions || { version: "1.0" }
-    } else {
-      return (<XMLBuilderImpl>this.doc())._asAny._builderOptions
-    }
-  }
-  private set _options(options: XMLBuilderOptions) {
-    const node = this._asNode
-
-    // character validation
-    if(options.pubID) {
-      this._assertLegalPubId(options.pubID)
-    }
-    if(options.sysID) {
-      this._assertLegalChar(options.sysID)
-      if (options.sysID.includes('"') && options.sysID.includes("'")) {
-        throw new Error(`System identifier cannot contain both a single and docule quote: ${options.sysID}.` + this._debugInfo())
-      }
-    }
-
-    if (node.nodeType === NodeType.Document) {
-      this._builderOptions = options
-    } else {
-      (<XMLBuilderImpl>this.doc())._asAny._builderOptions = options
-    }
-  }
-
   /** 
    * Validates characters according to the XML spec.
    */
   private _assertLegalChar(str: string): void {
-    if (!XMLSpec.isLegalChar(str, this._options.version)) {
+    if (!XMLSpec.isLegalChar(str, this.options.version)) {
       throw new Error(`Invalid character in string: ${str}.` + this._debugInfo())
     }
   }
