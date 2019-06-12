@@ -71,10 +71,6 @@ export interface XMLStringifier {
    */
   comment?: (v: any) => string
   /**
-   * Converts the contents of a raw text node to string
-   */
-  raw?: (v: any) => string
-  /**
    * Converts attribute value to string
    */
   attValue?: (v: any) => string
@@ -123,11 +119,6 @@ export interface XMLStringifier {
    * comment node. Defaults to `"#comment"`.
    */
   convertCommentKey?: string
-  /** 
-   * When prepended to a JS object key, converts its value to a raw 
-   * text node. Defaults to `"#raw"`.
-   */
-  convertRawKey?: string
   /**
    * Escapes special characters in text. Following characters are escaped by
    * default:
@@ -348,15 +339,6 @@ export interface XMLBuilder {
    * @returns current element node
    */
   ins(target: string, content?: string): XMLBuilder
-
-  /**
-   * Creates a new raw text node and appends it to the list of child nodes.
-   * 
-   * @param content - node content
-   * 
-   * @returns current element node
-   */
-  raw(content: string): XMLBuilder
 
   /**
    * Imports a node as a child node of this node. The nodes' descendants and

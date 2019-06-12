@@ -36,8 +36,6 @@ export class XMLStringifierImpl implements XMLStringifier {
   convertCDataKey = '#cdata'
   /** @inheritdoc */
   convertCommentKey = '#comment'
-  /** @inheritdoc */
-  convertRawKey = '#raw'
 
   /** @inheritdoc */
   name(val: any): string {
@@ -61,10 +59,6 @@ export class XMLStringifierImpl implements XMLStringifier {
       throw new Error("Comment text cannot contain double-hypen: " + val)
     }
     return this._assertLegalChar(val)
-  }
-  /** @inheritdoc */
-  raw(val: any): string {
-    return '' + val || ''
   }
   /** @inheritdoc */
   attValue(val: any): string {

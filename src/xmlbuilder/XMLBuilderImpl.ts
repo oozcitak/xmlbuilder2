@@ -116,9 +116,6 @@ export class XMLBuilderImpl implements XMLBuilder {
       } else if (!this._stringify.ignoreDecorators && this._stringify.convertCommentKey && name.indexOf(this._stringify.convertCommentKey) === 0) {
         // comment node
         lastChild = this.com(text)
-      } else if (!this._stringify.ignoreDecorators && this._stringify.convertRawKey && name.indexOf(this._stringify.convertRawKey) === 0) {
-        // raw text node
-        lastChild = this.raw(text)
       } else if (!this._stringify.ignoreDecorators && this._stringify.convertPIKey && name.indexOf(this._stringify.convertPIKey) === 0) {
         // processing instruction
         lastChild = this.ins(name.substr(this._stringify.convertPIKey.length), text)
@@ -251,16 +248,6 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = this._asElement
 
     const child = this._doc.createProcessingInstruction(target, content || '')
-    ele.appendChild(child)
-
-    return this
-  }
-
-  /** @inheritdoc */
-  raw(content: string): XMLBuilder {
-    const ele = this._asElement
-
-    const child = this._doc.createTextNode(content)
     ele.appendChild(child)
 
     return this
