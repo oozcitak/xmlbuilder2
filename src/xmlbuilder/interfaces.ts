@@ -184,7 +184,8 @@ export interface XMLWriter<T> {
    * Index signature
    */
   [key: string]: undefined | ((v: string) => string) |
-    ((node: Node, options: WriterOptions, state: WriterState, user: {}) => T)
+    ((node: Node, options: WriterOptions, state: WriterState, user: {}) => T) |
+    XMLBuilderOptions
 }
 
 /**

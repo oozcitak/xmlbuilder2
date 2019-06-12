@@ -1,10 +1,21 @@
-import { XMLWriter, WriterOptions, WriterState } from "./interfaces"
+import { XMLWriter, WriterOptions, WriterState, XMLBuilderOptions } from "./interfaces"
 import { Node } from "../dom/interfaces"
 
 /**
  * Converts values to strings.
  */
-export class XMLWriterBaseImpl<T> implements XMLWriter<T> {
+export abstract class XMLWriterBaseImpl<T> implements XMLWriter<T> {
+
+  protected _options: XMLBuilderOptions
+
+  /**
+   * Initializes a new instance of `XMLWriterBaseImpl`.
+   * 
+   * @param options - builder options
+   */
+  constructor(options: XMLBuilderOptions) {
+    this._options = options
+  }
 
   /** @inheritdoc */
   textEscape(str: string): string {
@@ -33,5 +44,6 @@ export class XMLWriterBaseImpl<T> implements XMLWriter<T> {
    * Index signature
    */
   [key: string]: undefined | ((v: string) => string) |
-    ((node: Node, options: WriterOptions, state: WriterState, user: {}) => T)
+    ((node: Node, options: WriterOptions, state: WriterState, user: {}) => T) |
+    XMLBuilderOptions
 }
