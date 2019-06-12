@@ -82,10 +82,6 @@ export interface XMLStringifier {
    * Converts processing instruction value to string
    */
   insValue?: (v: any) => string
-  /**
-   * Converts XML version to string
-   */
-  xmlVersion?: (v: any) => string
   /** 
    * When prepended to a JS object key, converts the key-value pair 
    * to an attribute. Defaults to `"@"`.
