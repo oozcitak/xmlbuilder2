@@ -147,13 +147,21 @@ export interface XMLWriter<T> {
   /**
    * Produces an XML serialization of the given node.
    * 
-   * @param root - node to serialize
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param state - current writer state
+   * @param user - user variables passed to serializer functions
+   * 
+   * @returns serialization of the given node
    */
-  serialize?(node: Node, options: WriterOptions, state: WriterState, user: {}): T
+  serialize(node: Node, options: WriterOptions, state: WriterState, user: {}): T
 
   /**
-   * Escapes special characters in text. Following characters are escaped by
-   * default:
+   * Escapes special characters in text. 
+   * 
+   * @param val - the text value to escape
+   * 
+   * Following characters are escaped by default:
    * 
    * Char | Escaped
    * ---- | -------
@@ -162,11 +170,14 @@ export interface XMLWriter<T> {
    * `>`  | `&gt;`
    * `\r` | `&#xD;`
    */
-  textEscape?(v: string): string
+  textEscape(val: string): string
 
   /**
-   * Escapes special characters in attribute values. Following characters are 
-   * escaped by default:
+   * Escapes special characters in attribute values.
+   * 
+   * @param val - the attribute value to escape
+   * 
+   * Following characters are escaped by default:
    * 
    * Char | Escaped
    * ---- | -------
@@ -178,14 +189,7 @@ export interface XMLWriter<T> {
    * `\n` | `&#xA;`
    * `\r` | `&#xD;`
    */
-  attEscape?(v: string): string
-
-  /**
-   * Index signature
-   */
-  [key: string]: undefined | ((v: string) => string) |
-    ((node: Node, options: WriterOptions, state: WriterState, user: {}) => T) |
-    XMLBuilderOptions
+  attEscape(val: string): string
 }
 
 /**
