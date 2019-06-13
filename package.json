@@ -38,8 +38,8 @@
     },
     "testRegex": "/test/.*\\.test\\.tsx?$",
     "testEnvironment": "node",
-    "setupFiles": [
-      "./test/TestHelpers.ts"
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}"
     ]
   },
   "scripts": {
