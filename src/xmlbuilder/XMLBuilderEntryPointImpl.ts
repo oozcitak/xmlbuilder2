@@ -30,10 +30,19 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   create(name?: string | ExpandObject, attributes?: AttributesObject | string,
     text?: AttributesObject | string): XMLBuilder {
 
-    const builder = <XMLBuilder><unknown>DOMImplementationInstance.createDocument(null, '')
+    const doc = DOMImplementationInstance.createDocument(null, '')
+    const builder = <XMLBuilder><unknown>doc
     builder.options = this._options
     if (name !== undefined) {
-      return builder.ele(name, attributes, text)
+      const ele = builder.ele(name, attributes, text)
+      const documentElement = doc.documentElement
+      if (documentElement && (this._options.pubID || this._options.sysID)) {
+        const docType = DOMImplementationInstance.createDocumentType(
+          documentElement.tagName, 
+          this._options.pubID || '', this._options.sysID || '')
+        doc.insertBefore(docType, doc.firstChild)
+      }
+      return ele
     } else {
       return builder
     }

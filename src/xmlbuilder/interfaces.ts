@@ -1,4 +1,7 @@
-import { Node } from "../dom/interfaces"
+import { 
+  Node, Attr, XMLDocument, Element, DocumentType, Text, CDATASection,
+  Comment, ProcessingInstruction, DocumentFragment
+} from "../dom/interfaces"
 
 /**
  * Defines the options used while creating an XML document.
@@ -81,13 +84,13 @@ export interface XMLBuilderOptions {
  */
 export interface WriterOptions {
   /**
+   * Whether to suppress the XML declaration from the output
+   */
+  headless?: boolean
+  /**
    * Whether to pretty-print the XML tree
    */
   prettyPrint?: boolean
-  /**
-   * Indentation level
-   */
-  level?: number
   /**
    * Indentation string for pretty printing. Defaults to two space characters.
    */
@@ -96,6 +99,10 @@ export interface WriterOptions {
    * Newline string for pretty printing. Defaults to `"\n"`.
    */
   newline?: string
+  /**
+   * A fixed number of indentations to add to every line
+   */
+  offset?: number
   /**
    * Maximum column width. Defaults to `80`.
    */
@@ -115,7 +122,15 @@ export interface WriterOptions {
   /**
    * Prevents existing html entities from being re-encoded
    */
-  noDoubleEncoding: boolean
+  noDoubleEncoding?: boolean
+  /**
+   * Defines the current state of the writer
+   */
+  state?: WriterState
+  /**
+   * User data which will be passed to writer functions
+   */
+  user?: {}
 }
 
 /**
@@ -144,52 +159,176 @@ export enum WriterState {
  * Defines the functions used for serializing XML nodes.
  */
 export interface XMLWriter<T> {
+
   /**
-   * Produces an XML serialization of the given node.
+   * Produces an XML serialization of the given node. This function is the main
+   * entry point to the serializer. It branches on the type of node to call
+   * specialized serializer functions.
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param state - current writer state
-   * @param user - user variables passed to serializer functions
-   * 
-   * @returns serialization of the given node
    */
-  serialize(node: Node, options: WriterOptions, state: WriterState, user: {}): T
+  serialize(node: Node, options?: WriterOptions): T
 
   /**
-   * Escapes special characters in text. 
+   * Serializes a document node.
    * 
-   * @param val - the text value to escape
-   * 
-   * Following characters are escaped by default:
-   * 
-   * Char | Escaped
-   * ---- | -------
-   * `&`  | `&amp;`
-   * `<`  | `&lt;`
-   * `>`  | `&gt;`
-   * `\r` | `&#xD;`
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
    */
-  textEscape(val: string): string
+  document?(node: XMLDocument, options: WriterOptions, level: number, refs?: any): T
 
   /**
-   * Escapes special characters in attribute values.
+   * Serializes a document type node.
    * 
-   * @param val - the attribute value to escape
-   * 
-   * Following characters are escaped by default:
-   * 
-   * Char | Escaped
-   * ---- | -------
-   * `&`  | `&amp;`
-   * `<`  | `&lt;`
-   * `>`  | `&gt;`
-   * `"`  | `&quot;`
-   * `\t` | `&#x9;`
-   * `\n` | `&#xA;`
-   * `\r` | `&#xD;`
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
    */
-  attEscape(val: string): string
+  documentType?(node: DocumentType, options: WriterOptions, level: number, refs?: any): T
+
+  /**
+   * Serializes a document fragment node.
+   * 
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  documentFragment?(node: DocumentFragment, options: WriterOptions, level: number, refs?: any): T
+
+  /**
+   * Serializes an element node.
+   * 
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  element?(node: Element, options: WriterOptions, level: number, refs?: any): T
+
+  /**
+   * Serializes a text node.
+   * 
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  text?(node: Text, options: WriterOptions, level: number, refs?: any): T
+
+  /**
+   * Serializes a CDATA node.
+   * 
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  cdata?(node: CDATASection, options: WriterOptions, level: number, refs?: any): T
+
+  /**
+   * Serializes a comment node.
+   * 
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  comment?(node: Comment, options: WriterOptions, level: number, refs?: any): T
+
+  /**
+   * Serializes a processing instruction node.
+   * 
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  processingInstruction?(node: ProcessingInstruction, options: WriterOptions, level: number, refs?: any): T
+
+  /**
+   * Serializes an attribute.
+   * 
+   * @param node - node to serialize
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  attribute?(node: Attr, options: WriterOptions, level: number, refs?: any): T
+
+  /** 
+   * Called before starting a new line of output. Not all writers use this 
+   * function. A string writer may use this function to write the indentation
+   * string. 
+   * 
+   * @param node - current node
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  beginLine?(node: Node, options: WriterOptions, level: number, refs?: any): T
+
+  /** 
+   * Called before completing the current line of output. Not all writers use 
+   * this function. A string writer may use this function to write the newline
+   * string. 
+   * 
+   * @param node - current node
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  endLine?(node: Node, options: WriterOptions, level: number, refs?: any): T
+
+  /** 
+   * Called right after starting writing a node. This function does not 
+   * produce any output, but can be used to alter the state of the writer. 
+   * 
+   * @param node - current node
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  openNode?(node: Node, options: WriterOptions, level: number, refs?: any): void
+
+  /** 
+   * Called right before completing writing a node. This function does not 
+   * produce any output, but can be used to alter the state of the writer.
+   * 
+   * @param node - current node
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  closeNode?(node: Node, options: WriterOptions, level: number, refs?: any): void
+
+  /** 
+   * Called right after starting writing an attribute. This function does 
+   * not produce any output, but can be used to alter the state of the 
+   * writer. 
+   * 
+   * @param node - current attribute
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  openAttribute?(node: Attr, options: WriterOptions, level: number, refs?: any): void
+
+  /** 
+   * Called right before completing writing an attribute. This function 
+   * does not produce any output, but can be used to alter the state of 
+   * the writer. 
+   * 
+   * @param node - current attribute
+   * @param options - serialization options
+   * @param level - curent depth of the XML tree
+   * @param refs - internal parameters passed to serializer functions
+   */
+  closeAttribute?(node: Attr, options: WriterOptions, level: number, refs?: any): void
 }
 
 /**
@@ -434,4 +573,18 @@ export interface XMLBuilder {
    * Returns the last child node.
    */
   last(): XMLBuilder
+
+  /**
+   * Converts the node into its string representation.
+   * 
+   * @param options - serialization options
+   */
+  toString(options?: WriterOptions): string
+
+  /**
+   * Converts the entire XML document into its string representation.
+   * 
+   * @param options - serialization options
+   */
+  end(options?: WriterOptions): string
 }

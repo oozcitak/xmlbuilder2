@@ -1,9 +1,11 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
-  XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject
+  XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject, WriterOptions
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
-import { Namespace, XMLSpec } from "../dom/spec"
+import { Namespace } from "../dom/spec"
+import { Char } from "./util/Char";
+import { XMLStringWriterImpl } from "./XMLStringWriterImpl";
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -18,10 +20,10 @@ export class XMLBuilderImpl implements XMLBuilder {
   set options(options: XMLBuilderOptions) {
     // character validation
     if(options.pubID) {
-      this._assertLegalPubId(options.pubID)
+      Char.assertPubId(options.pubID, options.version || "1.0", this._debugInfo())
     }
     if(options.sysID) {
-      this._assertLegalChar(options.sysID)
+      Char.assertChar(options.sysID, options.version || "1.0", this._debugInfo())
       if (options.sysID.includes('"') && options.sysID.includes("'")) {
         throw new Error(`System identifier cannot contain both a single and double quote: ${options.sysID}.` + this._debugInfo())
       }
@@ -182,8 +184,8 @@ export class XMLBuilderImpl implements XMLBuilder {
         const ele = this._asElement
 
         // character validation
-        this._assertLegalName(name)
-        this._assertLegalChar(value)
+        Char.assertName(name, this.options.version || "1.0", this._debugInfo())
+        Char.assertChar(value, this.options.version || "1.0", this._debugInfo())
 
         // skip the default namespace declaration attribute
         // it is already processed by the _node function
@@ -238,7 +240,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = this._asElement
 
     // character validation
-    this._assertLegalChar(content)
+    Char.assertChar(content, this.options.version || "1.0", this._debugInfo())
 
     const child = this._doc.createTextNode(content)
     ele.appendChild(child)
@@ -251,7 +253,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = this._asElement
 
     // character validation
-    this._assertLegalChar(content)
+    Char.assertChar(content, this.options.version || "1.0", this._debugInfo())
     if (content.includes("--") || content.endsWith("-")) {
       throw new Error(`Comment content cannot contain double-hypen or end with a hypen: ${content}.` + this._debugInfo())
     }
@@ -267,7 +269,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = this._asElement
 
     // character validation
-    this._assertLegalChar(content)
+    Char.assertChar(content, this.options.version || "1.0", this._debugInfo())
     if (content.includes("]]>")) {
       throw new Error(`CDATA content cannot contain "]]>": ${content}.` + this._debugInfo())
     }
@@ -283,11 +285,11 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = this._asElement
 
     // character validation
-    this._assertLegalName(target)
+    Char.assertName(target, this.options.version || "1.0", this._debugInfo())
     if (target.includes(":") || (/^xml$/i).test(target)) {
       throw new Error(`Processing instruction target cannot contain ":" or cannot be "xml": ${target}.` + this._debugInfo())
     }
-    this._assertLegalChar(content)
+    Char.assertChar(content, this.options.version || "1.0", this._debugInfo())
     if (content.includes("?>")) {
       throw new Error(`Processing instruction content cannot contain "?>": ${content}.` + this._debugInfo())
     }
@@ -390,6 +392,17 @@ export class XMLBuilderImpl implements XMLBuilder {
     return XMLBuilderImpl._FromNode(node)
   }
 
+  /** @inheritdoc */
+  toString(options?: WriterOptions): string {
+    const writer = new XMLStringWriterImpl(this.options)
+    return writer.serialize(this._asNode, options)
+  }
+
+  /** @inheritdoc */
+  end(options?: WriterOptions): string {
+    return this.doc().toString(options)
+  }
+
   /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
@@ -437,7 +450,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const node = this._asNode
 
     // character validation
-    this._assertLegalName(name)
+    Char.assertName(name, this.options.version || "1.0", this._debugInfo())
 
     const child = (namespace !== null ?
       this._doc.createElementNS(namespace, name) :
@@ -483,34 +496,6 @@ export class XMLBuilderImpl implements XMLBuilder {
       throw new Error("Document is null. " + this._debugInfo())
     }
     return doc
-  }
-
-  /** 
-   * Validates characters according to the XML spec.
-   */
-  private _assertLegalChar(str: string): void {
-    if (!XMLSpec.isLegalChar(str, this.options.version)) {
-      throw new Error(`Invalid character in string: ${str}.` + this._debugInfo())
-    }
-  }
-
-  /** 
-   * Validates a name according to the XML spec.
-   */  
-  private _assertLegalName(str: string): void {
-    this._assertLegalChar(str)
-    if (!XMLSpec.isName(str)) {
-      throw new Error(`Invalid character in XML name: ${str}.` + this._debugInfo())
-    }
-  }
-  
-  /** 
-   * Validates public identifier according to the XML spec.
-   */
-  private _assertLegalPubId(str: string): void {
-    if (!XMLSpec.isPubidChar(str)) {
-      throw new Error(`Invalid character in public identifier string: ${str}.` + this._debugInfo())
-    }
   }
 
   /**
