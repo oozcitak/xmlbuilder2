@@ -11,7 +11,7 @@ export class XMLBuilderDocumentImpl extends XMLBuilderImpl {
 
   /** @inheritdoc */
   get options(): XMLBuilderOptions {
-    return this._builderOptions || { version: "1.0" }
+    return this._builderOptions
   }
   set options(options: XMLBuilderOptions) {
     this._builderOptions = options

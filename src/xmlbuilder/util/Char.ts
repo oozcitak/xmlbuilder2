@@ -53,7 +53,7 @@ export class Char {
    */
   static assertChar(str: string, version: "1.0" | "1.1", debugInfo?: string): void {
     if (!XMLSpec.isLegalChar(str, version)) {
-      throw new Error(`Invalid character in string: ${str}. ` + (debugInfo || ""))
+      throw new Error(`Invalid character in string: ${str}. ${debugInfo || ""}`)
     }
   }
 
@@ -67,7 +67,7 @@ export class Char {
   static assertName(str: string, version: "1.0" | "1.1", debugInfo?: string): void {
     Char.assertChar(str, version, debugInfo)
     if (!XMLSpec.isName(str)) {
-      throw new Error(`Invalid character in XML name: ${str}. ` + (debugInfo || ""))
+      throw new Error(`Invalid character in XML name: ${str}. ${debugInfo || ""}`)
     }
   }
   
@@ -80,7 +80,7 @@ export class Char {
    */
   static assertPubId(str: string, version: "1.0" | "1.1", debugInfo?: string): void {
     if (!XMLSpec.isPubidChar(str)) {
-      throw new Error(`Invalid character in public identifier string: ${str}. ` + (debugInfo || ""))
+      throw new Error(`Invalid character in public identifier string: ${str}. ${debugInfo || ""}`)
     }
   }
 }

@@ -10,7 +10,7 @@ describe('util', function () {
     expect(util.isNumber("x")).toBeFalsy()
     expect(util.isNumber(["x"])).toBeFalsy()
     expect(util.isNumber({ x: "x" })).toBeFalsy()
-    expect(util.isNumber(() => {})).toBeFalsy()
+    expect(util.isNumber(() => { })).toBeFalsy()
   })
 
   test('isString', function () {
@@ -19,19 +19,19 @@ describe('util', function () {
     expect(util.isString(1)).toBeFalsy()
     expect(util.isString(["x"])).toBeFalsy()
     expect(util.isString({ x: "x" })).toBeFalsy()
-    expect(util.isString(() => {})).toBeFalsy()
+    expect(util.isString(() => { })).toBeFalsy()
   })
 
   test('isFunction', function () {
-    expect(util.isFunction(() => {})).toBeTruthy()
+    expect(util.isFunction(() => { })).toBeTruthy()
     expect(util.isFunction("0")).toBeFalsy()
     expect(util.isFunction(1)).toBeFalsy()
     expect(util.isFunction(["x"])).toBeFalsy()
     expect(util.isFunction({ x: "x" })).toBeFalsy()
   })
-  
+
   test('isObject', function () {
-    expect(util.isObject(() => {})).toBeTruthy()
+    expect(util.isObject(() => { })).toBeTruthy()
     expect(util.isObject(["x"])).toBeTruthy()
     expect(util.isObject({ x: "x" })).toBeTruthy()
     expect(util.isObject("0")).toBeFalsy()
@@ -40,24 +40,29 @@ describe('util', function () {
 
   test('isArray', function () {
     expect(util.isArray(["x"])).toBeTruthy()
-    expect(util.isArray(() => {})).toBeFalsy()
+    expect(util.isArray(() => { })).toBeFalsy()
     expect(util.isArray({ x: "x" })).toBeFalsy()
     expect(util.isArray("0")).toBeFalsy()
     expect(util.isArray(1)).toBeFalsy()
   })
 
   test('isEmpty', function () {
-    expect(util.isEmpty([ ])).toBeTruthy()
-    expect(util.isEmpty({ })).toBeTruthy()
+    expect(util.isEmpty([])).toBeTruthy()
+    expect(util.isEmpty({})).toBeTruthy()
     expect(util.isEmpty(["x"])).toBeFalsy()
     expect(util.isEmpty({ x: "x" })).toBeFalsy()
+
+    class Obj { }
+    const emptyObj = new Obj()
+    Reflect.setPrototypeOf(emptyObj, { id: 42 })
+    expect(util.isEmpty(emptyObj)).toBeTruthy()
   })
 
   test('isPlainObject', function () {
     expect(util.isPlainObject({ x: "x" })).toBeTruthy()
     expect(util.isPlainObject(new Number(1))).toBeFalsy()
     expect(util.isPlainObject(["x"])).toBeFalsy()
-    expect(util.isPlainObject(() => {})).toBeFalsy()
+    expect(util.isPlainObject(() => { })).toBeFalsy()
     expect(util.isPlainObject("0")).toBeFalsy()
     expect(util.isPlainObject(1)).toBeFalsy()
   })
