@@ -1,8 +1,8 @@
-import { 
-  XMLWriter, WriterOptions, XMLBuilderOptions, WriterState 
+import {
+  XMLWriter, WriterOptions, XMLBuilderOptions, WriterState, XMLSerializedValue
 } from "./interfaces"
-import { 
-  Node, Attr, XMLDocument, Element, DocumentType, Text, CDATASection,
+import {
+  Node, Attr, XMLDocument, Element, Text, CDATASection,
   Comment, ProcessingInstruction, NodeType, DocumentFragment
 } from "../dom/interfaces"
 import { Namespace } from "../dom/spec"
@@ -12,12 +12,12 @@ import { TupleSet } from "../util"
 /**
  * Serializes XML nodes into strings.
  */
-export class XMLStringWriterImpl implements XMLWriter<string> {
+export class XMLObjectWriterImpl implements XMLWriter<XMLSerializedValue> {
 
   private _builderOptions: XMLBuilderOptions
 
   /**
-   * Initializes a new instance of `XMLStringWriterImpl`.
+   * Initializes a new instance of `XMLObjectWriterImpl`.
    * 
    * @param builderOptions - XML builder options
    */
@@ -26,7 +26,7 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
   }
 
   /** @inheritdoc */
-  serialize(node: Node, options?: WriterOptions): string {
+  serialize(node: Node, options?: WriterOptions): XMLSerializedValue {
     let refs: any = {}
     refs.prefixMap = new Map<string | null, string>()
     refs.prefixMap.set(Namespace.XML, "xml")
@@ -34,7 +34,7 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
     refs.namespace = null
     options = options || {}
 
-    return this._serializeNode(node, options, options.offset || 0, refs)
+    return this._serializeNode(node, options, refs)
   }
 
   /**
@@ -42,114 +42,78 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
    * 
    * @param node - current node
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
    * @param refs - internal parameters passed to serializer functions
    */
-  private _serializeNode(node: Node, options: WriterOptions, level: number, refs?: any): string {
+  private _serializeNode(node: Node, options: WriterOptions, refs?: any): XMLSerializedValue {
     options.state = WriterState.None
-    this.openNode(node, options, level, refs)
+    this.openNode(node, options, 0, refs)
 
-    let markup = ''
+    let obj: XMLSerializedValue = ""
     switch (node.nodeType) {
       case NodeType.Element:
-        markup = this.element(<Element>node, options, level, refs)
+        obj = this.element(<Element>node, options, 0, refs)
         break
       case NodeType.Document:
-        markup = this.document(<XMLDocument>node, options, level, refs)
+        obj = this.document(<XMLDocument>node, options, 0, refs)
         break
       case NodeType.Comment:
-        markup = this.comment(<Comment>node, options, level, refs)
+        obj = this.comment(<Comment>node, options, 0, refs)
         break
       case NodeType.Text:
-        markup = this.text(<Text>node, options, level, refs)
+        obj = this.text(<Text>node, options, 0, refs)
         break
       case NodeType.DocumentFragment:
-        markup = this.documentFragment(<DocumentFragment>node, options, level, refs)
+        obj = this.documentFragment(<DocumentFragment>node, options, 0, refs)
         break
       case NodeType.DocumentType:
-        markup = this.documentType(<DocumentType>node, options, level, refs)
+        // doctype is not serialized
         break
       case NodeType.ProcessingInstruction:
-        markup = this.processingInstruction(<ProcessingInstruction>node, options, level, refs)
+        obj = this.processingInstruction(<ProcessingInstruction>node, options, 0, refs)
         break
       case NodeType.CData:
-        markup = this.cdata(<CDATASection>node, options, level, refs)
+        obj = this.cdata(<CDATASection>node, options, 0, refs)
         break
       default:
         throw new Error("Invalid node type.")
     }
 
-    this.closeNode(node, options, level, refs)
+    this.closeNode(node, options, 0, refs)
     options.state = WriterState.None
 
+    return obj
+  }
+
+  /** @inheritdoc */
+  document(node: XMLDocument, options: WriterOptions, level: number, refs?: any): XMLSerializedValue {
+    let markup = new Array<XMLSerializedValue>()
+    markup.push(this._serializeChildNodes(node.childNodes.values(), options, refs))
     return markup
   }
 
   /** @inheritdoc */
-  document(node: XMLDocument, options: WriterOptions, level: number, refs?: any): string {
-    let markup = ""
-
-    if(!options.headless) {
-      markup = this.beginLine(node, options, level, refs) + '<?xml'
-      markup += ' version="' + (this._builderOptions.version || "1.0") + '"'
-      if (this._builderOptions.encoding !== undefined) {
-        markup += ' encoding="' + this._builderOptions.encoding + '"'
-      }
-      if (this._builderOptions.standalone !== undefined) {
-        markup += ' standalone="' + (this._builderOptions.standalone ? "yes" : "no") + '"'
-      }
-      markup += "?>" + this.endLine(node, options, level, refs)
-    }
-
-    for (const childNode of node.childNodes) {
-      markup += this._serializeNode(childNode, options, level, refs)
-    }
-
+  documentFragment(node: DocumentFragment, options: WriterOptions, level: number, refs?: any): XMLSerializedValue {
+    let markup = new Array<XMLSerializedValue>()
+    markup.push(this._serializeChildNodes(node.childNodes.values(), options, refs))
     return markup
   }
 
   /** @inheritdoc */
-  documentType(node: DocumentType, options: WriterOptions, level: number, refs?: any): string {
-    let markup = this.beginLine(node, options, level, refs)
-
-    if (node.publicId && node.systemId) {
-      markup += `<!DOCTYPE ${node.name} PUBLIC "${node.publicId}" "${node.systemId}">`
-    } else if (node.publicId) {
-      markup += `<!DOCTYPE ${node.name} PUBLIC "${node.publicId}">`
-    } else if (node.systemId) {
-      markup += `<!DOCTYPE ${node.name} SYSTEM "${node.systemId}">`
-    } else {
-      markup += `<!DOCTYPE ${node.name}>`
-    }
-
-    markup += this.endLine(node, options, level, refs)
-    return markup
-  }
-
-  /** @inheritdoc */
-  documentFragment(node: DocumentFragment, options: WriterOptions, level: number, refs?: any): string {
-    let markup = ''
-
-    for (const childNode of node.childNodes) {
-      markup += this._serializeNode(childNode, options, level, refs)
-    }
-
-    return markup
-  }
-
-  /** @inheritdoc */
-  element(node: Element, options: WriterOptions, level: number, refs?: any): string {
+  element(node: Element, options: WriterOptions, level: number, refs?: any): XMLSerializedValue {
     options.state = WriterState.OpenTag
-    let markup = this.beginLine(node, options, level, refs) + '<'
+    let markup = new Map<string, XMLSerializedValue>()
+    let attributes = new Map<string, string>()
     let qualifiedName = ''
     let skipEndTag = false
     let ignoreNamespaceDefinitionAttribute = false
     let map = new Map<string | null, string>(refs.prefixMap)
     let elementPrefixesList: string[] = []
     let duplicatePrefixDefinition: string | null = null
-    let localDefaultNamespace = this._recordNamespaceInformation(node, 
-      { map: map, list: elementPrefixesList, 
-        duplicatePrefixDefinition: duplicatePrefixDefinition })
+    let localDefaultNamespace = this._recordNamespaceInformation(node,
+      {
+        map: map, list: elementPrefixesList,
+        duplicatePrefixDefinition: duplicatePrefixDefinition
+      })
     let inheritedNS = refs.namespace
     let ns = node.namespaceURI
 
@@ -162,7 +126,6 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
       } else {
         qualifiedName = node.localName
       }
-      markup += qualifiedName
     } else {
       // inherited ns is not equal to ns (the node's own namespace is different
       // from the context namespace of its parent
@@ -175,7 +138,6 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
         if (localDefaultNamespace !== null) {
           inheritedNS = ns
         }
-        markup += qualifiedName
       } else if (prefix !== null && localDefaultNamespace === null) {
         if (elementPrefixesList.includes(prefix)) {
           const generateRefs = { map: map, prefixIndex: refs.prefixIndex }
@@ -185,12 +147,14 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
           map.set(ns, prefix)
         }
         qualifiedName = `${prefix}:${node.localName}`
-        markup += qualifiedName
         // serialize the new namespace/prefix association just added to the map
         refs.attrName = 'xmlns:' + prefix
         refs.attrValue = ns
-        markup += ' ' + this.attribute(<Attr><unknown>null, options, level, refs)
-      } else if (localDefaultNamespace === null || 
+        const attResult = <Map<string, string>>this.attribute(<Attr><unknown>null, options, level, refs)
+        for(const [key, val] of attResult) {
+          attributes.set(key, val)
+        }
+      } else if (localDefaultNamespace === null ||
         (localDefaultNamespace !== null && localDefaultNamespace !== ns)) {
         ignoreNamespaceDefinitionAttribute = true
         qualifiedName = node.localName
@@ -198,113 +162,65 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
         // define this node's namespace and act as the context namespace for 
         // its children
         inheritedNS = ns
-        markup += qualifiedName
         refs.attrName = 'xmlns'
-        refs.attrValue = ns        
+        refs.attrValue = ns
         // serialize the new (or replacement) default namespace definition
-        markup += ' ' + this.attribute(<Attr><unknown>null, options, level, refs)
+        const attResult = <Map<string, string>>this.attribute(<Attr><unknown>null, options, level, refs)
+        for(const [key, val] of attResult) {
+          attributes.set(key, val)
+        }        
       } else {
         // node has a local default namespace that matches ns
         qualifiedName = node.localName
         inheritedNS = ns
-        markup += qualifiedName
       }
     }
 
     const attRefs = { namespacePrefixMap: map, prefixIndex: refs.prefixIndex }
-    markup += this._serializeAttributes(node, options, level, attRefs, 
+    const attResult = this._serializeAttributes(node, options, level, attRefs,
       ignoreNamespaceDefinitionAttribute, duplicatePrefixDefinition)
     refs.prefixIndex = attRefs.prefixIndex
-
-    if (!node.hasChildNodes()) {
-      // self closing tag
-      if (options.spaceBeforeSlash) {
-        markup += ' '
-      }
-      markup += "/"
-      skipEndTag = true
-    }
-
-    markup += ">"
-
-    if (skipEndTag) {
-      // leaf-node, no need to process child nodes
-      markup += this.endLine(node, options, level, refs)
-      options.state = WriterState.None
-      return markup
+    let key: string, val: any
+    for([key, val] of attResult) {
+      attributes.set(key, val)
     }
 
     // serialize child-nodes
     options.state = WriterState.InsideTag
-    for (const childNode of node.childNodes) {
-      const childRefs = { prefixMap: map, prefixIndex: refs.prefixIndex, namespace: inheritedNS }
-      markup += this._serializeNode(childNode, options, level + 1, childRefs)
-      refs.prefixIndex = childRefs.prefixIndex
-    }
+    markup.set(qualifiedName, this._serializeChildNodes(node.childNodes.values(), options, refs))
 
-    options.state = WriterState.CloseTag
-    markup += `</${options.spaceBeforeSlash ? ' ' : ''}${qualifiedName}>`
-    markup += this.endLine(node, options, level, refs)
     options.state = WriterState.None
     return markup
   }
 
   /** @inheritdoc */
-  text(node: Text, options: WriterOptions, level: number, refs?: any): string {
-    return this.beginLine(node, options, level, refs) + 
-      Char.escapeText(node.data) + 
-      this.endLine(node, options, level, refs)
+  text(node: Text, options: WriterOptions, level: number, refs?: any): XMLSerializedValue {
+    return node.data
   }
 
   /** @inheritdoc */
-  cdata(node: CDATASection, options: WriterOptions, level: number, refs?: any): string {
-    return this.beginLine(node, options, level, refs) + 
-      `<![CDATA[${node.data}]]>` + 
-      this.endLine(node, options, level, refs)    
+  cdata(node: CDATASection, options: WriterOptions, level: number, refs?: any): XMLSerializedValue {
+    return node.data
   }
 
   /** @inheritdoc */
-  comment(node: Comment, options: WriterOptions, level: number, refs?: any): string {
-    return this.beginLine(node, options, level, refs) + 
-      `<!--${node.data}-->` + 
-      this.endLine(node, options, level, refs)  
+  comment(node: Comment, options: WriterOptions, level: number, refs?: any): XMLSerializedValue {
+    return node.data
   }
 
   /** @inheritdoc */
-  processingInstruction(node: ProcessingInstruction, options: WriterOptions, level: number, refs?: any): string {
-    return this.beginLine(node, options, level, refs) + 
-      `<?${node.target} ${node.data}?>` + 
-      this.endLine(node, options, level, refs)  
+  processingInstruction(node: ProcessingInstruction, options: WriterOptions, level: number, refs?: any): XMLSerializedValue {
+    return node.data
   }
 
   /** @inheritdoc */
-  attribute(node: Attr, options: WriterOptions, level: number, refs?: any): string {
-    let markup = refs.attrName || node.name
-    markup += '="' + Char.escapeAttrValue(refs.attrValue || node.value) + '"'
+  attribute(node: Attr, options: WriterOptions, level: number, refs?: any): XMLSerializedValue {
+    let attrName: string = refs.attrName || node.name
+    let attrValue: string = Char.escapeAttrValue(refs.attrValue || node.value)
+    let result = new Map<string, string>([[attrName, attrValue]])
     refs.attrName = undefined
     refs.attrValue = undefined
-    return markup
-  }
-
-  /** @inheritdoc */
-  beginLine(node: Node, options: WriterOptions, level: number, refs?: any): string {
-    if (options.prettyPrint && !refs.suppressPrettyCount) {
-      const indentLevel = level + 1
-      if (indentLevel > 0) {
-        return new Array(indentLevel).join(options.indent || '  ')
-      }
-    }
-
-    return ''
-  }
-
-  /** @inheritdoc */
-  endLine(node: Node, options: WriterOptions, level: number, refs?: any): string {
-    if (options.prettyPrint && !refs.suppressPrettyCount) {
-      return options.newline || '\n'
-    } else {
-      return ''
-    }
+    return result
   }
 
   /** @inheritdoc */
@@ -320,6 +236,58 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
   closeAttribute(node: Attr, options: WriterOptions, level: number, refs?: any): void { }
 
   /**
+   * Returns key/value pairs for the given child nodes.
+   * 
+   * @param childNodes - child node list
+   * @param options - serialization options
+   * @param refs - reference parameters
+   */
+  _serializeChildNodes(childNodes: IterableIterator<Node>, options: WriterOptions, refs?: any): XMLSerializedValue {
+    const items = new Array<[string, Node]>()
+    const keyCount = new Map<string, number>()
+    const keyIndices = new Map<string, number>()
+    let hasDuplicateKeys = false
+
+    for (const node of childNodes) {
+      const [key, canIncrement] = this._getNodeKey(node)
+      items.push([key, node])
+      let count = keyCount.get(key)
+      count = (count || 0) + 1
+      if(!hasDuplicateKeys && !canIncrement && count > 1) [
+        hasDuplicateKeys = true
+      ]
+      keyCount.set(key, count)
+      keyIndices.set(key, 0)
+    }
+
+    if (hasDuplicateKeys) {
+      // child nodes have duplicate keys
+      // return an array
+      const result = new Array<XMLSerializedValue>()
+      for (const [key, node] of items) {
+        const nodeResult = this._serializeNode(node, options, refs)
+        result.push(new Map<string, XMLSerializedValue>([[key, nodeResult]]))
+      }
+      return result
+    } else {
+      // child nodes have unique keys
+      // return a map
+      const result = new Map<string, XMLSerializedValue>()
+      for (const [key, node] of items) {
+        let uniqueKey = key
+        if (keyCount.get(key) || 0 > 1) {
+          let index = (keyIndices.get(key) || 0) + 1
+          uniqueKey = key + index.toString()
+          keyIndices.set(key, index)
+        }
+        const nodeResult = this._serializeNode(node, options, refs)
+        result.set(uniqueKey, nodeResult)
+      }
+      return result
+    }
+  }
+
+  /**
    * Produces an XML serialization of the attributes of an element node.
    * 
    * @param node - element node whose attributes to serialize
@@ -331,14 +299,16 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
    * definition attribute
    * @param requireWellFormed - whether to check conformance
    */
-  private _serializeAttributes(node: Element, 
+  private _serializeAttributes(node: Element,
     options: WriterOptions, level: number,
-    refs: { namespacePrefixMap: Map<string | null, string>,
-      prefixIndex: number },
-    ignoreNamespaceDefinitionAttribute: boolean, 
-    duplicatePrefixDefinition: string | null): string {
+    refs: {
+      namespacePrefixMap: Map<string | null, string>,
+      prefixIndex: number
+    },
+    ignoreNamespaceDefinitionAttribute: boolean,
+    duplicatePrefixDefinition: string | null): Map<string, string> {
 
-    let result = ""
+    let result = new Map<string, string>()
 
     // Contains unique attribute namespaceURI and localName pairs
     // This set is used to [optionally] enforce the well-formed constraint that 
@@ -355,14 +325,14 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
       if (attributeNamespace !== null) {
         if (attributeNamespace === Namespace.XMLNS &&
           ((attr.prefix === null && ignoreNamespaceDefinitionAttribute) ||
-          (attr.prefix !== null && attr.localName === duplicatePrefixDefinition))) {
+            (attr.prefix !== null && attr.localName === duplicatePrefixDefinition))) {
           continue
         } else if (refs.namespacePrefixMap.has(attributeNamespace)) {
           candidatePrefix = refs.namespacePrefixMap.get(attributeNamespace) || null
         } else if (candidatePrefix === null) {
           // we deviate from the spec here
           // see: https://github.com/w3c/DOM-Parsing/pull/30
-          if(attr.prefix === null || refs.namespacePrefixMap.has(attributeNamespace)) {
+          if (attr.prefix === null || refs.namespacePrefixMap.has(attributeNamespace)) {
             const generateRefs = { map: refs.namespacePrefixMap, prefixIndex: refs.prefixIndex }
             candidatePrefix = this._generatePrefix(attributeNamespace, generateRefs)
             refs.prefixIndex = generateRefs.prefixIndex
@@ -374,7 +344,10 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
           if (candidatePrefix !== "xmlns") {
             localNameSet.set([attributeNamespace, candidatePrefix])
             const attRef = { attrName: 'xmlns:' + candidatePrefix, attrValue: attributeNamespace }
-            result += ' ' + this.attribute(<Attr><unknown>null, options, level, attRef)
+            const attResult = <Map<string, string>>this.attribute(<Attr><unknown>null, options, level, attRef)
+            for (const [key, val] of attResult) {
+              result.set(key, val)
+            }
           }
         }
       }
@@ -385,7 +358,10 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
       }
 
       attrName += attr.localName
-      result += ' ' + this.attribute(attr, options, level, { attrName: attrName })
+      let attResult = <Map<string, string>>this.attribute(attr, options, level, { attrName: attrName })
+      for (const [key, val] of attResult) {
+        result.set(key, val)
+      }
     }
 
     return result
@@ -399,9 +375,11 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
    * @param refs - reference parameters
    * @param requireWellFormed - whether to check conformance
    */
-  private _recordNamespaceInformation(element: Element,     
-    refs: { map: Map<string | null, string>, list: string[], 
-    duplicatePrefixDefinition: string | null }): string | null {
+  private _recordNamespaceInformation(element: Element,
+    refs: {
+      map: Map<string | null, string>, list: string[],
+      duplicatePrefixDefinition: string | null
+    }): string | null {
 
     let defaultNamespaceAttrValue: string | null = null
     for (const attr of element.attributes) {
@@ -416,7 +394,7 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
           // attribute is a namespace prefix definition
           let prefixDefinition = attr.localName
           let namespaceDefinition = attr.value
-          if (refs.map.has(namespaceDefinition) && 
+          if (refs.map.has(namespaceDefinition) &&
             refs.map.get(namespaceDefinition) === prefixDefinition) {
             refs.duplicatePrefixDefinition = prefixDefinition
           } else {
@@ -443,6 +421,32 @@ export class XMLStringWriterImpl implements XMLWriter<string> {
     refs.prefixIndex++
     refs.map.set(newNamespace, generatedPrefix)
     return generatedPrefix
+  }
+
+  /**
+   * Returns an object key for the given node.
+   * 
+   * @param node - node to get a key for
+   * 
+   * @returns a two-tuple whose first value is the node key and second value
+   * is a boolean determining whether the key can be prefixed with a random 
+   * string to provide uniqueness.
+   */
+  private _getNodeKey(node: Node): [string, boolean] {
+    switch (node.nodeType) {
+      case NodeType.Element:
+        return [(<Element>node).tagName, false]
+      case NodeType.Comment:
+        return [this._builderOptions.convertCommentKey || '#comment', true]
+      case NodeType.Text:
+        return [this._builderOptions.convertTextKey || '#text', true]
+      case NodeType.ProcessingInstruction:
+        return [(this._builderOptions.convertPIKey || '?') + (<ProcessingInstruction>node).target, false]
+      case NodeType.CData:
+        return [this._builderOptions.convertCDataKey || '#cdata', true]
+      default:
+        throw new Error("Invalid node type.")
+    }
   }
 
 }

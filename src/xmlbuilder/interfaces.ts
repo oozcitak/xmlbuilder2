@@ -332,6 +332,15 @@ export interface XMLWriter<T> {
 }
 
 /**
+ * Represents a recursive type that can arrays and maps of serialized nodes.
+ * Uses the approach in explained in: 
+ * https://github.com/Microsoft/TypeScript/issues/3496#issuecomment-128553540
+ */
+export type XMLSerializedValue = string | XMLSerializedObject | XMLSerializedArray
+interface XMLSerializedObject extends Map<string, XMLSerializedValue> { }
+interface XMLSerializedArray extends Array<XMLSerializedValue> { }
+
+/**
  * Represents the type of a variable that can be expanded by the `ele` function 
  * into nodes.
  */
@@ -580,6 +589,13 @@ export interface XMLBuilder {
    * @param options - serialization options
    */
   toString(options?: WriterOptions): string
+
+  /**
+   * Converts the node into its object representation.
+   * 
+   * @param options - serialization options
+   */
+  toObject(options?: WriterOptions): XMLSerializedValue
 
   /**
    * Converts the entire XML document into its string representation.

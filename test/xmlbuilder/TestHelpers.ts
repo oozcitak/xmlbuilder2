@@ -12,4 +12,8 @@ export default class TestHelpers extends TestHelpersRoot {
     const serializer = new XMLSerializer()
     return serializer.serializeToString(node)
   }
+
+  static printMap(map: any): string {
+    return JSON.stringify(map, (key, value) => (value instanceof Map ? [...value] : value))
+  }
 }
