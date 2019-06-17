@@ -1,7 +1,9 @@
-import { Node, Attr, Element, NodeType } from "../../dom/interfaces"
+import { Node, Element, NodeType } from "../../dom/interfaces"
 import { Namespace } from "../../dom/spec"
 import { TupleSet } from "../../util"
-import { PreSerializedNode, PreSerializedAttr, PreSerializedNS } from "../interfaces"
+import { 
+  PreSerializedNode, PreSerializedAttr, PreSerializedNS 
+} from "../interfaces"
 
 interface NodeParamRefs {
   prefixMap: Map<string | null, string>,
@@ -30,8 +32,8 @@ export class PreSerializer {
    * namespace declarations where necessary and produces qualified names for
    * nodes and attributes.
    * 
-   * A serializer should process each `SerializedNode` produced by this function
-   * and use the information provided to serialize the node.
+   * A serializer should process each `PreSerializedNode` produced by this
+   * function and use the information provided to serialize the node.
    * 
    * @param node - node to serialize
    */
@@ -54,7 +56,9 @@ export class PreSerializer {
    * @param refs - reference parameters
    * @param level - current depth of the XML tree
    */
-  private _serializeNode(node: Node, refs: NodeParamRefs, level: number): PreSerializedNode<Node> {
+  private _serializeNode(node: Node, refs: NodeParamRefs, level: number): 
+    PreSerializedNode<Node> {
+
     switch (node.nodeType) {
       case NodeType.Element:
         return this._serializeElement(<Element>node, refs, level)
@@ -89,7 +93,9 @@ export class PreSerializer {
    * @param refs - reference parameters
    * @param level - current depth of the XML tree
    */
-  private _serializeElement(node: Element, refs: NodeParamRefs, level: number): PreSerializedNode<Element> {
+  private _serializeElement(node: Element, refs: NodeParamRefs, level: number): 
+    PreSerializedNode<Element> {
+
     let qualifiedName = ''
     const attributes: PreSerializedAttr[] = []
     const children: PreSerializedNode<Node>[] = []
@@ -128,7 +134,10 @@ export class PreSerializer {
         }
       } else if (prefix !== null && localDefaultNamespace === null) {
         if (elementPrefixesList.includes(prefix)) {
-          const generateRefs = { map: map, prefixIndex: refs.prefixIndex }
+          const generateRefs = { 
+            namespacePrefixMap: map, 
+            prefixIndex: refs.prefixIndex 
+          }
           prefix = this._generatePrefix(ns, generateRefs)
           refs.prefixIndex = generateRefs.prefixIndex
         } else {
@@ -165,7 +174,11 @@ export class PreSerializer {
 
     // serialize child-nodes
     for (const childNode of node.childNodes) {
-      const childRefs = { prefixMap: map, prefixIndex: refs.prefixIndex, namespace: inheritedNS }
+      const childRefs = { 
+        prefixMap: map, 
+        prefixIndex: refs.prefixIndex, 
+        namespace: inheritedNS 
+      }
       children.push(this._serializeNode(childNode, childRefs, level + 1))
       refs.prefixIndex = childRefs.prefixIndex
     }
@@ -181,33 +194,17 @@ export class PreSerializer {
   }
 
   /**
-  * Produces an XML serialization of an attributes.
-  * 
-  * @param node - attribute node to serialize or attribute name
-  * @param attrValue - attribute value
-  */
-  private _serializeAttribute(node: Attr, attrName?: string, attrValue?: string): PreSerializedAttr {
-    let name = node ? node.name : ''
-    let value = node ? node.value : ''
-    return {
-      attr: node,
-      name: attrName || name,
-      value: attrValue || value
-    }
-  }
-
-  /**
   * Produces an XML serialization of the attributes of an element node.
   * 
   * @param node - element node whose attributes to serialize
   * @param refs - reference parameters
   * @param ignoreNamespaceDefinitionAttribute - whether to ignore namespace
-  * @param duplicatePrefixDefinition - duplicate prefix definition
-  * definition attribute
+  * @param duplicatePrefixDefinition - duplicate prefix definition attribute
   */
   private _serializeAttributes(node: Element, refs: AttrParamRefs,
     ignoreNamespaceDefinitionAttribute: boolean,
-    duplicatePrefixDefinition: string | null): [ PreSerializedAttr[], PreSerializedNS[] ] {
+    duplicatePrefixDefinition: string | null): 
+    [ PreSerializedAttr[], PreSerializedNS[] ] {
 
     const attrResult: PreSerializedAttr[] = []
     const nsResult: PreSerializedNS[] = []
@@ -232,7 +229,10 @@ export class PreSerializer {
           // we deviate from the spec here
           // see: https://github.com/w3c/DOM-Parsing/pull/30
           if (attr.prefix === null || refs.namespacePrefixMap.has(attributeNamespace)) {
-            const generateRefs = { map: refs.namespacePrefixMap, prefixIndex: refs.prefixIndex }
+            const generateRefs = { 
+              namespacePrefixMap: refs.namespacePrefixMap, 
+              prefixIndex: refs.prefixIndex 
+            }
             candidatePrefix = this._generatePrefix(attributeNamespace, generateRefs)
             refs.prefixIndex = generateRefs.prefixIndex
           } else {
@@ -250,7 +250,7 @@ export class PreSerializer {
         attrName = candidatePrefix + ':'
       }
       attrName += attr.localName
-      attrResult.push(this._serializeAttribute(attr, attrName))
+      attrResult.push({ attr: attr, name: attrName, value: attr.value })
     }
 
     return [attrResult, nsResult]
@@ -260,17 +260,17 @@ export class PreSerializer {
   * Records namespace information for the given element and returns the 
   * default namespace attribute value.
   * 
-  * @param element - element node to process
+  * @param node - element node to process
   * @param refs - reference parameters
-  * @param requireWellFormed - whether to check conformance
   */
-  private _recordNamespaceInformation(element: Element,
+  private _recordNamespaceInformation(node: Element,
     refs: {
-      map: Map<string | null, string>, list: string[],
+      map: Map<string | null, string>,
+      list: string[],
       duplicatePrefixDefinition: string | null
     }): string | null {
     let defaultNamespaceAttrValue: string | null = null
-    for (const attr of element.attributes) {
+    for (const attr of node.attributes) {
       let attributeNamespace = attr.namespaceURI
       let attributePrefix = attr.prefix
       if (attributeNamespace === Namespace.XMLNS) {
@@ -301,11 +301,10 @@ export class PreSerializer {
   * @param newNamespace - a namespace to generate prefix for
   * @param refs - reference parameters
   */
-  private _generatePrefix(newNamespace: string | null,
-    refs: { map: Map<string | null, string>, prefixIndex: number }): string {
+  private _generatePrefix(newNamespace: string | null, refs: AttrParamRefs): string {
     let generatedPrefix = "ns" + refs.prefixIndex
     refs.prefixIndex++
-    refs.map.set(newNamespace, generatedPrefix)
+    refs.namespacePrefixMap.set(newNamespace, generatedPrefix)
     return generatedPrefix
   }
 
