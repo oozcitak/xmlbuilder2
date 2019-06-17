@@ -69,7 +69,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         let val = name[key]
         if (isFunction(val)) {
           // evaluate if function
-          val = val.apply()
+          val = val.apply(this)
         }
         if (!this.options.ignoreDecorators && this.options.convertAttKey && key.indexOf(this.options.convertAttKey) === 0) {
           // assign attributes

@@ -100,12 +100,30 @@ export function isPlainObject(x: any): boolean {
   if (isObject(x)) {
     const proto = Object.getPrototypeOf(x)
     const ctor = proto.constructor
-    return proto && ctor && 
-      (typeof ctor === 'function') && (ctor instanceof ctor) && 
+    return proto && ctor &&
+      (typeof ctor === 'function') && (ctor instanceof ctor) &&
       (Function.prototype.toString.call(ctor) === Function.prototype.toString.call(Object))
   }
 
   return false
+}
+
+/**
+ * Determines if `x` is an iterable Object.
+ * 
+ * @param x - a variable to check
+ */
+export function isIterable(x: any): boolean {
+  return x && (typeof x[Symbol.iterator] === 'function')
+}
+
+/**
+ * Determines if `x` is an iterable Object.
+ * 
+ * @param x - a variable to check
+ */
+export function isMap(x: any): x is Map<string, any> {
+  return x instanceof Map
 }
 
 /**
