@@ -80,6 +80,35 @@ export interface XMLBuilderOptions {
 }
 
 /**
+ * Represents an attribute ready to be serialized.
+ */
+export interface PreSerializedAttr {
+  attr: Attr
+  name: string
+  value: string
+}
+
+/**
+ * Represents a namespace declaration ready to be serialized.
+ */
+export interface PreSerializedNS {
+  name: string
+  value: string
+}
+
+/**
+ * Represents a node ready to be serialized.
+ */
+export interface PreSerializedNode<T extends Node> {
+  node: T
+  level: number
+  name?: string
+  attributes: PreSerializedAttr[]
+  children: PreSerializedNode<Node>[]
+  namespaces: PreSerializedNS[]
+}
+
+/**
  * Defines the options passed to the XML writer.
  */
 export interface WriterOptions {
@@ -130,7 +159,7 @@ export interface WriterOptions {
   /**
    * User data which will be passed to writer functions
    */
-  user?: {}
+  user?: any
 }
 
 /**
@@ -175,90 +204,80 @@ export interface XMLWriter<T> {
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  document?(node: XMLDocument, options: WriterOptions, level: number, refs?: any): T
+  document?(node: PreSerializedNode<XMLDocument>, options: WriterOptions): T
 
   /**
    * Serializes a document type node.
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  documentType?(node: DocumentType, options: WriterOptions, level: number, refs?: any): T
+  documentType?(node: PreSerializedNode<DocumentType>, options: WriterOptions): T
 
   /**
    * Serializes a document fragment node.
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  documentFragment?(node: DocumentFragment, options: WriterOptions, level: number, refs?: any): T
+  documentFragment?(node: PreSerializedNode<DocumentFragment>, options: WriterOptions): T
 
   /**
    * Serializes an element node.
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  element?(node: Element, options: WriterOptions, level: number, refs?: any): T
+  element?(node: PreSerializedNode<Element>, options: WriterOptions): T
 
   /**
    * Serializes a text node.
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  text?(node: Text, options: WriterOptions, level: number, refs?: any): T
+  text?(node: PreSerializedNode<Text>, options: WriterOptions): T
 
   /**
    * Serializes a CDATA node.
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  cdata?(node: CDATASection, options: WriterOptions, level: number, refs?: any): T
+  cdata?(node: PreSerializedNode<CDATASection>, options: WriterOptions): T
 
   /**
    * Serializes a comment node.
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  comment?(node: Comment, options: WriterOptions, level: number, refs?: any): T
+  comment?(node: PreSerializedNode<Comment>, options: WriterOptions): T
 
   /**
    * Serializes a processing instruction node.
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  processingInstruction?(node: ProcessingInstruction, options: WriterOptions, level: number, refs?: any): T
+  processingInstruction?(node: PreSerializedNode<ProcessingInstruction>, options: WriterOptions): T
 
   /**
    * Serializes an attribute.
    * 
    * @param node - node to serialize
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  attribute?(node: Attr, options: WriterOptions, level: number, refs?: any): T
+  attribute?(node: PreSerializedAttr, options: WriterOptions): T
+
+  /**
+   * Serializes a namespace declaration.
+   * 
+   * @param node - node to serialize
+   * @param options - serialization options
+   */
+  namespace?(node: PreSerializedNS, options: WriterOptions): T
 
   /** 
    * Called before starting a new line of output. Not all writers use this 
@@ -267,10 +286,8 @@ export interface XMLWriter<T> {
    * 
    * @param node - current node
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  beginLine?(node: Node, options: WriterOptions, level: number, refs?: any): T
+  beginLine?(node: PreSerializedNode<Node>, options: WriterOptions): T
 
   /** 
    * Called before completing the current line of output. Not all writers use 
@@ -279,10 +296,8 @@ export interface XMLWriter<T> {
    * 
    * @param node - current node
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  endLine?(node: Node, options: WriterOptions, level: number, refs?: any): T
+  endLine?(node: PreSerializedNode<Node>, options: WriterOptions): T
 
   /** 
    * Called right after starting writing a node. This function does not 
@@ -290,10 +305,8 @@ export interface XMLWriter<T> {
    * 
    * @param node - current node
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  openNode?(node: Node, options: WriterOptions, level: number, refs?: any): void
+  openNode?(node: PreSerializedNode<Node>, options: WriterOptions): void
 
   /** 
    * Called right before completing writing a node. This function does not 
@@ -301,10 +314,8 @@ export interface XMLWriter<T> {
    * 
    * @param node - current node
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  closeNode?(node: Node, options: WriterOptions, level: number, refs?: any): void
+  closeNode?(node: PreSerializedNode<Node>, options: WriterOptions): void
 
   /** 
    * Called right after starting writing an attribute. This function does 
@@ -313,10 +324,8 @@ export interface XMLWriter<T> {
    * 
    * @param node - current attribute
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  openAttribute?(node: Attr, options: WriterOptions, level: number, refs?: any): void
+  openAttribute?(node: PreSerializedAttr, options: WriterOptions): void
 
   /** 
    * Called right before completing writing an attribute. This function 
@@ -325,14 +334,12 @@ export interface XMLWriter<T> {
    * 
    * @param node - current attribute
    * @param options - serialization options
-   * @param level - curent depth of the XML tree
-   * @param refs - internal parameters passed to serializer functions
    */
-  closeAttribute?(node: Attr, options: WriterOptions, level: number, refs?: any): void
+  closeAttribute?(node: PreSerializedAttr, options: WriterOptions): void
 }
 
 /**
- * Represents a recursive type that can arrays and maps of serialized nodes.
+ * Represents a recursive type that can for arrays and maps of serialized nodes.
  * Uses the approach in explained in: 
  * https://github.com/Microsoft/TypeScript/issues/3496#issuecomment-128553540
  */
