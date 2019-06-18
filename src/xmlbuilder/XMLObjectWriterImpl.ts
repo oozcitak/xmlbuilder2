@@ -1,5 +1,5 @@
 import {
-  WriterOptions, XMLBuilderOptions, WriterState, XMLSerializedValue, 
+  WriterOptions, XMLBuilderOptions, WriterState, XMLSerializedValue,
   PreSerializedNode, PreSerializedAttr, PreSerializedNS
 } from "./interfaces"
 import {
@@ -24,9 +24,7 @@ export class XMLObjectWriterImpl extends XMLWriterImpl<XMLSerializedValue> {
 
   /** @inheritdoc */
   document(preNode: PreSerializedNode<XMLDocument>, options: WriterOptions): XMLSerializedValue {
-    let markup = new Array<XMLSerializedValue>()
-    markup.push(this._serializeChildNodes(preNode, options))
-    return markup
+    return this._serializeChildNodes(preNode, options)
   }
 
   /** @inheritdoc */
@@ -36,20 +34,14 @@ export class XMLObjectWriterImpl extends XMLWriterImpl<XMLSerializedValue> {
 
   /** @inheritdoc */
   documentFragment(preNode: PreSerializedNode<DocumentFragment>, options: WriterOptions): XMLSerializedValue {
-    let markup = new Array<XMLSerializedValue>()
-    markup.push(this._serializeChildNodes(preNode, options))
-    return markup
+    return this._serializeChildNodes(preNode, options)
   }
 
   /** @inheritdoc */
   element(preNode: PreSerializedNode<Element>, options: WriterOptions): XMLSerializedValue {
-    options.state = WriterState.OpenTag
-    let markup = new Map<string, XMLSerializedValue>()
-    let attributes = new Map<string, string>()
-
     // serialize child-nodes
     options.state = WriterState.InsideTag
-    markup.set(preNode.name || '', this._serializeChildNodes(preNode, options))
+    let markup = this._serializeChildNodes(preNode, options)
 
     options.state = WriterState.None
     return markup
@@ -112,7 +104,7 @@ export class XMLObjectWriterImpl extends XMLWriterImpl<XMLSerializedValue> {
       items.push([key, node])
       let count = keyCount.get(key)
       count = (count || 0) + 1
-      if(!hasDuplicateKeys && !canIncrement && count > 1) [
+      if (!hasDuplicateKeys && !canIncrement && count > 1) [
         hasDuplicateKeys = true
       ]
       keyCount.set(key, count)
@@ -123,6 +115,14 @@ export class XMLObjectWriterImpl extends XMLWriterImpl<XMLSerializedValue> {
       // child nodes have duplicate keys
       // return an array
       const result = new Array<XMLSerializedValue>()
+      for (const ns of preNode.namespaces) {
+        const [key, canIncrement] = this._getAttrKey(ns.name)
+        result.push(new Map<string, XMLSerializedValue>([[key, ns.value]]))
+      }
+      for (const attr of preNode.attributes) {
+        const [key, canIncrement] = this._getAttrKey(attr.name)
+        result.push(new Map<string, XMLSerializedValue>([[key, attr.value]]))
+      }
       for (const [key, node] of items) {
         const nodeResult = this._serializeNode(node, options)
         result.push(new Map<string, XMLSerializedValue>([[key, nodeResult]]))
@@ -132,9 +132,17 @@ export class XMLObjectWriterImpl extends XMLWriterImpl<XMLSerializedValue> {
       // child nodes have unique keys
       // return a map
       const result = new Map<string, XMLSerializedValue>()
+      for (const ns of preNode.namespaces) {
+        const [key, canIncrement] = this._getAttrKey(ns.name)
+        result.set(key, ns.value)
+      }
+      for (const attr of preNode.attributes) {
+        const [key, canIncrement] = this._getAttrKey(attr.name)
+        result.set(key, attr.value)
+      }
       for (const [key, node] of items) {
         let uniqueKey = key
-        if (keyCount.get(key) || 0 > 1) {
+        if ((keyCount.get(key) || 0) > 1) {
           let index = (keyIndices.get(key) || 0) + 1
           uniqueKey = key + index.toString()
           keyIndices.set(key, index)
@@ -144,6 +152,19 @@ export class XMLObjectWriterImpl extends XMLWriterImpl<XMLSerializedValue> {
       }
       return result
     }
+  }
+
+  /**
+   * Returns an object key for the given attribute or namespace declaration.
+   * 
+   * @param name - attribute name
+   * 
+   * @returns a two-tuple whose first value is the node key and second value
+   * is a boolean determining whether the key can be prefixed with a random 
+   * string to provide uniqueness.
+   */
+  private _getAttrKey(name: string): [string, boolean] {
+    return [(this.builderOptions.convertAttKey || '@') + name, false]
   }
 
   /**
