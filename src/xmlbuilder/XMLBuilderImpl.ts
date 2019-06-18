@@ -73,7 +73,11 @@ export class XMLBuilderImpl implements XMLBuilder {
         }
         if (!this.options.ignoreDecorators && this.options.convertAttKey && key.indexOf(this.options.convertAttKey) === 0) {
           // assign attributes
-          lastChild = this.att(key.substr(this.options.convertAttKey.length), val)
+          if (key === this.options.convertAttKey) {
+            lastChild = this.att(val)
+          } else {
+            lastChild = this.att(key.substr(this.options.convertAttKey.length), val)
+          }
         } else if (Array.isArray(val) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()

@@ -49,4 +49,25 @@ describe('att()', () => {
         node2
       `)
   })
+
+  test('attribute from JS object', () => {
+    const root = $$.create().ele('root')
+    root.ele('node').ele({ '@att1': 'val1', '@att2': 'val2' })
+
+    expect($$.printTree(root.doc())).toBe($$.t`
+      root
+        node att1="val1" att2="val2"
+      `)
+  })
+
+  test('attribute from JS object alternate notation', () => {
+    const root = $$.create().ele('root')
+    root.ele('node').ele({ '@': { 'att1': 'val1', 'att2': 'val2' } })
+
+    expect($$.printTree(root.doc())).toBe($$.t`
+      root
+        node att1="val1" att2="val2"
+      `)
+  })
+
 })
