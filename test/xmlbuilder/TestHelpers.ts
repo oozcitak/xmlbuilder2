@@ -13,7 +13,7 @@ export default class TestHelpers extends TestHelpersRoot {
     return serializer.serializeToString(node)
   }
 
-  static printMap(map: any, level: number = 1): string {
+  static printMap(map: any, level: number = 0): string {
 
     const indent = (indentLevel: number): string => new Array(indentLevel).join('  ')
 

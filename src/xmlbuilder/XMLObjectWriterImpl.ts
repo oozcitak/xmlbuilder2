@@ -41,7 +41,8 @@ export class XMLObjectWriterImpl extends XMLWriterImpl<XMLSerializedValue> {
   element(preNode: PreSerializedNode<Element>, options: WriterOptions): XMLSerializedValue {
     // serialize child-nodes
     options.state = WriterState.InsideTag
-    let markup = this._serializeChildNodes(preNode, options)
+    const markup = new Map<string, XMLSerializedValue>()
+    markup.set(preNode.name || '', this._serializeChildNodes(preNode, options))
 
     options.state = WriterState.None
     return markup
