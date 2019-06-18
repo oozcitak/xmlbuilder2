@@ -109,9 +109,9 @@ export interface PreSerializedNode<T extends Node> {
 }
 
 /**
- * Defines the options passed to the XML writer.
+ * Defines the options passed to the `StringWriter`.
  */
-export interface WriterOptions {
+export interface StringWriterOptions {
   /**
    * Whether to suppress the XML declaration from the output
    */
@@ -152,199 +152,30 @@ export interface WriterOptions {
    * Prevents existing html entities from being re-encoded
    */
   noDoubleEncoding?: boolean
-  /**
-   * Defines the current state of the writer
-   */
-  state?: WriterState
-  /**
-   * User data which will be passed to writer functions
-   */
-  user?: any
 }
 
 /**
- * Defines the state of the XML writer.
+ * Defines the options passed to the `ObjectWriter`.
  */
-export enum WriterState {
+export interface ObjectWriterOptions {
   /**
-   * Writer state is unknown.
+   * Output format
+   * - `"map"` - serialized object will consists of `Map`s and `Array`s. Note 
+   * that this is the preferred format since a `Map` preserves insertion 
+   * order of nodes as opposed to `Object`.
+   * - `"object"` - serialized object will consists of `Object`s and `Array`s
+   * - `"json"` - serialized object will be a JSON string
    */
-  None = 0,
-  /**
-   * Writer is at an opening tag, e.g. `<node>`.
-   */
-  OpenTag = 1,
-  /**
-   * Writer is inside an element.
-   */
-  InsideTag = 2,
-  /**
-   * Writer is at a closing tag, e.g. `</node>`.
-   */
-  CloseTag = 3
+  format?: "map" | "object" | "json"
 }
 
 /**
- * Defines the functions used for serializing XML nodes.
+ * Defines a recursive type that can represent objects, arrays and maps of
+ * serialized nodes.
  */
-export interface XMLWriter<T> {
-
-  /**
-   * Produces an XML serialization of the given node. This function is the main
-   * entry point to the serializer. It branches on the type of node to call
-   * specialized serializer functions.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  serialize(node: Node, options?: WriterOptions): T
-
-  /**
-   * Serializes a document node.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  document?(node: PreSerializedNode<XMLDocument>, options: WriterOptions): T
-
-  /**
-   * Serializes a document type node.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  documentType?(node: PreSerializedNode<DocumentType>, options: WriterOptions): T
-
-  /**
-   * Serializes a document fragment node.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  documentFragment?(node: PreSerializedNode<DocumentFragment>, options: WriterOptions): T
-
-  /**
-   * Serializes an element node.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  element?(node: PreSerializedNode<Element>, options: WriterOptions): T
-
-  /**
-   * Serializes a text node.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  text?(node: PreSerializedNode<Text>, options: WriterOptions): T
-
-  /**
-   * Serializes a CDATA node.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  cdata?(node: PreSerializedNode<CDATASection>, options: WriterOptions): T
-
-  /**
-   * Serializes a comment node.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  comment?(node: PreSerializedNode<Comment>, options: WriterOptions): T
-
-  /**
-   * Serializes a processing instruction node.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  processingInstruction?(node: PreSerializedNode<ProcessingInstruction>, options: WriterOptions): T
-
-  /**
-   * Serializes an attribute.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  attribute?(node: PreSerializedAttr, options: WriterOptions): T
-
-  /**
-   * Serializes a namespace declaration.
-   * 
-   * @param node - node to serialize
-   * @param options - serialization options
-   */
-  namespace?(node: PreSerializedNS, options: WriterOptions): T
-
-  /** 
-   * Called before starting a new line of output. Not all writers use this 
-   * function. A string writer may use this function to write the indentation
-   * string. 
-   * 
-   * @param node - current node
-   * @param options - serialization options
-   */
-  beginLine?(node: PreSerializedNode<Node>, options: WriterOptions): T
-
-  /** 
-   * Called before completing the current line of output. Not all writers use 
-   * this function. A string writer may use this function to write the newline
-   * string. 
-   * 
-   * @param node - current node
-   * @param options - serialization options
-   */
-  endLine?(node: PreSerializedNode<Node>, options: WriterOptions): T
-
-  /** 
-   * Called right after starting writing a node. This function does not 
-   * produce any output, but can be used to alter the state of the writer. 
-   * 
-   * @param node - current node
-   * @param options - serialization options
-   */
-  openNode?(node: PreSerializedNode<Node>, options: WriterOptions): void
-
-  /** 
-   * Called right before completing writing a node. This function does not 
-   * produce any output, but can be used to alter the state of the writer.
-   * 
-   * @param node - current node
-   * @param options - serialization options
-   */
-  closeNode?(node: PreSerializedNode<Node>, options: WriterOptions): void
-
-  /** 
-   * Called right after starting writing an attribute. This function does 
-   * not produce any output, but can be used to alter the state of the 
-   * writer. 
-   * 
-   * @param node - current attribute
-   * @param options - serialization options
-   */
-  openAttribute?(node: PreSerializedAttr, options: WriterOptions): void
-
-  /** 
-   * Called right before completing writing an attribute. This function 
-   * does not produce any output, but can be used to alter the state of 
-   * the writer. 
-   * 
-   * @param node - current attribute
-   * @param options - serialization options
-   */
-  closeAttribute?(node: PreSerializedAttr, options: WriterOptions): void
-}
-
-/**
- * Represents a recursive type that can for arrays and maps of serialized nodes.
- * Uses the approach in explained in: 
- * https://github.com/Microsoft/TypeScript/issues/3496#issuecomment-128553540
- */
-export type XMLSerializedValue = string | XMLSerializedObject | XMLSerializedArray
-interface XMLSerializedObject extends Map<string, XMLSerializedValue> { }
+export type XMLSerializedValue = string | XMLSerializedMap | XMLSerializedArray | XMLSerializedObject
+type XMLSerializedObject = { [key: string]: XMLSerializedValue }
+interface XMLSerializedMap extends Map<string, XMLSerializedValue> { }
 interface XMLSerializedArray extends Array<XMLSerializedValue> { }
 
 /**
@@ -595,19 +426,19 @@ export interface XMLBuilder {
    * 
    * @param options - serialization options
    */
-  toString(options?: WriterOptions): string
+  toString(options?: StringWriterOptions): string
 
   /**
    * Converts the node into its object representation.
    * 
    * @param options - serialization options
    */
-  toObject(options?: WriterOptions): XMLSerializedValue
+  toObject(options?: ObjectWriterOptions): XMLSerializedValue
 
   /**
    * Converts the entire XML document into its string representation.
    * 
    * @param options - serialization options
    */
-  end(options?: WriterOptions): string
+  end(options?: StringWriterOptions): string
 }

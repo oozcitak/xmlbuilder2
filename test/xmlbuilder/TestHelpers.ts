@@ -15,31 +15,39 @@ export default class TestHelpers extends TestHelpersRoot {
 
   static printMap(map: any, level: number = 0): string {
 
-    const indent = (indentLevel: number): string => new Array(indentLevel).join('  ')
+    const indent = (indentLevel: number): string => '  '.repeat(indentLevel)
 
     let r = ''
     if (isMap(map)) {
-      r += '{\n'
+      r += '{'
       const len = map.size
       let i = 0
       for (const [key, val] of map) {
-        r += indent(level + 1) + key + ': ' + TestHelpers.printMap(val, level + 1)
-        if (i < len - 1) { r += ',\n' }
+        r += '\n' + indent(level + 1) + key + ': ' + TestHelpers.printMap(val, level + 1)
+        if (i < len - 1) { r += ',' }
         i++
       }
-      r += indent(level) + '}'
+      r += '\n' + indent(level) + '}'
     } else if (isArray(map)) {
-      r += '[\n'
+      r += '['
+      const len = map.length
+      let i = 0      
       for (const val of map) {
-        r += indent(level + 1) + TestHelpers.printMap(val, level + 1) + '\n'
+        r += '\n' + indent(level + 1) + TestHelpers.printMap(val, level + 1)
+        if (i < len - 1) { r += ',' }
+        i++
       }
-      r += indent(level) + ']\n'
+      r += '\n' + indent(level) + ']'
     } else if (isObject(map)) {
-      r += '{\n'
+      r += '{'
+      const len = map.size
+      let i = 0
       for (const [key, val] of Object.entries(map)) {
-        r += indent(level + 1) + key + ': ' + TestHelpers.printMap(val, level + 1) + '\n'
+        r += '\n' + indent(level + 1) + key + ': ' + TestHelpers.printMap(val, level + 1)
+        if (i < len - 1) { r += ',' }
+        i++
       }
-      r += indent(level) + '}\n'
+      r += '\n' + indent(level) + '}'
     } else {
       r += map
     }

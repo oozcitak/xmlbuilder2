@@ -1,13 +1,13 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
   XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject, 
-  WriterOptions, XMLSerializedValue
+  StringWriterOptions, XMLSerializedValue, ObjectWriterOptions
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
 import { Namespace } from "../dom/spec"
 import { Char } from "./util/Char";
-import { XMLStringWriterImpl } from "./XMLStringWriterImpl"
-import { XMLObjectWriterImpl } from "./XMLObjectWriterImpl"
+import { StringWriterImpl } from "./StringWriterImpl"
+import { ObjectWriterImpl } from "./ObjectWriterImpl"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -399,19 +399,19 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  toString(options?: WriterOptions): string {
-    const writer = new XMLStringWriterImpl(this.options)
+  toString(options?: StringWriterOptions): string {
+    const writer = new StringWriterImpl(this.options)
     return writer.serialize(this._asNode, options)
   }
 
   /** @inheritdoc */
-  toObject(options?: WriterOptions): XMLSerializedValue {
-    const writer = new XMLObjectWriterImpl(this.options)
+  toObject(options?: ObjectWriterOptions): XMLSerializedValue {
+    const writer = new ObjectWriterImpl(this.options)
     return writer.serialize(this._asNode, options)
   }
 
   /** @inheritdoc */
-  end(options?: WriterOptions): string {
+  end(options?: StringWriterOptions): string {
     return this.doc().toString(options)
   }
 

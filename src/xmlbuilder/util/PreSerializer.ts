@@ -21,7 +21,6 @@ interface AttrParamRefs {
  */
 export class PreSerializer {
 
-
   /**
    * Initializes a new instance of `PreSerializer`.
    */
