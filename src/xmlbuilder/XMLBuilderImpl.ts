@@ -404,8 +404,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       writerOptions.format = "text"
     }
         
-    const writer = new StringWriterImpl(this.options)
-    return writer.serialize(this._asNode, writerOptions)
+    return <string>this._serialize(writerOptions)
   }
 
   /** @inheritdoc */
@@ -455,7 +454,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   private _node(name: string, attributes?: AttributesObject | string,
     text?: AttributesObject | string): XMLBuilder {
 
-    name = getValue(name)
+    name = getValue(name + '')
 
     // swap argument order: text <-> attributes
     if (attributes && !isObject(attributes)) {
@@ -546,7 +545,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /**
-   * Returns the underlying node.
+   * Returns the underlying DOMnode.
    */
   private get _asNode(): Node {
     const node = <Node><unknown>this
