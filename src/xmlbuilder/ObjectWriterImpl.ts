@@ -1,5 +1,5 @@
 import {
-  ObjectWriterOptions, XMLSerializedValue, PreSerializedNode, XMLBuilderOptions
+  WriterOptions, XMLSerializedValue, PreSerializedNode, XMLBuilderOptions
 } from "./interfaces"
 import {
   Node, Element, Text, CDATASection, Comment, ProcessingInstruction, NodeType
@@ -28,7 +28,7 @@ export class ObjectWriterImpl {
    * @param node - node to serialize
    * @param options - serialization options
    */
-  serialize(node: Node, options?: ObjectWriterOptions): XMLSerializedValue {
+  serialize(node: Node, options?: WriterOptions): XMLSerializedValue {
     options = options || { }
     if (options.format === undefined) {
       options.format = "map"
@@ -44,7 +44,7 @@ export class ObjectWriterImpl {
    * @param options - serialization options
    */
   protected _serializeNode(preNode: PreSerializedNode<Node>,
-    options: ObjectWriterOptions): XMLSerializedValue {
+    options: WriterOptions): XMLSerializedValue {
     switch (preNode.node.nodeType) {
       case NodeType.Element:
         return this._serializeElement(preNode, options)
@@ -74,7 +74,7 @@ export class ObjectWriterImpl {
    * @param options - serialization options
    */
   private _serializeElement(preNode: PreSerializedNode<Node>,
-    options: ObjectWriterOptions): XMLSerializedValue {
+    options: WriterOptions): XMLSerializedValue {
     if (preNode.name === undefined) {
       throw new Error("Element node doesn't have a name.")
     }
@@ -99,7 +99,7 @@ export class ObjectWriterImpl {
    * @param options - serialization options
    */
   private _serializeChildNodes(preNode: PreSerializedNode<Node>,
-    options: ObjectWriterOptions): XMLSerializedValue {
+    options: WriterOptions): XMLSerializedValue {
     const items = new Array<[string, PreSerializedNode<Node>]>()
     const keyCount = new Map<string, number>()
     const keyIndices = new Map<string, number>()

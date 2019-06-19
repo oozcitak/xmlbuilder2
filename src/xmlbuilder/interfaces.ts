@@ -109,64 +109,87 @@ export interface PreSerializedNode<T extends Node> {
 }
 
 /**
- * Defines the options passed to the `StringWriter`.
+ * Defines the options passed to the writer.
  */
-export interface StringWriterOptions {
+export interface WriterOptions {
   /**
-   * Whether to suppress the XML declaration from the output
+   * Output format. Defaults to `"text"`.
+   * - `"text"` - Serializes the document as a string in XML format.
+   * - `"map"` - Serializes the document as an object using `Map`s and 
+   * `Array`s. Note that this is the preferred format since a `Map` preserves
+   * insertion order of nodes as opposed to `Object`.
+   * - `"object"` - Serializes the document as an object using `Object`s and
+   * `Array`s.
+   * - `"json"` - Serializes the document tree as a JSON string.
+   */
+  format?: "text" | "map" | "object" | "json"  
+  /**
+   * Suppresses the XML declaration from the output.
    */
   headless?: boolean
   /**
-   * Whether to pretty-print the XML tree
+   * Pretty-prints the XML tree.
    */
   prettyPrint?: boolean
   /**
-   * Indentation string for pretty printing. Defaults to two space characters.
+   * Determines the indentation string for pretty printing. Defaults to two
+   * space characters.
    */
   indent?: string
   /**
-   * Newline string for pretty printing. Defaults to `"\n"`.
+   * Determines the newline string for pretty printing. Defaults to `"\n"`.
    */
   newline?: string
   /**
-   * A fixed number of indentations to add to every line
+   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * `0`.
    */
   offset?: number
   /**
-   * Maximum column width. Defaults to `80`.
+   * Determines the maximum column width. Defaults to `80`.
    */
   width?: number
   /**
-   * Whether to output closing tags for empty element nodes
+   * Produces closing tags for empty element nodes. Defaults to `false`. With
+   * this option set to `true`, closing tags will be produced for element nodes
+   * without child nodes, e.g.
+   * ```xml
+   * <node></node>
+   * ```
+   * Otherwise, empty element nodes will be self-closed, e.g.
+   * ```xml
+   * <node/>
+   * ````
    */
   allowEmptyTags?: boolean
   /**
-   * Whether to suppress pretty-printing for text nodes
+   * Suppresses pretty-printing for text nodes. Defaults to `false`. With this 
+   * option set to `true`, a text node will stay on the same line with its 
+   * containing element node, e.g.
+   * ```xml
+   * <node>some text</node>
+   * ```
+   * Otherwise, it will be printed on a new line. e.g.
+   * ```xml
+   * <node>
+   *   some text
+   * </node>
+   * ```
    */
   dontPrettyPrintTextNodes?: boolean
   /**
-   * Whether to insert a space character before closing slash character
+   * Inserts a space character before the slash character of self-closing tags. 
+   * Defaults to `false`. With this options set to `true`, a space character 
+   * will be inserted before the slash character of self-closing tags, e.g.
+   * ```xml
+   * <node />
+   * ```
    */
   spaceBeforeSlash?: boolean
   /**
-   * Prevents existing html entities from being re-encoded
+   * Prevents existing html entities from being re-encoded.
    */
   noDoubleEncoding?: boolean
-}
-
-/**
- * Defines the options passed to the `ObjectWriter`.
- */
-export interface ObjectWriterOptions {
-  /**
-   * Output format
-   * - `"map"` - serialized object will consists of `Map`s and `Array`s. Note 
-   * that this is the preferred format since a `Map` preserves insertion 
-   * order of nodes as opposed to `Object`.
-   * - `"object"` - serialized object will consists of `Object`s and `Array`s
-   * - `"json"` - serialized object will be a JSON string
-   */
-  format?: "map" | "object" | "json"
 }
 
 /**
@@ -426,19 +449,19 @@ export interface XMLBuilder {
    * 
    * @param options - serialization options
    */
-  toString(options?: StringWriterOptions): string
+  toString(writerOptions?: WriterOptions): string
 
   /**
    * Converts the node into its object representation.
    * 
    * @param options - serialization options
    */
-  toObject(options?: ObjectWriterOptions): XMLSerializedValue
+  toObject(writerOptions?: WriterOptions): XMLSerializedValue
 
   /**
-   * Converts the entire XML document into its string representation.
+   * Converts the entire XML document into its string or object representation.
    * 
    * @param options - serialization options
    */
-  end(options?: StringWriterOptions): string
+  end(writerOptions?: WriterOptions): XMLSerializedValue
 }

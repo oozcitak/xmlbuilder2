@@ -1,7 +1,7 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
   XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject, 
-  StringWriterOptions, XMLSerializedValue, ObjectWriterOptions
+  WriterOptions, XMLSerializedValue
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
 import { Namespace } from "../dom/spec"
@@ -399,20 +399,49 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  toString(options?: StringWriterOptions): string {
+  toString(writerOptions?: WriterOptions): string {
+    writerOptions = writerOptions || { }
+    if (writerOptions.format === undefined) {
+      writerOptions.format = "text"
+    }
+        
     const writer = new StringWriterImpl(this.options)
-    return writer.serialize(this._asNode, options)
+    return writer.serialize(this._asNode, writerOptions)
   }
 
   /** @inheritdoc */
-  toObject(options?: ObjectWriterOptions): XMLSerializedValue {
-    const writer = new ObjectWriterImpl(this.options)
-    return writer.serialize(this._asNode, options)
+  toObject(writerOptions?: WriterOptions): XMLSerializedValue {
+    writerOptions = writerOptions || { }
+    if (writerOptions.format === undefined) {
+      writerOptions.format = "map"
+    }
+
+    return this._serialize(writerOptions)
   }
 
   /** @inheritdoc */
-  end(options?: StringWriterOptions): string {
-    return this.doc().toString(options)
+  end(writerOptions?: WriterOptions): XMLSerializedValue {
+    writerOptions = writerOptions || { }
+    if (writerOptions.format === undefined) {
+      writerOptions.format = "text"
+    }
+
+    return (<XMLBuilderImpl>this.doc())._serialize(writerOptions)
+  }
+
+  /**
+   * Converts the node into its string or object representation.
+   * 
+   * @param options - serialization options
+   */
+  private _serialize(writerOptions: WriterOptions): XMLSerializedValue {
+    if (writerOptions.format === "text") {
+      const writer = new StringWriterImpl(this.options)
+      return writer.serialize(this._asNode, writerOptions)
+    } else {
+      const writer = new ObjectWriterImpl(this.options)
+      return writer.serialize(this._asNode, writerOptions)
+    }
   }
 
   /**
