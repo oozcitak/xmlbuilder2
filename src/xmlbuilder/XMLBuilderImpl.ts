@@ -5,9 +5,8 @@ import {
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
 import { Namespace } from "../dom/spec"
-import { Char } from "./util/Char";
-import { StringWriterImpl } from "./StringWriterImpl"
-import { ObjectWriterImpl } from "./ObjectWriterImpl"
+import { Char } from "./util/Char"
+import { StringWriterImpl, ObjectWriterImpl } from "./writers"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and

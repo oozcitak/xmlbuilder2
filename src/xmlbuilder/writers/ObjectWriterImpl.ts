@@ -1,10 +1,10 @@
 import {
   WriterOptions, XMLSerializedValue, PreSerializedNode, XMLBuilderOptions
-} from "./interfaces"
+} from "../interfaces"
 import {
   Node, Element, Text, CDATASection, Comment, ProcessingInstruction, NodeType
-} from "../dom/interfaces"
-import { PreSerializer } from "./util"
+} from "../../dom/interfaces"
+import { PreSerializer } from "../util"
 
 /**
  * Serializes XML nodes into objects.

@@ -1,12 +1,12 @@
 import {
   WriterOptions, XMLBuilderOptions,
   PreSerializedNode, PreSerializedAttr, PreSerializedNS
-} from "./interfaces"
+} from "../interfaces"
 import {
   Node, XMLDocument, Element, DocumentType, Text, CDATASection,
   Comment, ProcessingInstruction, DocumentFragment, NodeType
-} from "../dom/interfaces"
-import { Char, PreSerializer } from "./util"
+} from "../../dom/interfaces"
+import { Char, PreSerializer } from "../util"
 
 /**
  * Represents reference parameters passed to string writer functions.
