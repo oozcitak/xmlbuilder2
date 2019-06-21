@@ -1,7 +1,7 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
-  XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject, 
-  WriterOptions, XMLSerializedValue
+  XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
+  WriterOptions, XMLSerializedValue, Validator
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
 import { Namespace } from "../dom/spec"
@@ -20,17 +20,22 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
   set options(options: XMLBuilderOptions) {
     // character validation
-    if(options.pubID) {
-      Char.assertPubId(options.pubID, options.version || "1.0", this._debugInfo())
+    if (options.pubID) {
+      options.pubID = this.validate.pubID(options.pubID, this._debugInfo())
     }
-    if(options.sysID) {
-      Char.assertChar(options.sysID, options.version || "1.0", this._debugInfo())
-      if (options.sysID.includes('"') && options.sysID.includes("'")) {
-        throw new Error(`System identifier cannot contain both a single and double quote: ${options.sysID}.` + this._debugInfo())
-      }
+    if (options.sysID) {
+      options.sysID = this.validate.sysID(options.sysID, this._debugInfo())
     }
 
     this.doc().options = options
+  }
+
+  /** @inheritdoc */
+  get validate(): Validator {
+    return this.doc().validate
+  }
+  set validate(validator: Validator) {
+    this.doc().validate = validator
   }
 
   /** @inheritdoc */
@@ -69,6 +74,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         if (isFunction(val)) {
           // evaluate if function
           val = val.apply(this)
+          console.log(val)
         }
         if (!this.options.ignoreDecorators && this.options.convertAttKey && key.indexOf(this.options.convertAttKey) === 0) {
           // assign attributes
@@ -189,8 +195,8 @@ export class XMLBuilderImpl implements XMLBuilder {
         const ele = this._asElement
 
         // character validation
-        Char.assertName(name, this.options.version || "1.0", this._debugInfo())
-        Char.assertChar(value, this.options.version || "1.0", this._debugInfo())
+        name = this.validate.name(name)
+        value = this.validate.attValue(value)
 
         // skip the default namespace declaration attribute
         // it is already processed by the _node function
@@ -202,7 +208,7 @@ export class XMLBuilderImpl implements XMLBuilder {
           } else {
             const attNamespace = ele.lookupNamespaceURI(attQName.prefix)
             if (attNamespace != null && !ele.isDefaultNamespace(attNamespace)) {
-              ele.setAttributeNS(attNamespace, name, value)
+              ele.setAttributeNS(this.validate.namespace(attNamespace), name, value)
             } else {
               ele.setAttribute(name, value)
             }
@@ -245,7 +251,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = this._asElement
 
     // character validation
-    Char.assertChar(content, this.options.version || "1.0", this._debugInfo())
+    content = this.validate.text(content)
 
     const child = this._doc.createTextNode(content)
     ele.appendChild(child)
@@ -258,10 +264,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = this._asElement
 
     // character validation
-    Char.assertChar(content, this.options.version || "1.0", this._debugInfo())
-    if (content.includes("--") || content.endsWith("-")) {
-      throw new Error(`Comment content cannot contain double-hypen or end with a hypen: ${content}.` + this._debugInfo())
-    }
+    content = this.validate.comment(content)
 
     const child = this._doc.createComment(content)
     ele.appendChild(child)
@@ -274,10 +277,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = this._asElement
 
     // character validation
-    Char.assertChar(content, this.options.version || "1.0", this._debugInfo())
-    if (content.includes("]]>")) {
-      throw new Error(`CDATA content cannot contain "]]>": ${content}.` + this._debugInfo())
-    }
+    content = this.validate.cdata(content)
 
     const child = this._doc.createCDATASection(content)
     ele.appendChild(child)
@@ -290,14 +290,8 @@ export class XMLBuilderImpl implements XMLBuilder {
     const ele = this._asElement
 
     // character validation
-    Char.assertName(target, this.options.version || "1.0", this._debugInfo())
-    if (target.includes(":") || (/^xml$/i).test(target)) {
-      throw new Error(`Processing instruction target cannot contain ":" or cannot be "xml": ${target}.` + this._debugInfo())
-    }
-    Char.assertChar(content, this.options.version || "1.0", this._debugInfo())
-    if (content.includes("?>")) {
-      throw new Error(`Processing instruction content cannot contain "?>": ${content}.` + this._debugInfo())
-    }
+    target = this.validate.insTarget(target)
+    content = this.validate.insValue(content)
 
     const child = this._doc.createProcessingInstruction(target, content)
     ele.appendChild(child)
@@ -399,17 +393,17 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   toString(writerOptions?: WriterOptions): string {
-    writerOptions = writerOptions || { }
+    writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
       writerOptions.format = "text"
     }
-        
+
     return <string>this._serialize(writerOptions)
   }
 
   /** @inheritdoc */
   toObject(writerOptions?: WriterOptions): XMLSerializedValue {
-    writerOptions = writerOptions || { }
+    writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
       writerOptions.format = "map"
     }
@@ -419,7 +413,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   end(writerOptions?: WriterOptions): XMLSerializedValue {
-    writerOptions = writerOptions || { }
+    writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
       writerOptions.format = "text"
     }
@@ -503,8 +497,8 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (attributes) builder.att(attributes)
 
     // create a text node
-    if (text && isString(text)) {
-      builder.txt(text)
+    if (text) {
+      builder.txt(<string>text)
     }
 
     return builder

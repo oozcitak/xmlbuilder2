@@ -77,6 +77,184 @@ export interface XMLBuilderOptions {
    * comment node. Defaults to `"#comment"`.
    */
   convertCommentKey?: string
+  /**
+   * Contains functions that validate character data in XML nodes.
+   */
+  validate?: ValidateOptions
+}
+
+type ValidatorFunction = (val: string, debugInfo?: string) => string
+
+/**
+ * Contains functions that validate character data in XML nodes.
+ */
+export interface ValidateOptions {
+
+  /**
+   * Validates a public identifier.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  pubID?: ValidatorFunction
+
+  /**
+   * Validates a system identifier.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  sysID?: ValidatorFunction
+
+  /**
+   * Validates element and attribute names.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  name?: ValidatorFunction
+
+  /**
+   * Validates text node contents.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  text?: ValidatorFunction
+
+  /**
+   * Validates CDATA node contents.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  cdata?: ValidatorFunction
+
+  /**
+   * Validates comment node contents.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  comment?: ValidatorFunction
+
+  /**
+   * Validates attribute values.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  attValue?: ValidatorFunction
+
+  /**
+   * Validates processing instruction node target.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  insTarget?: ValidatorFunction
+
+  /**
+   * Validates processing instruction node value.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  insValue?: ValidatorFunction
+
+  /**
+   * Validates namespace declaration.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  namespace?: ValidatorFunction
+}
+
+/**
+ * Validates character data in XML nodes.
+ */
+export interface Validator {
+
+  /**
+   * Validates a public identifier.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  pubID: ValidatorFunction
+
+  /**
+   * Validates a system identifier.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  sysID: ValidatorFunction
+
+  /**
+   * Validates element and attribute names.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  name: ValidatorFunction
+
+  /**
+   * Validates text node contents.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  text: ValidatorFunction
+
+  /**
+   * Validates CDATA node contents.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  cdata: ValidatorFunction
+
+  /**
+   * Validates comment node contents.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  comment: ValidatorFunction
+
+  /**
+   * Validates attribute values.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  attValue: ValidatorFunction
+
+  /**
+   * Validates processing instruction node target.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  insTarget: ValidatorFunction
+
+  /**
+   * Validates processing instruction node value.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  insValue: ValidatorFunction
+
+  /**
+   * Validates namespace declaration.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  namespace: ValidatorFunction
 }
 
 /**
@@ -279,6 +457,11 @@ export interface XMLBuilder {
    * Gets or sets builder options.
    */
   options: XMLBuilderOptions
+
+  /**
+   * Gets or sets the character validator.
+   */
+  validate: Validator
 
   /**
    * Creates a new element node and appends it to the list of child nodes.

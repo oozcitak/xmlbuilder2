@@ -4,6 +4,7 @@ import {
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { isString } from "util"
+import { ValidatorImpl } from "./ValidatorImpl"
 
 /**
  * Serves as an entry point to builder functions.
@@ -32,6 +33,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
 
     const doc = DOMImplementationInstance.createDocument(null, '')
     const builder = <XMLBuilder><unknown>doc
+    builder.validate = new ValidatorImpl(this._options)
     builder.options = this._options
     if (name !== undefined) {
       const ele = builder.ele(name, attributes, text)
@@ -52,6 +54,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   fragment(): XMLBuilder {
     const doc = DOMImplementationInstance.createDocument(null, '')
     const builder = <XMLBuilder><unknown>doc
+    builder.validate = new ValidatorImpl(this._options)
     builder.options = this._options
     return <XMLBuilder><unknown>doc.createDocumentFragment()
   }
@@ -61,10 +64,12 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
     if (isString(document)) {
       const parser = new DOMParser()
       const builder = <XMLBuilder><unknown>parser.parseFromString(document, MimeType.XML)
+      builder.validate = new ValidatorImpl(this._options)
       builder.options = this._options
       return builder.root()
     } else {
       const builder = <XMLBuilder><unknown>DOMImplementationInstance.createDocument(null, '')
+      builder.validate = new ValidatorImpl(this._options)
       builder.options = this._options
       builder.ele(document)
       return builder.root()

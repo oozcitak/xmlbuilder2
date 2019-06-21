@@ -18,33 +18,33 @@ describe('StringWriter', () => {
         contact: {
           phone: [ "555-1234", "555-1235" ]
         },
-        id() { return 42; },
+        id: () => 42,
         details: {
           '#text': 'classified'
         }
       }
     }
 
-    expect($$.create('root').ele(obj).end({ format: "text" })).toBe($$.t`
+    expect($$.create('root').ele(obj).root().
+      toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <root>
         <ele>simple element</ele>
         <person age="35">
-            <name>John</name>
-            <?pi mypi?>
-            <!-- Good guy -->
-            <![CDATA[well formed!]]>
-            <address>
-                <city>Istanbul</city>
-                <street>End of long and winding road</street>
-            </address>
-            <contact>
-                <phone>555-1234</phone>
-                <phone>555-1235</phone>
-            </contact>
-            <id>42</id>
-            <details>classified</details>
+          <name>John</name>
+          <?pi mypi?>
+          <!--Good guy-->
+          <![CDATA[well formed!]]>
+          <address>
+            <city>Istanbul</city>
+            <street>End of long and winding road</street>
+          </address>
+          <contact>
+            <phone>555-1234</phone>
+            <phone>555-1235</phone>
+          </contact>
+          <id>42</id>
+          <details>classified</details>
         </person>
-        <added/>
       </root>
       `)
   })
@@ -58,7 +58,8 @@ describe('StringWriter', () => {
       }
     }
 
-    expect($$.create('root').ele(obj).end({ format: "text", prettyPrint: true, offset: 2 })).toBe(
+    expect($$.create('root').ele(obj).root().
+      toString({ format: "text", prettyPrint: true, offset: 2 })).toBe(
       '    <root>\n' +
       '      <ele>simple element</ele>\n' +
       '      <person age="35">\n' +
