@@ -5,6 +5,14 @@ import {
   Node, Element, Text, CDATASection, Comment, ProcessingInstruction, NodeType
 } from "../../dom/interfaces"
 import { PreSerializer } from "../util"
+import { applyDefaults } from "../../util"
+
+/**
+ * Represents object writer options.
+ */
+interface ObjectWriterOptions {
+  format: "map" | "object" | "json"
+}
 
 /**
  * Serializes XML nodes into objects.
@@ -26,13 +34,12 @@ export class ObjectWriterImpl {
    * Produces an XML serialization of the given node.
    * 
    * @param node - node to serialize
-   * @param options - serialization options
+   * @param writerOptions - serialization options
    */
-  serialize(node: Node, options?: WriterOptions): XMLSerializedValue {
-    options = options || { }
-    if (options.format === undefined) {
-      options.format = "map"
-    }
+  serialize(node: Node, writerOptions?: WriterOptions): XMLSerializedValue {
+    const options: ObjectWriterOptions = applyDefaults(writerOptions, {
+      format: "map"
+    })
 
     return this._serializeNode(PreSerializer.Serialize(node), options)
   }
@@ -44,7 +51,7 @@ export class ObjectWriterImpl {
    * @param options - serialization options
    */
   protected _serializeNode(preNode: PreSerializedNode<Node>,
-    options: WriterOptions): XMLSerializedValue {
+    options: ObjectWriterOptions): XMLSerializedValue {
     switch (preNode.node.nodeType) {
       case NodeType.Element:
         return this._serializeElement(preNode, options)
@@ -74,7 +81,7 @@ export class ObjectWriterImpl {
    * @param options - serialization options
    */
   private _serializeElement(preNode: PreSerializedNode<Node>,
-    options: WriterOptions): XMLSerializedValue {
+    options: ObjectWriterOptions): XMLSerializedValue {
     if (preNode.name === undefined) {
       throw new Error("Element node doesn't have a name.")
     }
@@ -99,7 +106,7 @@ export class ObjectWriterImpl {
    * @param options - serialization options
    */
   private _serializeChildNodes(preNode: PreSerializedNode<Node>,
-    options: WriterOptions): XMLSerializedValue {
+    options: ObjectWriterOptions): XMLSerializedValue {
     const items = new Array<[string, PreSerializedNode<Node>]>()
     const keyCount = new Map<string, number>()
     const keyIndices = new Map<string, number>()

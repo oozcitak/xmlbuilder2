@@ -27,6 +27,27 @@ export function applyMixin(baseClass: any, mixinClass: any, ...overrides: string
 }
 
 /**
+ * Applies default values to the given object.
+ * 
+ * @param obj - an object
+ * @param defaults - an object with default values
+ */
+export function applyDefaults<T>(obj: any, defaults: any): T {
+  if (obj === undefined || obj === null) {
+    obj = { }
+  }
+
+  for (const name in defaults) {
+    if (defaults.hasOwnProperty(name)) {
+      if (obj[name] === undefined) {
+        obj[name] = defaults[name]
+      }
+    }
+  }
+  return <T>obj
+}
+
+/**
  * Type guard for numeric types
  * 
  * @param x - a variable to type check

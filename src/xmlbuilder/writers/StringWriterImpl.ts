@@ -7,6 +7,7 @@ import {
   Comment, ProcessingInstruction, DocumentFragment, NodeType
 } from "../../dom/interfaces"
 import { PreSerializer, Char } from "../util"
+import { applyDefaults } from "../../util"
 
 /**
  * Represents string writer options.
@@ -58,19 +59,18 @@ export class StringWriterImpl {
    */
   serialize(node: Node, writerOptions?: WriterOptions): string {
     // provide default options
-    writerOptions = writerOptions || {}
-    const options: StringWriterOptions = {
-      headless: writerOptions.headless === undefined ? false : writerOptions.headless,
-      prettyPrint: writerOptions.prettyPrint === undefined ? false : writerOptions.prettyPrint,
-      indent: writerOptions.indent === undefined ? '  ' : writerOptions.indent,
-      newline: writerOptions.newline === undefined ? '\n' : writerOptions.newline,
-      offset: writerOptions.offset === undefined ? 0 : writerOptions.offset,
-      width: writerOptions.width === undefined ? 80 : writerOptions.width,
-      allowEmptyTags: writerOptions.allowEmptyTags === undefined ? false : writerOptions.allowEmptyTags,
-      dontPrettyPrintTextNodes: writerOptions.dontPrettyPrintTextNodes === undefined ? false : writerOptions.dontPrettyPrintTextNodes,
-      spaceBeforeSlash: writerOptions.spaceBeforeSlash === undefined ? false : writerOptions.spaceBeforeSlash,
-      noDoubleEncoding: writerOptions.noDoubleEncoding === undefined ? false : writerOptions.noDoubleEncoding
-    }
+    const options: StringWriterOptions = applyDefaults(writerOptions, {
+      headless: false,
+      prettyPrint: false,
+      indent: '  ',
+      newline: '\n',
+      offset: 0,
+      width: 80,
+      allowEmptyTags: false,
+      dontPrettyPrintTextNodes: false,
+      spaceBeforeSlash: false,
+      noDoubleEncoding: false
+    })
 
     let markup =  this._serializeNode(PreSerializer.Serialize(node), options,
       { suppressPrettyCount: 0 })

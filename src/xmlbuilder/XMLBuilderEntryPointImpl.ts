@@ -5,6 +5,7 @@ import {
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { isString } from "util"
 import { ValidatorImpl } from "./ValidatorImpl"
+import { applyDefaults } from "../util"
 
 /**
  * Serves as an entry point to builder functions.
@@ -17,14 +18,15 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
    * Initializes a new instance of  `XMLBuilderEntryPointImpl`
   */
   constructor(options?: XMLBuilderOptions) {
-    this._options = options || { }
-    this._options.version = this._options.version || "1.0"
-    this._options.convertAttKey = this._options.convertAttKey || "@"
-    this._options.convertPIKey = this._options.convertPIKey || "?"
-    this._options.convertTextKey = this._options.convertTextKey || "#text"
-    this._options.convertCDataKey = this._options.convertCDataKey || "#cdata"
-    this._options.convertCommentKey = this._options.convertCommentKey || "#comment"
-  }
+    this._options = applyDefaults(options, {
+      version: "1.0",
+      convertAttKey: "@",
+      convertPIKey: "?",
+      convertTextKey: "#text",
+      convertCDataKey: "#cdata",
+      convertCommentKey: "#comment",
+    })
+}
 
   /** @inheritdoc */
   create(name?: string | ExpandObject, attributes?: AttributesObject | string,

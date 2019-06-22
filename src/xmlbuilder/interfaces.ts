@@ -1,7 +1,4 @@
-import { 
-  Node, Attr, XMLDocument, Element, DocumentType, Text, CDATASection,
-  Comment, ProcessingInstruction, DocumentFragment
-} from "../dom/interfaces"
+import { Node, Attr } from "../dom/interfaces"
 
 /**
  * Defines the options used while creating an XML document.
@@ -300,7 +297,7 @@ export interface WriterOptions {
    * `Array`s.
    * - `"json"` - Serializes the document tree as a JSON string.
    */
-  format?: "text" | "map" | "object" | "json"  
+  format?: "text" | "map" | "object" | "json"
   /**
    * Suppresses the XML declaration from the output.
    */
