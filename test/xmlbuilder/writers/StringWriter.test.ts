@@ -25,8 +25,9 @@ describe('StringWriter', () => {
       }
     }
 
-    expect($$.create('root').ele(obj).root().
-      toString({ format: "text", prettyPrint: true })).toBe($$.t`
+    expect($$.withOptions({ version: "1.0", encoding: "UTF-8", standalone: true })
+      .create('root').ele(obj).doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <root>
         <ele>simple element</ele>
         <person age="35">
@@ -69,5 +70,31 @@ describe('StringWriter', () => {
       )
   })
 
+  test('doctype with both public and system identifier', () => {
+    expect($$.withOptions({ pubID: "pub", sysID: "sys" })
+      .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <!DOCTYPE root PUBLIC "pub" "sys">
+      <root/>
+      `)
+  })
+
+  test('doctype with public identifier', () => {
+    expect($$.withOptions({ pubID: "pub", })
+      .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <!DOCTYPE root PUBLIC "pub">
+      <root/>
+      `)
+  })
+
+  test('doctype with system identifier', () => {
+    expect($$.withOptions({ sysID: "sys", })
+      .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <!DOCTYPE root SYSTEM "sys">
+      <root/>
+      `)
+  })
 
 })

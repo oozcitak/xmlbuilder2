@@ -19,14 +19,6 @@ export class XMLBuilderImpl implements XMLBuilder {
     return this.doc().options
   }
   set options(options: XMLBuilderOptions) {
-    // character validation
-    if (options.pubID) {
-      options.pubID = this.validate.pubID(options.pubID, this._debugInfo())
-    }
-    if (options.sysID) {
-      options.sysID = this.validate.sysID(options.sysID, this._debugInfo())
-    }
-
     this.doc().options = options
   }
 
@@ -74,7 +66,6 @@ export class XMLBuilderImpl implements XMLBuilder {
         if (isFunction(val)) {
           // evaluate if function
           val = val.apply(this)
-          console.log(val)
         }
         if (!this.options.ignoreDecorators && this.options.convertAttKey && key.indexOf(this.options.convertAttKey) === 0) {
           // assign attributes
@@ -522,7 +513,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /**
    * Returns the document owning this node.
    */
-  private get _doc(): Document {
+  protected get _doc(): Document {
     const node = this._asNode
     const doc = node.ownerDocument
     if (!doc) {
@@ -534,14 +525,14 @@ export class XMLBuilderImpl implements XMLBuilder {
   /**
    * Cast to `any` to call methods without a TypeScript interface definition.
    */
-  private get _asAny(): any {
+  protected get _asAny(): any {
     return <any>this
   }
 
   /**
    * Returns the underlying DOMnode.
    */
-  private get _asNode(): Node {
+  protected get _asNode(): Node {
     const node = <Node><unknown>this
 
     if (!node.nodeType) {
@@ -554,7 +545,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /**
    * Returns the underlying element node.
    */
-  private get _asElement(): Element {
+  protected get _asElement(): Element {
     const ele = <Element><unknown>this
 
     if (!ele.nodeType || ele.nodeType != NodeType.Element) {
@@ -567,7 +558,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /**
    * Returns the underlying document node.
    */
-  private get _asDocument(): Document {
+  protected get _asDocument(): Document {
     const doc = <Document><unknown>this
 
     if (!doc.nodeType || doc.nodeType != NodeType.Document) {
@@ -580,7 +571,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /**
    * Converts a DOM node to an `XMLBuilder`.
    */
-  private static _FromNode(node: Node): XMLBuilder {
+  protected static _FromNode(node: Node): XMLBuilder {
     return <XMLBuilder><unknown>node
   }
 
@@ -589,7 +580,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * 
    * @param name - node name
    */
-  private _debugInfo(name?: string): string {
+  protected _debugInfo(name?: string): string {
     const node = this._asNode
     const parentNode = this._asNode.parentNode
 

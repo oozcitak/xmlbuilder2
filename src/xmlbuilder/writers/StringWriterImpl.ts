@@ -9,6 +9,22 @@ import {
 import { PreSerializer, Char } from "../util"
 
 /**
+ * Represents string writer options.
+ */
+interface StringWriterOptions {
+  headless: boolean
+  prettyPrint: boolean
+  indent: string
+  newline: string
+  offset: number
+  width: number
+  allowEmptyTags: boolean
+  dontPrettyPrintTextNodes: boolean
+  spaceBeforeSlash: boolean
+  noDoubleEncoding: boolean
+}
+
+/**
  * Represents reference parameters passed to string writer functions.
  */
 interface StringWriterRefs {
@@ -38,17 +54,30 @@ export class StringWriterImpl {
    * Produces an XML serialization of the given node.
    * 
    * @param node - node to serialize
-   * @param options - serialization options
+   * @param writerOptions - serialization options
    */
-  serialize(node: Node, options?: WriterOptions): string {
-    options = options || {}
+  serialize(node: Node, writerOptions?: WriterOptions): string {
+    // provide default options
+    writerOptions = writerOptions || {}
+    const options: StringWriterOptions = {
+      headless: writerOptions.headless === undefined ? false : writerOptions.headless,
+      prettyPrint: writerOptions.prettyPrint === undefined ? false : writerOptions.prettyPrint,
+      indent: writerOptions.indent === undefined ? '  ' : writerOptions.indent,
+      newline: writerOptions.newline === undefined ? '\n' : writerOptions.newline,
+      offset: writerOptions.offset === undefined ? 0 : writerOptions.offset,
+      width: writerOptions.width === undefined ? 80 : writerOptions.width,
+      allowEmptyTags: writerOptions.allowEmptyTags === undefined ? false : writerOptions.allowEmptyTags,
+      dontPrettyPrintTextNodes: writerOptions.dontPrettyPrintTextNodes === undefined ? false : writerOptions.dontPrettyPrintTextNodes,
+      spaceBeforeSlash: writerOptions.spaceBeforeSlash === undefined ? false : writerOptions.spaceBeforeSlash,
+      noDoubleEncoding: writerOptions.noDoubleEncoding === undefined ? false : writerOptions.noDoubleEncoding
+    }
+
     let markup =  this._serializeNode(PreSerializer.Serialize(node), options,
       { suppressPrettyCount: 0 })
 
     // remove trailing newline
-    const newline = options.newline === undefined ? '\n' : options.newline
-    if (options.prettyPrint && markup.slice(-newline.length) === newline) {
-        markup = markup.slice(0, -newline.length)
+    if (options.prettyPrint && markup.slice(-options.newline.length) === options.newline) {
+        markup = markup.slice(0, -options.newline.length)
     }
     
     return markup
@@ -62,7 +91,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeNode(preNode: PreSerializedNode<Node>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     switch (preNode.node.nodeType) {
       case NodeType.Element:
         return this._serializeElement(<PreSerializedNode<Element>>preNode, options, refs)
@@ -93,7 +122,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeChildNodes(preNode: PreSerializedNode<Node>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
     for (const child of preNode.children) {
       markup += this._serializeNode(child, options, refs)
@@ -109,7 +138,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeAttributes(preNode: PreSerializedNode<Node>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
     for (const preAttr of preNode.attributes) {
       markup += ` ${this._serializeAttribute(preAttr, options, refs)}`
@@ -125,7 +154,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeNamespaces(preNode: PreSerializedNode<Node>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
     for (const preNS of preNode.namespaces) {
       markup += ` ${this._serializeNamespace(preNS, options, refs)}`
@@ -141,19 +170,19 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeDocument(preNode: PreSerializedNode<XMLDocument>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
 
     if (!options.headless) {
-      markup = this._beginLine(preNode, options, refs) + '<?xml'
-      markup += ' version="' + (this._builderOptions.version || "1.0") + '"'
+      markup = `${this._beginLine(preNode, options, refs)}<?xml`
+      markup += ` version="${this._builderOptions.version || "1.0"}"`
       if (this._builderOptions.encoding !== undefined) {
-        markup += ' encoding="' + this._builderOptions.encoding + '"'
+        markup += ` encoding="${this._builderOptions.encoding}"`
       }
       if (this._builderOptions.standalone !== undefined) {
-        markup += ' standalone="' + (this._builderOptions.standalone ? "yes" : "no") + '"'
+        markup += ` standalone="${this._builderOptions.standalone ? "yes" : "no"}"`
       }
-      markup += '?>' + this._endLine(preNode, options, refs)
+      markup += `?>${this._endLine(preNode, options, refs)}`
     }
 
     markup += this._serializeChildNodes(preNode, options, refs)
@@ -169,7 +198,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeDocumentType(preNode: PreSerializedNode<DocumentType>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     let markup = this._beginLine(preNode, options, refs)
 
     if (preNode.node.publicId && preNode.node.systemId) {
@@ -194,7 +223,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeDocumentFragment(preNode: PreSerializedNode<DocumentFragment>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     return this._serializeChildNodes(preNode, options, refs)
   }
 
@@ -206,7 +235,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeElement(preNode: PreSerializedNode<Element>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     // opening tag
     let markup = this._beginLine(preNode, options, refs) + '<' + preNode.name
     // serialize namespaces
@@ -219,12 +248,12 @@ export class StringWriterImpl {
         e.node.nodeType === NodeType.Text && (<Text>e.node).data === '')) {
       // self closing tag
       if (options.allowEmptyTags) {
-        markup += '></' + preNode.name + '>' + this._endLine(preNode, options, refs)
+        markup += `></${preNode.name}>${this._endLine(preNode, options, refs)}`
       } else {
         if (options.spaceBeforeSlash) {
           markup += ' '
         }
-        markup += "/>" + this._endLine(preNode, options, refs)
+        markup += `/>${this._endLine(preNode, options, refs)}`
       }
     } else if (options.prettyPrint && preNode.children.length === 1 && 
       preNode.children[0].node.nodeType === NodeType.Text && 
@@ -234,7 +263,7 @@ export class StringWriterImpl {
       refs.suppressPrettyCount++
       markup += this._serializeNode(preNode.children[0], options, refs)
       refs.suppressPrettyCount--
-      markup += '</' + preNode.name + '>' + this._endLine(preNode, options, refs)
+      markup += `</${preNode.name}>${this._endLine(preNode, options, refs)}`
     } else {
       let prettySuppressed = false
 
@@ -249,7 +278,7 @@ export class StringWriterImpl {
         }
       }
 
-      markup += ">" + this._endLine(preNode, options, refs)
+      markup += `>${this._endLine(preNode, options, refs)}`
 
       // serialize child-nodes
       markup += this._serializeChildNodes(preNode, options, refs)
@@ -259,8 +288,7 @@ export class StringWriterImpl {
       }
 
       // closing tag
-      markup += this._beginLine(preNode, options, refs) + '</' + preNode.name + '>'
-        + this._endLine(preNode, options, refs)
+      markup += `${this._beginLine(preNode, options, refs)}</${preNode.name}>${this._endLine(preNode, options, refs)}`
     }
 
     return markup
@@ -274,7 +302,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeText(preNode: PreSerializedNode<Text>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     return this._beginLine(preNode, options, refs) +
       Char.escapeText(preNode.node.data) +
       this._endLine(preNode, options, refs)
@@ -288,10 +316,8 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeCdata(preNode: PreSerializedNode<CDATASection>,
-    options: WriterOptions, refs: StringWriterRefs): string {
-    return this._beginLine(preNode, options, refs) +
-      `<![CDATA[${preNode.node.data}]]>` +
-      this._endLine(preNode, options, refs)
+    options: StringWriterOptions, refs: StringWriterRefs): string {
+    return `${this._beginLine(preNode, options, refs)}<![CDATA[${preNode.node.data}]]>${this._endLine(preNode, options, refs)}`
   }
 
   /**
@@ -302,10 +328,8 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeComment(preNode: PreSerializedNode<Comment>,
-    options: WriterOptions, refs: StringWriterRefs): string {
-    return this._beginLine(preNode, options, refs) +
-      `<!--${preNode.node.data}-->` +
-      this._endLine(preNode, options, refs)
+    options: StringWriterOptions, refs: StringWriterRefs): string {
+    return `${this._beginLine(preNode, options, refs)}<!--${preNode.node.data}-->${this._endLine(preNode, options, refs)}`
   }
 
   /**
@@ -316,10 +340,8 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeProcessingInstruction(preNode: PreSerializedNode<ProcessingInstruction>,
-    options: WriterOptions, refs: StringWriterRefs): string {
-    return this._beginLine(preNode, options, refs) +
-      `<?${preNode.node.target} ${preNode.node.data}?>` +
-      this._endLine(preNode, options, refs)
+    options: StringWriterOptions, refs: StringWriterRefs): string {
+    return `${this._beginLine(preNode, options, refs)}<?${preNode.node.target} ${preNode.node.data}?>${this._endLine(preNode, options, refs)}`
   }
 
   /**
@@ -330,7 +352,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeAttribute(preAttr: PreSerializedAttr,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     return `${preAttr.name}="${Char.escapeAttrValue(preAttr.value)}"`
   }
 
@@ -342,7 +364,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeNamespace(preNS: PreSerializedNS,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     return `${preNS.name}="${Char.escapeAttrValue(preNS.value)}"`
   }
 
@@ -355,11 +377,11 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _beginLine(preNode: PreSerializedNode<Node>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     if (options.prettyPrint && !refs.suppressPrettyCount) {
-      const indentLevel = (options.offset || 0) + preNode.level + 1
+      const indentLevel = options.offset + preNode.level + 1
       if (indentLevel > 0) {
-        return new Array(indentLevel).join(options.indent || '  ')
+        return new Array(indentLevel).join(options.indent)
       }
     }
 
@@ -375,9 +397,9 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _endLine(preNode: PreSerializedNode<Node>,
-    options: WriterOptions, refs: StringWriterRefs): string {
+    options: StringWriterOptions, refs: StringWriterRefs): string {
     if (options.prettyPrint && !refs.suppressPrettyCount) {
-      return options.newline || '\n'
+      return options.newline
     } else {
       return ''
     }
