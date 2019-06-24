@@ -34,7 +34,7 @@ export function applyMixin(baseClass: any, mixinClass: any, ...overrides: string
  * @param obj - an object
  */
 export function clone<T>(obj: T): T {
-  if (obj === undefined || obj === null || isBoolean(obj) || isNumber(obj) || isFunction(obj) || isString(obj)) {
+  if (isFunction(obj)) {
     return obj
   } else if (isArray(obj)) {
     const result = [ ]

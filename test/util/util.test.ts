@@ -2,6 +2,37 @@ import * as util from '../../src/util'
 
 describe('util', function () {
 
+  test('clone', function () {
+    expect(util.clone(1)).toBe(1)
+    expect(util.clone(true)).toBe(true)
+    expect(util.clone("x")).toBe("x")
+    expect(util.clone(["x"])).toEqual(["x"])
+    expect(util.clone({ x: "x" })).toEqual({ x: "x" })
+
+    const obj1 = {
+      a: 1,
+      b: [1, 2, 3],
+      c: "x",
+      d: (val: string): string => 'hello ' + val
+    }
+    const  obj2 = util.clone(obj1)
+    expect(obj2.a).toBe(1)
+    expect(obj2.b).toEqual([1, 2, 3])
+    expect(obj2.c).toBe("x")
+    expect(obj2.d("world")).toBe("hello world")
+  })
+
+  test('isBoolean', function () {
+    expect(util.isBoolean(true)).toBeTruthy()
+    expect(util.isBoolean(true)).toBeTruthy()
+    expect(util.isBoolean(1)).toBeFalsy()
+    expect(util.isBoolean(0)).toBeFalsy()
+    expect(util.isBoolean("x")).toBeFalsy()
+    expect(util.isBoolean(["x"])).toBeFalsy()
+    expect(util.isBoolean({ x: "x" })).toBeFalsy()
+    expect(util.isBoolean(() => { })).toBeFalsy()
+  })
+
   test('isNumber', function () {
     expect(util.isNumber(1)).toBeTruthy()
     expect(util.isNumber(0)).toBeTruthy()
@@ -65,6 +96,24 @@ describe('util', function () {
     expect(util.isPlainObject(() => { })).toBeFalsy()
     expect(util.isPlainObject("0")).toBeFalsy()
     expect(util.isPlainObject(1)).toBeFalsy()
+  })
+
+  test('isIterable', function () {
+    expect(util.isIterable(["x"])).toBeTruthy()
+    expect(util.isIterable(new Map<string, number>([["a", 1]]))).toBeTruthy()
+    expect(util.isIterable("0")).toBeTruthy()
+    expect(util.isIterable({ x: "x" })).toBeFalsy()
+    expect(util.isIterable(() => { })).toBeFalsy()
+    expect(util.isIterable(1)).toBeFalsy()
+  })
+
+  test('isMap', function () {
+    expect(util.isMap(new Map<string, number>([["a", 1]]))).toBeTruthy()
+    expect(util.isMap({ x: "x" })).toBeFalsy()
+    expect(util.isMap(["x"])).toBeFalsy()
+    expect(util.isMap(() => { })).toBeFalsy()
+    expect(util.isMap("0")).toBeFalsy()
+    expect(util.isMap(1)).toBeFalsy()
   })
 
   test('getValue', function () {
