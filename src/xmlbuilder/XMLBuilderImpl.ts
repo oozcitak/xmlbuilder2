@@ -1,6 +1,6 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
-  XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
+  BuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, Validator
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
@@ -15,10 +15,10 @@ import { StringWriterImpl, ObjectWriterImpl } from "./writers"
 export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
-  get options(): XMLBuilderOptions {
+  get options(): BuilderOptions {
     return this.doc().options
   }
-  set options(options: XMLBuilderOptions) {
+  set options(options: BuilderOptions) {
     this.doc().options = options
   }
 
@@ -67,12 +67,12 @@ export class XMLBuilderImpl implements XMLBuilder {
           // evaluate if function
           val = val.apply(this)
         }
-        if (!this.options.ignoreDecorators && this.options.convertAttKey && key.indexOf(this.options.convertAttKey) === 0) {
+        if (!this.options.ignoreConverters && key.indexOf(this.options.convert.att) === 0) {
           // assign attributes
-          if (key === this.options.convertAttKey) {
+          if (key === this.options.convert.att) {
             lastChild = this.att(val)
           } else {
-            lastChild = this.att(key.substr(this.options.convertAttKey.length), val)
+            lastChild = this.att(key.substr(this.options.convert.att.length), val)
           }
         } else if (Array.isArray(val) && isEmpty(val)) {
           // skip empty arrays
@@ -95,13 +95,13 @@ export class XMLBuilderImpl implements XMLBuilder {
           // expand child nodes under parent
         } else if (isObject(val)) {
           // if the key is #text expand child nodes under this node to support mixed content
-          if (!this.options.ignoreDecorators && this.options.convertTextKey && key.indexOf(this.options.convertTextKey) === 0) {
+          if (!this.options.ignoreConverters && key.indexOf(this.options.convert.text) === 0) {
             lastChild = this.ele(val)
           } else {
             // check for a default namespace declaration attribute
             let namespace: string | null = null
-            if (!this.options.ignoreDecorators && this.options.convertAttKey && isObject(val)) {
-              const nsKey = this.options.convertAttKey + "xmlns"
+            if (!this.options.ignoreConverters && isObject(val)) {
+              const nsKey = this.options.convert.att + "xmlns"
               const attValue = val[nsKey]
               if (attValue === null || isString(attValue)) {
                 namespace = attValue
@@ -127,18 +127,18 @@ export class XMLBuilderImpl implements XMLBuilder {
       // skip null nodes
       lastChild = this._dummy()
     } else if (text !== undefined) {
-      if (!this.options.ignoreDecorators && this.options.convertTextKey && name.indexOf(this.options.convertTextKey) === 0) {
+      if (!this.options.ignoreConverters && name.indexOf(this.options.convert.text) === 0) {
         // text node
         lastChild = this.txt(text)
-      } else if (!this.options.ignoreDecorators && this.options.convertCDataKey && name.indexOf(this.options.convertCDataKey) === 0) {
+      } else if (!this.options.ignoreConverters && name.indexOf(this.options.convert.cdata) === 0) {
         // cdata node
         lastChild = this.dat(text)
-      } else if (!this.options.ignoreDecorators && this.options.convertCommentKey && name.indexOf(this.options.convertCommentKey) === 0) {
+      } else if (!this.options.ignoreConverters && name.indexOf(this.options.convert.comment) === 0) {
         // comment node
         lastChild = this.com(text)
-      } else if (!this.options.ignoreDecorators && this.options.convertPIKey && name.indexOf(this.options.convertPIKey) === 0) {
+      } else if (!this.options.ignoreConverters && name.indexOf(this.options.convert.ins) === 0) {
         // processing instruction
-        lastChild = this.ins(name.substr(this.options.convertPIKey.length), text)
+        lastChild = this.ins(name.substr(this.options.convert.ins.length), text)
       } else {
         // element node with text
         lastChild = this._node(name, attributes, text)

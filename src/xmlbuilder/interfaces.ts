@@ -1,9 +1,10 @@
 import { Node, Attr } from "../dom/interfaces"
 
 /**
- * Defines the options used while creating an XML document.
+ * Defines the options used while creating an XML document. Default values will
+ * be provided for optional parameters.
  */
-export interface XMLBuilderOptions {
+export interface BuilderOptionsParams {
   /**
    * A version number string, e.g. `"1.0"`
    */
@@ -37,20 +38,86 @@ export interface XMLBuilderOptions {
    */
   keepNullAttributes?: boolean
   /** 
-   * Whether decorator strings will be ignored when converting JS 
-   * objects
+   * Whether converter strings will be ignored when converting JS 
+   * objects to nodes
    */
-  ignoreDecorators?: boolean
+  ignoreConverters?: boolean
+  /** 
+   * Defines string keys used while converting JS objects to nodes.
+   */
+  convert?: ConvertOptions
+  /**
+   * Contains functions that validate character data in XML nodes.
+   */
+  validate?: ValidateOptions
+}
+
+/**
+ * Defines the options used while creating an XML document.
+ */
+export interface BuilderOptions {
+  /**
+   * A version number string, e.g. `"1.0"`
+   */
+  version: "1.0" | "1.1"
+  /**
+   * Encoding declaration, e.g. `"UTF-8"`
+   */
+  encoding?: string
+  /**
+   * Standalone document declaration: `true` or `false`
+   */
+  standalone?: boolean
+  /**
+   * Public identifier of the DTD
+   */
+  pubID?: string
+  /**
+   * System identifier of the DTD
+   */
+  sysID?: string
+  /**
+   * Whether child nodes inherit their parent namespace
+   */
+  inheritNS: boolean
+  /**
+   * Whether nodes with `null` values will be kept or ignored
+   */
+  keepNullNodes: boolean
+  /**
+   * Whether attributes with `null` values will be kept or ignored
+   */
+  keepNullAttributes: boolean
+  /** 
+   * Whether converter strings will be ignored when converting JS 
+   * objects to nodes
+   */
+  ignoreConverters: boolean
+  /** 
+   * Defines string keys used while converting JS objects to nodes.
+   */
+  convert: ConvertOptions
+  /**
+   * Contains functions that validate character data in XML nodes.
+   */
+  validate: ValidateOptions
+}
+
+/**
+ * Defines string keys used while converting JS objects to nodes. Default values
+ * will be provided for optional parameters.
+ */
+export interface ConvertOptionsParams {
   /** 
    * When prepended to a JS object key, converts the key-value pair 
    * to an attribute. Defaults to `"@"`.
    */
-  convertAttKey?: string
+  att?: string
   /** 
    * When prepended to a JS object key, converts the key-value pair 
    * to a processing instruction node. Defaults to `"?"`.
    */
-  convertPIKey?: string
+  ins?: string
   /** 
    * When prepended to a JS object key, converts its value to a text node. 
    * Defaults to `"#text"`.
@@ -63,21 +130,56 @@ export interface XMLBuilderOptions {
    * 
    * const textNodes = { '#text1': 'some text', '#text2': 'more text' }
    */
-  convertTextKey?: string
+  text?: string
   /** 
    * When prepended to a JS object key, converts its value to a CDATA 
    * node. Defaults to `"#cdata"`.
    */
-  convertCDataKey?: string
+  cdata?: string
   /** 
    * When prepended to a JS object key, converts its value to a 
    * comment node. Defaults to `"#comment"`.
    */
-  convertCommentKey?: string
-  /**
-   * Contains functions that validate character data in XML nodes.
+  comment?: string
+}
+
+/**
+ * Defines string keys used while converting JS objects to nodes.
+ */
+export interface ConvertOptions {
+  /** 
+   * When prepended to a JS object key, converts the key-value pair 
+   * to an attribute. Defaults to `"@"`.
    */
-  validate?: ValidateOptions
+  att: string
+  /** 
+   * When prepended to a JS object key, converts the key-value pair 
+   * to a processing instruction node. Defaults to `"?"`.
+   */
+  ins: string
+  /** 
+   * When prepended to a JS object key, converts its value to a text node. 
+   * Defaults to `"#text"`.
+   * 
+   * _Note:_ Since JS objects cannot contain duplicate keys, multiple text 
+   * nodes can be created by adding some unique text after each object 
+   * key. For example: 
+   * 
+   * @example
+   * 
+   * const textNodes = { '#text1': 'some text', '#text2': 'more text' }
+   */
+  text: string
+  /** 
+   * When prepended to a JS object key, converts its value to a CDATA 
+   * node. Defaults to `"#cdata"`.
+   */
+  cdata: string
+  /** 
+   * When prepended to a JS object key, converts its value to a 
+   * comment node. Defaults to `"#comment"`.
+   */
+  comment: string
 }
 
 type ValidatorFunction = (val: string, debugInfo?: string) => string
@@ -453,7 +555,7 @@ export interface XMLBuilder {
   /**
    * Gets or sets builder options.
    */
-  options: XMLBuilderOptions
+  options: BuilderOptions
 
   /**
    * Gets or sets the character validator.

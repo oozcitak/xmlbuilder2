@@ -1,5 +1,5 @@
 import { Char } from "./util"
-import { Validator, XMLBuilderOptions } from "./interfaces"
+import { Validator, BuilderOptions, ValidateOptions } from "./interfaces"
 
 /**
  * Validates character data in XML nodes.
@@ -13,21 +13,19 @@ export class ValidatorImpl implements Validator {
    * 
    * @options - builder options
    */
-  constructor(options: XMLBuilderOptions) {
-    this._xmlVersion = options.version || "1.0"
+  constructor(version: "1.0" | "1.1", options: ValidateOptions) {
+    this._xmlVersion = version
 
     // override base implementation with user supplied functions
-    if (options.validate) {
-      if (options.validate.pubID) this.pubID = options.validate.pubID
-      if (options.validate.sysID) this.sysID = options.validate.sysID
-      if (options.validate.text) this.text = options.validate.text
-      if (options.validate.cdata) this.cdata = options.validate.cdata
-      if (options.validate.comment) this.comment = options.validate.comment
-      if (options.validate.attValue) this.attValue = options.validate.attValue
-      if (options.validate.insTarget) this.insTarget = options.validate.insTarget
-      if (options.validate.insValue) this.insValue = options.validate.insValue
-      if (options.validate.namespace) this.namespace = options.validate.namespace
-    }
+    if (options.pubID) this.pubID = options.pubID
+    if (options.sysID) this.sysID = options.sysID
+    if (options.text) this.text = options.text
+    if (options.cdata) this.cdata = options.cdata
+    if (options.comment) this.comment = options.comment
+    if (options.attValue) this.attValue = options.attValue
+    if (options.insTarget) this.insTarget = options.insTarget
+    if (options.insValue) this.insValue = options.insValue
+    if (options.namespace) this.namespace = options.namespace
   }
 
   /** @inheritdoc */

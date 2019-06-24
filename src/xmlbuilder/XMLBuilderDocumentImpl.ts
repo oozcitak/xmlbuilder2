@@ -1,6 +1,5 @@
-import { XMLBuilderOptions, Validator } from "./interfaces"
+import { BuilderOptions, Validator } from "./interfaces"
 import { XMLBuilderImpl } from "./XMLBuilderImpl"
-import { ValidatorImpl } from "./ValidatorImpl"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -8,14 +7,18 @@ import { ValidatorImpl } from "./ValidatorImpl"
  */
 export class XMLBuilderDocumentImpl extends XMLBuilderImpl {
 
-  private _builderOptions: XMLBuilderOptions = { version: "1.0" }
-  private _validator: Validator = new ValidatorImpl({ version: "1.0" })
+  private _builderOptions?: BuilderOptions
+  private _validator?: Validator
 
   /** @inheritdoc */
-  get options(): XMLBuilderOptions {
+  get options(): BuilderOptions {
+    if (this._builderOptions === undefined) {
+      throw new Error("Builder options is undefined." + this._debugInfo())
+    }
+
     return this._builderOptions
   }
-  set options(options: XMLBuilderOptions) {
+  set options(options: BuilderOptions) {
     // character validation
     if (options.pubID !== undefined) {
       options.pubID = this.validate.pubID(options.pubID, this._debugInfo())
@@ -29,6 +32,10 @@ export class XMLBuilderDocumentImpl extends XMLBuilderImpl {
 
   /** @inheritdoc */
   get validate(): Validator {
+    if (this._validator === undefined) {
+      throw new Error("Validator is undefined." + this._debugInfo())
+    }
+
     return this._validator
   }
   set validate(validator: Validator) {

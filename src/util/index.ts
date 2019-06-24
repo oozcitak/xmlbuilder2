@@ -1,3 +1,5 @@
+import { strict } from 'assert';
+
 export { TupleSet } from './TupleSet'
 
 /**
@@ -27,24 +29,62 @@ export function applyMixin(baseClass: any, mixinClass: any, ...overrides: string
 }
 
 /**
+ * Deep clones the given object.
+ * 
+ * @param obj - an object
+ */
+export function clone<T>(obj: T): T {
+  if (obj === undefined || obj === null || isBoolean(obj) || isNumber(obj) || isFunction(obj) || isString(obj)) {
+    return obj
+  } else if (isArray(obj)) {
+    const result = [ ]
+    for (const item of obj) {
+      result.push(clone(item))
+    }
+    return <T><unknown>result
+  } else if (isObject(obj)) {
+    const result: any = { }
+    for (const [key, val] of Object.entries(obj)) {
+      result[key] = clone(val)
+    }
+    return result
+  } else {
+    return obj
+  }
+}
+
+/**
  * Applies default values to the given object.
  * 
  * @param obj - an object
  * @param defaults - an object with default values
  */
-export function applyDefaults<T>(obj: any, defaults: any): T {
-  if (obj === undefined || obj === null) {
-    obj = { }
-  }
+export function applyDefaults<T>(
+  obj: { [key: string]: any } | undefined, 
+  defaults: { [key: string]: any }): T {
+    
+  const result = clone(obj || {})
 
-  for (const name in defaults) {
-    if (defaults.hasOwnProperty(name)) {
-      if (obj[name] === undefined) {
-        obj[name] = defaults[name]
-      }
+  for (const [key, val] of Object.entries(defaults)) {
+    if (result[key] !== undefined) continue
+
+    if (isObject(val)) {
+      result[key] = applyDefaults(result[key], val)
+    } else {
+      result[key] = val
     }
   }
-  return <T>obj
+
+  return <T>result
+}
+
+/**
+ * Type guard for boolean types
+ * 
+ * @param x - a variable to type check
+ */
+export function isBoolean(x: any): x is boolean {
+  return typeof x === "boolean"
 }
 
 /**

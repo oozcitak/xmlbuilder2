@@ -1,13 +1,14 @@
 import { applyMixin } from '../util'
 import { 
   CDATASection, Comment, DocumentFragment, Document, 
-  DocumentType, Element, ProcessingInstruction, Text, CharacterData, Node, XMLDocument
+  DocumentType, Element, ProcessingInstruction, Text, CharacterData, 
+  Node, XMLDocument
 } from '../dom'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
 import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
 import {
-  XMLBuilderOptions, XMLBuilderEntryPoint, XMLBuilder, 
-  ExpandObject, AttributesObject
+  XMLBuilderEntryPoint, XMLBuilder, ExpandObject, AttributesObject, 
+  BuilderOptionsParams
 } from './interfaces'
 import { XMLBuilderDocumentImpl } from './XMLBuilderDocumentImpl'
 
@@ -31,7 +32,7 @@ applyMixin(XMLDocument, XMLBuilderDocumentImpl, "remove")
  * 
  * @param options - builder options
  */
-export function withOptions(options: XMLBuilderOptions): XMLBuilderEntryPoint {
+export function withOptions(options: BuilderOptionsParams): XMLBuilderEntryPoint {
   return new XMLBuilderEntryPointImpl(options)
 }
 

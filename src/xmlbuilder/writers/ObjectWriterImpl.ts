@@ -1,5 +1,5 @@
 import {
-  WriterOptions, XMLSerializedValue, PreSerializedNode, XMLBuilderOptions
+  WriterOptions, XMLSerializedValue, PreSerializedNode, BuilderOptions
 } from "../interfaces"
 import {
   Node, Element, Text, CDATASection, Comment, ProcessingInstruction, NodeType
@@ -19,14 +19,14 @@ interface ObjectWriterOptions {
  */
 export class ObjectWriterImpl {
 
-  private _builderOptions: XMLBuilderOptions
+  private _builderOptions: BuilderOptions
 
   /**
    * Initializes a new instance of `ObjectWriterImpl`.
    * 
    * @param builderOptions - XML builder options
    */
-  constructor(builderOptions: XMLBuilderOptions) {
+  constructor(builderOptions: BuilderOptions) {
     this._builderOptions = builderOptions
   }
 
@@ -198,7 +198,7 @@ export class ObjectWriterImpl {
    * @param name - attribute name
    */
   private _getAttrKey(name: string): string {
-    return (this._builderOptions.convertAttKey || '@') + name
+    return (this._builderOptions.convert.att) + name
   }
 
   /**
@@ -215,13 +215,13 @@ export class ObjectWriterImpl {
       case NodeType.Element:
         return [(<Element>preNode.node).tagName, false]
       case NodeType.Comment:
-        return [this._builderOptions.convertCommentKey || '#comment', true]
+        return [this._builderOptions.convert.comment, true]
       case NodeType.Text:
-        return [this._builderOptions.convertTextKey || '#text', true]
+        return [this._builderOptions.convert.text, true]
       case NodeType.ProcessingInstruction:
-        return [(this._builderOptions.convertPIKey || '?') + (<ProcessingInstruction>preNode.node).target, false]
+        return [(this._builderOptions.convert.ins) + (<ProcessingInstruction>preNode.node).target, false]
       case NodeType.CData:
-        return [this._builderOptions.convertCDataKey || '#cdata', true]
+        return [this._builderOptions.convert.cdata, true]
       default:
         throw new Error("Invalid node type.")
     }
