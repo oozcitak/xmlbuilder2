@@ -29,7 +29,7 @@ export class XMLSpec {
    *   .addRange(0xFFFE, 0xFFFF)
    * ```
    */
-  static readonly Char_10 = /[\0-\x08\x0B\f\x0E-\x1F\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/
+  static readonly InvalidChar_10 = /[\0-\x08\x0B\f\x0E-\x1F\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/
 
   /**
    * Valid characters for XML 1.1 from https://www.w3.org/TR/xml11/#charsets.
@@ -47,7 +47,7 @@ export class XMLSpec {
    *   .addRange(0xFFFE, 0xFFFF)
    * ```
    */
-  static readonly Char_11 = /[\0\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/
+  static readonly InvalidChar_11 = /[\0\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/
 
   /**
    * Determines if the given string is valid for a `"Name"` construct.
@@ -75,9 +75,9 @@ export class XMLSpec {
    */
   static isLegalChar(chars: string, xmlVersion: "1.0" | "1.1" = "1.0"): boolean {
     if (xmlVersion === "1.0") {
-      return (!chars.match(XMLSpec.Char_10))
+      return (!chars.match(XMLSpec.InvalidChar_10))
     } else {
-      return (!chars.match(XMLSpec.Char_11))
+      return (!chars.match(XMLSpec.InvalidChar_11))
     }
   }
 

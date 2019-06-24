@@ -1,4 +1,4 @@
-import { XMLSpec } from "../../dom/spec";
+import { XMLSpec } from "../../dom/spec"
 
 /**
  * Contains character processing utility functions.

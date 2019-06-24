@@ -5,7 +5,7 @@ import {
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
 import { Namespace } from "../dom/spec"
-import { Char } from "./util/Char"
+import { Char } from "./util"
 import { StringWriterImpl, ObjectWriterImpl } from "./writers"
 
 /**

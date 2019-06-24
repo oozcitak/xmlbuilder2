@@ -3,9 +3,8 @@ import {
   AttributesObject, XMLBuilder, BuilderOptionsParams, Validator
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
-import { isString } from "util"
-import { ValidatorImpl } from "./ValidatorImpl"
-import { applyDefaults } from "../util"
+import { ValidatorImpl } from "./util"
+import { isString, applyDefaults } from "../util"
 
 /**
  * Serves as an entry point to builder functions.
@@ -19,7 +18,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
    * Initializes a new instance of  `XMLBuilderEntryPointImpl`
   */
   constructor(options?: BuilderOptionsParams) {
-    this._validate = new ValidatorImpl((options && options.version) || "1.0", 
+    this._validate = new ValidatorImpl((options && options.version) || "1.0",
       (options && options.validate) || {})
 
     this._options = applyDefaults(options, <BuilderOptions>{
@@ -37,14 +36,14 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
       }
     })
 
-    if (this._options.convert.att.length === 0 || 
+    if (this._options.convert.att.length === 0 ||
       this._options.convert.ins.length === 0 ||
       this._options.convert.text.length === 0 ||
       this._options.convert.cdata.length === 0 ||
       this._options.convert.comment.length === 0) {
       throw new Error("JS object converter strings cannot be zero length.")
     }
-}
+  }
 
   /** @inheritdoc */
   create(name?: string | ExpandObject, attributes?: AttributesObject | string,
@@ -59,7 +58,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
       const documentElement = doc.documentElement
       if (documentElement && (this._options.pubID || this._options.sysID)) {
         const docType = DOMImplementationInstance.createDocumentType(
-          documentElement.tagName, 
+          documentElement.tagName,
           this._options.pubID || '', this._options.sysID || '')
         doc.insertBefore(docType, doc.firstChild)
       }
