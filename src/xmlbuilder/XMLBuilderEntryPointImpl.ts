@@ -5,6 +5,7 @@ import {
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { ValidatorImpl } from "./util"
 import { isString, applyDefaults } from "../util"
+import { XMLDocument } from "../dom/interfaces"
 
 /**
  * Serves as an entry point to builder functions.
@@ -49,28 +50,26 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   create(name?: string | ExpandObject, attributes?: AttributesObject | string,
     text?: AttributesObject | string): XMLBuilder {
 
-    const doc = DOMImplementationInstance.createDocument(null, '')
-    const builder = <XMLBuilder><unknown>doc
+    let builder = <XMLBuilder><unknown>this._createEmptyDocument()
     builder.validate = this._validate
     builder.options = this._options
+
+    // document element node
     if (name !== undefined) {
-      const ele = builder.ele(name, attributes, text)
-      const documentElement = doc.documentElement
-      if (documentElement && (this._options.pubID || this._options.sysID)) {
-        const docType = DOMImplementationInstance.createDocumentType(
-          documentElement.tagName,
-          this._options.pubID || '', this._options.sysID || '')
-        doc.insertBefore(docType, doc.firstChild)
-      }
-      return ele
-    } else {
-      return builder
+      builder = builder.ele(name, attributes, text)
     }
+
+    // DocType node
+    if (this._options.pubID || this._options.sysID) {
+      builder.dtd(this._options.pubID, this._options.sysID)
+    }
+
+    return builder
   }
 
   /** @inheritdoc */
   fragment(): XMLBuilder {
-    const doc = DOMImplementationInstance.createDocument(null, '')
+    const doc = this._createEmptyDocument()
     const builder = <XMLBuilder><unknown>doc
     builder.validate = this._validate
     builder.options = this._options
@@ -86,7 +85,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
       builder.options = this._options
       return builder.root()
     } else {
-      const builder = <XMLBuilder><unknown>DOMImplementationInstance.createDocument(null, '')
+      const builder = <XMLBuilder><unknown>this._createEmptyDocument()
       builder.validate = this._validate
       builder.options = this._options
       builder.ele(document)
@@ -94,4 +93,14 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
     }
   }
 
+  /**
+   * Creates an XML document without any child nodes.
+   */
+  private _createEmptyDocument(): XMLDocument {
+    const doc = DOMImplementationInstance.createDocument(null, 'root')
+    if (doc.documentElement) {
+      doc.removeChild(doc.documentElement)
+    }
+    return doc
+  }
 }

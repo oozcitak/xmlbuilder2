@@ -289,7 +289,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     // create doctype node
     const docType = this._doc.implementation.createDocumentType(
-      this._doc.documentElement !== null ? this._doc.documentElement.tagName : '',
+      this._doc.documentElement !== null ? this._doc.documentElement.tagName : 'ROOT',
       pubID, sysID)
 
     if (this._doc.doctype !== null) {

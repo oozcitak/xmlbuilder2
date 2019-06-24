@@ -48,4 +48,13 @@ describe('dtd()', () => {
       `)
   })
 
+  test('update when element node changes', () => {
+    const doc = $$.withOptions({ pubID: "pub", sysID: "sys" }).create()
+    doc.ele('newroot')
+    expect($$.printTree(doc)).toBe($$.t`
+      !DOCTYPE newroot PUBLIC pub sys
+      newroot
+      `)
+  })
+
 })
