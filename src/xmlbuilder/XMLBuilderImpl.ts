@@ -282,10 +282,10 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  dtd(pubID?: string, sysID?: string): XMLBuilder {
+  dtd(dtdOptions?: { pubID?: string, sysID?: string }): XMLBuilder {
     // character validation
-    pubID = this.validate.pubID(pubID || '')
-    sysID = this.validate.sysID(sysID || '')
+    const pubID = this.validate.pubID((dtdOptions && dtdOptions.pubID) || '')
+    const sysID = this.validate.sysID((dtdOptions && dtdOptions.sysID) || '')
 
     // create doctype node
     const docType = this._doc.implementation.createDocumentType(

@@ -61,7 +61,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
 
     // DocType node
     if (this._options.pubID || this._options.sysID) {
-      builder.dtd(this._options.pubID, this._options.sysID)
+      builder.dtd({ pubID: this._options.pubID, sysID: this._options.sysID })
     }
 
     return builder

@@ -679,12 +679,11 @@ export interface XMLBuilder {
    * document already contains a DocType node it will be replaced by the new
    * node. Otherwise it will be inserted before the document element node.
    * 
-   * @param pubID - public identifier
-   * @param sysID - system identifier
+   * @param dtdOptions - DocType identifiers
    * 
    * @returns current element node
    */
-  dtd(pubID?: string, sysID?: string): XMLBuilder
+  dtd(dtdOptions?: { pubID?: string, sysID?: string }): XMLBuilder
 
   /**
    * Imports a node as a child node of this node. The nodes' descendants and

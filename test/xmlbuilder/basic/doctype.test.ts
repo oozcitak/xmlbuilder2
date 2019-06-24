@@ -11,7 +11,7 @@ describe('dtd()', () => {
   })
 
   test('public identifier', () => {
-    const root = $$.create('root').dtd('pub')
+    const root = $$.create('root').dtd({ pubID: 'pub' })
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root PUBLIC pub
       root
@@ -19,7 +19,7 @@ describe('dtd()', () => {
   })
 
   test('system identifier', () => {
-    const root = $$.create('root').dtd('', 'sys')
+    const root = $$.create('root').dtd({ sysID: 'sys' })
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root SYSTEM sys
       root
@@ -27,7 +27,7 @@ describe('dtd()', () => {
   })
 
   test('both identifiers', () => {
-    const root = $$.create('root').dtd('pub', 'sys')
+    const root = $$.create('root').dtd({ pubID: 'pub', sysID: 'sys' })
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root PUBLIC pub sys
       root
@@ -41,7 +41,7 @@ describe('dtd()', () => {
       root
       `)
 
-    root.dtd('newpub', 'newsys')
+    root.dtd({ pubID: 'newpub', sysID: 'newsys' })
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root PUBLIC newpub newsys
       root
