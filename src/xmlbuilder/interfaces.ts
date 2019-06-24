@@ -45,7 +45,7 @@ export interface BuilderOptionsParams {
   /** 
    * Defines string keys used while converting JS objects to nodes.
    */
-  convert?: ConvertOptions
+  convert?: ConvertOptionsParams
   /**
    * Contains functions that validate character data in XML nodes.
    */
