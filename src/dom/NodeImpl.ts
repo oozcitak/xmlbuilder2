@@ -409,7 +409,7 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
    * @returns the removed child node
    */
   replaceChild(newChild: Node, oldChild: Node): Node {
-    return TreeMutation.replaceNode(newChild, oldChild, this)
+    return TreeMutation.replaceNode(oldChild, newChild, this)
   }
 
   /**

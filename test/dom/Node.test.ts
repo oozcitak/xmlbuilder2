@@ -321,7 +321,7 @@ describe('Node', function () {
 
   test('replaceChild()', function () {
     const newText = doc.createTextNode('txt')
-    ele1.replaceChild(child2, newText)
+    ele1.replaceChild(newText, child2)
     expect(newText.previousSibling).toBe(child1)
     expect(newText.nextSibling).toBe(child3)
   })
