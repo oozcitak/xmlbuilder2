@@ -32,7 +32,7 @@ describe('DOMParser - XML', function () {
         node att="val" att2="val2"
         ? kidding itwas="different"
         ? forreal
-        [ here be dragons
+        $ here be dragons
         text
           # alien's pinky toe
       `)

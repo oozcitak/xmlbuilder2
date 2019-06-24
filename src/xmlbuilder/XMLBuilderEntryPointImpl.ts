@@ -31,9 +31,9 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
       convert: {
         att: "@",
         ins: "?",
-        text: "#text",
-        cdata: "#cdata",
-        comment: "#comment"
+        text: "#",
+        cdata: "$",
+        comment: "!"
       }
     })
 

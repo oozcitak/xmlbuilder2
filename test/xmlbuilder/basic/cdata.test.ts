@@ -11,7 +11,7 @@ describe('dat()', () => {
     expect($$.printTree(root.doc())).toBe($$.t`
       root
         node1
-          [ node1 cdata
+          $ node1 cdata
           node1-2
         node2
       `)

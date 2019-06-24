@@ -120,7 +120,7 @@ export interface ConvertOptionsParams {
   ins?: string
   /** 
    * When prepended to a JS object key, converts its value to a text node. 
-   * Defaults to `"#text"`.
+   * Defaults to `"#"`.
    * 
    * _Note:_ Since JS objects cannot contain duplicate keys, multiple text 
    * nodes can be created by adding some unique text after each object 
@@ -133,12 +133,12 @@ export interface ConvertOptionsParams {
   text?: string
   /** 
    * When prepended to a JS object key, converts its value to a CDATA 
-   * node. Defaults to `"#cdata"`.
+   * node. Defaults to `"$"`.
    */
   cdata?: string
   /** 
    * When prepended to a JS object key, converts its value to a 
-   * comment node. Defaults to `"#comment"`.
+   * comment node. Defaults to `"!"`.
    */
   comment?: string
 }
@@ -159,7 +159,7 @@ export interface ConvertOptions {
   ins: string
   /** 
    * When prepended to a JS object key, converts its value to a text node. 
-   * Defaults to `"#text"`.
+   * Defaults to `"#"`.
    * 
    * _Note:_ Since JS objects cannot contain duplicate keys, multiple text 
    * nodes can be created by adding some unique text after each object 
@@ -172,12 +172,12 @@ export interface ConvertOptions {
   text: string
   /** 
    * When prepended to a JS object key, converts its value to a CDATA 
-   * node. Defaults to `"#cdata"`.
+   * node. Defaults to `"$"`.
    */
   cdata: string
   /** 
    * When prepended to a JS object key, converts its value to a 
-   * comment node. Defaults to `"#comment"`.
+   * comment node. Defaults to `"!"`.
    */
   comment: string
 }

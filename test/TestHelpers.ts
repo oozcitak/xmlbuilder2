@@ -35,7 +35,7 @@ export default class TestHelpers {
         str = `${indent}# ${node.data}\n`
         break
       case 4: // CData
-        str = `${indent}[ ${node.data}\n`
+        str = `${indent}$ ${node.data}\n`
         break
       case 7: // ProcessingInstruction
         if (node.data) {

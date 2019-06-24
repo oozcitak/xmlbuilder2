@@ -9,8 +9,8 @@ describe('object', () => {
         name: "John",
         '@age': 35,
         '?pi': 'mypi',
-        '#comment': 'Good guy',
-        '#cdata': 'well formed!',
+        '!': 'Good guy',
+        '$': 'well formed!',
         address: {
           city: "Istanbul",
           street: "End of long and winding road"
@@ -20,7 +20,7 @@ describe('object', () => {
         },
         id: () => 42,
         details: {
-          '#text': 'classified'
+          '#': 'classified'
         }
       }
     }
@@ -36,7 +36,7 @@ describe('object', () => {
             # John
           ? pi mypi
           ! Good guy
-          [ well formed!
+          $ well formed!
           address
             city
               # Istanbul
