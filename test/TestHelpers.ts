@@ -53,9 +53,11 @@ export default class TestHelpers {
         break
       case 10: // DocumentType
         str = `${indent}!DOCTYPE ${node.name}`
-        if (node.publicId)
+        if (node.publicId && node.systemId)
+          str += ` PUBLIC ${node.publicId} ${node.systemId}`
+        else if (node.publicId)
           str += ` PUBLIC ${node.publicId}`
-        if (node.systemId)
+        else if (node.systemId)
           str += ` SYSTEM ${node.systemId}`
         str += `\n`
         break

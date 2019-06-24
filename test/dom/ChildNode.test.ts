@@ -29,7 +29,7 @@ describe('ChildNode', function () {
 
     expect($$.printTree(doc)).toBe($$.t`
       ! comment1
-      !DOCTYPE qname PUBLIC pubid SYSTEM sysid
+      !DOCTYPE qname PUBLIC pubid sysid
       n:root (ns:myns)
         node1
         # text1
@@ -145,7 +145,7 @@ describe('ChildNode', function () {
     doctype.after(doc.createComment('comment1'))
 
     expect($$.printTree(doc)).toBe($$.t`
-      !DOCTYPE qname PUBLIC pubid SYSTEM sysid
+      !DOCTYPE qname PUBLIC pubid sysid
       ! comment1
       n:root (ns:myns)
         ele

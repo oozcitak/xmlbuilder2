@@ -5,7 +5,6 @@ import {
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
 import { Namespace } from "../dom/spec"
-import { Char } from "./util"
 import { StringWriterImpl, ObjectWriterImpl } from "./writers"
 
 /**
@@ -239,53 +238,67 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   txt(content: string): XMLBuilder {
-    const ele = this._asElement
-
     // character validation
     content = this.validate.text(content)
 
     const child = this._doc.createTextNode(content)
-    ele.appendChild(child)
+    this._asElement.appendChild(child)
 
     return this
   }
 
   /** @inheritdoc */
   com(content: string): XMLBuilder {
-    const ele = this._asElement
-
     // character validation
     content = this.validate.comment(content)
 
     const child = this._doc.createComment(content)
-    ele.appendChild(child)
+    this._asElement.appendChild(child)
 
     return this
   }
 
   /** @inheritdoc */
   dat(content: string): XMLBuilder {
-    const ele = this._asElement
-
     // character validation
     content = this.validate.cdata(content)
 
     const child = this._doc.createCDATASection(content)
-    ele.appendChild(child)
+    this._asElement.appendChild(child)
 
     return this
   }
 
   /** @inheritdoc */
   ins(target: string, content: string = ''): XMLBuilder {
-    const ele = this._asElement
-
     // character validation
     target = this.validate.insTarget(target)
     content = this.validate.insValue(content)
 
     const child = this._doc.createProcessingInstruction(target, content)
-    ele.appendChild(child)
+    this._asElement.appendChild(child)
+
+    return this
+  }
+
+  /** @inheritdoc */
+  dtd(pubID?: string, sysID?: string): XMLBuilder {
+    // character validation
+    pubID = this.validate.pubID(pubID || '')
+    sysID = this.validate.sysID(sysID || '')
+
+    // create doctype node
+    const docType = this._doc.implementation.createDocumentType(
+      this._doc.documentElement !== null ? this._doc.documentElement.tagName : '',
+      pubID, sysID)
+
+    if (this._doc.doctype !== null) {
+      // replace existing doctype
+      this._doc.replaceChild(docType, this._doc.doctype)
+    } else {
+      // insert before document element node or append to end
+      this._doc.insertBefore(docType, this._doc.documentElement)
+    }
 
     return this
   }
@@ -474,7 +487,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const node = this._asNode
 
     // character validation
-    Char.assertName(name, this.options.version || "1.0", this._debugInfo())
+    this.validate.name(name, this._debugInfo())
 
     const child = (namespace !== null ?
       this._doc.createElementNS(namespace, name) :
@@ -483,6 +496,15 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     node.appendChild(child)
     const builder = XMLBuilderImpl._FromNode(child)
+
+    // update doctype node if the new node is the document element node
+    const oldDocType = this._doc.doctype
+    if (child === this._doc.documentElement && oldDocType !== null) {
+      const docType = this._doc.implementation.createDocumentType(
+        this._doc.documentElement.tagName, 
+        oldDocType.publicId, oldDocType.systemId)
+      this._doc.replaceChild(docType, oldDocType)
+    }
 
     // create attributes
     if (attributes) builder.att(attributes)

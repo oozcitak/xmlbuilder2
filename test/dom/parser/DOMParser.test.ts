@@ -25,7 +25,7 @@ describe('DOMParser - XML', function () {
     const doc = parser.parseFromString(xmlStr, $$.MimeType.XML)
 
     expect($$.printTree(doc)).toBe($$.t`
-      !DOCTYPE root PUBLIC pubid SYSTEM sysid
+      !DOCTYPE root PUBLIC pubid sysid
       root
         node att="val"
         !  same node below 

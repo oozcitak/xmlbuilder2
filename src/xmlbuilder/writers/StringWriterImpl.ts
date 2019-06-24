@@ -175,7 +175,7 @@ export class StringWriterImpl {
 
     if (!options.headless) {
       markup = `${this._beginLine(preNode, options, refs)}<?xml`
-      markup += ` version="${this._builderOptions.version || "1.0"}"`
+      markup += ` version="${this._builderOptions.version}"`
       if (this._builderOptions.encoding !== undefined) {
         markup += ` encoding="${this._builderOptions.encoding}"`
       }

@@ -31,7 +31,7 @@ describe('Document', function () {
 
   test('constructor()', function () {
     expect($$.printTree(doc)).toBe($$.t`
-      !DOCTYPE qname PUBLIC pubid SYSTEM sysid
+      !DOCTYPE qname PUBLIC pubid sysid
       n:root (ns:myns)
         tagged id="tele1"
         node_with_id id="uniq"

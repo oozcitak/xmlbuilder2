@@ -11,7 +11,7 @@ describe('DOMImplementation', function () {
   test('createDocumentType()', function () {
     const doctype = $$.dom.createDocumentType('qname', 'pubid', 'sysid')
     expect($$.printTree(doctype)).toBe($$.t`
-      !DOCTYPE qname PUBLIC pubid SYSTEM sysid
+      !DOCTYPE qname PUBLIC pubid sysid
       `)
   })
 
@@ -21,7 +21,7 @@ describe('DOMImplementation', function () {
     expect(doc.contentType).toBe('application/xml')
 
     expect($$.printTree(doc)).toBe($$.t`
-      !DOCTYPE qname PUBLIC pubid SYSTEM sysid
+      !DOCTYPE qname PUBLIC pubid sysid
       qname (ns:myns)
       `)
 

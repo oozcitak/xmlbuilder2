@@ -675,6 +675,18 @@ export interface XMLBuilder {
   ins(target: string, content?: string): XMLBuilder
 
   /**
+   * Creates a new DocType node and inserts it into the document. If the 
+   * document already contains a DocType node it will be replaced by the new
+   * node. Otherwise it will be inserted before the document element node.
+   * 
+   * @param pubID - public identifier
+   * @param sysID - system identifier
+   * 
+   * @returns current element node
+   */
+  dtd(pubID?: string, sysID?: string): XMLBuilder
+
+  /**
    * Imports a node as a child node of this node. The nodes' descendants and
    * attributes will also be imported. 
    * 
