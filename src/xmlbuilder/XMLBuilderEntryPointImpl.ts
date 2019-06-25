@@ -82,20 +82,12 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   }
 
   /** @inheritdoc */
-  parse(document: string | ExpandObject): XMLBuilder {
-    if (isString(document)) {
-      const parser = new DOMParser()
-      const builder = <XMLBuilder><unknown>parser.parseFromString(document, MimeType.XML)
-      builder.validate = this._validate
-      builder.options = this._options
-      return builder.root()
-    } else {
-      const builder = <XMLBuilder><unknown>this._createEmptyDocument()
-      builder.validate = this._validate
-      builder.options = this._options
-      builder.ele(document)
-      return builder.root()
-    }
+  parse(document: string): XMLBuilder {
+    const parser = new DOMParser()
+    const builder = <XMLBuilder><unknown>parser.parseFromString(document, MimeType.XML)
+    builder.validate = this._validate
+    builder.options = this._options
+    return builder.root()
   }
 
   /**

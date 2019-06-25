@@ -69,11 +69,10 @@ export function fragment(): XMLBuilder {
 /**
  * Creates an XML document by parsing the given document representation.
  * 
- * @param document - a string containing an XML document or a JS object 
- * representing nodes to insert
+ * @param document - a string containing an XML document
  * 
  * @returns document element node
  */
-export function parse(document: string | ExpandObject): XMLBuilder {
+export function parse(document: string): XMLBuilder {
   return new XMLBuilderEntryPointImpl().parse(document)
 }

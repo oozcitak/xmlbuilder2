@@ -539,12 +539,11 @@ export interface XMLBuilderEntryPoint {
   /**
    * Creates an XML document by parsing the given document representation.
    * 
-   * @param document - a string containing an XML document or a JS object 
-   * representing nodes to insert
+   * @param document - a string containing an XML document
    * 
    * @returns document element node
    */
-  parse(document: string | ExpandObject): XMLBuilder
+  parse(document: string): XMLBuilder
 
 }
 
