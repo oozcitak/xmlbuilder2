@@ -1,7 +1,7 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
   BuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
-  WriterOptions, XMLSerializedValue, Validator, DTDOptions, BuilderOptionsParams
+  WriterOptions, XMLSerializedValue, Validator, DTDOptions, BuilderOptionsParams, DefaultBuilderOptions
 } from "./interfaces"
 import {
   isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults
@@ -17,7 +17,9 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   set(options: BuilderOptionsParams): XMLBuilder {
-    this._options = applyDefaults(this._options, options, true)
+    this._options = applyDefaults(
+      applyDefaults(this._options, options, true), // apply user settings
+      DefaultBuilderOptions) // provide defaults
     return this
   }
 

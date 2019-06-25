@@ -184,6 +184,24 @@ export interface ConvertOptions {
   comment: string
 }
 
+/**
+ * Defines default values for builder options.
+ */
+export const DefaultBuilderOptions: BuilderOptionsParams = {
+  version: "1.0",
+  inheritNS: true,
+  keepNullNodes: false,
+  keepNullAttributes: false,
+  ignoreConverters: false,
+  convert: {
+    att: "@",
+    ins: "?",
+    text: "#",
+    cdata: "$",
+    comment: "!"
+  }
+}
+
 type ValidatorFunction = (val: string, debugInfo?: string) => string
 
 /**

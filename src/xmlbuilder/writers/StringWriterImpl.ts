@@ -110,7 +110,8 @@ export class StringWriterImpl {
       case NodeType.CData:
         return this._serializeCdata(<PreSerializedNode<CDATASection>>preNode, options, refs)
       default:
-        throw new Error("Invalid node type.")
+        // skip unknown nodes
+        return ''
     }
   }
 
@@ -270,7 +271,7 @@ export class StringWriterImpl {
       // if ANY are a text node, then suppress pretty now
       if (options.dontPrettyPrintTextNodes) {
         for (const child of preNode.children) {
-          if (child.node.nodeType === NodeType.Text && (<Text>child.node).data === '') {
+          if (child.node.nodeType === NodeType.Text && (<Text>child.node).data !== '') {
             refs.suppressPrettyCount++
             prettySuppressed = true
             break
@@ -283,12 +284,14 @@ export class StringWriterImpl {
       // serialize child-nodes
       markup += this._serializeChildNodes(preNode, options, refs)
 
+      // closing tag
+      markup += `${this._beginLine(preNode, options, refs)}</${preNode.name}>`
+
       if (prettySuppressed) {
         refs.suppressPrettyCount--
-      }
+      }      
 
-      // closing tag
-      markup += `${this._beginLine(preNode, options, refs)}</${preNode.name}>${this._endLine(preNode, options, refs)}`
+      markup += `${this._endLine(preNode, options, refs)}`
     }
 
     return markup
@@ -378,7 +381,9 @@ export class StringWriterImpl {
    */
   private _beginLine(preNode: PreSerializedNode<Node>,
     options: StringWriterOptions, refs: StringWriterRefs): string {
-    if (options.prettyPrint && !refs.suppressPrettyCount) {
+    if (!options.prettyPrint || refs.suppressPrettyCount > 0) {
+      return ''
+    } else if (options.prettyPrint) {
       const indentLevel = options.offset + preNode.level + 1
       if (indentLevel > 0) {
         return new Array(indentLevel).join(options.indent)
@@ -398,10 +403,10 @@ export class StringWriterImpl {
    */
   private _endLine(preNode: PreSerializedNode<Node>,
     options: StringWriterOptions, refs: StringWriterRefs): string {
-    if (options.prettyPrint && !refs.suppressPrettyCount) {
-      return options.newline
-    } else {
+    if (!options.prettyPrint || refs.suppressPrettyCount > 0) {
       return ''
+    } else {
+      return options.newline
     }
   }
 

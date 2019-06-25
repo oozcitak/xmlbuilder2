@@ -7,7 +7,7 @@ describe('namespaces', () => {
 
   test('default namespace', () => {
     const ns1 = 'http://example.com/ns1'
-    const doc = $$.create('root', { xmlns: ns1 })
+    const doc = $$.withOptions({ inheritNS: false }) .create('root', { xmlns: ns1 })
       .ele('foo').ele('bar', 'foobar').doc() as any
 
     expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1"><foo xmlns=""><bar>foobar</bar></foo></root>')

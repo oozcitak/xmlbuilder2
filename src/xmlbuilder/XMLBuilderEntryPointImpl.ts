@@ -1,6 +1,7 @@
 import {
   BuilderOptions, XMLBuilderEntryPoint, ExpandObject,
-  AttributesObject, XMLBuilder, BuilderOptionsParams, Validator, DTDOptions
+  AttributesObject, XMLBuilder, BuilderOptionsParams, Validator,
+  DTDOptions, DefaultBuilderOptions
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { ValidatorImpl } from "./util"
@@ -27,20 +28,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
 
     this._docType = options.docType
 
-    this._options = applyDefaults(options, <BuilderOptions>{
-      version: "1.0",
-      inheritNS: false,
-      keepNullNodes: false,
-      keepNullAttributes: false,
-      ignoreConverters: false,
-      convert: {
-        att: "@",
-        ins: "?",
-        text: "#",
-        cdata: "$",
-        comment: "!"
-      }
-    })
+    this._options = applyDefaults(options, DefaultBuilderOptions)
 
     if (this._options.convert.att.length === 0 ||
       this._options.convert.ins.length === 0 ||
