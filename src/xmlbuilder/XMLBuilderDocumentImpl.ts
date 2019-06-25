@@ -19,14 +19,6 @@ export class XMLBuilderDocumentImpl extends XMLBuilderImpl {
     return this._builderOptions
   }
   set options(options: BuilderOptions) {
-    // character validation
-    if (options.pubID !== undefined) {
-      options.pubID = this.validate.pubID(options.pubID, this._debugInfo())
-    }
-    if (options.sysID !== undefined) {
-      options.sysID = this.validate.sysID(options.sysID, this._debugInfo())
-    }
-
     this._builderOptions = options
   }
 

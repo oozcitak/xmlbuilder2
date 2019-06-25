@@ -8,7 +8,7 @@ describe('toString()', () => {
   })
 
   test('document type', () => {
-    const doc = $$.withOptions({ pubID: "pub", sysID: "sys" }).create('root').doc()
+    const doc = $$.withOptions({ docType: { pubID: "pub", sysID: "sys" } }).create('root').doc()
     expect(doc.toString()).toBe('<?xml version="1.0"?><!DOCTYPE root PUBLIC "pub" "sys"><root/>')
   })
 

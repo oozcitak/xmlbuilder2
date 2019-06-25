@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('end()', () => {
 
   test('simple document', () => {
-    const xml = $$.withOptions({ pubID: "pub", sysID: "sys" })
+    const xml = $$.withOptions({ docType: { pubID: "pub", sysID: "sys" } })
       .create('root')
       .com('comment')
       .ins('target', 'content')

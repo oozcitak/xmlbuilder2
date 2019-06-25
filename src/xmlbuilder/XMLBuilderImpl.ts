@@ -1,7 +1,7 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
   BuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
-  WriterOptions, XMLSerializedValue, Validator
+  WriterOptions, XMLSerializedValue, Validator, DTDOptions
 } from "./interfaces"
 import { isArray, isFunction, isObject, isEmpty, getValue, isString } from "../util"
 import { Namespace } from "../dom/spec"
@@ -282,10 +282,19 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  dtd(dtdOptions?: { pubID?: string, sysID?: string }): XMLBuilder {
+  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilder {
+    this.options.version = options.version
+    this.options.encoding = options.encoding
+    this.options.standalone = options.standalone
+
+    return this
+  }
+
+  /** @inheritdoc */
+  dtd(options?: DTDOptions): XMLBuilder {
     // character validation
-    const pubID = this.validate.pubID((dtdOptions && dtdOptions.pubID) || '')
-    const sysID = this.validate.sysID((dtdOptions && dtdOptions.sysID) || '')
+    const pubID = this.validate.pubID((options && options.pubID) || '')
+    const sysID = this.validate.sysID((options && options.sysID) || '')
 
     // create doctype node
     const docType = this._doc.implementation.createDocumentType(

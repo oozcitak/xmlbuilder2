@@ -1,6 +1,6 @@
 import {
   BuilderOptions, XMLBuilderEntryPoint, ExpandObject,
-  AttributesObject, XMLBuilder, BuilderOptionsParams, Validator
+  AttributesObject, XMLBuilder, BuilderOptionsParams, Validator, DTDOptions
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { ValidatorImpl } from "./util"
@@ -13,14 +13,19 @@ import { XMLDocument } from "../dom/interfaces"
 export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
 
   private _options: BuilderOptions
+  private _docType?: DTDOptions
   private _validate: Validator
 
   /** 
    * Initializes a new instance of  `XMLBuilderEntryPointImpl`
   */
   constructor(options?: BuilderOptionsParams) {
-    this._validate = new ValidatorImpl((options && options.version) || "1.0",
-      (options && options.validate) || {})
+    options = options || { version: "1.0" }
+
+    this._validate = new ValidatorImpl(options.version || "1.0",
+      options.validate || {})
+
+    this._docType = options.docType
 
     this._options = applyDefaults(options, <BuilderOptions>{
       version: "1.0",
@@ -60,8 +65,8 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
     }
 
     // DocType node
-    if (this._options.pubID || this._options.sysID) {
-      builder.dtd({ pubID: this._options.pubID, sysID: this._options.sysID })
+    if (this._docType !== undefined) {
+      builder.dtd(this._docType)
     }
 
     return builder

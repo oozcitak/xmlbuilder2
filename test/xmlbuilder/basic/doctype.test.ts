@@ -35,7 +35,7 @@ describe('dtd()', () => {
   })
 
   test('replace doctype', () => {
-    const root = $$.withOptions({ pubID: "pub", sysID: "sys" }).create('root')
+    const root = $$.withOptions({ docType: { pubID: "pub", sysID: "sys" } }).create('root')
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root PUBLIC pub sys
       root
@@ -49,7 +49,7 @@ describe('dtd()', () => {
   })
 
   test('update when element node changes', () => {
-    const doc = $$.withOptions({ pubID: "pub", sysID: "sys" }).create()
+    const doc = $$.withOptions({ docType: { pubID: "pub", sysID: "sys" } }).create()
     doc.ele('newroot')
     expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE newroot PUBLIC pub sys

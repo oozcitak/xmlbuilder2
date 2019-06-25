@@ -18,19 +18,24 @@ describe('withOptions()', () => {
 
   test('DocType', () => {
     expect(
-      $$.withOptions({ pubID: "pub", sysID: "sys" }).create('root').end()).toBe(
+      $$.withOptions({ docType: { pubID: "pub", sysID: "sys" } }).create('root').end()).toBe(
         '<?xml version="1.0"?><!DOCTYPE root PUBLIC "pub" "sys"><root/>'
       )
 
     expect(
-      $$.withOptions({ pubID: "pub" }).create('root').end()).toBe(
+      $$.withOptions({ docType: { pubID: "pub" } }).create('root').end()).toBe(
         '<?xml version="1.0"?><!DOCTYPE root PUBLIC "pub"><root/>'
       )
 
     expect(
-      $$.withOptions({ sysID: "sys" }).create('root').end()).toBe(
+      $$.withOptions({ docType: { sysID: "sys" } }).create('root').end()).toBe(
         '<?xml version="1.0"?><!DOCTYPE root SYSTEM "sys"><root/>'
       )
+
+    expect(
+      $$.withOptions({ docType: { } }).create('root').end()).toBe(
+        '<?xml version="1.0"?><!DOCTYPE root><root/>'
+      )      
   })
 
   test('zero length converter strings', () => {

@@ -18,13 +18,9 @@ export interface BuilderOptionsParams {
    */
   standalone?: boolean
   /**
-   * Public identifier of the DTD
+   * DocType node identifiers
    */
-  pubID?: string
-  /**
-   * System identifier of the DTD
-   */
-  sysID?: string
+  docType?: DTDOptions
   /**
    * Whether child nodes inherit their parent namespace
    */
@@ -69,14 +65,6 @@ export interface BuilderOptions {
    */
   standalone?: boolean
   /**
-   * Public identifier of the DTD
-   */
-  pubID?: string
-  /**
-   * System identifier of the DTD
-   */
-  sysID?: string
-  /**
    * Whether child nodes inherit their parent namespace
    */
   inheritNS: boolean
@@ -101,6 +89,20 @@ export interface BuilderOptions {
    * Contains functions that validate character data in XML nodes.
    */
   validate: ValidateOptions
+}
+
+/**
+ * Defines the identifier strings of the DocType node.
+ */
+export interface DTDOptions {
+  /**
+   * Public identifier of the DTD
+   */
+  pubID?: string
+  /**
+   * System identifier of the DTD
+   */
+  sysID?: string
 }
 
 /**
@@ -397,7 +399,7 @@ export interface WriterOptions {
    * insertion order of nodes as opposed to `Object`.
    * - `"object"` - Serializes the document as an object using `Object`s and
    * `Array`s.
-   * - `"json"` - Serializes the document tree as a JSON string.
+   * - `"json"` - Serializes the document as a JSON string.
    */
   format?: "text" | "map" | "object" | "json"
   /**
@@ -675,15 +677,24 @@ export interface XMLBuilder {
   ins(target: string, content?: string): XMLBuilder
 
   /**
+   * Updates XML declaration.
+   * 
+   * @param options - declaration options
+   * 
+   * @returns current element node
+   */
+  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilder
+
+  /**
    * Creates a new DocType node and inserts it into the document. If the 
    * document already contains a DocType node it will be replaced by the new
    * node. Otherwise it will be inserted before the document element node.
    * 
-   * @param dtdOptions - DocType identifiers
+   * @param options - DocType identifiers
    * 
    * @returns current element node
    */
-  dtd(dtdOptions?: { pubID?: string, sysID?: string }): XMLBuilder
+  dtd(options?: DTDOptions): XMLBuilder
 
   /**
    * Imports a node as a child node of this node. The nodes' descendants and

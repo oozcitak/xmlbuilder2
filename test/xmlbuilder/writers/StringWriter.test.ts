@@ -71,7 +71,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype with both public and system identifier', () => {
-    expect($$.withOptions({ pubID: "pub", sysID: "sys" })
+    expect($$.withOptions({ docType: { pubID: "pub", sysID: "sys" } })
       .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub" "sys">
@@ -80,7 +80,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype with public identifier', () => {
-    expect($$.withOptions({ pubID: "pub", })
+    expect($$.withOptions({ docType: { pubID: "pub", } })
       .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub">
@@ -89,10 +89,19 @@ describe('StringWriter', () => {
   })
 
   test('doctype with system identifier', () => {
-    expect($$.withOptions({ sysID: "sys", })
+    expect($$.withOptions({ docType: { sysID: "sys" } })
       .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root SYSTEM "sys">
+      <root/>
+      `)
+  })
+
+  test('doctype without identifiers', () => {
+    expect($$.withOptions({ docType: { } })
+      .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <!DOCTYPE root>
       <root/>
       `)
   })
