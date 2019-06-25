@@ -10,28 +10,23 @@ export class XMLBuilderDocumentImpl extends XMLBuilderImpl {
   private _builderOptions?: BuilderOptions
   private _validator?: Validator
 
-  /** @inheritdoc */
-  get options(): BuilderOptions {
+  protected get _options(): BuilderOptions {
     if (this._builderOptions === undefined) {
-      throw new Error("Builder options is undefined." + this._debugInfo())
+      throw new Error("Builder options is not set.")
     }
-
     return this._builderOptions
   }
-  set options(options: BuilderOptions) {
-    this._builderOptions = options
+  protected set _options(value: BuilderOptions) {
+    this._builderOptions = value
   }
 
-  /** @inheritdoc */
-  get validate(): Validator {
+  protected get _validate(): Validator {
     if (this._validator === undefined) {
-      throw new Error("Validator is undefined." + this._debugInfo())
+      throw new Error("Validator is not set.")
     }
-
     return this._validator
   }
-  set validate(validator: Validator) {
-    this._validator = validator
+  protected set _validate(value: Validator) {
+    this._validator = value
   }
-
 }

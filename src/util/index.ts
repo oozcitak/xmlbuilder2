@@ -58,15 +58,17 @@ export function clone<T>(obj: T): T {
  * 
  * @param obj - an object
  * @param defaults - an object with default values
+ * @param overwrite - if set to `true` defaults object always overwrites object 
+ * values, whether they are `undefined` or not.
  */
 export function applyDefaults<T>(
   obj: { [key: string]: any } | undefined, 
-  defaults: { [key: string]: any }): T {
+  defaults: { [key: string]: any }, overwrite: boolean = false): T {
     
   const result = clone(obj || {})
 
   for (const [key, val] of Object.entries(defaults)) {
-    if (result[key] !== undefined) continue
+    if (!overwrite && result[key] !== undefined) continue
 
     if (isObject(val)) {
       result[key] = applyDefaults(result[key], val)

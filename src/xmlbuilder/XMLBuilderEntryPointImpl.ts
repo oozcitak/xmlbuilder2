@@ -4,7 +4,7 @@ import {
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { ValidatorImpl } from "./util"
-import { isString, applyDefaults } from "../util"
+import { applyDefaults } from "../util"
 import { XMLDocument } from "../dom/interfaces"
 
 /**
@@ -20,7 +20,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
    * Initializes a new instance of  `XMLBuilderEntryPointImpl`
   */
   constructor(options?: BuilderOptionsParams) {
-    options = options || { version: "1.0" }
+    options = options || {}
 
     this._validate = new ValidatorImpl(options.version || "1.0",
       options.validate || {})
@@ -56,8 +56,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
     text?: AttributesObject | string): XMLBuilder {
 
     let builder = <XMLBuilder><unknown>this._createEmptyDocument()
-    builder.validate = this._validate
-    builder.options = this._options
+    this._setOptions(builder)
 
     // document element node
     if (name !== undefined) {
@@ -75,9 +74,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   /** @inheritdoc */
   fragment(): XMLBuilder {
     const doc = this._createEmptyDocument()
-    const builder = <XMLBuilder><unknown>doc
-    builder.validate = this._validate
-    builder.options = this._options
+    this._setOptions(doc)
     return <XMLBuilder><unknown>doc.createDocumentFragment()
   }
 
@@ -85,8 +82,7 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   parse(document: string): XMLBuilder {
     const parser = new DOMParser()
     const builder = <XMLBuilder><unknown>parser.parseFromString(document, MimeType.XML)
-    builder.validate = this._validate
-    builder.options = this._options
+    this._setOptions(builder)
     return builder.root()
   }
 
@@ -99,5 +95,15 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
       doc.removeChild(doc.documentElement)
     }
     return doc
+  }
+
+  /**
+   * Sets builder options.
+   * 
+   * @param doc - document node
+   */
+  private _setOptions(doc: any): void {
+    doc._validate = this._validate
+    doc._options = this._options
   }
 }

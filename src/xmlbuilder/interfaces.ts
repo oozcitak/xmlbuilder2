@@ -554,14 +554,13 @@ export interface XMLBuilderEntryPoint {
 export interface XMLBuilder {
 
   /**
-   * Gets or sets builder options.
+   * Sets builder options.
+   * 
+   * @param - builder options
+   * 
+   * @returns current element node
    */
-  options: BuilderOptions
-
-  /**
-   * Gets or sets the character validator.
-   */
-  validate: Validator
+  set(builderOptions: BuilderOptionsParams): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
