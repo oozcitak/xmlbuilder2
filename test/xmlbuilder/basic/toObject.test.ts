@@ -56,7 +56,7 @@ describe('toObject()', () => {
 
   test('processing instruction', () => {
     const node = $$.create('root').ins('target', 'content').first()
-    expect($$.printMap(node.toObject())).toBe('{ ?target: content }')
+    expect($$.printMap(node.toObject())).toBe('{ ?: target content }')
   })
 
   test('attribute', () => {

@@ -150,13 +150,13 @@ export interface ConvertOptionsParams {
  */
 export interface ConvertOptions {
   /** 
-   * When prepended to a JS object key, converts the key-value pair 
+   * When prepended to a JS object key, converts its key-value pair 
    * to an attribute. Defaults to `"@"`.
    */
   att: string
   /** 
-   * When prepended to a JS object key, converts the key-value pair 
-   * to a processing instruction node. Defaults to `"?"`.
+   * When prepended to a JS object key, converts its value to a processing
+   * instruction node. Defaults to `"?"`.
    */
   ins: string
   /** 

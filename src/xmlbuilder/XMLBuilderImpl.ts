@@ -131,7 +131,10 @@ export class XMLBuilderImpl implements XMLBuilder {
         lastChild = this.com(text)
       } else if (!this._options.ignoreConverters && name.indexOf(this._options.convert.ins) === 0) {
         // processing instruction
-        lastChild = this.ins(name.substr(this._options.convert.ins.length), text)
+        const insIndex = text.indexOf(' ') 
+        const insTarget = (insIndex === -1 ? text : text.substr(0, insIndex))
+        const insValue = (insIndex === -1 ? '' : text.substr(insIndex + 1))
+        lastChild = this.ins(insTarget, insValue)
       } else {
         // element node with text
         lastChild = this._node(name, attributes, text)
@@ -560,7 +563,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /**
-   * Returns the underlying DOMnode.
+   * Returns the underlying DOM node.
    */
   protected get _asNode(): Node {
     const node = <Node><unknown>this

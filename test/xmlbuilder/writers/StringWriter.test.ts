@@ -8,7 +8,7 @@ describe('StringWriter', () => {
       person: {
         name: "John",
         '@age': 35,
-        '?pi': 'mypi',
+        '?': 'pi mypi',
         '!': 'Good guy',
         '$': 'well formed!',
         address: {

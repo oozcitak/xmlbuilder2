@@ -43,10 +43,13 @@ export class MapWriterImpl {
         return this._serializeNode(preNode, options)
       case NodeType.Comment:
       case NodeType.Text:
-      case NodeType.ProcessingInstruction:
       case NodeType.CData:
         return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0], 
           (<CharacterData>node).data]])
+      case NodeType.ProcessingInstruction:
+        const pi = <ProcessingInstruction>node
+        return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0], 
+          `${pi.target} ${pi.data}`]])
       /* istanbul ignore next */
       default:
         throw new Error("Invalid node type.")
@@ -73,7 +76,8 @@ export class MapWriterImpl {
       case NodeType.DocumentFragment:
         return this._serializeChildNodes(preNode, options)
       case NodeType.ProcessingInstruction:
-        return (<ProcessingInstruction>preNode.node).data
+        const pi = <ProcessingInstruction>preNode.node
+        return `${pi.target} ${pi.data}`
       case NodeType.CData:
         return (<CDATASection>preNode.node).data
       /* istanbul ignore next */
@@ -190,7 +194,7 @@ export class MapWriterImpl {
       case NodeType.Text:
         return [this._builderOptions.convert.text, true]
       case NodeType.ProcessingInstruction:
-        return [(this._builderOptions.convert.ins) + (<ProcessingInstruction>preNode.node).target, false]
+        return [this._builderOptions.convert.ins, true]
       case NodeType.CData:
         return [this._builderOptions.convert.cdata, true]
       /* istanbul ignore next */
