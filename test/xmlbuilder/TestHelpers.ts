@@ -25,8 +25,13 @@ export default class TestHelpers extends TestHelpersRoot {
       for (const val of obj) {
         count += this.descendantCount(val, count)
       }
-    } else if (isMap(obj) || isObject(obj)) {
+    } else if (isMap(obj)) {
       for (const val of obj.values()) {
+        count += this.descendantCount(val, count)
+      }
+    } else if (isObject(obj)) {
+      for (const key of Object.keys(obj)) {
+        const val = obj[key]
         count += this.descendantCount(val, count)
       }
     } else {
@@ -62,7 +67,7 @@ export default class TestHelpers extends TestHelpersRoot {
       r += (leaf ? ' ' : '\n' + TestHelpers.indent(level)) + ']'
     } else if (isObject(map)) {
       r += '{'
-      const len = map.size
+      const len = Object.keys(map).length
       let i = 0
       for (const [key, val] of Object.entries(map)) {
         r += (leaf ? ' ' : '\n' + TestHelpers.indent(level + 1)) + key + ': ' + TestHelpers.printMap(val, level + 1)

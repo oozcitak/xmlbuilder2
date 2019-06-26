@@ -7,7 +7,7 @@ import {
   isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults
 } from "../util"
 import { Namespace } from "../dom/spec"
-import { StringWriterImpl, MapWriterImpl } from "./writers"
+import { StringWriterImpl, MapWriterImpl, ObjectWriterImpl } from "./writers"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -439,6 +439,9 @@ export class XMLBuilderImpl implements XMLBuilder {
       return writer.serialize(this._asNode, writerOptions)
     } else if (writerOptions.format === "map") {
       const writer = new MapWriterImpl(this._options)
+      return writer.serialize(this._asNode, writerOptions)
+    } else if (writerOptions.format === "object") {
+      const writer = new ObjectWriterImpl(this._options)
       return writer.serialize(this._asNode, writerOptions)
     } else {
       return ''

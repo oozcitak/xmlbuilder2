@@ -8,14 +8,14 @@ import { PreSerializer } from "../util"
 import { applyDefaults } from "../../util"
 
 /**
- * Serializes XML nodes into maps and arrays.
+ * Serializes XML nodes into objects and arrays.
  */
-export class MapWriterImpl {
+export class ObjectWriterImpl {
 
   private _builderOptions: BuilderOptions
 
   /**
-   * Initializes a new instance of `MapWriterImpl`.
+   * Initializes a new instance of `ObjectWriterImpl`.
    * 
    * @param builderOptions - XML builder options
    */
@@ -31,7 +31,7 @@ export class MapWriterImpl {
    */
   serialize(node: Node, writerOptions?: WriterOptions): XMLSerializedValue {
     const options: BuilderOptions = applyDefaults(writerOptions, {
-      format: "map"
+      format: "object"
     })
 
     const preNode = PreSerializer.Serialize(node)
@@ -90,9 +90,9 @@ export class MapWriterImpl {
    */
   private _serializeElement(preNode: PreSerializedNode<Node>,
     options: BuilderOptions): XMLSerializedValue {
-    return new Map<string, XMLSerializedValue>([
-      [<string><unknown>preNode.name, this._serializeChildNodes(preNode, options)]
-    ])
+    const markup: { [key:string]: any } = { }
+    markup[<string><unknown>preNode.name] = this._serializeChildNodes(preNode, options)
+    return markup
   }
 
   /**
@@ -126,14 +126,14 @@ export class MapWriterImpl {
       // an element node with a single text node
       return (<Text>(items[0][2].node)).data
     } else {
-      const markup = new Map<string, XMLSerializedValue>()
+      const markup: { [key:string]: any } = { }
       for (const ns of preNode.namespaces) {
         const key = this._getAttrKey(ns.name)
-        markup.set(key, ns.value)
+        markup[key] = ns.value
       }
       for (const attr of preNode.attributes) {
         const key = this._getAttrKey(attr.name)
-        markup.set(key, attr.value)
+        markup[key] = attr.value
       }
       for (const [key, canIncrement, node] of items) {
         // serialize child nodes or node contents
@@ -147,16 +147,16 @@ export class MapWriterImpl {
           const uniqueKey = key + index.toString()
           keyIndices.set(key, index)
 
-          markup.set(uniqueKey, nodeResult)
+          markup[uniqueKey] = nodeResult
         } else if (<number>keyCount.get(key) > 1) {
           // cannot generate a unique key, create an array to hold nodes with
           // duplicate keys
-          const nodeList = <Array<XMLSerializedValue>>(markup.get(key) || [])
+          const nodeList = <Array<XMLSerializedValue>>(markup[key] || [])
           nodeList.push(nodeResult)
-          markup.set(key, nodeList)
+          markup[key] = nodeList
         } else {
           // object already has a unique key
-          markup.set(key, nodeResult)
+          markup[key] = nodeResult
         }
       }
       return markup
