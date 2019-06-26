@@ -11,6 +11,7 @@ export class XMLBuilderDocumentImpl extends XMLBuilderImpl {
   private _validator?: Validator
 
   protected get _options(): BuilderOptions {
+    /* istanbul ignore next */
     if (this._builderOptions === undefined) {
       throw new Error("Builder options is not set.")
     }
@@ -21,6 +22,7 @@ export class XMLBuilderDocumentImpl extends XMLBuilderImpl {
   }
 
   protected get _validate(): Validator {
+    /* istanbul ignore next */
     if (this._validator === undefined) {
       throw new Error("Validator is not set.")
     }

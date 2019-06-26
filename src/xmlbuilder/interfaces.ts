@@ -143,6 +143,12 @@ export interface ConvertOptionsParams {
    * comment node. Defaults to `"!"`.
    */
   comment?: string
+  /** 
+   * When prepended to a JS object key, converts its value to a 
+   * text node. No character validation is applied to raw nodes.
+   * Defaults to `"&"`.
+   */
+  raw?: string
 }
 
 /**
@@ -182,6 +188,12 @@ export interface ConvertOptions {
    * comment node. Defaults to `"!"`.
    */
   comment: string
+  /** 
+   * When prepended to a JS object key, converts its value to a 
+   * text node. No character validation is applied to raw nodes.
+   * Defaults to `"&"`.
+   */
+  raw: string
 }
 
 /**
@@ -198,7 +210,8 @@ export const DefaultBuilderOptions: BuilderOptionsParams = {
     ins: "?",
     text: "#",
     cdata: "$",
-    comment: "!"
+    comment: "!",
+    raw: "&"
   }
 }
 
@@ -256,6 +269,14 @@ export interface ValidateOptions {
    * @param debugInfo - optional debug information
    */
   comment?: ValidatorFunction
+
+  /**
+   * Validates raw text node contents.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  raw?: ValidatorFunction
 
   /**
    * Validates attribute values.
@@ -342,6 +363,14 @@ export interface Validator {
    * @param debugInfo - optional debug information
    */
   comment: ValidatorFunction
+
+  /**
+   * Validates raw text node contents.
+   * 
+   * @param val - value to validate
+   * @param debugInfo - optional debug information
+   */
+  raw: ValidatorFunction
 
   /**
    * Validates attribute values.
@@ -671,6 +700,16 @@ export interface XMLBuilder {
    * @returns current element node
    */
   com(content: string): XMLBuilder
+
+  /**
+   * Creates a new raw text node and appends it to the list of child nodes.
+   * No character validation is applied to raw text nodes.
+   * 
+   * @param content - node content
+   * 
+   * @returns current element node
+   */
+  raw(content: string): XMLBuilder
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.

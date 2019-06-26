@@ -54,6 +54,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else if (isObject(name)) {
       // expand if object
       for (const key in name) {
+        /* istanbul ignore next */
         if (!name.hasOwnProperty(key)) continue
         let val = name[key]
         if (isFunction(val)) {
@@ -129,6 +130,9 @@ export class XMLBuilderImpl implements XMLBuilder {
       } else if (!this._options.ignoreConverters && name.indexOf(this._options.convert.comment) === 0) {
         // comment node
         lastChild = this.com(text)
+      } else if (!this._options.ignoreConverters && name.indexOf(this._options.convert.raw) === 0) {
+        // raw text node
+        lastChild = this.raw(text)
       } else if (!this._options.ignoreConverters && name.indexOf(this._options.convert.ins) === 0) {
         // processing instruction
         const insIndex = text.indexOf(' ') 
@@ -250,6 +254,17 @@ export class XMLBuilderImpl implements XMLBuilder {
     content = this._validate.comment(content)
 
     const child = this._doc.createComment(content)
+    this._asElement.appendChild(child)
+
+    return this
+  }
+
+  /** @inheritdoc */
+  raw(content: string): XMLBuilder {
+    // character validation
+    content = this._validate.raw(content)
+
+    const child = this._doc.createTextNode(content)
     this._asElement.appendChild(child)
 
     return this
