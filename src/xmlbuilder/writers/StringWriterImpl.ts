@@ -110,8 +110,7 @@ export class StringWriterImpl {
       case NodeType.CData:
         return this._serializeCdata(<PreSerializedNode<CDATASection>>preNode, options, refs)
       default:
-        // skip unknown nodes
-        return ''
+        throw new Error("Invalid node type.")
     }
   }
 

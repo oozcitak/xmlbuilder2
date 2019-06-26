@@ -203,9 +203,7 @@ describe('StringWriter', () => {
   test('unknown node', () => {
     const ele = $$.create('root').ele('alien')
     Object.defineProperty(ele, "nodeType", { value: 1001, writable: false })
-    expect(ele.end()).toBe($$.t`
-      <?xml version="1.0"?><root></root>
-      `)
+    expect(() => ele.end()).toThrow()
   })
 
 })

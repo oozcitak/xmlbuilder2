@@ -12,12 +12,57 @@ describe('toObject()', () => {
         root: {
           @att: val,
           @att2: val2,
-          node1: {
-          },
-          node2: {
-          }
+          node1: { },
+          node2: { }
         }
       }
+    `)
+  })
+
+  test('document', () => {
+    const obj = $$.create('root').doc().toObject()
+    expect($$.printMap(obj)).toBe('{ root: { } }')
+  })
+
+  test('document type', () => {
+    const dtd = $$.withOptions({ docType: { pubID: "pub", sysID: "sys" } }).create('root').doc().first()
+    expect(() => dtd.toObject()).toThrow()
+  })
+
+  test('document fragment', () => {
+    const frag = $$.fragment().ele('foo').ele('bar').up().up()
+    expect($$.printMap(frag.toObject())).toBe('{ foo: { bar: { } } }')
+  })
+
+  test('element', () => {
+    const root = $$.create('root')
+    expect($$.printMap(root.toObject())).toBe('{ root: { } }')
+  })
+
+  test('text', () => {
+    const node = $$.create('root').txt('content').first()
+    expect($$.printMap(node.toObject())).toBe('{ #: content }')
+  })
+
+  test('cdata', () => {
+    const node = $$.create('root').dat('content').first()
+    expect($$.printMap(node.toObject())).toBe('{ $: content }')
+  })
+
+  test('comment', () => {
+    const node = $$.create('root').com('content').first()
+    expect($$.printMap(node.toObject())).toBe('{ !: content }')
+  })
+
+  test('processing instruction', () => {
+    const node = $$.create('root').ins('target', 'content').first()
+    expect($$.printMap(node.toObject())).toBe('{ ?target: content }')
+  })
+
+  test('attribute', () => {
+    const root = $$.create('root').att("att", "val")
+    expect($$.printMap(root.toObject())).toBe($$.t`
+      { root: { @att: val } }
     `)
   })
 

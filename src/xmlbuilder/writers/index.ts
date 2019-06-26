@@ -1,2 +1,2 @@
-export { ObjectWriterImpl } from './ObjectWriterImpl'
+export { MapWriterImpl } from './MapWriterImpl'
 export { StringWriterImpl } from './StringWriterImpl'

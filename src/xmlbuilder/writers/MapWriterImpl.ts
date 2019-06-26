@@ -2,27 +2,20 @@ import {
   WriterOptions, XMLSerializedValue, PreSerializedNode, BuilderOptions
 } from "../interfaces"
 import {
-  Node, Element, Text, CDATASection, Comment, ProcessingInstruction, NodeType
+  Node, Element, Text, CDATASection, Comment, ProcessingInstruction, NodeType, CharacterData
 } from "../../dom/interfaces"
 import { PreSerializer } from "../util"
 import { applyDefaults } from "../../util"
 
 /**
- * Represents object writer options.
+ * Serializes XML nodes into maps and arrays.
  */
-interface ObjectWriterOptions {
-  format: "map" | "object" | "json"
-}
-
-/**
- * Serializes XML nodes into objects.
- */
-export class ObjectWriterImpl {
+export class MapWriterImpl {
 
   private _builderOptions: BuilderOptions
 
   /**
-   * Initializes a new instance of `ObjectWriterImpl`.
+   * Initializes a new instance of `MapWriterImpl`.
    * 
    * @param builderOptions - XML builder options
    */
@@ -37,11 +30,27 @@ export class ObjectWriterImpl {
    * @param writerOptions - serialization options
    */
   serialize(node: Node, writerOptions?: WriterOptions): XMLSerializedValue {
-    const options: ObjectWriterOptions = applyDefaults(writerOptions, {
+    const options: BuilderOptions = applyDefaults(writerOptions, {
       format: "map"
     })
 
-    return this._serializeNode(PreSerializer.Serialize(node), options)
+    const preNode = PreSerializer.Serialize(node)
+
+    switch (preNode.node.nodeType) {
+      case NodeType.Element:
+      case NodeType.Document:
+      case NodeType.DocumentFragment:
+        return this._serializeNode(preNode, options)
+      case NodeType.Comment:
+      case NodeType.Text:
+      case NodeType.ProcessingInstruction:
+      case NodeType.CData:
+        return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0], 
+          (<CharacterData>node).data]])
+      /* istanbul ignore next */
+      default:
+        throw new Error("Invalid node type.")
+    }
   }
 
   /**
@@ -51,7 +60,7 @@ export class ObjectWriterImpl {
    * @param options - serialization options
    */
   protected _serializeNode(preNode: PreSerializedNode<Node>,
-    options: ObjectWriterOptions): XMLSerializedValue {
+    options: BuilderOptions): XMLSerializedValue {
     switch (preNode.node.nodeType) {
       case NodeType.Element:
         return this._serializeElement(preNode, options)
@@ -63,12 +72,11 @@ export class ObjectWriterImpl {
         return (<Text>preNode.node).data
       case NodeType.DocumentFragment:
         return this._serializeChildNodes(preNode, options)
-      case NodeType.DocumentType:
-        return ''
       case NodeType.ProcessingInstruction:
         return (<ProcessingInstruction>preNode.node).data
       case NodeType.CData:
         return (<CDATASection>preNode.node).data
+      /* istanbul ignore next */
       default:
         throw new Error("Invalid node type.")
     }
@@ -81,22 +89,10 @@ export class ObjectWriterImpl {
    * @param options - serialization options
    */
   private _serializeElement(preNode: PreSerializedNode<Node>,
-    options: ObjectWriterOptions): XMLSerializedValue {
-    if (preNode.name === undefined) {
-      throw new Error("Element node doesn't have a name.")
-    }
-
-    if (options.format === "map") {
-      return new Map<string, XMLSerializedValue>([
-        [preNode.name, this._serializeChildNodes(preNode, options)]
-      ])
-    } else if (options.format === "object") {
-      const markup: { [key: string]: XMLSerializedValue } = { }
-      markup[preNode.name] = this._serializeChildNodes(preNode, options)
-      return markup
-    } else {
-      return ''
-    }
+    options: BuilderOptions): XMLSerializedValue {
+    return new Map<string, XMLSerializedValue>([
+      [<string><unknown>preNode.name, this._serializeChildNodes(preNode, options)]
+    ])
   }
 
   /**
@@ -106,15 +102,17 @@ export class ObjectWriterImpl {
    * @param options - serialization options
    */
   private _serializeChildNodes(preNode: PreSerializedNode<Node>,
-    options: ObjectWriterOptions): XMLSerializedValue {
-    const items = new Array<[string, PreSerializedNode<Node>]>()
+    options: BuilderOptions): XMLSerializedValue {
+    const items = new Array<[string, boolean, PreSerializedNode<Node>]>()
     const keyCount = new Map<string, number>()
     const keyIndices = new Map<string, number>()
     let hasDuplicateKeys = false
 
-    for (const node of preNode.children) {
-      const [key, canIncrement] = this._getNodeKey(node)
-      items.push([key, node])
+    for (const childPreNode of preNode.children) {
+      if (childPreNode.node.nodeType === NodeType.DocumentType) continue
+
+      const [key, canIncrement] = this._getNodeKey(childPreNode)
+      items.push([key, canIncrement, childPreNode])
       let count = keyCount.get(key)
       count = (count || 0) + 1
       if (!hasDuplicateKeys && !canIncrement && count > 1) [
@@ -124,71 +122,44 @@ export class ObjectWriterImpl {
       keyIndices.set(key, 0)
     }
 
-    if (hasDuplicateKeys) {
-      // child nodes have duplicate keys
-      // return an array
-      const markup = new Array<XMLSerializedValue>()
+    if (items.length === 1 && items[0][2].node.nodeType === NodeType.Text) {
+      // an element node with a single text node
+      return (<Text>(items[0][2].node)).data
+    } else {
+      const markup = new Map<string, XMLSerializedValue>()
       for (const ns of preNode.namespaces) {
         const key = this._getAttrKey(ns.name)
-        markup.push(new Map<string, XMLSerializedValue>([[key, ns.value]]))
+        markup.set(key, ns.value)
       }
       for (const attr of preNode.attributes) {
         const key = this._getAttrKey(attr.name)
-        markup.push(new Map<string, XMLSerializedValue>([[key, attr.value]]))
+        markup.set(key, attr.value)
       }
-      for (const [key, node] of items) {
-        const nodeResult = this._serializeNode(node, options)
-        markup.push(nodeResult)
+      for (const [key, canIncrement, node] of items) {
+        // serialize child nodes or node contents
+        const nodeResult = node.node.nodeType === NodeType.Element ?
+          this._serializeChildNodes(node, options) :
+          this._serializeNode(node, options)
+
+        if (canIncrement && <number>keyCount.get(key) > 1) {
+          // generate a unique key
+          let index = (keyIndices.get(key) || 0) + 1
+          const uniqueKey = key + index.toString()
+          keyIndices.set(key, index)
+
+          markup.set(uniqueKey, nodeResult)
+        } else if (<number>keyCount.get(key) > 1) {
+          // cannot generate a unique key, create an array to hold nodes with
+          // duplicate keys
+          const nodeList = <Array<XMLSerializedValue>>(markup.get(key) || [])
+          nodeList.push(nodeResult)
+          markup.set(key, nodeList)
+        } else {
+          // object already has a unique key
+          markup.set(key, nodeResult)
+        }
       }
       return markup
-    } else {
-      // child nodes have unique keys
-      // return a map
-      if (options.format === "map") {
-        const markup = new Map<string, XMLSerializedValue>()
-        for (const ns of preNode.namespaces) {
-          const key = this._getAttrKey(ns.name)
-          markup.set(key, ns.value)
-        }
-        for (const attr of preNode.attributes) {
-          const key = this._getAttrKey(attr.name)
-          markup.set(key, attr.value)
-        }
-        for (const [key, node] of items) {
-          let uniqueKey = key
-          if ((keyCount.get(key) || 0) > 1) {
-            let index = (keyIndices.get(key) || 0) + 1
-            uniqueKey = key + index.toString()
-            keyIndices.set(key, index)
-          }
-          const nodeResult = this._serializeChildNodes(node, options)
-          markup.set(uniqueKey, nodeResult)
-        }
-        return markup
-      } else if (options.format === "object") {
-        const markup: { [key: string]: XMLSerializedValue } = { }
-        for (const ns of preNode.namespaces) {
-          const key = this._getAttrKey(ns.name)
-          markup[key] = ns.value
-        }
-        for (const attr of preNode.attributes) {
-          const key = this._getAttrKey(attr.name)
-          markup[key] = attr.value
-        }
-        for (const [key, node] of items) {
-          let uniqueKey = key
-          if ((keyCount.get(key) || 0) > 1) {
-            let index = (keyIndices.get(key) || 0) + 1
-            uniqueKey = key + index.toString()
-            keyIndices.set(key, index)
-          }
-          const nodeResult = this._serializeChildNodes(node, options)
-          markup[uniqueKey] = nodeResult
-        }
-        return markup        
-      } else {
-        return ''
-      }
     }
   }
 
@@ -222,6 +193,7 @@ export class ObjectWriterImpl {
         return [(this._builderOptions.convert.ins) + (<ProcessingInstruction>preNode.node).target, false]
       case NodeType.CData:
         return [this._builderOptions.convert.cdata, true]
+      /* istanbul ignore next */
       default:
         throw new Error("Invalid node type.")
     }
