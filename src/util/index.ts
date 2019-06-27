@@ -1,5 +1,3 @@
-import { strict } from 'assert';
-
 export { TupleSet } from './TupleSet'
 
 /**
@@ -81,6 +79,67 @@ export function applyDefaults<T>(
 }
 
 /**
+ * Iterates over items pairs of an array.
+ * 
+ * @param arr - array to iterate
+ */
+export function *forEachArray<T>(arr: Array<T>): IterableIterator<T> {
+  for (let i = 0, len = arr.length; i < len; i++) {
+    yield arr[i]
+  }
+}
+
+/**
+ * Iterates over key/value pairs of a map or object.
+ * 
+ * @param obj - map or object to iterate
+ */
+export function *forEachObject<T>(obj: Map<string, T> | { [key: string]: T}): 
+  IterableIterator<[string, T]> {
+  if (isMap(obj)) {
+    for (const [key, val] of obj.entries()) {
+      yield [key, val]
+    }
+  } else {
+    for (const key in obj) {
+      /* istanbul ignore next */
+      if (!obj.hasOwnProperty(key)) continue
+      yield [key, obj[key]]
+    }
+  }
+}
+
+/**
+ * Gets the value of a key from a map or object.
+ * 
+ * @param obj - map or object
+ * @param key - the key to retrieve
+ */
+export function getObjectValue<T>(obj: Map<string, T> | 
+  { [key: string]: T}, key: string): T | undefined {
+  if (isMap(obj)) {
+    return obj.get(key)
+  } else {
+    return obj[key]
+  }
+}
+
+/**
+ * Removes a property from a map or object.
+ * 
+ * @param obj - map or object
+ * @param key - the key to remove
+ */
+export function removeObjectValue<T>(obj: Map<string, T> | 
+  { [key: string]: T}, key: string): void {
+  if (isMap(obj)) {
+    obj.delete(key)
+  } else {
+    delete obj[key]
+  }
+}
+
+/**
  * Type guard for boolean types
  * 
  * @param x - a variable to type check
@@ -138,6 +197,15 @@ export function isArray(x: any): x is any[] {
 }
 
 /**
+ * Type guard for maps.
+ * 
+ * @param x - a variable to check
+ */
+export function isMap(x: any): x is Map<string, any> {
+  return x instanceof Map
+}
+
+/**
  * Determines if `x` is an empty Array or an Object with no own properties.
  * 
  * @param x - a variable to check
@@ -145,13 +213,14 @@ export function isArray(x: any): x is any[] {
 export function isEmpty(x: any): boolean {
   if (isArray(x)) {
     return !x.length
-  } else {
-    for (const key in x) {
-      if (!x.hasOwnProperty(key)) continue
+  } else if (isMap(x) || isObject(x)) {
+    for (const [,] of forEachObject(x)) {
       return false
     }
     return true
   }
+
+  return false
 }
 
 /**
@@ -178,15 +247,6 @@ export function isPlainObject(x: any): boolean {
  */
 export function isIterable(x: any): boolean {
   return x && (typeof x[Symbol.iterator] === 'function')
-}
-
-/**
- * Determines if `x` is an iterable Object.
- * 
- * @param x - a variable to check
- */
-export function isMap(x: any): x is Map<string, any> {
-  return x instanceof Map
 }
 
 /**

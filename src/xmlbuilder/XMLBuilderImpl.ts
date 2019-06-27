@@ -4,7 +4,7 @@ import {
   WriterOptions, XMLSerializedValue, Validator, DTDOptions, BuilderOptionsParams, DefaultBuilderOptions
 } from "./interfaces"
 import {
-  isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults
+  isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults, forEachArray, forEachObject, isMap, getObjectValue, removeObjectValue
 } from "../util"
 import { Namespace } from "../dom/spec"
 import { StringWriterImpl, MapWriterImpl, ObjectWriterImpl } from "./writers"
@@ -44,23 +44,20 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     if (isArray(name)) {
       // expand if array
-      for (let i = 0, len = name.length; i < len; i++) {
-        const item = name[i]
+      for (const item of forEachArray(name)) {
         lastChild = this.ele(item)
       }
     } else if (isFunction(name)) {
       // evaluate if function
       lastChild = this.ele(name.apply(this))
-    } else if (isObject(name)) {
+    } else if (isMap(name) || isObject(name)) {
       // expand if object
-      for (const key in name) {
-        /* istanbul ignore next */
-        if (!name.hasOwnProperty(key)) continue
-        let val = name[key]
+      for (let [key, val] of forEachObject(name)) {
         if (isFunction(val)) {
           // evaluate if function
           val = val.apply(this)
         }
+
         if (!this._options.ignoreConverters && key.indexOf(this._options.convert.att) === 0) {
           // assign attributes
           if (key === this._options.convert.att) {
@@ -79,27 +76,25 @@ export class XMLBuilderImpl implements XMLBuilder {
           lastChild = this._dummy()
         } else if (Array.isArray(val)) {
           // expand list by creating child nodes
-          for (let j = 0, len = val.length; j < len; j++) {
-            const item = val[j]
-            let childNode: { [key: string]: any } = {}
+          for (const item of forEachArray(val)) {
+            const childNode: { [key: string]: any } = {}
             childNode[key] = item
             lastChild = this.ele(childNode)
           }
-
+        } else if (isObject(val) || isMap(val)) {
           // expand child nodes under parent
-        } else if (isObject(val)) {
           // if the key is #text expand child nodes under this node to support mixed content
           if (!this._options.ignoreConverters && key.indexOf(this._options.convert.text) === 0) {
             lastChild = this.ele(val)
           } else {
             // check for a default namespace declaration attribute
             let namespace: string | null = null
-            if (!this._options.ignoreConverters && isObject(val)) {
+            if (!this._options.ignoreConverters) {
               const nsKey = this._options.convert.att + "xmlns"
-              const attValue = val[nsKey]
+              const attValue = getObjectValue(val, nsKey)
               if (attValue === null || isString(attValue)) {
                 namespace = attValue
-                delete val[nsKey]
+                removeObjectValue(val, nsKey)
               }
             }
 
