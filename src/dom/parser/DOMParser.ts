@@ -78,7 +78,7 @@ export class DOMParser {
             }
 
             // create the DOM element node
-            const elementNode = (namespace != null ?
+            const elementNode = (namespace !== null ?
               doc.createElementNS(namespace, element.name) :
               doc.createElement(element.name))
 
@@ -97,7 +97,7 @@ export class DOMParser {
                 elementNode.setAttributeNS(Namespace.XMLNS, attName, attValue)
               } else {
                 const attNamespace = elementNode.lookupNamespaceURI(attQName.prefix)
-                if (attNamespace != null && !elementNode.isDefaultNamespace(attNamespace)) {
+                if (attNamespace !== null && !elementNode.isDefaultNamespace(attNamespace)) {
                   elementNode.setAttributeNS(attNamespace, attName, attValue)
                 } else {
                   elementNode.setAttribute(attName, attValue)

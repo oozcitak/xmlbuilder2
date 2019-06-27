@@ -11,7 +11,9 @@ describe('object', () => {
         '?': 'pi mypi',
         '!': 'Good guy',
         '$': 'well formed!',
+        '&': '<>&',
         address: {
+          '?': 'pi',
           city: "Istanbul",
           street: "End of long and winding road"
         },
@@ -37,7 +39,9 @@ describe('object', () => {
           ? pi mypi
           ! Good guy
           $ well formed!
+          # <>&
           address
+            ? pi
             city
               # Istanbul
             street
@@ -106,6 +110,92 @@ describe('object', () => {
           details
             # classified
       `)
+  })
+
+  test('from function', () => {
+    const doc = $$.create('root').ele(() => {
+      const arr = []
+      const i = 0
+      for (let i = 1; i < 5; i++) {
+        arr.push({ "#": "ele" + i.toString() })
+      }
+      return { node: arr }
+    }).doc()
+
+    expect($$.printTree(doc)).toBe($$.t`
+      root
+        node
+          # ele1
+        node
+          # ele2
+        node
+          # ele3
+        node
+          # ele4
+    `)
+  })
+
+  test('empty nodes', () => {
+    const obj = { 
+      root: {
+        node1: [],
+        node2: {},
+        node3: null
+      }
+    }
+    const doc = $$.create(obj).doc()
+
+    expect($$.printTree(doc)).toBe($$.t`
+      root
+        node2
+    `)
+  })
+
+  test('mixed content', () => {
+    const obj = { 
+      root: {
+        node1: "val1",
+        "#": {
+          "#1": "some text",
+          node: "and a node",
+          "#2": "more text"
+        },
+        node3: "val3"
+      }
+    }
+    const doc = $$.create(obj).doc()
+
+    expect($$.printTree(doc)).toBe($$.t`
+      root
+        node1
+          # val1
+        # some text
+        node
+          # and a node
+        # more text
+        node3
+          # val3
+    `)
+  })
+
+  test('namespace', () => {
+    const obj = { 
+      root: {
+        "@xmlns": "myns",
+        node: "val",
+      }
+    }
+    const doc = $$.create(obj).doc()
+
+    expect($$.printTree(doc)).toBe($$.t`
+      root (ns:myns)
+        node (ns:myns)
+          # val
+    `)
+  })
+
+  test('error if no nodes created', () => {
+    expect(() => $$.create({ })).toThrow()
   })
 
 })

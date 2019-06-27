@@ -1,10 +1,12 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
   BuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
-  WriterOptions, XMLSerializedValue, Validator, DTDOptions, BuilderOptionsParams, DefaultBuilderOptions
+  WriterOptions, XMLSerializedValue, Validator, DTDOptions, 
+  BuilderOptionsParams, DefaultBuilderOptions
 } from "./interfaces"
 import {
-  isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults, forEachArray, forEachObject, isMap, getObjectValue, removeObjectValue
+  isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults, 
+  forEachArray, forEachObject, isMap, getObjectValue, removeObjectValue
 } from "../util"
 import { Namespace } from "../dom/spec"
 import { StringWriterImpl, MapWriterImpl, ObjectWriterImpl } from "./writers"
@@ -42,12 +44,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     let lastChild: XMLBuilder | null = null
 
-    if (isArray(name)) {
-      // expand if array
-      for (const item of forEachArray(name)) {
-        lastChild = this.ele(item)
-      }
-    } else if (isFunction(name)) {
+    if (isFunction(name)) {
       // evaluate if function
       lastChild = this.ele(name.apply(this))
     } else if (isMap(name) || isObject(name)) {
@@ -71,7 +68,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         } else if (isObject(val) && isEmpty(val)) {
           // empty objects produce one node
           lastChild = this.ele(key)
-        } else if (!this._options.keepNullNodes && (val == null)) {
+        } else if (!this._options.keepNullNodes && (val === null)) {
           // skip null and undefined nodes
           lastChild = this._dummy()
         } else if (Array.isArray(val)) {
@@ -99,7 +96,7 @@ export class XMLBuilderImpl implements XMLBuilder {
             }
 
             // create a parent node
-            lastChild = (namespace !== null ?
+            lastChild = (namespace === null ?
               this._node(key) :
               this._node(key, { xmlns: namespace })
             )
@@ -112,9 +109,6 @@ export class XMLBuilderImpl implements XMLBuilder {
           lastChild = this.ele(key, val)
         }
       }
-    } else if (!this._options.keepNullNodes && text === null) {
-      // skip null nodes
-      lastChild = this._dummy()
     } else if (text !== undefined) {
       if (!this._options.ignoreConverters && name.indexOf(this._options.convert.text) === 0) {
         // text node
@@ -143,7 +137,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       lastChild = this._node(name, attributes, text)
     }
 
-    if (lastChild == null) {
+    if (lastChild === null) {
       throw new Error("Could not create any elements with: " + name.toString() + ". " + this._debugInfo())
     }
 
@@ -171,18 +165,20 @@ export class XMLBuilderImpl implements XMLBuilder {
           this.att(attName, attValue)
         }
       }
+    } else if (value === undefined) {
+      throw new Error("Attribute value not specified. " + this._debugInfo())
     } else {
       if (isFunction(value)) {
         value = value.apply(this)
       }
-      if (this._options.keepNullAttributes && (value == null)) {
+      if (this._options.keepNullAttributes && (value === null)) {
         this.att(name, "")
-      } else if (value != null) {
+      } else if (value !== undefined) {
         const ele = this._asElement
 
         // character validation
-        name = this._validate.name(name)
-        value = this._validate.attValue(value)
+        name = this._validate.name(name, this._debugInfo())
+        value = this._validate.attValue(value, this._debugInfo())
 
         // skip the default namespace declaration attribute
         // it is already processed by the _node function
@@ -193,8 +189,8 @@ export class XMLBuilderImpl implements XMLBuilder {
             ele.setAttributeNS(Namespace.XMLNS, name, value)
           } else {
             const attNamespace = ele.lookupNamespaceURI(attQName.prefix)
-            if (attNamespace != null && !ele.isDefaultNamespace(attNamespace)) {
-              ele.setAttributeNS(this._validate.namespace(attNamespace), name, value)
+            if (attNamespace !== null && !ele.isDefaultNamespace(attNamespace)) {
+              ele.setAttributeNS(this._validate.namespace(attNamespace, this._debugInfo()), name, value)
             } else {
               ele.setAttribute(name, value)
             }
@@ -235,7 +231,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   txt(content: string): XMLBuilder {
     // character validation
-    content = this._validate.text(content)
+    content = this._validate.text(content, this._debugInfo())
 
     const child = this._doc.createTextNode(content)
     this._asElement.appendChild(child)
@@ -246,7 +242,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   com(content: string): XMLBuilder {
     // character validation
-    content = this._validate.comment(content)
+    content = this._validate.comment(content, this._debugInfo())
 
     const child = this._doc.createComment(content)
     this._asElement.appendChild(child)
@@ -257,7 +253,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   raw(content: string): XMLBuilder {
     // character validation
-    content = this._validate.raw(content)
+    content = this._validate.raw(content, this._debugInfo())
 
     const child = this._doc.createTextNode(content)
     this._asElement.appendChild(child)
@@ -268,7 +264,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   dat(content: string): XMLBuilder {
     // character validation
-    content = this._validate.cdata(content)
+    content = this._validate.cdata(content, this._debugInfo())
 
     const child = this._doc.createCDATASection(content)
     this._asElement.appendChild(child)
@@ -279,8 +275,8 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   ins(target: string, content: string = ''): XMLBuilder {
     // character validation
-    target = this._validate.insTarget(target)
-    content = this._validate.insValue(content)
+    target = this._validate.insTarget(target, this._debugInfo())
+    content = this._validate.insValue(content, this._debugInfo())
 
     const child = this._doc.createProcessingInstruction(target, content)
     this._asElement.appendChild(child)
@@ -300,8 +296,8 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   dtd(options?: DTDOptions): XMLBuilder {
     // character validation
-    const pubID = this._validate.pubID((options && options.pubID) || '')
-    const sysID = this._validate.sysID((options && options.sysID) || '')
+    const pubID = this._validate.pubID((options && options.pubID) || '', this._debugInfo())
+    const sysID = this._validate.sysID((options && options.sysID) || '', this._debugInfo())
 
     // create doctype node
     const docType = this._doc.implementation.createDocumentType(
@@ -549,7 +545,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * @returns the new dummy element node
    */
   private _dummy(): XMLBuilder {
-    const child = this._doc.createElement('## DUMMY ##')
+    const child = this._doc.createElement('dummy_node')
     return XMLBuilderImpl._FromNode(child)
   }
 
@@ -591,7 +587,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   protected get _asElement(): Element {
     const ele = <Element><unknown>this
 
-    if (!ele.nodeType || ele.nodeType != NodeType.Element) {
+    if (!ele.nodeType || ele.nodeType !== NodeType.Element) {
       throw new Error("This function can only be applied to an element node." + this._debugInfo())
     }
 
@@ -604,7 +600,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   protected get _asDocument(): Document {
     const doc = <Document><unknown>this
 
-    if (!doc.nodeType || doc.nodeType != NodeType.Document) {
+    if (!doc.nodeType || doc.nodeType !== NodeType.Document) {
       throw new Error("This function can only be applied to a document node." + this._debugInfo())
     }
 
