@@ -186,6 +186,12 @@ export class MapWriterImpl {
    * string to provide uniqueness.
    */
   private _getNodeKey(preNode: PreSerializedNode<Node>): [string, boolean] {
+    const isRaw = (<any><unknown>preNode.node).isRawNode
+
+    if (isRaw) {
+      return [this._builderOptions.convert.raw, true]
+    }
+        
     switch (preNode.node.nodeType) {
       case NodeType.Element:
         return [(<Element>preNode.node).tagName, false]

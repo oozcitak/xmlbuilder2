@@ -92,6 +92,12 @@ export class StringWriterImpl {
    */
   private _serializeNode(preNode: PreSerializedNode<Node>,
     options: StringWriterOptions, refs: StringWriterRefs): string {
+    const isRaw = (<any><unknown>preNode.node).isRawNode
+
+    if (isRaw) {
+      return this._serializeRaw(<PreSerializedNode<Text>>preNode, options, refs)
+    }
+
     switch (preNode.node.nodeType) {
       case NodeType.Element:
         return this._serializeElement(<PreSerializedNode<Element>>preNode, options, refs)
@@ -307,6 +313,20 @@ export class StringWriterImpl {
     options: StringWriterOptions, refs: StringWriterRefs): string {
     return this._beginLine(preNode, options, refs) +
       Char.escapeText(preNode.node.data) +
+      this._endLine(preNode, options, refs)
+  }
+
+  /**
+   * Produces an XML serialization of a raw text node.
+   * 
+   * @param preNode - current node
+   * @param options - serialization options
+   * @param refs - reference parameters
+   */
+  private _serializeRaw(preNode: PreSerializedNode<Text>,
+    options: StringWriterOptions, refs: StringWriterRefs): string {
+    return this._beginLine(preNode, options, refs) +
+      preNode.node.data +
       this._endLine(preNode, options, refs)
   }
 

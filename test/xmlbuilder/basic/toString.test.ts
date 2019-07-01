@@ -42,6 +42,11 @@ describe('toString()', () => {
     expect(node.toString()).toBe('<root><?target content?></root>')
   })
 
+  test('raw', () => {
+    const node = $$.create('root').raw('content<>')
+    expect(node.toString()).toBe('<root>content<></root>')
+  })
+
   test('attribute', () => {
     const root = $$.create('root').att("att", "val")
     expect(root.toString()).toBe('<root att="val"/>')

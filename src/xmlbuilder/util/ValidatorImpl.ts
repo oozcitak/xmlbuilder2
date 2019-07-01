@@ -23,6 +23,7 @@ export class ValidatorImpl implements Validator {
     if (options.text) this.text = options.text
     if (options.cdata) this.cdata = options.cdata
     if (options.comment) this.comment = options.comment
+    if (options.raw) this.raw = options.raw
     if (options.attValue) this.attValue = options.attValue
     if (options.insTarget) this.insTarget = options.insTarget
     if (options.insValue) this.insValue = options.insValue
