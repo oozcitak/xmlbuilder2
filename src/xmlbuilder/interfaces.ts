@@ -558,7 +558,7 @@ export interface XMLBuilderEntryPoint {
    * 
    * @returns the XML document node
    */
-  create(): XMLBuilder
+  create(): XMLBuilderNode
 
   /**
    * Creates a new XML document and returns the document element node for
@@ -574,14 +574,14 @@ export interface XMLBuilderEntryPoint {
    * @returns document element node
    */
   create(name: string | ExpandObject, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilder
+    text?: AttributesObject | string): XMLBuilderNode
 
   /**
    * Creates and returns a new document fragment.
    * 
    * @returns document fragment node
    */
-  fragment(): XMLBuilder
+  fragment(): XMLBuilderNode
 
   /**
    * Creates an XML document by parsing the given document representation.
@@ -590,7 +590,7 @@ export interface XMLBuilderEntryPoint {
    * 
    * @returns document element node
    */
-  parse(document: string): XMLBuilder
+  parse(document: string): XMLBuilderNode
 
 }
 
@@ -598,7 +598,7 @@ export interface XMLBuilderEntryPoint {
  * Represents a mixin that extends XML nodes to implement easy to use and
  * chainable document builder methods.
  */
-export interface XMLBuilder {
+export interface XMLBuilderNode {
 
   /**
    * Sets builder options.
@@ -607,7 +607,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  set(builderOptions: XMLBuilderOptionsAsParams): XMLBuilder
+  set(builderOptions: XMLBuilderOptionsAsParams): XMLBuilderNode
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -622,7 +622,7 @@ export interface XMLBuilder {
    * @returns the new element node
    */
   ele(name: string, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilder
+    text?: AttributesObject | string): XMLBuilderNode
 
   /**
    * Creates new element nodes from the given JS object and appends it to the
@@ -632,7 +632,7 @@ export interface XMLBuilder {
    * 
    * @returns the last top level element node created
    */
-  ele(obj: ExpandObject): XMLBuilder
+  ele(obj: ExpandObject): XMLBuilderNode
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -644,14 +644,14 @@ export interface XMLBuilder {
    * @returns the last top level element node created
    */
   ele(name: string | ExpandObject, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilder
+    text?: AttributesObject | string): XMLBuilderNode
 
   /**
    * Removes this node from the XML document.
    * 
    * @returns parent element node
    */
-  remove(): XMLBuilder
+  remove(): XMLBuilderNode
 
   /**
    * Creates or updates an element attribute.
@@ -662,7 +662,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  att(name: AttributesObject | string, value?: string): XMLBuilder
+  att(name: AttributesObject | string, value?: string): XMLBuilderNode
 
   /**
    * Removes an attribute or a list of attributes.
@@ -671,7 +671,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  removeAtt(name: string | string[]): XMLBuilder
+  removeAtt(name: string | string[]): XMLBuilderNode
 
   /**
    * Removes an attribute or a list of attributes.
@@ -681,7 +681,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  removeAtt(namespace: string, name: string | string[]): XMLBuilder
+  removeAtt(namespace: string, name: string | string[]): XMLBuilderNode
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
@@ -690,7 +690,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  txt(content: string): XMLBuilder
+  txt(content: string): XMLBuilderNode
 
   /**
    * Creates a new comment node and appends it to the list of child nodes.
@@ -699,7 +699,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  com(content: string): XMLBuilder
+  com(content: string): XMLBuilderNode
 
   /**
    * Creates a new raw text node and appends it to the list of child nodes.
@@ -709,7 +709,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  raw(content: string): XMLBuilder
+  raw(content: string): XMLBuilderNode
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.
@@ -718,7 +718,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  dat(content: string): XMLBuilder
+  dat(content: string): XMLBuilderNode
 
   /**
    * Creates a new processing instruction node and appends it to the list of 
@@ -729,7 +729,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  ins(target: string, content?: string): XMLBuilder
+  ins(target: string, content?: string): XMLBuilderNode
 
   /**
    * Updates XML declaration.
@@ -738,7 +738,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilder
+  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilderNode
 
   /**
    * Creates a new DocType node and inserts it into the document. If the 
@@ -749,7 +749,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  dtd(options?: DTDOptions): XMLBuilder
+  dtd(options?: DTDOptions): XMLBuilderNode
 
   /**
    * Imports a node as a child node of this node. The nodes' descendants and
@@ -766,42 +766,42 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  import(node: XMLBuilder): XMLBuilder
+  import(node: XMLBuilderNode): XMLBuilderNode
 
   /**
    * Returns the document node.
    */
-  doc(): XMLBuilder
+  doc(): XMLBuilderNode
 
   /**
    * Returns the root element node.
    */
-  root(): XMLBuilder
+  root(): XMLBuilderNode
 
   /**
    * Returns the parent node.
    */
-  up(): XMLBuilder
+  up(): XMLBuilderNode
 
   /**
    * Returns the previous sibling node.
    */
-  prev(): XMLBuilder
+  prev(): XMLBuilderNode
 
   /**
    * Returns the next sibling node.
    */
-  next(): XMLBuilder
+  next(): XMLBuilderNode
 
   /**
    * Returns the first child node.
    */
-  first(): XMLBuilder
+  first(): XMLBuilderNode
 
   /**
    * Returns the last child node.
    */
-  last(): XMLBuilder
+  last(): XMLBuilderNode
 
   /**
    * Converts the node into its string representation.

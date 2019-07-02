@@ -4,26 +4,26 @@ import {
   DocumentType, Element, ProcessingInstruction, Text, CharacterData, 
   Node, XMLDocument
 } from '../dom'
-import { XMLBuilderImpl } from './XMLBuilderImpl'
+import { XMLBuilderNodeImpl } from './XMLBuilderNodeImpl'
 import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
 import {
-  XMLBuilderEntryPoint, XMLBuilder, ExpandObject, AttributesObject, 
+  XMLBuilderEntryPoint, XMLBuilderNode, ExpandObject, AttributesObject, 
   XMLBuilderOptionsAsParams
 } from './interfaces'
 import { XMLBuilderDocumentImpl } from './XMLBuilderDocumentImpl'
 
 // Apply XMLBuilder mixin
-applyMixin(Node, XMLBuilderImpl, "remove")
-applyMixin(Element, XMLBuilderImpl, "remove")
+applyMixin(Node, XMLBuilderNodeImpl, "remove")
+applyMixin(Element, XMLBuilderNodeImpl, "remove")
 
-applyMixin(CharacterData, XMLBuilderImpl, "remove")
-applyMixin(CDATASection, XMLBuilderImpl, "remove")
-applyMixin(Comment, XMLBuilderImpl, "remove")
-applyMixin(Text, XMLBuilderImpl, "remove")
-applyMixin(ProcessingInstruction, XMLBuilderImpl, "remove")
+applyMixin(CharacterData, XMLBuilderNodeImpl, "remove")
+applyMixin(CDATASection, XMLBuilderNodeImpl, "remove")
+applyMixin(Comment, XMLBuilderNodeImpl, "remove")
+applyMixin(Text, XMLBuilderNodeImpl, "remove")
+applyMixin(ProcessingInstruction, XMLBuilderNodeImpl, "remove")
 
-applyMixin(DocumentType, XMLBuilderImpl, "remove")
-applyMixin(DocumentFragment, XMLBuilderImpl, "remove")
+applyMixin(DocumentType, XMLBuilderNodeImpl, "remove")
+applyMixin(DocumentFragment, XMLBuilderNodeImpl, "remove")
 applyMixin(Document, XMLBuilderDocumentImpl, "remove")
 applyMixin(XMLDocument, XMLBuilderDocumentImpl, "remove")
 
@@ -53,7 +53,7 @@ export function withOptions(options: XMLBuilderOptionsAsParams): XMLBuilderEntry
  */
 export function create(name?: string | ExpandObject, 
   attributes?: AttributesObject | string,
-  text?: AttributesObject | string): XMLBuilder {
+  text?: AttributesObject | string): XMLBuilderNode {
   return new XMLBuilderEntryPointImpl().create(name, attributes, text)
 }
 
@@ -62,7 +62,7 @@ export function create(name?: string | ExpandObject,
  * 
  * @returns document fragment node
  */
-export function fragment(): XMLBuilder {
+export function fragment(): XMLBuilderNode {
   return new XMLBuilderEntryPointImpl().fragment()
 }
 
@@ -73,6 +73,6 @@ export function fragment(): XMLBuilder {
  * 
  * @returns document element node
  */
-export function parse(document: string): XMLBuilder {
+export function parse(document: string): XMLBuilderNode {
   return new XMLBuilderEntryPointImpl().parse(document)
 }

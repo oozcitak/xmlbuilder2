@@ -1,6 +1,6 @@
 import {
   XMLBuilderOptions, XMLBuilderEntryPoint, ExpandObject,
-  AttributesObject, XMLBuilder, XMLBuilderOptionsAsParams, Validator,
+  AttributesObject, XMLBuilderNode, XMLBuilderOptionsAsParams, Validator,
   DTDOptions, DefaultBuilderOptions
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
@@ -41,9 +41,9 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
 
   /** @inheritdoc */
   create(name?: string | ExpandObject, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilder {
+    text?: AttributesObject | string): XMLBuilderNode {
 
-    let builder = <XMLBuilder><unknown>this._createEmptyDocument()
+    let builder = <XMLBuilderNode><unknown>this._createEmptyDocument()
     this._setOptions(builder)
 
     // document element node
@@ -60,16 +60,16 @@ export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
   }
 
   /** @inheritdoc */
-  fragment(): XMLBuilder {
+  fragment(): XMLBuilderNode {
     const doc = this._createEmptyDocument()
     this._setOptions(doc)
-    return <XMLBuilder><unknown>doc.createDocumentFragment()
+    return <XMLBuilderNode><unknown>doc.createDocumentFragment()
   }
 
   /** @inheritdoc */
-  parse(document: string): XMLBuilder {
+  parse(document: string): XMLBuilderNode {
     const parser = new DOMParser()
-    const builder = <XMLBuilder><unknown>parser.parseFromString(document, MimeType.XML)
+    const builder = <XMLBuilderNode><unknown>parser.parseFromString(document, MimeType.XML)
     this._setOptions(builder)
     return builder.root()
   }

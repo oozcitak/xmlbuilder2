@@ -1,11 +1,11 @@
 import { XMLBuilderOptions, Validator } from "./interfaces"
-import { XMLBuilderImpl } from "./XMLBuilderImpl"
+import { XMLBuilderNodeImpl } from "./XMLBuilderNodeImpl"
 
 /**
- * Represents a mixin that extends XML nodes to implement easy to use and
- * chainable document builder methods.
+ * Represents a mixin that extends XML document nodes to implement easy to use
+ * and chainable document builder methods.
  */
-export class XMLBuilderDocumentImpl extends XMLBuilderImpl {
+export class XMLBuilderDocumentImpl extends XMLBuilderNodeImpl {
 
   private _builderOptions?: XMLBuilderOptions
   private _validator?: Validator
