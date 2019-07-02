@@ -1,8 +1,8 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
-  BuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
+  XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, Validator, DTDOptions, 
-  BuilderOptionsParams, DefaultBuilderOptions
+  XMLBuilderOptionsAsParams, DefaultBuilderOptions
 } from "./interfaces"
 import {
   isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults, 
@@ -20,7 +20,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   private _isRawNode: boolean = false
 
   /** @inheritdoc */
-  set(options: BuilderOptionsParams): XMLBuilder {
+  set(options: XMLBuilderOptionsAsParams): XMLBuilder {
     this._options = applyDefaults(
       applyDefaults(this._options, options, true), // apply user settings
       DefaultBuilderOptions) // provide defaults
@@ -644,10 +644,10 @@ export class XMLBuilderImpl implements XMLBuilder {
   /**
    * Gets or sets builder options.
    */
-  protected get _options(): BuilderOptions {
+  protected get _options(): XMLBuilderOptions {
     return (<any><unknown>this.doc())._builderOptions
   }
-  protected set _options(value: BuilderOptions) {
+  protected set _options(value: XMLBuilderOptions) {
     (<any><unknown>this.doc())._builderOptions = value
   }
 

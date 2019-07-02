@@ -1,5 +1,5 @@
 import {
-  WriterOptions, XMLSerializedValue, PreSerializedNode, BuilderOptions
+  WriterOptions, XMLSerializedValue, PreSerializedNode, XMLBuilderOptions
 } from "../interfaces"
 import {
   Node, Element, Text, CDATASection, Comment, ProcessingInstruction, 
@@ -13,14 +13,14 @@ import { applyDefaults } from "../../util"
  */
 export class MapWriterImpl {
 
-  private _builderOptions: BuilderOptions
+  private _builderOptions: XMLBuilderOptions
 
   /**
    * Initializes a new instance of `MapWriterImpl`.
    * 
    * @param builderOptions - XML builder options
    */
-  constructor(builderOptions: BuilderOptions) {
+  constructor(builderOptions: XMLBuilderOptions) {
     this._builderOptions = builderOptions
   }
 
@@ -31,7 +31,7 @@ export class MapWriterImpl {
    * @param writerOptions - serialization options
    */
   serialize(node: Node, writerOptions?: WriterOptions): XMLSerializedValue {
-    const options: BuilderOptions = applyDefaults(writerOptions, {
+    const options: XMLBuilderOptions = applyDefaults(writerOptions, {
       format: "map"
     })
 
@@ -64,7 +64,7 @@ export class MapWriterImpl {
    * @param options - serialization options
    */
   protected _serializeNode(preNode: PreSerializedNode<Node>,
-    options: BuilderOptions): XMLSerializedValue {
+    options: XMLBuilderOptions): XMLSerializedValue {
     switch (preNode.node.nodeType) {
       case NodeType.Element:
         return this._serializeElement(preNode, options)
@@ -94,7 +94,7 @@ export class MapWriterImpl {
    * @param options - serialization options
    */
   private _serializeElement(preNode: PreSerializedNode<Node>,
-    options: BuilderOptions): XMLSerializedValue {
+    options: XMLBuilderOptions): XMLSerializedValue {
     return new Map<string, XMLSerializedValue>([
       [<string><unknown>preNode.name, this._serializeChildNodes(preNode, options)]
     ])
@@ -107,7 +107,7 @@ export class MapWriterImpl {
    * @param options - serialization options
    */
   private _serializeChildNodes(preNode: PreSerializedNode<Node>,
-    options: BuilderOptions): XMLSerializedValue {
+    options: XMLBuilderOptions): XMLSerializedValue {
     const items = new Array<[string, boolean, PreSerializedNode<Node>]>()
     const keyCount = new Map<string, number>()
     const keyIndices = new Map<string, number>()

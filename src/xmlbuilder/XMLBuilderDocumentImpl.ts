@@ -1,4 +1,4 @@
-import { BuilderOptions, Validator } from "./interfaces"
+import { XMLBuilderOptions, Validator } from "./interfaces"
 import { XMLBuilderImpl } from "./XMLBuilderImpl"
 
 /**
@@ -7,17 +7,17 @@ import { XMLBuilderImpl } from "./XMLBuilderImpl"
  */
 export class XMLBuilderDocumentImpl extends XMLBuilderImpl {
 
-  private _builderOptions?: BuilderOptions
+  private _builderOptions?: XMLBuilderOptions
   private _validator?: Validator
 
-  protected get _options(): BuilderOptions {
+  protected get _options(): XMLBuilderOptions {
     /* istanbul ignore next */
     if (this._builderOptions === undefined) {
       throw new Error("Builder options is not set.")
     }
     return this._builderOptions
   }
-  protected set _options(value: BuilderOptions) {
+  protected set _options(value: XMLBuilderOptions) {
     this._builderOptions = value
   }
 

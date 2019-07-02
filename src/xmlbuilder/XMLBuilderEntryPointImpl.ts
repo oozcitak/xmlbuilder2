@@ -1,6 +1,6 @@
 import {
-  BuilderOptions, XMLBuilderEntryPoint, ExpandObject,
-  AttributesObject, XMLBuilder, BuilderOptionsParams, Validator,
+  XMLBuilderOptions, XMLBuilderEntryPoint, ExpandObject,
+  AttributesObject, XMLBuilder, XMLBuilderOptionsAsParams, Validator,
   DTDOptions, DefaultBuilderOptions
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
@@ -13,14 +13,14 @@ import { XMLDocument } from "../dom/interfaces"
  */
 export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
 
-  private _options: BuilderOptions
+  private _options: XMLBuilderOptions
   private _docType?: DTDOptions
   private _validate: Validator
 
   /** 
    * Initializes a new instance of  `XMLBuilderEntryPointImpl`
   */
-  constructor(options?: BuilderOptionsParams) {
+  constructor(options?: XMLBuilderOptionsAsParams) {
     options = options || {}
 
     this._validate = new ValidatorImpl(options.version || "1.0",

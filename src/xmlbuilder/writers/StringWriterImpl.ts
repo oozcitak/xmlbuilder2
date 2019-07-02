@@ -1,5 +1,5 @@
 import {
-  WriterOptions, BuilderOptions, PreSerializedNode, 
+  WriterOptions, XMLBuilderOptions, PreSerializedNode, 
   PreSerializedNS, PreSerializedAttr
 } from "../interfaces"
 import {
@@ -40,14 +40,14 @@ interface StringWriterRefs {
  */
 export class StringWriterImpl {
 
-  private _builderOptions: BuilderOptions
+  private _builderOptions: XMLBuilderOptions
 
   /**
    * Initializes a new instance of `StringWriterImpl`.
    * 
    * @param builderOptions - XML builder options
    */
-  constructor(builderOptions: BuilderOptions) {
+  constructor(builderOptions: XMLBuilderOptions) {
     this._builderOptions = builderOptions
   }
 

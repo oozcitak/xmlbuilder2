@@ -8,7 +8,7 @@ import { XMLBuilderImpl } from './XMLBuilderImpl'
 import { XMLBuilderEntryPointImpl } from './XMLBuilderEntryPointImpl'
 import {
   XMLBuilderEntryPoint, XMLBuilder, ExpandObject, AttributesObject, 
-  BuilderOptionsParams
+  XMLBuilderOptionsAsParams
 } from './interfaces'
 import { XMLBuilderDocumentImpl } from './XMLBuilderDocumentImpl'
 
@@ -32,7 +32,7 @@ applyMixin(XMLDocument, XMLBuilderDocumentImpl, "remove")
  * 
  * @param options - builder options
  */
-export function withOptions(options: BuilderOptionsParams): XMLBuilderEntryPoint {
+export function withOptions(options: XMLBuilderOptionsAsParams): XMLBuilderEntryPoint {
   return new XMLBuilderEntryPointImpl(options)
 }
 

@@ -4,7 +4,7 @@ import { Node, Attr } from "../dom/interfaces"
  * Defines the options used while creating an XML document. Default values will
  * be provided for optional parameters.
  */
-export interface BuilderOptionsParams {
+export interface XMLBuilderOptionsAsParams {
   /**
    * A version number string, e.g. `"1.0"`
    */
@@ -51,7 +51,7 @@ export interface BuilderOptionsParams {
 /**
  * Defines the options used while creating an XML document.
  */
-export interface BuilderOptions {
+export interface XMLBuilderOptions {
   /**
    * A version number string, e.g. `"1.0"`
    */
@@ -199,7 +199,7 @@ export interface ConvertOptions {
 /**
  * Defines default values for builder options.
  */
-export const DefaultBuilderOptions: BuilderOptionsParams = {
+export const DefaultBuilderOptions: XMLBuilderOptionsAsParams = {
   version: "1.0",
   inheritNS: true,
   keepNullNodes: false,
@@ -607,7 +607,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  set(builderOptions: BuilderOptionsParams): XMLBuilder
+  set(builderOptions: XMLBuilderOptionsAsParams): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
