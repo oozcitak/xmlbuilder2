@@ -3,12 +3,12 @@ import $$ from '../TestHelpers'
 describe('create()', () => {
 
   test('Empty document', () => {
-    const doc = $$.create()
+    const doc = $$.xml().create()
     expect($$.printTree(doc)).toBe('')
   })
 
   test('Document with root element', () => {
-    const ele = $$.create('root', { att: "val" }, "text")
+    const ele = $$.xml().create('root', { att: "val" }, "text")
     expect($$.printTree(ele)).toBe($$.t`
       root att="val"
         # text
@@ -16,7 +16,7 @@ describe('create()', () => {
   })
 
   test('Document with root element - reverse argument order', () => {
-    const ele = $$.create('root', "text", { att: "val" })
+    const ele = $$.xml().create('root', "text", { att: "val" })
     expect($$.printTree(ele)).toBe($$.t`
       root att="val"
         # text

@@ -26,7 +26,7 @@ describe('StringWriter', () => {
       }
     }
 
-    expect($$.withOptions({ version: "1.0", encoding: "UTF-8", standalone: true })
+    expect($$.xml({ version: "1.0", encoding: "UTF-8", standalone: true })
       .create('root').ele(obj).doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <root>
@@ -61,7 +61,7 @@ describe('StringWriter', () => {
       }
     }
 
-    expect($$.create('root').ele(obj).root().
+    expect($$.xml().create('root').ele(obj).root().
       toString({ format: "text", prettyPrint: true, offset: 2 })).toBe(
       '    <root>\n' +
       '      <ele>simple element</ele>\n' +
@@ -81,7 +81,7 @@ describe('StringWriter', () => {
       }
     }
 
-    expect($$.create('root').ele(obj).root().
+    expect($$.xml().create('root').ele(obj).root().
       toString({ format: "text", prettyPrint: true, offset: -2 })).toBe(
       '<root>\n' +
       '<ele>simple element</ele>\n' +
@@ -93,7 +93,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype with both public and system identifier', () => {
-    expect($$.withOptions({ docType: { pubID: "pub", sysID: "sys" } })
+    expect($$.xml({ docType: { pubID: "pub", sysID: "sys" } })
       .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub" "sys">
@@ -102,7 +102,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype with public identifier', () => {
-    expect($$.withOptions({ docType: { pubID: "pub", } })
+    expect($$.xml({ docType: { pubID: "pub", } })
       .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub">
@@ -111,7 +111,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype with system identifier', () => {
-    expect($$.withOptions({ docType: { sysID: "sys" } })
+    expect($$.xml({ docType: { sysID: "sys" } })
       .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root SYSTEM "sys">
@@ -120,7 +120,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype without identifiers', () => {
-    expect($$.withOptions({ docType: { } })
+    expect($$.xml({ docType: { } })
       .create('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root>
@@ -129,7 +129,7 @@ describe('StringWriter', () => {
   })
 
   test('namespaces', () => {
-    const doc = $$.create('root', { xmlns: "myns" })
+    const doc = $$.xml().create('root', { xmlns: "myns" })
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
@@ -143,21 +143,21 @@ describe('StringWriter', () => {
   })
 
   test('allowEmptyTags', () => {
-    expect($$.create('root').end({ allowEmptyTags: true, prettyPrint: true })).toBe($$.t`
+    expect($$.xml().create('root').end({ allowEmptyTags: true, prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <root></root>
       `)
   })
 
   test('spaceBeforeSlash', () => {
-    expect($$.create('root').end({ spaceBeforeSlash: true, prettyPrint: true })).toBe($$.t`
+    expect($$.xml().create('root').end({ spaceBeforeSlash: true, prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <root />
       `)
   })
 
   test('Pretty printing with dontPrettyPrintTextNodes, no mixed content', () => {
-    const doc = $$.create('root')
+    const doc = $$.xml().create('root')
       .ele('atttest', { 'att': 'val' }, 'text').up()
       .ele('atttest', 'text').att('att', 'val').doc()
 
@@ -171,7 +171,7 @@ describe('StringWriter', () => {
   })
 
   test('Pretty printing with mixed content', () => {
-    const doc = $$.create('root')
+    const doc = $$.xml().create('root')
       .ele('atttest', { 'att': 'val' }, 'mixed content')
         .ele('atttest', 'text').att('att', 'val').up()
         .txt('moretext after node').doc()
@@ -189,7 +189,7 @@ describe('StringWriter', () => {
   })
 
   test('Pretty printing with dontPrettyPrintTextNodes, mixed content', () => {
-    const doc = $$.create('root')
+    const doc = $$.xml().create('root')
       .ele('atttest', { 'att': 'val' }, 'mixed content')
       .ele('atttest', 'text').att('att', 'val').up()
       .txt('moretext after node').doc()
@@ -203,7 +203,7 @@ describe('StringWriter', () => {
   })
 
   test('unknown node', () => {
-    const ele = $$.create('root').ele('alien')
+    const ele = $$.xml().create('root').ele('alien')
     Object.defineProperty(ele, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end()).toThrow()
   })

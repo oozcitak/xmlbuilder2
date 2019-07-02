@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('dtd()', () => {
 
   test('without identifiers', () => {
-    const root = $$.create('root').dtd()
+    const root = $$.xml().create('root').dtd()
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root
       root
@@ -11,7 +11,7 @@ describe('dtd()', () => {
   })
 
   test('public identifier', () => {
-    const root = $$.create('root').dtd({ pubID: 'pub' })
+    const root = $$.xml().create('root').dtd({ pubID: 'pub' })
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root PUBLIC pub
       root
@@ -19,7 +19,7 @@ describe('dtd()', () => {
   })
 
   test('system identifier', () => {
-    const root = $$.create('root').dtd({ sysID: 'sys' })
+    const root = $$.xml().create('root').dtd({ sysID: 'sys' })
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root SYSTEM sys
       root
@@ -27,7 +27,7 @@ describe('dtd()', () => {
   })
 
   test('both identifiers', () => {
-    const root = $$.create('root').dtd({ pubID: 'pub', sysID: 'sys' })
+    const root = $$.xml().create('root').dtd({ pubID: 'pub', sysID: 'sys' })
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root PUBLIC pub sys
       root
@@ -35,7 +35,7 @@ describe('dtd()', () => {
   })
 
   test('replace doctype', () => {
-    const root = $$.withOptions({ docType: { pubID: "pub", sysID: "sys" } }).create('root')
+    const root = $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).create('root')
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root PUBLIC pub sys
       root
@@ -49,7 +49,7 @@ describe('dtd()', () => {
   })
 
   test('update when element node changes', () => {
-    const doc = $$.withOptions({ docType: { pubID: "pub", sysID: "sys" } }).create()
+    const doc = $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).create()
     doc.ele('newroot')
     expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE newroot PUBLIC pub sys

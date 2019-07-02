@@ -1,13 +1,13 @@
 import TestHelpersRoot from "../TestHelpers"
 import { XMLSerializer } from '../../src/dom/serializer'
-import { withOptions, create, parse, fragment } from '../../src/xmlbuilder'
+import { XMLBuilder } from '../../src/xmlbuilder'
 import { isMap, isArray, isObject } from "../../src/util"
+import { XMLBuilderOptionsAsParams } from "../../src/xmlbuilder/interfaces"
 
 export default class TestHelpers extends TestHelpersRoot {
-  static withOptions = withOptions
-  static create = create
-  static fragment = fragment
-  static parse = parse
+  static xml(options?: XMLBuilderOptionsAsParams): XMLBuilder {
+    return new XMLBuilder(options) 
+  }
   static serialize(node: any): string {
     const serializer = new XMLSerializer()
     return serializer.serializeToString(node)

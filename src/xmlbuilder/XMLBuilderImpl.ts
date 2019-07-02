@@ -1,5 +1,5 @@
 import {
-  XMLBuilderOptions, XMLBuilderEntryPoint, ExpandObject,
+  XMLBuilderOptions, XMLBuilder, ExpandObject,
   AttributesObject, XMLBuilderNode, XMLBuilderOptionsAsParams, Validator,
   DTDOptions, DefaultBuilderOptions
 } from "./interfaces"
@@ -11,14 +11,14 @@ import { XMLDocument } from "../dom/interfaces"
 /**
  * Serves as an entry point to builder functions.
  */
-export class XMLBuilderEntryPointImpl implements XMLBuilderEntryPoint {
+export class XMLBuilderImpl implements XMLBuilder {
 
   private _options: XMLBuilderOptions
   private _docType?: DTDOptions
   private _validate: Validator
 
   /** 
-   * Initializes a new instance of  `XMLBuilderEntryPointImpl`
+   * Initializes a new instance of  `XMLBuilderImpl`
   */
   constructor(options?: XMLBuilderOptionsAsParams) {
     options = options || {}

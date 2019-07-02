@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('fragment()', () => {
 
   test('document fragment', () => {
-    const frag = $$.fragment()
+    const frag = $$.xml().fragment()
     const node1 = frag.ele('node1')
     const node2 = frag.ele('node2')
     node1.ele('node1-1').att("att1-1", "val1-1")

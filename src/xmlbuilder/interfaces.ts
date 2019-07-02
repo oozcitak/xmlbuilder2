@@ -157,12 +157,33 @@ export interface ConvertOptionsParams {
 export interface ConvertOptions {
   /** 
    * When prepended to a JS object key, converts its key-value pair 
-   * to an attribute. Defaults to `"@"`.
+   * to an attribute. Defaults to `"@"`. Multiple attribues can also be grouped
+   * under the attribute key. For example:
+   * ```js
+   * obj1 = { pilot: { '@callsign': 'Maverick', '@rank': 'Lieutenant' } }
+   * obj2 = { pilot: { '@': { 'callsign': 'Maverick', 'rank': 'Lieutenant' } } }
+   * ```
+   * both become:
+   * ```xml
+   * <pilot callsign="Maverick" rank="Lieutenant"/>
+   * ````
    */
   att: string
   /** 
    * When prepended to a JS object key, converts its value to a processing
-   * instruction node. Defaults to `"?"`.
+   * instruction node. Defaults to `"?"`. Instruction target and value should
+   * be separated with a single space character. For example:
+   * ```js
+   * obj = { 
+   *   '?': 'background classified ref="NAM#123456"',
+   *   pilot: 'Pete Mitchell'
+   * }
+   * ```
+   * becomes:
+   * ```xml
+   * <?background classified ref="NAM#123456"?>
+   * <pilot>Pete Mitchell</pilot>
+   * ````
    */
   ins: string
   /** 
@@ -172,26 +193,61 @@ export interface ConvertOptions {
    * _Note:_ Since JS objects cannot contain duplicate keys, multiple text 
    * nodes can be created by adding some unique text after each object 
    * key. For example: 
-   * 
-   * @example
-   * 
-   * const textNodes = { '#text1': 'some text', '#text2': 'more text' }
+   * ```js
+   * obj = { needCourage: {
+   *   '#1': 'Talk to me Goose!',
+   *   '#2': 'Talk to me...'
+   * } }
+   * ```
+   * becomes:
+   * ```xml
+   * <needCourage>Talk to me Goose!Talk to me...</needCourage>
+   * ````
    */
   text: string
   /** 
    * When prepended to a JS object key, converts its value to a CDATA 
-   * node. Defaults to `"$"`.
+   * node. Defaults to `"$"`. For example:
+   * ```js
+   * obj = { 
+   *   '$': '<a href="https://topgun.fandom.com/wiki/MiG-28"/>',
+   *   aircraft: 'MiG-28'
+   * }
+   * ```
+   * becomes:
+   * ```xml
+   * <![CDATA[<a href="https://topgun.fandom.com/wiki/MiG-28"/>]]>
+   * <aircraft>MiG-28</aircraft>
+   * ````
    */
   cdata: string
   /** 
    * When prepended to a JS object key, converts its value to a 
-   * comment node. Defaults to `"!"`.
+   * comment node. Defaults to `"!"`. For example:
+   * ```js
+   * obj = {
+   *   '!': 'Fictional; MiGs use odd numbers for fighters.',
+   *   aircraft: 'MiG-28'
+   * }
+   * ```
+   * becomes:
+   * ```xml
+   * <!--Fictional; MiGs use odd numbers for fighters.-->
+   * <aircraft>MiG-28</aircraft>
+   * ````
    */
   comment: string
   /** 
-   * When prepended to a JS object key, converts its value to a 
-   * text node. No character validation is applied to raw nodes.
-   * Defaults to `"&"`.
+   * When prepended to a JS object key, converts its value to a raw text node.
+   * Defaults to `"&"`. Character validation does not apply to raw text nodes.
+   * This can potentially result in invalid XML documents. Example:
+   * ```js
+   * obj = { node: { '&': '<&>' } }
+   * ```
+   * becomes:
+   * ```xml
+   * <node><&></node>
+   * ```
    */
   raw: string
 }
@@ -531,7 +587,8 @@ interface XMLSerializedArray extends Array<XMLSerializedValue> { }
  * Represents the type of a variable that can be expanded by the `ele` function 
  * into nodes.
  */
-export type ExpandObject = { [key: string]: any } | any[] | ((...args: any) => any)
+export type ExpandObject = { [key: string]: any } | Map<string, any> |
+  any[] | ((...args: any) => any)
 
 /**
  * Represents the type of a variable that is a JS object defining
@@ -551,7 +608,7 @@ export type AttributesObject = {
 /**
  * Serves as an entry point to builder functions.
  */
-export interface XMLBuilderEntryPoint {
+export interface XMLBuilder {
 
   /**
    * Creates a new XML document without a document element and returns it.

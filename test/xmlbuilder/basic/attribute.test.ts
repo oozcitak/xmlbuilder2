@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('att()', () => {
 
   test('add attribute', () => {
-    const root = $$.create().ele('root')
+    const root = $$.xml().create().ele('root')
     const node1 = root.ele('node1')
     node1.att('att1', 'val1').att('att2', 'val2').ele('node1-2')
     const node2 = root.ele('node2')
@@ -17,7 +17,7 @@ describe('att()', () => {
   })
 
   test('replace attribute', () => {
-    const root = $$.create().ele('root')
+    const root = $$.xml().create().ele('root')
     const node1 = root.ele('node1')
     node1.att('att1', 'val1').att('att1', 'val2').ele('node1-2')
     const node2 = root.ele('node2')
@@ -31,7 +31,7 @@ describe('att()', () => {
   })
 
   test('remove attribute', () => {
-    const root = $$.create().ele('root')
+    const root = $$.xml().create().ele('root')
     const node1 = root.ele('node1')
     node1.att('att1', 'val1')
       .att('att2', 'val2')
@@ -51,7 +51,7 @@ describe('att()', () => {
   })
 
   test('attribute from JS object', () => {
-    const root = $$.create().ele('root')
+    const root = $$.xml().create().ele('root')
     root.ele('node').ele({ '@att1': 'val1', '@att2': 'val2' })
 
     expect($$.printTree(root.doc())).toBe($$.t`
@@ -61,7 +61,7 @@ describe('att()', () => {
   })
 
   test('attribute from JS object alternate notation', () => {
-    const root = $$.create().ele('root')
+    const root = $$.xml().create().ele('root')
     root.ele('node').ele({ '@': { 'att1': 'val1', 'att2': 'val2' } })
 
     expect($$.printTree(root.doc())).toBe($$.t`
