@@ -19,7 +19,9 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** 
    * Initializes a new instance of  `XMLBuilderImpl`
-  */
+   * 
+   * @param options - builder options
+   */
   constructor(options?: XMLBuilderOptionsAsParams) {
     options = options || {}
 
