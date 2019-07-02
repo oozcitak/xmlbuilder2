@@ -1,7 +1,7 @@
 import TestHelpersRoot from "../TestHelpers"
 import { XMLSerializer } from '../../src/dom/serializer'
 import { withOptions, create, parse, fragment } from '../../src/xmlbuilder'
-import { isMap, isArray, isObject, isEmpty } from "../../src/util"
+import { isMap, isArray, isObject } from "../../src/util"
 
 export default class TestHelpers extends TestHelpersRoot {
   static withOptions = withOptions

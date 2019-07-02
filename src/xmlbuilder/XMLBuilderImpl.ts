@@ -17,7 +17,7 @@ import { StringWriterImpl, MapWriterImpl, ObjectWriterImpl } from "./writers"
  */
 export class XMLBuilderImpl implements XMLBuilder {
 
-  private isRawNode: boolean = false
+  private _isRawNode: boolean = false
 
   /** @inheritdoc */
   set(options: BuilderOptionsParams): XMLBuilder {
@@ -258,8 +258,8 @@ export class XMLBuilderImpl implements XMLBuilder {
     content = this._validate.raw(content, this._debugInfo())
 
     const child = this._doc.createTextNode(content)
-    const nodeAsAny = (<any><unknown>child)
-    nodeAsAny.isRawNode = true
+    const builder = (<XMLBuilderImpl><unknown>child)
+    builder._isRawNode = true
     this._asElement.appendChild(child)
 
     return this

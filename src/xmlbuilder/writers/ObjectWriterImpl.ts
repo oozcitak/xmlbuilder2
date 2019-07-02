@@ -2,7 +2,8 @@ import {
   WriterOptions, XMLSerializedValue, PreSerializedNode, BuilderOptions
 } from "../interfaces"
 import {
-  Node, Element, Text, CDATASection, Comment, ProcessingInstruction, NodeType, CharacterData
+  Node, Element, Text, CDATASection, Comment, ProcessingInstruction, 
+  NodeType, CharacterData
 } from "../../dom/interfaces"
 import { PreSerializer } from "../util"
 import { applyDefaults } from "../../util"
@@ -186,7 +187,7 @@ export class ObjectWriterImpl {
    * string to provide uniqueness.
    */
   private _getNodeKey(preNode: PreSerializedNode<Node>): [string, boolean] {
-    const isRaw = (<any><unknown>preNode.node).isRawNode
+    const isRaw = (<any><unknown>preNode.node)._isRawNode
 
     if (isRaw) {
       return [this._builderOptions.convert.raw, true]
