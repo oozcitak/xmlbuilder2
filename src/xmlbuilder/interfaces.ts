@@ -692,18 +692,6 @@ export interface XMLBuilderNode {
   ele(obj: ExpandObject): XMLBuilderNode
 
   /**
-   * Creates a new element node and appends it to the list of child nodes.
-   * 
-   * @param name - element name or a JS object representing nodes to insert
-   * @param attributes - a JS object with element attributes
-   * @param text - contents of a text child node
-   * 
-   * @returns the last top level element node created
-   */
-  ele(name: string | ExpandObject, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilderNode
-
-  /**
    * Removes this node from the XML document.
    * 
    * @returns parent element node
@@ -713,13 +701,32 @@ export interface XMLBuilderNode {
   /**
    * Creates or updates an element attribute.
    * 
-   * @param name - attribute name or a JS object with element attributes and 
-   * values
+   * @param namespace - namespace of the attribute
+   * @param name - attribute name
    * @param value - attribute value
    * 
    * @returns current element node
    */
-  att(name: AttributesObject | string, value?: string): XMLBuilderNode
+  att(namespace: string, name: string, value: string | (() => string)): XMLBuilderNode
+
+  /**
+   * Creates or updates an element attribute.
+   * 
+   * @param name - attribute name
+   * @param value - attribute value
+   * 
+   * @returns current element node
+   */
+  att(name: string, value: string | (() => string)): XMLBuilderNode
+
+  /**
+   * Creates or updates an element attribute.
+   * 
+   * @param obj - a JS object containing element attributes and values
+   * 
+   * @returns current element node
+   */
+  att(obj: AttributesObject): XMLBuilderNode
 
   /**
    * Removes an attribute or a list of attributes.

@@ -142,6 +142,47 @@ describe('StringWriter', () => {
       `)
   })
 
+  test('XML namespace', () => {
+    const doc = $$.xml().create('root', { xmlns: "http://www.w3.org/XML/1998/namespace" })
+      .ele('foo').up()
+      .set({ inheritNS: false }).ele('bar').up()
+      .doc()
+    expect(doc.end({ prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <xml:root>
+        <xml:foo/>
+        <bar/>
+      </xml:root>
+      `)
+  })
+
+  test('duplicate namespaces', () => {
+    const doc = $$.xml().create('d:root', { "xmlns:d": "ns1" })
+      .ele('e:foo', { "xmlns:e": "ns1" }).up()
+      .set({ inheritNS: false }).ele('bar').up()
+      .doc()
+    expect(doc.end({ prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <d:root xmlns:d="ns1">
+        <e:foo xmlns:e="ns1"/>
+        <bar/>
+      </d:root>
+      `)
+  })
+
+  test('attribute with namespace and no prefix', () => {
+    const doc = $$.xml().create('r', { "xmlns:x0": "myns", "xmlns:x2": "myns" })
+      .ele('b', { "xmlns:x1": "myns" })
+      .att('myns', 'name', 'v')
+      .doc()
+    expect(doc.end({ prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <r xmlns:x0="myns" xmlns:x2="myns">
+        <b xmlns:x1="myns" x1:name="v"/>
+      </r>
+      `)
+  })
+
   test('allowEmptyTags', () => {
     expect($$.xml().create('root').end({ allowEmptyTags: true, prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>

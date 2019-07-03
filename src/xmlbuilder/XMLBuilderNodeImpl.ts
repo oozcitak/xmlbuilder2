@@ -1,11 +1,11 @@
 import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
   XMLBuilderOptions, XMLBuilderNode, AttributesObject, ExpandObject,
-  WriterOptions, XMLSerializedValue, Validator, DTDOptions, 
+  WriterOptions, XMLSerializedValue, Validator, DTDOptions,
   XMLBuilderOptionsAsParams, DefaultBuilderOptions
 } from "./interfaces"
 import {
-  isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults, 
+  isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults,
   forEachArray, forEachObject, isMap, getObjectValue, removeObjectValue
 } from "../util"
 import { Namespace } from "../dom/spec"
@@ -31,7 +31,6 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   ele(name: string | ExpandObject, attributes?: AttributesObject | string,
     text?: AttributesObject | string): XMLBuilderNode {
 
-    name = getValue(name)
     // swap argument order: text <-> attributes
     if (attributes && !isObject(attributes)) {
       [text, attributes] = [attributes, text]
@@ -41,7 +40,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       attributes = <{ [key: string]: any }>getValue(attributes)
     }
     if (text) {
-      text = <string>text
+      text = <string>getValue(text)
     }
 
     let lastChild: XMLBuilderNode | null = null
@@ -126,7 +125,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
         lastChild = this.raw(text)
       } else if (!this._options.ignoreConverters && name.indexOf(this._options.convert.ins) === 0) {
         // processing instruction
-        const insIndex = text.indexOf(' ') 
+        const insIndex = text.indexOf(' ')
         const insTarget = (insIndex === -1 ? text : text.substr(0, insIndex))
         const insValue = (insIndex === -1 ? '' : text.substr(insIndex + 1))
         lastChild = this.ins(insTarget, insValue)
@@ -155,46 +154,68 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  att(name: AttributesObject | string, value?: string): XMLBuilderNode {
+  att(namespace: AttributesObject | string, name?: string | (() => string),
+    value?: string | (() => string)): XMLBuilderNode {
 
-    name = getValue(name)
-
-    if (isObject(name)) {
-      // expand if object
-      for (const attName in name) {
-        if (name.hasOwnProperty(attName)) {
-          const attValue = name[attName]
-          this.att(attName, attValue)
-        }
+    if (isObject(namespace)) {
+      if (name !== undefined) {
+        throw new Error("Unexpected argument (expecting a single object argument). " + this._debugInfo())
       }
-    } else if (value === undefined) {
-      throw new Error("Attribute value not specified. " + this._debugInfo())
+
+      // expand if object
+      for (const [attName, attValue] of forEachObject(namespace)) {
+        this.att(attName, attValue)
+      }
     } else {
+      if (name === undefined) {
+        throw new Error("Attribute name and value not specified. " + this._debugInfo())
+      }
+
+      let attNamespace: string | null = null
+      let attName: string
+      let attValue: string
+      if (isFunction(name)) {
+        name = name.apply(this)
+      }
       if (isFunction(value)) {
         value = value.apply(this)
       }
-      if (this._options.keepNullAttributes && (value === null)) {
-        this.att(name, "")
-      } else if (value !== undefined) {
+
+      if (value === undefined) {
+        [attNamespace, attName, attValue] = [null, namespace, name]
+      } else {
+        [attNamespace, attName, attValue] = [namespace, name, value]
+      }
+
+      if (this._options.keepNullAttributes && (attValue === null)) {
+        attValue = ""
+      }
+
+      if (attValue !== null) {
         const ele = this._asElement
 
+        attName = getValue(attName)
+        attValue = getValue(attValue)
+
         // character validation
-        name = this._validate.name(name, this._debugInfo())
-        value = this._validate.attValue(value, this._debugInfo())
+        attName = this._validate.name(attName, this._debugInfo())
+        attValue = this._validate.attValue(attValue, this._debugInfo())
 
         // skip the default namespace declaration attribute
         // it is already processed by the _node function
-        if (name !== "xmlns") {
-          const attQName = Namespace.extractQName(name)
+        if (attName !== "xmlns") {
+          const attQName = Namespace.extractQName(attName)
           if (attQName.prefix === "xmlns") {
             // prefixed namespace declaration attribute
-            ele.setAttributeNS(Namespace.XMLNS, name, value)
+            ele.setAttributeNS(Namespace.XMLNS, attName, attValue)
           } else {
-            const attNamespace = ele.lookupNamespaceURI(attQName.prefix)
+            if (attNamespace === null && this._options.inheritNS) {
+              attNamespace = ele.lookupNamespaceURI(attQName.prefix)
+            }
             if (attNamespace !== null && !ele.isDefaultNamespace(attNamespace)) {
-              ele.setAttributeNS(this._validate.namespace(attNamespace, this._debugInfo()), name, value)
+              ele.setAttributeNS(this._validate.namespace(attNamespace, this._debugInfo()), attName, attValue)
             } else {
-              ele.setAttribute(name, value)
+              ele.setAttribute(attName, attValue)
             }
           }
         }
@@ -473,34 +494,40 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   private _node(name: string, attributes?: AttributesObject | string,
     text?: AttributesObject | string): XMLBuilderNode {
 
-    name = getValue(name + '')
+    let nodeAttributes: AttributesObject = {}
+    let nodeText: string = ''
 
     // swap argument order: text <-> attributes
+    if (attributes && isObject(attributes)) {
+      nodeAttributes = attributes
+    } else if (text && isObject(text)) {
+      nodeAttributes = text
+    }
     if (attributes && !isObject(attributes)) {
-      [text, attributes] = [attributes, text]
+      nodeText = getValue(attributes + '')
+    } else if (text && !isObject(text)) {
+      nodeText = getValue(text + '')
     }
 
     // inherit namespace from parent
     const qName = Namespace.extractQName(name)
-    let namespace: string | null = null
+    let nodeNamespace: string | null = null
     if (this._options.inheritNS) {
       const parent = this._asNode.parentNode
       if (parent) {
-        namespace = parent.lookupNamespaceURI(qName.prefix)
+        nodeNamespace = parent.lookupNamespaceURI(qName.prefix)
       }
     }
 
     // override namespace if there is a namespace declaration
     // attribute
-    if (attributes && isObject(attributes)) {
-      for (let [attName, attValue] of Object.entries(attributes)) {
-        if (attName === "xmlns") {
-          namespace = attValue
-        } else {
-          const attQName = Namespace.extractQName(attName)
-          if (attQName.prefix === "xmlns" && attQName.localName === qName.prefix) {
-            namespace = attValue
-          }
+    for (let [attName, attValue] of forEachObject(nodeAttributes)) {
+      if (attName === "xmlns") {
+        nodeNamespace = attValue
+      } else {
+        const attQName = Namespace.extractQName(attName)
+        if (attQName.prefix === "xmlns" && attQName.localName === qName.prefix) {
+          nodeNamespace = attValue
         }
       }
     }
@@ -510,8 +537,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     // character validation
     this._validate.name(name, this._debugInfo())
 
-    const child = (namespace !== null ?
-      this._doc.createElementNS(namespace, name) :
+    const child = (nodeNamespace !== null ?
+      this._doc.createElementNS(nodeNamespace, name) :
       this._doc.createElement(name)
     )
 
@@ -528,11 +555,13 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     }
 
     // create attributes
-    if (attributes) builder.att(attributes)
+    if (!isEmpty(nodeAttributes)) {
+      builder.att(nodeAttributes)
+    }
 
     // create a text node
-    if (text) {
-      builder.txt(<string>text)
+    if (nodeText) {
+      builder.txt(nodeText)
     }
 
     return builder

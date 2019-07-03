@@ -5,7 +5,7 @@ import {
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { ValidatorImpl } from "./util"
-import { applyDefaults } from "../util"
+import { applyDefaults, isString } from "../util"
 import { XMLDocument } from "../dom/interfaces"
 
 /**
@@ -51,7 +51,11 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     // document element node
     if (name !== undefined) {
-      builder = builder.ele(name, attributes, text)
+      if (isString(name)) {
+        builder = builder.ele(name, attributes, text)
+      } else {
+        builder = builder.ele(name)
+      }
     }
 
     // DocType node
