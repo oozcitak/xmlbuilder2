@@ -5,7 +5,7 @@ import {
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { ValidatorImpl } from "./util"
-import { applyDefaults, isString } from "../util"
+import { applyDefaults, isString, isObject, isMap } from "../util"
 import { XMLDocument } from "../dom/interfaces"
 
 /**
@@ -43,18 +43,41 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  create(name?: string | ExpandObject, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilderNode {
+  create(p1?: string | ExpandObject, p2?: AttributesObject | string,
+    p3?: AttributesObject): XMLBuilderNode {
+
+    let namespace: string | undefined
+    let name: string | ExpandObject | undefined
+    let attributes: AttributesObject | undefined
+
+    if (p1 === undefined) {
+      // create()
+      [namespace, name, attributes] = [undefined, undefined, undefined]
+    } else if(isObject(p1)) {
+      // create(obj: ExpandObject)
+      [namespace, name, attributes] = [undefined, p1, undefined]
+    } else if(isString(p1) && isString(p2)) {
+      // create(namespace: string, name: string, attributes?: AttributesObject)
+      [namespace, name, attributes] = [p1, p2, p3]
+    } else if(isString(p1) && isObject(p2)) {
+      // create(name: string, attributes: AttributesObject)
+      [namespace, name, attributes] = [undefined, p1, p2]
+    } else if(isString(p1)) {
+      // create(name: string)
+      [namespace, name, attributes] = [undefined, p1, undefined]
+    }
 
     let builder = <XMLBuilderNode><unknown>this._createEmptyDocument()
     this._setOptions(builder)
 
     // document element node
     if (name !== undefined) {
-      if (isString(name)) {
-        builder = builder.ele(name, attributes, text)
-      } else {
+      if (isMap(name) || isObject(name)) {
         builder = builder.ele(name)
+      } else if (namespace !== undefined) {
+        builder = builder.ele(namespace, name, attributes)
+      } else {
+        builder = builder.ele(name, attributes)
       }
     }
 

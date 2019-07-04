@@ -8,15 +8,7 @@ describe('create()', () => {
   })
 
   test('Document with root element', () => {
-    const ele = $$.xml().create('root', { att: "val" }, "text")
-    expect($$.printTree(ele)).toBe($$.t`
-      root att="val"
-        # text
-      `)
-  })
-
-  test('Document with root element - reverse argument order', () => {
-    const ele = $$.xml().create('root', "text", { att: "val" })
+    const ele = $$.xml().create('root', { att: "val" }).txt("text")
     expect($$.printTree(ele)).toBe($$.t`
       root att="val"
         # text

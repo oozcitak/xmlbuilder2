@@ -8,7 +8,7 @@ describe('namespaces', () => {
   test('default namespace', () => {
     const ns1 = 'http://example.com/ns1'
     const doc = $$.xml({ inheritNS: false }) .create('root', { xmlns: ns1 })
-      .ele('foo').ele('bar', 'foobar').doc() as any
+      .ele('foo').ele('bar').txt('foobar').doc() as any
 
     expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1"><foo xmlns=""><bar>foobar</bar></foo></root>')
 
@@ -20,7 +20,7 @@ describe('namespaces', () => {
   test('inherit parent namespace', () => {
     const ns1 = 'http://example.com/ns1'
     const doc = $$.xml({ inheritNS: true }).create('root', { xmlns: ns1 })
-      .ele('foo').ele('bar', 'foobar').doc() as any
+      .ele('foo').ele('bar').txt('foobar').doc() as any
 
     expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1"><foo><bar>foobar</bar></foo></root>')
 
@@ -37,7 +37,7 @@ describe('namespaces', () => {
     const doc = $$.xml({ inheritNS: true }).create('root', { xmlns: ns1,
       "xmlns:xsi": xsi,
       "xsi:schemaLocation": "http://example.com/n1 schema.xsd" })
-      .ele('foo').ele('bar', 'foobar').doc() as any
+      .ele('foo').ele('bar').txt('foobar').doc() as any
 
     expect($$.serialize(doc)).toBe(
       '<root xmlns="http://example.com/ns1"' +

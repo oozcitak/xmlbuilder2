@@ -28,19 +28,29 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  ele(name: string | ExpandObject, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilderNode {
+  ele(p1: string | ExpandObject, p2?: AttributesObject | string,
+    p3?: AttributesObject): XMLBuilderNode {
 
-    // swap argument order: text <-> attributes
-    if (attributes && !isObject(attributes)) {
-      [text, attributes] = [attributes, text]
+    let namespace: string | undefined
+    let name: string | ExpandObject | undefined
+    let attributes: AttributesObject | undefined
+
+    if(isObject(p1)) {
+      // ele(obj: ExpandObject)
+      [namespace, name, attributes] = [undefined, p1, undefined]
+    } else if(isString(p1) && isString(p2)) {
+      // ele(namespace: string, name: string, attributes?: AttributesObject)
+      [namespace, name, attributes] = [p1, p2, p3]
+    } else if(isString(p1) && isObject(p2)) {
+      // ele(name: string, attributes: AttributesObject)
+      [namespace, name, attributes] = [undefined, p1, p2]
+    } else if(isString(p1)) {
+      // ele(name: string)
+      [namespace, name, attributes] = [undefined, p1, undefined]
     }
 
     if (attributes) {
-      attributes = <{ [key: string]: any }>getValue(attributes)
-    }
-    if (text) {
-      text = <string>getValue(text)
+      attributes = getValue(attributes)
     }
 
     let lastChild: XMLBuilderNode | null = null
@@ -63,6 +73,29 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           } else {
             lastChild = this.att(key.substr(this._options.convert.att.length), val)
           }
+        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.text) === 0) {
+          // text node
+          if (isObject(val) || isMap(val)) {
+            // if the key is #text expand child nodes under this node to support mixed content
+            lastChild = this.ele(val)
+          } else {
+            lastChild = this.txt(val)
+          }
+        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.cdata) === 0) {
+          // cdata node
+          lastChild = this.dat(val)
+        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.comment) === 0) {
+          // comment node
+          lastChild = this.com(val)
+        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.raw) === 0) {
+          // raw text node
+          lastChild = this.raw(val)
+        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.ins) === 0) {
+          // processing instruction
+          const insIndex = val.indexOf(' ')
+          const insTarget = (insIndex === -1 ? val : val.substr(0, insIndex))
+          const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
+          lastChild = this.ins(insTarget, insValue)
         } else if (Array.isArray(val) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
@@ -80,66 +113,37 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
             lastChild = this.ele(childNode)
           }
         } else if (isObject(val) || isMap(val)) {
-          // expand child nodes under parent
-          // if the key is #text expand child nodes under this node to support mixed content
-          if (!this._options.ignoreConverters && key.indexOf(this._options.convert.text) === 0) {
-            lastChild = this.ele(val)
-          } else {
-            // check for a default namespace declaration attribute
-            let namespace: string | null = null
-            if (!this._options.ignoreConverters) {
-              const nsKey = this._options.convert.att + "xmlns"
-              const attValue = getObjectValue(val, nsKey)
-              if (attValue === null || isString(attValue)) {
-                namespace = attValue
-                removeObjectValue(val, nsKey)
-              }
+          // check for a default namespace declaration attribute
+          if (!this._options.ignoreConverters) {
+            const nsKey = this._options.convert.att + "xmlns"
+            const attValue = getObjectValue(val, nsKey)
+            if (isString(attValue)) {
+              namespace = attValue
+              removeObjectValue(name, nsKey)
             }
-
-            // create a parent node
-            lastChild = (namespace === null ?
-              this._node(key) :
-              this._node(key, { xmlns: namespace })
-            )
-
-            // expand child nodes under parent
-            lastChild.ele(val)
           }
+
+          // create a parent node
+          lastChild = this._node(namespace, key)
+
+          // expand child nodes under parent
+          lastChild.ele(val)
+        } else if (val) {
+          // leaf element node with a single text node
+          lastChild = this.ele(key)
+          lastChild.txt(val)
         } else {
-          // text node
-          lastChild = this.ele(key, val)
+          // leaf element node
+          lastChild = this.ele(key)
         }
       }
-    } else if (text !== undefined) {
-      if (!this._options.ignoreConverters && name.indexOf(this._options.convert.text) === 0) {
-        // text node
-        lastChild = this.txt(text)
-      } else if (!this._options.ignoreConverters && name.indexOf(this._options.convert.cdata) === 0) {
-        // cdata node
-        lastChild = this.dat(text)
-      } else if (!this._options.ignoreConverters && name.indexOf(this._options.convert.comment) === 0) {
-        // comment node
-        lastChild = this.com(text)
-      } else if (!this._options.ignoreConverters && name.indexOf(this._options.convert.raw) === 0) {
-        // raw text node
-        lastChild = this.raw(text)
-      } else if (!this._options.ignoreConverters && name.indexOf(this._options.convert.ins) === 0) {
-        // processing instruction
-        const insIndex = text.indexOf(' ')
-        const insTarget = (insIndex === -1 ? text : text.substr(0, insIndex))
-        const insValue = (insIndex === -1 ? '' : text.substr(insIndex + 1))
-        lastChild = this.ins(insTarget, insValue)
-      } else {
-        // element node with text
-        lastChild = this._node(name, attributes, text)
-      }
-    } else {
-      // element node without text
-      lastChild = this._node(name, attributes, text)
+    } else if (isString(name)) {
+      // element node
+      lastChild = this._node(namespace, name, attributes)
     }
 
     if (lastChild === null) {
-      throw new Error("Could not create any elements with: " + name.toString() + ". " + this._debugInfo())
+      throw new Error("Could not create any elements with: " + (name || '').toString() + ". " + this._debugInfo())
     }
 
     return lastChild
@@ -157,7 +161,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   att(namespace: AttributesObject | string, name?: string | (() => string),
     value?: string | (() => string)): XMLBuilderNode {
 
-    if (isObject(namespace)) {
+    if (isMap(namespace) || isObject(namespace)) {
       if (name !== undefined) {
         throw new Error("Unexpected argument (expecting a single object argument). " + this._debugInfo())
       }
@@ -228,8 +232,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   /** @inheritdoc */
   removeAtt(namespace: string | string[], name?: string | string[]): XMLBuilderNode {
     if (name === undefined) {
-      name = namespace
-      namespace = ""
+      [namespace, name] = ["", namespace]
     }
 
     if (isArray(namespace)) {
@@ -491,44 +494,31 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    *  
    * @returns the new element node
    */
-  private _node(name: string, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilderNode {
-
-    let nodeAttributes: AttributesObject = {}
-    let nodeText: string = ''
-
-    // swap argument order: text <-> attributes
-    if (attributes && isObject(attributes)) {
-      nodeAttributes = attributes
-    } else if (text && isObject(text)) {
-      nodeAttributes = text
-    }
-    if (attributes && !isObject(attributes)) {
-      nodeText = getValue(attributes + '')
-    } else if (text && !isObject(text)) {
-      nodeText = getValue(text + '')
-    }
+  private _node(namespace: string | null | undefined, name: string, 
+    attributes?: AttributesObject): XMLBuilderNode {
 
     // inherit namespace from parent
-    const qName = Namespace.extractQName(name)
-    let nodeNamespace: string | null = null
-    if (this._options.inheritNS) {
-      const parent = this._asNode.parentNode
-      if (parent) {
-        nodeNamespace = parent.lookupNamespaceURI(qName.prefix)
-      }
-    }
-
-    // override namespace if there is a namespace declaration
-    // attribute
-    for (let [attName, attValue] of forEachObject(nodeAttributes)) {
-      if (attName === "xmlns") {
-        nodeNamespace = attValue
-      } else {
-        const attQName = Namespace.extractQName(attName)
-        if (attQName.prefix === "xmlns" && attQName.localName === qName.prefix) {
-          nodeNamespace = attValue
+    if (namespace === null || namespace === undefined) {
+      const qName = Namespace.extractQName(name)
+      if (this._options.inheritNS) {
+        const parent = this._asNode.parentNode
+        if (parent) {
+          namespace = parent.lookupNamespaceURI(qName.prefix)
         }
+      }
+      // override namespace if there is a namespace declaration
+      // attribute
+      if (attributes !== undefined) {
+        for (let [attName, attValue] of forEachObject(attributes)) {
+          if (attName === "xmlns") {
+            namespace = attValue
+          } else {
+            const attQName = Namespace.extractQName(attName)
+            if (attQName.prefix === "xmlns" && attQName.localName === qName.prefix) {
+              namespace = attValue
+            }
+          }
+        }    
       }
     }
 
@@ -537,8 +527,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     // character validation
     this._validate.name(name, this._debugInfo())
 
-    const child = (nodeNamespace !== null ?
-      this._doc.createElementNS(nodeNamespace, name) :
+    const child = (namespace !== null && namespace !== undefined ?
+      this._doc.createElementNS(namespace, name) :
       this._doc.createElement(name)
     )
 
@@ -555,13 +545,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     }
 
     // create attributes
-    if (!isEmpty(nodeAttributes)) {
-      builder.att(nodeAttributes)
-    }
-
-    // create a text node
-    if (nodeText) {
-      builder.txt(nodeText)
+    if (attributes && !isEmpty(attributes)) {
+      builder.att(attributes)
     }
 
     return builder

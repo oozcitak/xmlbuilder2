@@ -199,8 +199,8 @@ describe('StringWriter', () => {
 
   test('Pretty printing with dontPrettyPrintTextNodes, no mixed content', () => {
     const doc = $$.xml().create('root')
-      .ele('atttest', { 'att': 'val' }, 'text').up()
-      .ele('atttest', 'text').att('att', 'val').doc()
+      .ele('atttest', { 'att': 'val' }).txt('text').up()
+      .ele('atttest').att('att', 'val').txt('text').doc()
 
     expect(doc.end({ dontPrettyPrintTextNodes: true, prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
@@ -213,8 +213,8 @@ describe('StringWriter', () => {
 
   test('Pretty printing with mixed content', () => {
     const doc = $$.xml().create('root')
-      .ele('atttest', { 'att': 'val' }, 'mixed content')
-        .ele('atttest', 'text').att('att', 'val').up()
+      .ele('atttest', { 'att': 'val' }).txt('mixed content')
+        .ele('atttest').att('att', 'val').txt('text').up()
         .txt('moretext after node').doc()
 
     expect(doc.end({ prettyPrint: true })).toBe($$.t`
@@ -231,8 +231,8 @@ describe('StringWriter', () => {
 
   test('Pretty printing with dontPrettyPrintTextNodes, mixed content', () => {
     const doc = $$.xml().create('root')
-      .ele('atttest', { 'att': 'val' }, 'mixed content')
-      .ele('atttest', 'text').att('att', 'val').up()
+      .ele('atttest', { 'att': 'val' }).txt('mixed content')
+      .ele('atttest').att('att', 'val').txt('text').up()
       .txt('moretext after node').doc()
 
     expect(doc.end({ dontPrettyPrintTextNodes: true, prettyPrint: true })).toBe($$.t`

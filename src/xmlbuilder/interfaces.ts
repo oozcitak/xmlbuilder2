@@ -594,7 +594,7 @@ export type ExpandObject = { [key: string]: any } | Map<string, any> |
  * Represents the type of a variable that is a JS object defining
  * attributes.
  */
-export type AttributesObject = {
+export type AttributesObject = Map<string, any> | {
   /**
    * Default namespace
    */
@@ -621,17 +621,35 @@ export interface XMLBuilder {
    * Creates a new XML document and returns the document element node for
    * chain building the document tree.
    * 
-   * @param name - element name
-   * @param attributes - a JS object with element attributes
-   * @param text - contents of a text child node
-   * 
-   * @remarks `attributes` and `text` parameters are optional and 
-   * interchangeable.
+   * @param obj - a JS object representing nodes to insert
    * 
    * @returns document element node
    */
-  create(name: string | ExpandObject, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilderNode
+  create(obj: ExpandObject): XMLBuilderNode
+
+    /**
+   * Creates a new XML document and returns the document element node for
+   * chain building the document tree.
+   * 
+   * @param name - element name
+   * @param attributes - a JS object with element attributes
+   * 
+   * @returns document element node
+   */
+  create(name: string, attributes?: AttributesObject): XMLBuilderNode
+
+    /**
+   * Creates a new XML document and returns the document element node for
+   * chain building the document tree.
+   * 
+   * @param namespace - element namespace
+   * @param name - element name
+   * @param attributes - a JS object with element attributes
+   * 
+   * @returns document element node
+   */
+  create(namespace: string, name: string, 
+    attributes?: AttributesObject): XMLBuilderNode
 
   /**
    * Creates and returns a new document fragment.
@@ -669,17 +687,24 @@ export interface XMLBuilderNode {
   /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
+   * @param namespace - element namespace
    * @param name - element name
    * @param attributes - a JS object with element attributes
-   * @param text - contents of a text child node
-   * 
-   * @remarks `attributes` and `text` parameters are optional and 
-   * interchangeable.
    * 
    * @returns the new element node
    */
-  ele(name: string, attributes?: AttributesObject | string,
-    text?: AttributesObject | string): XMLBuilderNode
+  ele(namespace: string, name: string, 
+    attributes?: AttributesObject): XMLBuilderNode
+
+  /**
+   * Creates a new element node and appends it to the list of child nodes.
+   * 
+   * @param name - element name
+   * @param attributes - a JS object with element attributes
+   * 
+   * @returns the new element node
+   */
+  ele(name: string, attributes?: AttributesObject): XMLBuilderNode
 
   /**
    * Creates new element nodes from the given JS object and appends it to the
@@ -707,7 +732,8 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  att(namespace: string, name: string, value: string | (() => string)): XMLBuilderNode
+  att(namespace: string, name: string, 
+    value: string | (() => string)): XMLBuilderNode
 
   /**
    * Creates or updates an element attribute.
@@ -741,11 +767,11 @@ export interface XMLBuilderNode {
    * Removes an attribute or a list of attributes.
    * 
    * @param namespace - namespace of the attribute to remove
-   * @param name - attribute name or an array with attribute names
+   * @param name - attribute name
    * 
    * @returns current element node
    */
-  removeAtt(namespace: string, name: string | string[]): XMLBuilderNode
+  removeAtt(namespace: string, name: string): XMLBuilderNode
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
