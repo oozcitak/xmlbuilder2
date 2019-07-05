@@ -133,8 +133,7 @@ describe('StringWriter', () => {
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
-    expect(doc.end({ prettyPrint: true })).toBe($$.t`
-      <?xml version="1.0"?>
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <root xmlns="myns">
         <foo/>
         <bar xmlns=""/>
@@ -147,8 +146,7 @@ describe('StringWriter', () => {
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
-    expect(doc.end({ prettyPrint: true })).toBe($$.t`
-      <?xml version="1.0"?>
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <xml:root>
         <xml:foo/>
         <bar/>
@@ -161,8 +159,7 @@ describe('StringWriter', () => {
       .ele('e:foo', { "xmlns:e": "ns1" }).up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
-    expect(doc.end({ prettyPrint: true })).toBe($$.t`
-      <?xml version="1.0"?>
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <d:root xmlns:d="ns1">
         <e:foo xmlns:e="ns1"/>
         <bar/>
@@ -175,11 +172,38 @@ describe('StringWriter', () => {
       .ele('b', { "xmlns:x1": "myns" })
       .att('myns', 'name', 'v')
       .doc()
-    expect(doc.end({ prettyPrint: true })).toBe($$.t`
-      <?xml version="1.0"?>
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <r xmlns:x0="myns" xmlns:x2="myns">
         <b xmlns:x1="myns" x1:name="v"/>
       </r>
+      `)
+  })
+
+  test('prefix of an attribute is replaced with another existing prefix mapped to the same namespace URI', () => {
+    const doc = $$.xml().create('r', { "xmlns:xx": "uri" })
+      .att('uri', 'p:name', 'v')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <r xmlns:xx="uri" xx:name="v"/>
+      `)
+
+    const doc2 = $$.xml().create('r', { "xmlns:xx": "uri" })
+      .ele('b')
+      .att('uri', 'p:name', 'value')
+      .doc()
+    expect(doc2.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <r xmlns:xx="uri">
+        <b xx:name="value"/>
+      </r>
+      `)
+  })
+
+  test('prefix of an attribute is NOT preserved if neither its prefix nor its namespace URI is not already used', () => {
+    const doc = $$.xml().create('r', { "xmlns:xx": "uri" })
+      .att('uri2', 'xx:name', 'value')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <r xmlns:ns1="uri2" xmlns:xx="uri" ns1:name="value"/>
       `)
   })
 
