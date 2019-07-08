@@ -2,9 +2,7 @@ import { Node, Element, NodeType } from "../../dom/interfaces"
 import { Namespace } from "../../dom/spec"
 import { TupleSet } from "../../util"
 import { NamespacePrefixMap } from './NamespacePrefixMap'
-import {
-  PreSerializedNode, PreSerializedAttr, PreSerializedNS
-} from "../interfaces"
+import { PreSerializedNode, PreSerializedAttr } from "../interfaces"
 
 interface NodeParamRefs {
   prefixMap: NamespacePrefixMap,
@@ -91,16 +89,14 @@ export class PreSerializer {
           node: node,
           level: level,
           attributes: [],
-          children: children,
-          namespaces: []
+          children: children
         }
       default:
         return {
           node: node,
           level: level,
           attributes: [],
-          children: [],
-          namespaces: []
+          children: []
         }
     }
   }
@@ -115,7 +111,6 @@ export class PreSerializer {
   private _serializeElement(node: Element, refs: NodeParamRefs, level: number):
     PreSerializedNode<Element> {
 
-    const namespaces: PreSerializedNS[] = []
     const attributes: PreSerializedAttr[] = []
     const children: PreSerializedNode<Node>[] = []
 
@@ -199,7 +194,7 @@ export class PreSerializer {
        * null if no namespace key ns exists in map.
        */
       let prefix = node.prefix
-      let candidatePrefix = prefix ? map.get(prefix, ns) : null
+      let candidatePrefix = map.get(prefix, ns)
       /** 
        * 12.3. If the value of prefix matches "xmlns", then run the following 
        * steps: 
@@ -293,7 +288,7 @@ export class PreSerializer {
          * the require well-formed flag as input;
          * 12.5.5.6. """ (U+0022 QUOTATION MARK).
          */
-        namespaces.push({ name: 'xmlns:' + prefix, value: ns || '' })
+        attributes.push({ name: 'xmlns:' + prefix, value: ns || '' })
 
         /**
          * 12.5.5.7. If local default namespace is not null (there exists a
@@ -346,7 +341,7 @@ export class PreSerializer {
          * and the require well-formed flag as input;
          * 12.6.5.5. """ (U+0022 QUOTATION MARK).
          */
-        namespaces.push({ name: 'xmlns', value: ns || '' })
+        attributes.push({ name: 'xmlns', value: ns || '' })
 
         /**
          * 12.7. Otherwise, the node has a local default namespace that matches 
@@ -370,11 +365,10 @@ export class PreSerializer {
       prefixIndex: refs.prefixIndex,
       localPrefixesMap: localPrefixesMap
     }
-    const [eleAttributes, eleNamespaces] = this._serializeAttributes(
+    const eleAttributes = this._serializeAttributes(
       node, attRefs, ignoreNamespaceDefinitionAttribute)
     refs.prefixIndex = attRefs.prefixIndex
     attributes.push(...eleAttributes)
-    namespaces.push(...eleNamespaces)
 
     /**
      * 14. If ns is the HTML namespace, and the node's list of children is 
@@ -428,8 +422,7 @@ export class PreSerializer {
       level: level,
       name: qualifiedName,
       attributes: attributes,
-      children: children,
-      namespaces: namespaces
+      children: children
     }
   }
 
@@ -444,11 +437,9 @@ export class PreSerializer {
     map: NamespacePrefixMap,
     prefixIndex: number,
     localPrefixesMap: Map<string, string>
-  }, ignoreNamespaceDefinitionAttribute: boolean):
-    [PreSerializedAttr[], PreSerializedNS[]] {
+  }, ignoreNamespaceDefinitionAttribute: boolean): PreSerializedAttr[] {
 
-    const attrResult: PreSerializedAttr[] = []
-    const nsResult: PreSerializedNS[] = []
+    const result: PreSerializedAttr[] = []
 
     /**
      * 1. Let result be the empty string.
@@ -489,7 +480,7 @@ export class PreSerializer {
          * prefix string from map given namespace attribute namespace with 
          * preferred prefix being attr's prefix value.
          */
-        candidatePrefix = refs.map.get(attr.prefix || '', attributeNamespace)
+        candidatePrefix = refs.map.get(attr.prefix, attributeNamespace)
 
         /**
          * 3.5.2. If the value of attribute namespace is the XMLNS namespace, 
@@ -548,10 +539,14 @@ export class PreSerializer {
           candidatePrefix = 'xmlns'
 
           /**
-           * 3.5.3. Otherwise, the attribute namespace in not the XMLNS namespace. 
+           * 3.5.3. Otherwise, the attribute namespace is not the XMLNS namespace. 
            * Run these steps:
+           * 
+           * _Note:_ The (candidatePrefix === null) check is not in the spec.
+           * We deviate from the spec here. Otherwise a prefix is generated for
+           * all attributes with namespaces.
            */
-        } else {
+        } else if (candidatePrefix === null) {
           /**
            * 3.5.3.1. Let candidate prefix be the result of generating a prefix 
            * providing map, attribute namespace, and prefix index as input.
@@ -573,7 +568,7 @@ export class PreSerializer {
             * attribute namespace and the require well-formed flag as input;
             * 3.5.3.2.6. """ (U+0022 QUOTATION MARK).
            */
-          nsResult.push({ name: 'xmlns:' + candidatePrefix, value: attributeNamespace })
+          result.push({ name: 'xmlns:' + candidatePrefix, value: attributeNamespace })
         }
       }
 
@@ -599,14 +594,14 @@ export class PreSerializer {
         attrName = candidatePrefix + ':'
       }
       attrName += attr.localName
-      attrResult.push({ attr: attr, name: attrName, value: attr.value })
+      result.push({ attr: attr, name: attrName, value: attr.value })
     }
 
     /**
      * 4. Return the value of result.
      */
 
-    return [attrResult, nsResult]
+    return result
   }
 
   /**

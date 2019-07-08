@@ -48,7 +48,7 @@ export class NamespacePrefixMap {
    * @param preferredPrefix - preferred prefix string
    * @param ns - namespace
    */
-  get(preferredPrefix: string, ns: string | null): string | null {
+  get(preferredPrefix: string | null, ns: string | null): string | null {
     /**
      * 1. Let candidates list be the result of retrieving a list from map where 
      * there exists a key in map that matches the value of ns or if there is no 

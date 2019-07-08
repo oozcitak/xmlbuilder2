@@ -203,7 +203,7 @@ describe('StringWriter', () => {
       .att('uri2', 'xx:name', 'value')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
-      <r xmlns:ns1="uri2" xmlns:xx="uri" ns1:name="value"/>
+      <r xmlns:xx="uri" xmlns:ns1="uri2" ns1:name="value"/>
       `)
   })
 

@@ -465,15 +465,7 @@ export interface Validator {
  * Represents an attribute ready to be serialized.
  */
 export interface PreSerializedAttr {
-  attr: Attr
-  name: string
-  value: string
-}
-
-/**
- * Represents a namespace declaration ready to be serialized.
- */
-export interface PreSerializedNS {
+  attr?: Attr
   name: string
   value: string
 }
@@ -487,7 +479,6 @@ export interface PreSerializedNode<T extends Node> {
   name?: string
   attributes: PreSerializedAttr[]
   children: PreSerializedNode<Node>[]
-  namespaces: PreSerializedNS[]
 }
 
 /**

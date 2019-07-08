@@ -132,10 +132,6 @@ export class ObjectWriterImpl {
       return (<Text>(items[0][2].node)).data
     } else {
       const markup: { [key:string]: any } = { }
-      for (const ns of preNode.namespaces) {
-        const key = this._getAttrKey(ns.name)
-        markup[key] = ns.value
-      }
       for (const attr of preNode.attributes) {
         const key = this._getAttrKey(attr.name)
         markup[key] = attr.value

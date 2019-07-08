@@ -1,6 +1,6 @@
 import {
   WriterOptions, XMLBuilderOptions, PreSerializedNode, 
-  PreSerializedNS, PreSerializedAttr
+  PreSerializedAttr
 } from "../interfaces"
 import {
   Node, XMLDocument, Element, DocumentType, Text, CDATASection,
@@ -153,22 +153,6 @@ export class StringWriterImpl {
   }
 
   /**
-   * Produces an XML serialization of the given node's namespace declarations.
-   * 
-   * @param preNode - current node
-   * @param options - serialization options
-   * @param refs - reference parameters
-   */
-  private _serializeNamespaces(preNode: PreSerializedNode<Node>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
-    let markup = ''
-    for (const preNS of preNode.namespaces) {
-      markup += ` ${this._serializeNamespace(preNS, options, refs)}`
-    }
-    return markup
-  }
-
-  /**
    * Produces an XML serialization of a document node.
    * 
    * @param preNode - current node
@@ -244,8 +228,6 @@ export class StringWriterImpl {
     options: StringWriterOptions, refs: StringWriterRefs): string {
     // opening tag
     let markup = this._beginLine(preNode, options, refs) + '<' + preNode.name
-    // serialize namespaces
-    markup += this._serializeNamespaces(preNode, options, refs)
     // serialize attributes
     markup += this._serializeAttributes(preNode, options, refs)
 
@@ -376,18 +358,6 @@ export class StringWriterImpl {
   private _serializeAttribute(preAttr: PreSerializedAttr,
     options: StringWriterOptions, refs: StringWriterRefs): string {
     return `${preAttr.name}="${Char.escapeAttrValue(preAttr.value)}"`
-  }
-
-  /**
-   * Produces an XML serialization of a namespace declaration.
-   * 
-   * @param preNode - current node
-   * @param options - serialization options
-   * @param refs - reference parameters
-   */
-  private _serializeNamespace(preNS: PreSerializedNS,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
-    return `${preNS.name}="${Char.escapeAttrValue(preNS.value)}"`
   }
 
   /**
