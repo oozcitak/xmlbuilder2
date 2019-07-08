@@ -1,4 +1,5 @@
 import $$ from '../TestHelpers'
+import { inherits } from 'util';
 
 describe('StringWriter', () => {
 
@@ -204,6 +205,91 @@ describe('StringWriter', () => {
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <r xmlns:xx="uri" xmlns:ns1="uri2" ns1:name="value"/>
+      `)
+  })
+
+  test('same prefix declared in an ancestor element', () => {
+    const doc = $$.xml().create('root', { "xmlns:p": "uri1" })
+      .set({ inheritNS: false })
+      .ele('child')
+      .att('uri2', 'p:foobar', 'value')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <root xmlns:p="uri1">
+        <child xmlns:ns1="uri2" ns1:foobar="value"/>
+      </root>
+      `)
+  })
+
+  test('drop element prefix if the namespace is same as inherited default namespace', () => {
+    const doc = $$.xml().create('root', { "xmlns": "uri" })
+      .set({ inheritNS: false })
+      .ele('p:child', { "xmlns:p": "uri" })
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <root xmlns="uri">
+        <child xmlns:p="uri"/>
+      </root>
+      `)
+  })
+
+  test('find an appropriate prefix', () => {
+    const doc = $$.xml().create('root', { "xmlns:p1": "u1" })
+      .set({ inheritNS: false })
+      .ele('child', { "xmlns:p2": "u1" })
+      .ele('u1', 'child2')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <root xmlns:p1="u1">
+        <child xmlns:p2="u1">
+          <p2:child2/>
+        </child>
+      </root>
+      `)
+  })
+
+  test('xmlns:* attributes', () => {
+    const doc = $$.xml().create('uri1', 'p:root')
+      .att('http://www.w3.org/2000/xmlns/', 'xmlns:p', 'uri2')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <ns1:root xmlns:ns1="uri1" xmlns:p="uri2"/>
+      `)
+  })
+
+  test('prefix redeclared in ancestor element', () => {
+    const doc = $$.xml().create('root')
+      .att('http://www.w3.org/2000/xmlns/', 'xmlns:p', 'uri2')
+      .ele('uri1', 'p:child')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <root xmlns:p="uri2">
+        <p:child xmlns:p="uri1"/>
+      </root>
+      `)
+  })
+
+  test('default namespace does not apply if was declared in an ancestor', () => {
+    const doc = $$.xml().create('root', { "xmlns:x": "uri1" })
+      .ele('table', { xmlns: "uri1" })
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <root xmlns:x="uri1">
+        <x:table xmlns="uri1"/>
+      </root>
+      `)
+  })
+
+  test('multiple generated prefixes', () => {
+    const doc = $$.xml().create('root')
+      .ele('child1').att('uri1', 'attr1', 'value1').att('uri2', 'attr2', 'value2').up()
+      .ele('child2').att('uri3', 'attr3', 'value3')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <root>
+        <child1 xmlns:ns1="uri1" ns1:attr1="value1" xmlns:ns2="uri2" ns2:attr2="value2"/>
+        <child2 xmlns:ns3="uri3" ns3:attr3="value3"/>
+      </root>
       `)
   })
 
