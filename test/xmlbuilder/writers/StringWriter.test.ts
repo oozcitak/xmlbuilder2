@@ -130,7 +130,7 @@ describe('StringWriter', () => {
   })
 
   test('namespaces', () => {
-    const doc = $$.xml().create('root', { xmlns: "myns" })
+    const doc = $$.xml().create('myns', 'root')
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
@@ -143,7 +143,7 @@ describe('StringWriter', () => {
   })
 
   test('XML namespace', () => {
-    const doc = $$.xml().create('root', { xmlns: "http://www.w3.org/XML/1998/namespace" })
+    const doc = $$.xml().create('http://www.w3.org/XML/1998/namespace', 'root')
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
@@ -222,7 +222,7 @@ describe('StringWriter', () => {
   })
 
   test('drop element prefix if the namespace is same as inherited default namespace', () => {
-    const doc = $$.xml().create('root', { "xmlns": "uri" })
+    const doc = $$.xml().create('uri', 'root')
       .set({ inheritNS: false })
       .ele('p:child', { "xmlns:p": "uri" })
       .doc()

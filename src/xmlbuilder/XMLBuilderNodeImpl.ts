@@ -113,13 +113,15 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
             lastChild = this.ele(childNode)
           }
         } else if (isObject(val) || isMap(val)) {
-          // check for a default namespace declaration attribute
-          if (!this._options.ignoreConverters) {
-            const nsKey = this._options.convert.att + "xmlns"
-            const attValue = getObjectValue(val, nsKey)
-            if (isString(attValue)) {
-              namespace = attValue
-              removeObjectValue(name, nsKey)
+          // check for a namespace declaration attribute
+          const qName = Namespace.extractQName(key)
+          for(const [attName, attValue] of forEachObject(val)) {
+            if (attName[0] === this._options.convert.att) {
+              const attQName = Namespace.extractQName(attName.slice(1))
+              if ((attQName.prefix === null && attQName.localName === "xmlns") ||
+               (attQName.prefix === "xmlns" && attQName.localName === qName.prefix)) {
+                namespace = attValue
+              }
             }
           }
 
@@ -205,22 +207,18 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
         attName = this._validate.name(attName, this._debugInfo())
         attValue = this._validate.attValue(attValue, this._debugInfo())
 
-        // skip the default namespace declaration attribute
-        // it is already processed by the _node function
-        if (attName !== "xmlns") {
-          const attQName = Namespace.extractQName(attName)
-          if (attQName.prefix === "xmlns") {
-            // prefixed namespace declaration attribute
-            ele.setAttributeNS(Namespace.XMLNS, attName, attValue)
+        const attQName = Namespace.extractQName(attName)
+        if (attQName.prefix === "xmlns") {
+          // prefixed namespace declaration attribute
+          ele.setAttributeNS(Namespace.XMLNS, attName, attValue)
+        } else {
+          if (attNamespace === null && this._options.inheritNS) {
+            attNamespace = ele.lookupNamespaceURI(attQName.prefix)
+          }
+          if (attNamespace !== null && !ele.isDefaultNamespace(attNamespace)) {
+            ele.setAttributeNS(this._validate.namespace(attNamespace, this._debugInfo()), attName, attValue)
           } else {
-            if (attNamespace === null && this._options.inheritNS) {
-              attNamespace = ele.lookupNamespaceURI(attQName.prefix)
-            }
-            if (attNamespace !== null && !ele.isDefaultNamespace(attNamespace)) {
-              ele.setAttributeNS(this._validate.namespace(attNamespace, this._debugInfo()), attName, attValue)
-            } else {
-              ele.setAttribute(attName, attValue)
-            }
+            ele.setAttribute(attName, attValue)
           }
         }
       }
@@ -506,6 +504,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           namespace = parent.lookupNamespaceURI(qName.prefix)
         }
       }
+
       // override namespace if there is a namespace declaration
       // attribute
       if (attributes !== undefined) {

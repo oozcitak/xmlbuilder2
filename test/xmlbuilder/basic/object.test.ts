@@ -188,7 +188,7 @@ describe('object', () => {
     const doc = $$.xml().create(obj).doc()
 
     expect($$.printTree(doc)).toBe($$.t`
-      root (ns:myns)
+      root (ns:myns) xmlns="myns"
         node (ns:myns)
           # val
     `)
