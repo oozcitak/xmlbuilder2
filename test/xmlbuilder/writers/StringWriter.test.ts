@@ -307,16 +307,20 @@ describe('StringWriter', () => {
       `)
   })
 
-  test('Pretty printing with dontPrettyPrintTextNodes, no mixed content', () => {
+  test('Pretty printing with indentTextOnlyNodes, no mixed content', () => {
     const doc = $$.xml().create('root')
-      .ele('atttest', { 'att': 'val' }).txt('text').up()
-      .ele('atttest').att('att', 'val').txt('text').doc()
+      .ele('node', { 'att': 'val' }).txt('text').up()
+      .ele('node').att('att', 'val').txt('text').doc()
 
-    expect(doc.end({ dontPrettyPrintTextNodes: true, prettyPrint: true })).toBe($$.t`
+    expect(doc.end({ indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <root>
-        <atttest att="val">text</atttest>
-        <atttest att="val">text</atttest>
+        <node att="val">
+          text
+        </node>
+        <node att="val">
+          text
+        </node>
       </root>
       `)
   })
@@ -339,16 +343,21 @@ describe('StringWriter', () => {
       `)
   })
 
-  test('Pretty printing with dontPrettyPrintTextNodes, mixed content', () => {
+  test('Pretty printing with indentTextOnlyNodes, mixed content', () => {
     const doc = $$.xml().create('root')
       .ele('atttest', { 'att': 'val' }).txt('mixed content')
       .ele('atttest').att('att', 'val').txt('text').up()
       .txt('more text after node').doc()
 
-    expect(doc.end({ dontPrettyPrintTextNodes: true, prettyPrint: true })).toBe($$.t`
-      <?xml version="1.0"?>
+    expect(doc.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
       <root>
-        <atttest att="val">mixed content<atttest att="val">text</atttest>more text after node</atttest>
+        <atttest att="val">
+          mixed content
+          <atttest att="val">
+            text
+          </atttest>
+          more text after node
+        </atttest>
       </root>
       `)
   })
@@ -368,6 +377,41 @@ describe('StringWriter', () => {
       .doc()
 
     expect(doc2.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root>text1text2</root>
+      `)
+
+    const doc3 = $$.xml().create('root')
+      .txt('text1')
+      .ele('node').up()
+      .txt('text2')
+      .doc()
+
+    expect(doc3.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        text1
+        <node/>
+        text2
+      </root>
+      `)
+  })
+
+  test('Various types of text nodes with indentTextOnlyNodes', () => {
+    const doc1 = $$.xml().create('root')
+      .txt('text1')
+      .doc()
+
+    expect(doc1.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        text1
+      </root>
+      `)
+
+    const doc2 = $$.xml().create('root')
+      .txt('text1')
+      .txt('text2')
+      .doc()
+
+    expect(doc2.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
       <root>
         text1
         text2
@@ -380,7 +424,7 @@ describe('StringWriter', () => {
       .txt('text2')
       .doc()
 
-    expect(doc3.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    expect(doc3.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
       <root>
         text1
         <node/>

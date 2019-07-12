@@ -20,7 +20,7 @@ interface StringWriterOptions {
   offset: number
   width: number
   allowEmptyTags: boolean
-  dontPrettyPrintTextNodes: boolean
+  indentTextOnlyNodes: boolean
   spaceBeforeSlash: boolean
   noDoubleEncoding: boolean
 }
@@ -67,7 +67,7 @@ export class StringWriterImpl {
       offset: 0,
       width: 80,
       allowEmptyTags: false,
-      dontPrettyPrintTextNodes: false,
+      indentTextOnlyNodes: false,
       spaceBeforeSlash: false,
       noDoubleEncoding: false
     })
@@ -231,9 +231,20 @@ export class StringWriterImpl {
     // serialize attributes
     markup += this._serializeAttributes(preNode, options, refs)
 
-    if (preNode.children.length === 0 ||
-      preNode.children.every((e) =>
-        e.node.nodeType === NodeType.Text && (<Text>e.node).data === '')) {
+    let textOnlyNode: boolean = true
+    let emptyNode: boolean = true
+
+    for (const childNode of preNode.children) {
+      if (childNode.node.nodeType !== NodeType.Text) {
+        textOnlyNode = false
+        emptyNode = false
+        break
+      } else if((<Text>childNode.node).data !== '') {
+        emptyNode = false
+      }
+    }
+
+    if (emptyNode) {
       // self closing tag
       if (options.allowEmptyTags) {
         markup += `></${preNode.name}>${this._endLine(preNode, options, refs)}`
@@ -243,44 +254,29 @@ export class StringWriterImpl {
         }
         markup += `/>${this._endLine(preNode, options, refs)}`
       }
-    } else if (options.prettyPrint && preNode.children.length === 1 && 
-      preNode.children[0].node.nodeType === NodeType.Text && 
-      (<Text>preNode.children[0].node).data !== '') {
-      // do not indent text-only nodes
-      markup += '>'
-      refs.suppressPrettyCount++
-      markup += this._serializeNode(preNode.children[0], options, refs)
-      refs.suppressPrettyCount--
-      markup += `</${preNode.name}>${this._endLine(preNode, options, refs)}`
     } else {
+      // an element node with only text child nodes
       let prettySuppressed = false
-
-      // if ANY are a text node, then suppress pretty now
-      if (options.dontPrettyPrintTextNodes) {
-        for (const child of preNode.children) {
-          if (child.node.nodeType === NodeType.Text && (<Text>child.node).data !== '') {
-            refs.suppressPrettyCount++
-            prettySuppressed = true
-            break
-          }
-        }
+      if (options.prettyPrint && textOnlyNode && !options.indentTextOnlyNodes) {
+        refs.suppressPrettyCount++
+        prettySuppressed = true
       }
 
       markup += `>${this._endLine(preNode, options, refs)}`
-
+      
       // serialize child-nodes
       markup += this._serializeChildNodes(preNode, options, refs)
 
       // closing tag
       markup += `${this._beginLine(preNode, options, refs)}</${preNode.name}>`
 
-      if (prettySuppressed) {
+      if(prettySuppressed) {
         refs.suppressPrettyCount--
-      }      
+      }
 
       markup += `${this._endLine(preNode, options, refs)}`
     }
-
+    
     return markup
   }
 

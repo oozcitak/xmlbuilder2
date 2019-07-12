@@ -422,9 +422,8 @@ export interface WriterOptions {
    */
   allowEmptyTags?: boolean
   /**
-   * Suppresses pretty-printing for text nodes. Defaults to `false`. With this 
-   * option set to `true`, a text node will stay on the same line with its 
-   * containing element node, e.g.
+   * Indents contents of text-only element nodes. Defaults to `false` which 
+   * keeps a text node on the same line with its containing element node, e.g.
    * ```xml
    * <node>some text</node>
    * ```
@@ -434,8 +433,10 @@ export interface WriterOptions {
    *   some text
    * </node>
    * ```
+   * _Note:_ Element nodes with mixed content are always indented regardless
+   * of this setting.
    */
-  dontPrettyPrintTextNodes?: boolean
+  indentTextOnlyNodes?: boolean
   /**
    * Inserts a space character before the slash character of self-closing tags. 
    * Defaults to `false`. With this options set to `true`, a space character 
