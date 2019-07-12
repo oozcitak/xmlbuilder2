@@ -325,7 +325,7 @@ describe('StringWriter', () => {
     const doc = $$.xml().create('root')
       .ele('atttest', { 'att': 'val' }).txt('mixed content')
         .ele('atttest').att('att', 'val').txt('text').up()
-        .txt('moretext after node').doc()
+        .txt('more text after node').doc()
 
     expect(doc.end({ prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
@@ -333,7 +333,7 @@ describe('StringWriter', () => {
         <atttest att="val">
           mixed content
           <atttest att="val">text</atttest>
-          moretext after node
+          more text after node
         </atttest>
       </root>
       `)
@@ -343,12 +343,48 @@ describe('StringWriter', () => {
     const doc = $$.xml().create('root')
       .ele('atttest', { 'att': 'val' }).txt('mixed content')
       .ele('atttest').att('att', 'val').txt('text').up()
-      .txt('moretext after node').doc()
+      .txt('more text after node').doc()
 
     expect(doc.end({ dontPrettyPrintTextNodes: true, prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <root>
-        <atttest att="val">mixed content<atttest att="val">text</atttest>moretext after node</atttest>
+        <atttest att="val">mixed content<atttest att="val">text</atttest>more text after node</atttest>
+      </root>
+      `)
+  })
+
+  test('Various types of text nodes', () => {
+    const doc1 = $$.xml().create('root')
+      .txt('text1')
+      .doc()
+
+    expect(doc1.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root>text1</root>
+      `)
+
+    const doc2 = $$.xml().create('root')
+      .txt('text1')
+      .txt('text2')
+      .doc()
+
+    expect(doc2.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        text1
+        text2
+      </root>
+      `)
+
+    const doc3 = $$.xml().create('root')
+      .txt('text1')
+      .ele('node').up()
+      .txt('text2')
+      .doc()
+
+    expect(doc3.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        text1
+        <node/>
+        text2
       </root>
       `)
   })
