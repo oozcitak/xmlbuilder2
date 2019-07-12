@@ -35,16 +35,16 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     let name: string | ExpandObject | undefined
     let attributes: AttributesObject | undefined
 
-    if(isObject(p1)) {
+    if (isObject(p1)) {
       // ele(obj: ExpandObject)
       [namespace, name, attributes] = [undefined, p1, undefined]
-    } else if(isString(p1) && isString(p2)) {
+    } else if (isString(p1) && isString(p2)) {
       // ele(namespace: string, name: string, attributes?: AttributesObject)
       [namespace, name, attributes] = [p1, p2, p3]
-    } else if(isString(p1) && isObject(p2)) {
+    } else if (isString(p1) && isObject(p2)) {
       // ele(name: string, attributes: AttributesObject)
       [namespace, name, attributes] = [undefined, p1, p2]
-    } else if(isString(p1)) {
+    } else if (isString(p1)) {
       // ele(name: string)
       [namespace, name, attributes] = [undefined, p1, undefined]
     }
@@ -115,11 +115,11 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
         } else if (isObject(val) || isMap(val)) {
           // check for a namespace declaration attribute
           const qName = Namespace.extractQName(key)
-          for(const [attName, attValue] of forEachObject(val)) {
+          for (const [attName, attValue] of forEachObject(val)) {
             if (attName[0] === this._options.convert.att) {
               const attQName = Namespace.extractQName(attName.slice(1))
               if ((attQName.prefix === null && attQName.localName === "xmlns") ||
-               (attQName.prefix === "xmlns" && attQName.localName === qName.prefix)) {
+                (attQName.prefix === "xmlns" && attQName.localName === qName.prefix)) {
                 namespace = attValue
               }
             }
@@ -160,93 +160,114 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  att(namespace: AttributesObject | string, name?: string | (() => string),
-    value?: string | (() => string)): XMLBuilderNode {
+  att(p1: AttributesObject | string, p2?: string | (() => string),
+    p3?: string | (() => string)): XMLBuilderNode {
 
-    if (isMap(namespace) || isObject(namespace)) {
-      if (name !== undefined) {
+    if (isMap(p1) || isObject(p1)) {
+      // att(obj: AttributesObject)
+      if (p2 !== undefined) {
         throw new Error("Unexpected argument (expecting a single object argument). " + this._debugInfo())
       }
-
       // expand if object
-      for (const [attName, attValue] of forEachObject(namespace)) {
+      for (const [attName, attValue] of forEachObject(p1)) {
         this.att(attName, attValue)
       }
+      return this
+    }
+
+    // get primitive values
+    p1 = getValue(p1)
+    if (p2 !== undefined) {
+      p2 = getValue(p2)
+    }
+    if (p3 !== undefined) {
+      p3 = getValue(p3)
+    }
+
+    // apply functions
+    if (isFunction(p2)) {
+      p2 = p2.apply(this)
+    }
+    if (isFunction(p3)) {
+      p3 = p3.apply(this)
+    }
+
+    let namespace: string | null | undefined
+    let name: string | undefined
+    let value: string
+
+    if (p1 !== undefined && p2 !== undefined && p3 !== undefined) {
+      // att(namespace: string, name: string, value: string)
+      [namespace, name, value] = [<string>p1, p2, p3]
+    } else if (p1 !== undefined && p2 !== undefined) {
+      // ele(name: string, value: string)
+      [namespace, name, value] = [undefined, <string>p1, p2]
     } else {
-      if (name === undefined) {
-        throw new Error("Attribute name and value not specified. " + this._debugInfo())
+      throw new Error("Attribute name and value not specified. " + this._debugInfo())
+    }
+
+    if (this._options.keepNullAttributes && (value === null)) {
+      // keep null attributes
+      value = ""
+    } else if (value === null) {
+      // skip null attributes
+      return this
+    }
+
+    const ele = this._asElement
+    // character validation
+    name = this._validate.name(name, this._debugInfo())
+    value = this._validate.attValue(value, this._debugInfo())
+
+    // check if this is a namespace declaration attribute
+    if (namespace === undefined) {
+      const attQName = Namespace.extractQName(name)
+      if (attQName.prefix === "xmlns") {
+        namespace = Namespace.XMLNS
+      } else if (attQName.prefix !== null) {
+        namespace = ele.lookupNamespaceURI(attQName.prefix)
+      } else if (this._options.inheritNS) {
+        namespace = ele.lookupNamespaceURI(attQName.prefix)
       }
+    }
 
-      let attNamespace: string | null = null
-      let attName: string
-      let attValue: string
-      if (isFunction(name)) {
-        name = name.apply(this)
-      }
-      if (isFunction(value)) {
-        value = value.apply(this)
-      }
-
-      if (value === undefined) {
-        [attNamespace, attName, attValue] = [null, namespace, name]
-      } else {
-        [attNamespace, attName, attValue] = [namespace, name, value]
-      }
-
-      if (this._options.keepNullAttributes && (attValue === null)) {
-        attValue = ""
-      }
-
-      if (attValue !== null) {
-        const ele = this._asElement
-
-        attName = getValue(attName)
-        attValue = getValue(attValue)
-
-        // character validation
-        attName = this._validate.name(attName, this._debugInfo())
-        attValue = this._validate.attValue(attValue, this._debugInfo())
-
-        const attQName = Namespace.extractQName(attName)
-        if (attQName.prefix === "xmlns") {
-          // prefixed namespace declaration attribute
-          ele.setAttributeNS(Namespace.XMLNS, attName, attValue)
-        } else {
-          if (attNamespace === null && this._options.inheritNS) {
-            attNamespace = ele.lookupNamespaceURI(attQName.prefix)
-          }
-          if (attNamespace !== null && !ele.isDefaultNamespace(attNamespace)) {
-            ele.setAttributeNS(this._validate.namespace(attNamespace, this._debugInfo()), attName, attValue)
-          } else {
-            ele.setAttribute(attName, attValue)
-          }
-        }
-      }
+    if (namespace !== null && namespace !== undefined && !ele.isDefaultNamespace(namespace)) {
+      namespace = this._validate.namespace(namespace, this._debugInfo())
+      ele.setAttributeNS(namespace, name, value)
+    } else {
+      ele.setAttribute(name, value)
     }
 
     return this
   }
 
   /** @inheritdoc */
-  removeAtt(namespace: string | string[], name?: string | string[]): XMLBuilderNode {
-    if (name === undefined) {
-      [namespace, name] = ["", namespace]
+  removeAtt(p1: string | string[], p2?: string | string[]): XMLBuilderNode {
+
+    // get primitive values
+    p1 = getValue(p1)
+    if (p2 !== undefined) {
+      p2 = getValue(p2)
     }
 
-    if (isArray(namespace)) {
-      throw new TypeError("namespace parameter must be a string" + this._debugInfo())
-    }
-
-    if (isArray(name)) {
-      for (const attName of name) {
-        this.removeAtt(namespace, attName)
+    if (isArray(p1) && p2 === undefined) {
+      // removeAtt(names: string[])
+      for (const attName of forEachArray(p1)) {
+        this.removeAtt(attName)
       }
+    } else if (isString(p1) && isArray(p2)) {
+      // removeAtt(namespace: string, names: string[])
+      for (const attName of forEachArray(p2)) {
+        this.removeAtt(p1, attName)
+      }
+    } else if (isString(p1) && p2 === undefined) {
+      // removeAtt(name: string)
+      this._asElement.removeAttribute(p1)
+    } else if (isString(p1) && isString(p2)) {
+      // removeAtt(namespace: string, name: string)
+      this._asElement.removeAttributeNS(p1, p2)
     } else {
-      if (namespace) {
-        this._asElement.removeAttributeNS(namespace, name)
-      } else {
-        this._asElement.removeAttribute(name)
-      }
+      throw new TypeError("Invalid arguments. " + this._debugInfo())
     }
 
     return this
@@ -492,7 +513,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    *  
    * @returns the new element node
    */
-  private _node(namespace: string | null | undefined, name: string, 
+  private _node(namespace: string | null | undefined, name: string,
     attributes?: AttributesObject): XMLBuilderNode {
 
     // inherit namespace from parent
@@ -517,7 +538,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
               namespace = attValue
             }
           }
-        }    
+        }
       }
     }
 
@@ -592,7 +613,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     const node = <Node><unknown>this
 
     if (!node.nodeType) {
-      throw new Error("This function can only be applied to a node." + this._debugInfo())
+      throw new Error("This function can only be applied to a DOM node." + this._debugInfo())
     }
 
     return node

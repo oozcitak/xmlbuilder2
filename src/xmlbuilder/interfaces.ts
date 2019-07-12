@@ -748,11 +748,20 @@ export interface XMLBuilderNode {
   /**
    * Removes an attribute or a list of attributes.
    * 
-   * @param name - attribute name or an array with attribute names
+   * @param name - attribute name
    * 
    * @returns current element node
    */
-  removeAtt(name: string | string[]): XMLBuilderNode
+  removeAtt(name: string): XMLBuilderNode
+
+  /**
+   * Removes an attribute or a list of attributes.
+   * 
+   * @param names - an array with attribute names
+   * 
+   * @returns current element node
+   */
+  removeAtt(names: string[]): XMLBuilderNode
 
   /**
    * Removes an attribute or a list of attributes.
@@ -763,6 +772,16 @@ export interface XMLBuilderNode {
    * @returns current element node
    */
   removeAtt(namespace: string, name: string): XMLBuilderNode
+
+  /**
+   * Removes an attribute or a list of attributes.
+   * 
+   * @param namespace - namespace of the attributes to remove
+   * @param names - an array with attribute names
+   * 
+   * @returns current element node
+   */
+  removeAtt(namespace: string, names: string[]): XMLBuilderNode
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
