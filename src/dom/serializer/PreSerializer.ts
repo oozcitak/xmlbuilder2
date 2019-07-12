@@ -1,8 +1,10 @@
-import { Node, Element, NodeType } from "../../dom/interfaces"
-import { Namespace } from "../../dom/spec"
+import {
+  Node, Element, NodeType, Document, Comment, Text, DocumentFragment, DocumentType, ProcessingInstruction, CDATASection
+} from "../../dom/interfaces"
+import { Namespace, XMLSpec } from "../../dom/spec"
 import { TupleSet } from "../../util"
 import { NamespacePrefixMap } from './NamespacePrefixMap'
-import { PreSerializedNode, PreSerializedAttr } from "../interfaces"
+import { PreSerializedNode, PreSerializedAttr } from "./interfaces"
 
 interface NodeParamRefs {
   prefixMap: NamespacePrefixMap,
@@ -15,10 +17,16 @@ interface NodeParamRefs {
  */
 export class PreSerializer {
 
+  private _xmlVersion: "1.0" | "1.1"
+
   /**
    * Initializes a new instance of `PreSerializer`.
+   * 
+   * @param xmlVersion - XML specification version
    */
-  private constructor() { }
+  constructor(xmlVersion: "1.0" | "1.1" = "1.0") {
+    this._xmlVersion = xmlVersion
+  }
 
   /**
    * Produces an XML serialization of the given node. The pre-serializer inserts
@@ -29,8 +37,9 @@ export class PreSerializer {
    * function and use the information provided to serialize the node.
    * 
    * @param node - node to serialize
+   * @param requireWellFormed - whether to check conformance
    */
-  static Serialize(node: Node): PreSerializedNode<Node> {
+  serialize(node: Node, requireWellFormed: boolean): PreSerializedNode<Node> {
     /** From: https://w3c.github.io/DOM-Parsing/#xml-serialization
      * 
      * 1. Let namespace be a context namespace with value null. 
@@ -62,8 +71,7 @@ export class PreSerializer {
      * of the algorithm, then catch that exception and throw an 
      * "InvalidStateError" DOMException.
      */
-    const serializer = new PreSerializer()
-    return serializer._serializeNode(node, refs, 0)
+    return this._serializeNode(node, refs, 0, requireWellFormed)
   }
 
   /**
@@ -72,25 +80,28 @@ export class PreSerializer {
    * @param node - node to serialize
    * @param refs - reference parameters
    * @param level - current depth of the XML tree
+   * @param requireWellFormed - whether to check conformance
    */
-  private _serializeNode(node: Node, refs: NodeParamRefs, level: number):
-    PreSerializedNode<Node> {
+  private _serializeNode(node: Node, refs: NodeParamRefs, level: number,
+    requireWellFormed: boolean): PreSerializedNode<Node> {
 
     switch (node.nodeType) {
       case NodeType.Element:
-        return this._serializeElement(<Element>node, refs, level)
+        return this._serializeElement(<Element>node, refs, level, requireWellFormed)
       case NodeType.Document:
+        return this._serializeDocument(<Document>node, refs, level, requireWellFormed)
+      case NodeType.Comment:
+        return this._serializeComment(<Comment>node, refs, level, requireWellFormed)
+      case NodeType.Text:
+        return this._serializeText(<Text>node, refs, level, requireWellFormed)
       case NodeType.DocumentFragment:
-        const children: PreSerializedNode<Node>[] = []
-        for (const childNode of node.childNodes) {
-          children.push(this._serializeNode(childNode, refs, level))
-        }
-        return {
-          node: node,
-          level: level,
-          attributes: [],
-          children: children
-        }
+        return this._serializeDocumentFragment(<DocumentFragment>node, refs, level, requireWellFormed)
+      case NodeType.DocumentType:
+        return this._serializeDocumentType(<DocumentType>node, refs, level, requireWellFormed)
+      case NodeType.ProcessingInstruction:
+        return this._serializeProcessingInstruction(<ProcessingInstruction>node, refs, level, requireWellFormed)
+      case NodeType.CData:
+        return this._serializeCData(<CDATASection>node, refs, level, requireWellFormed)
       default:
         return {
           node: node,
@@ -107,9 +118,10 @@ export class PreSerializer {
    * @param node - node to serialize
    * @param refs - reference parameters
    * @param level - current depth of the XML tree
+   * @param requireWellFormed - whether to check conformance
    */
-  private _serializeElement(node: Element, refs: NodeParamRefs, level: number):
-    PreSerializedNode<Element> {
+  private _serializeElement(node: Element, refs: NodeParamRefs, level: number,
+    requireWellFormed: boolean): PreSerializedNode<Element> {
 
     const attributes: PreSerializedAttr[] = []
     const children: PreSerializedNode<Node>[] = []
@@ -366,7 +378,7 @@ export class PreSerializer {
       localPrefixesMap: localPrefixesMap
     }
     const eleAttributes = this._serializeAttributes(
-      node, attRefs, ignoreNamespaceDefinitionAttribute)
+      node, attRefs, ignoreNamespaceDefinitionAttribute, requireWellFormed)
     refs.prefixIndex = attRefs.prefixIndex
     attributes.push(...eleAttributes)
 
@@ -406,7 +418,7 @@ export class PreSerializer {
         prefixIndex: refs.prefixIndex,
         namespace: inheritedNS
       }
-      children.push(this._serializeNode(childNode, childRefs, level + 1))
+      children.push(this._serializeNode(childNode, childRefs, level + 1, requireWellFormed))
       refs.prefixIndex = childRefs.prefixIndex
     }
 
@@ -427,17 +439,310 @@ export class PreSerializer {
   }
 
   /**
+   * Produces an XML serialization of a document node.
+   * 
+   * @param node - node to serialize
+   * @param refs - reference parameters
+   * @param level - current depth of the XML tree
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeDocument(node: Document, refs: NodeParamRefs, level: number,
+    requireWellFormed: boolean): PreSerializedNode<Document> {
+
+    /**
+     * If the require well-formed flag is set (its value is true), and this node
+     * has no documentElement (the documentElement attribute's value is null), 
+     * then throw an exception; the serialization of this node would not be a 
+     * well-formed document.
+     */
+    if (requireWellFormed && node.documentElement === null) {
+      throw new Error("Missing document element (well-formed required).")
+    }
+    /**
+     * Otherwise, run the following steps:
+     * 1. Let serialized document be an empty string.
+     * 2. For each child child of node, in tree order, run the XML 
+     * serialization algorithm on the child passing along the provided 
+     * arguments, and append the result to serialized document.
+     * 
+     * _Note:_ This will serialize any number of ProcessingInstruction and
+     * Comment nodes both before and after the Document's documentElement node,
+     * including at most one DocumentType node. (Text nodes are not allowed as
+     * children of the Document.)
+     * 
+     * 3. Return the value of serialized document.
+    */
+    const children: PreSerializedNode<Node>[] = []
+    for (const childNode of node.childNodes) {
+      children.push(this._serializeNode(childNode, refs, level, requireWellFormed))
+    }
+    return {
+      node: node,
+      level: level,
+      attributes: [],
+      children: children
+    }
+  }
+
+  /**
+   * Produces an XML serialization of a comment node.
+   * 
+   * @param node - node to serialize
+   * @param refs - reference parameters
+   * @param level - current depth of the XML tree
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeComment(node: Comment, refs: NodeParamRefs, level: number,
+    requireWellFormed: boolean): PreSerializedNode<Comment> {
+
+    /**
+     * If the require well-formed flag is set (its value is true), and node's 
+     * data contains characters that are not matched by the XML Char production 
+     * or contains "--" (two adjacent U+002D HYPHEN-MINUS characters) or that 
+     * ends with a "-" (U+002D HYPHEN-MINUS) character, then throw an exception;
+     * the serialization of this node's data would not be well-formed.
+     */
+    if (requireWellFormed && (!XMLSpec.isLegalChar(node.data, this._xmlVersion) ||
+      node.data.includes("--") || node.data.endsWith("-"))) {
+      throw new Error("Comment data contains invalid characters (well-formed required).")
+    }
+
+    /**
+     * Otherwise, return the concatenation of "<!--", node's data, and "-->".
+     */
+    return {
+      node: node,
+      level: level,
+      attributes: [],
+      children: []
+    }
+  }
+
+  /**
+   * Produces an XML serialization of a text node.
+   * 
+   * @param node - node to serialize
+   * @param refs - reference parameters
+   * @param level - current depth of the XML tree
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeText(node: Text, refs: NodeParamRefs, level: number,
+    requireWellFormed: boolean): PreSerializedNode<Text> {
+
+    /**
+     * 1. If the require well-formed flag is set (its value is true), and 
+     * node's data contains characters that are not matched by the XML Char 
+     * production, then throw an exception; the serialization of this node's 
+     * data would not be well-formed.
+     */
+    if (requireWellFormed && !XMLSpec.isLegalChar(node.data, this._xmlVersion)) {
+      throw new Error("Text data contains invalid characters (well-formed required).")
+    }
+
+    /**
+     * 2. Let markup be the value of node's data.
+     * 3. Replace any occurrences of "&" in markup by "&amp;".
+     * 4. Replace any occurrences of "<" in markup by "&lt;".
+     * 5. Replace any occurrences of ">" in markup by "&gt;".
+     * 6. Return the value of markup.
+     */
+    return {
+      node: node,
+      level: level,
+      attributes: [],
+      children: []
+    }
+  }
+
+  /**
+   * Produces an XML serialization of a document fragment node.
+   * 
+   * @param node - node to serialize
+   * @param refs - reference parameters
+   * @param level - current depth of the XML tree
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeDocumentFragment(node: DocumentFragment,
+    refs: NodeParamRefs, level: number,
+    requireWellFormed: boolean): PreSerializedNode<DocumentFragment> {
+
+    /**
+     * 1. Let markup the empty string.
+     * 2. For each child child of node, in tree order, run the XML serialization
+     * algorithm on the child given namespace, prefix map, a reference to prefix
+     * index, and flag require well-formed. Concatenate the result to markup.
+     * 3. Return the value of markup.
+     */
+    const children: PreSerializedNode<Node>[] = []
+    for (const childNode of node.childNodes) {
+      children.push(this._serializeNode(childNode, refs, level, requireWellFormed))
+    }
+    return {
+      node: node,
+      level: level,
+      attributes: [],
+      children: children
+    }
+  }
+
+  /**
+   * Produces an XML serialization of a document type node.
+   * 
+   * @param node - node to serialize
+   * @param refs - reference parameters
+   * @param level - current depth of the XML tree
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeDocumentType(node: DocumentType,
+    refs: NodeParamRefs, level: number,
+    requireWellFormed: boolean): PreSerializedNode<DocumentType> {
+
+    /**
+     * 1. If the require well-formed flag is true and the node's publicId 
+     * attribute contains characters that are not matched by the XML PubidChar
+     *  production, then throw an exception; the serialization of this node 
+     * would not be a well-formed document type declaration.
+     */
+    if (requireWellFormed && !XMLSpec.isPubidChar(node.publicId)) {
+      throw new Error("DocType public identifier does not match PubidChar construct (well-formed required).")
+    }
+
+    /**    
+     * 2. If the require well-formed flag is true and the node's systemId
+     * attribute contains characters that are not matched by the XML Char
+     * production or that contains both a """ (U+0022 QUOTATION MARK) and a
+     * "'" (U+0027 APOSTROPHE), then throw an exception; the serialization
+     * of this node would not be a well-formed document type declaration.
+     */
+    if (requireWellFormed &&
+      (!XMLSpec.isLegalChar(node.systemId, this._xmlVersion) ||
+        (node.systemId.includes('"') && node.systemId.includes("'")))) {
+      throw new Error("DocType system identifier contains invalid characters (well-formed required).")
+    }
+
+    /**
+     * 3. Let markup be an empty string.
+     * 4. Append the string "<!DOCTYPE" to markup.
+     * 5. Append " " (U+0020 SPACE) to markup.
+     * 6. Append the value of the node's name attribute to markup. For a node
+     * belonging to an HTML document, the value will be all lowercase.
+     * 7. If the node's publicId is not the empty string then append the 
+     * following, in the order listed, to markup:
+     * 7.1. " " (U+0020 SPACE);
+     * 7.2. The string "PUBLIC";
+     * 7.3. " " (U+0020 SPACE);
+     * 7.4. """ (U+0022 QUOTATION MARK);
+     * 7.5. The value of the node's publicId attribute;
+     * 7.6. """ (U+0022 QUOTATION MARK).
+     * 8. If the node's systemId is not the empty string and the node's publicId
+     * is set to the empty string, then append the following, in the order
+     * listed, to markup:
+     * 8.1. " " (U+0020 SPACE);
+     * 8.2. The string "SYSTEM".
+     * 9. If the node's systemId is not the empty string then append the 
+     * following, in the order listed, to markup:
+     * 9.2. " " (U+0020 SPACE);
+     * 9.3. """ (U+0022 QUOTATION MARK);
+     * 9.3. The value of the node's systemId attribute;
+     * 9.4. """ (U+0022 QUOTATION MARK).
+     * 10. Append ">" (U+003E GREATER-THAN SIGN) to markup.
+     * 11. Return the value of markup.
+     */
+    return {
+      node: node,
+      level: level,
+      attributes: [],
+      children: []
+    }
+  }
+
+  /**
+   * Produces an XML serialization of a processing instruction node.
+   * 
+   * @param node - node to serialize
+   * @param refs - reference parameters
+   * @param level - current depth of the XML tree
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeProcessingInstruction(node: ProcessingInstruction, refs: NodeParamRefs, level: number,
+    requireWellFormed: boolean): PreSerializedNode<ProcessingInstruction> {
+
+    /**
+     * 1. If the require well-formed flag is set (its value is true), and node's
+     * target contains a ":" (U+003A COLON) character or is an ASCII 
+     * case-insensitive match for the string "xml", then throw an exception; 
+     * the serialization of this node's target would not be well-formed.
+     */
+    if (requireWellFormed && (node.target.includes(":") || (/^xml$/i).test(node.target))) {
+      throw new Error("Processing instruction target contains invalid characters (well-formed required).")
+    }
+
+    /**
+     * 2. If the require well-formed flag is set (its value is true), and node's
+     * data contains characters that are not matched by the XML Char production
+     * or contains the string "?>" (U+003F QUESTION MARK, 
+     * U+003E GREATER-THAN SIGN), then throw an exception; the serialization of
+     * this node's data would not be well-formed.
+     */
+    if (requireWellFormed && (!XMLSpec.isLegalChar(node.data, this._xmlVersion) ||
+      node.data.includes("?>"))) {
+      throw new Error("Processing instruction data contains invalid characters (well-formed required).")
+    }
+
+    /**
+     * 3. Let markup be the concatenation of the following, in the order listed:
+     * 3.1. "<?" (U+003C LESS-THAN SIGN, U+003F QUESTION MARK);
+     * 3.2. The value of node's target;
+     * 3.3. " " (U+0020 SPACE);
+     * 3.4. The value of node's data;
+     * 3.5. "?>" (U+003F QUESTION MARK, U+003E GREATER-THAN SIGN).
+     * 4. Return the value of markup.
+     */
+    return {
+      node: node,
+      level: level,
+      attributes: [],
+      children: []
+    }
+  }
+
+  /**
+   * Produces an XML serialization of a CDATA node.
+   * 
+   * @param node - node to serialize
+   * @param refs - reference parameters
+   * @param level - current depth of the XML tree
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeCData(node: CDATASection, refs: NodeParamRefs, level: number,
+    requireWellFormed: boolean): PreSerializedNode<CDATASection> {
+
+    if (requireWellFormed && (node.data.includes("]]>"))) {
+      throw new Error("CDATA contains invalid characters (well-formed required).")
+    }
+
+    return {
+      node: node,
+      level: level,
+      attributes: [],
+      children: []
+    }
+  }
+
+  /**
   * Produces an XML serialization of the attributes of an element node.
   * 
   * @param node - element node whose attributes to serialize
   * @param refs - reference parameters
   * @param ignoreNamespaceDefinitionAttribute - whether to ignore namespace
+  * @param requireWellFormed - whether to check conformance
   */
   private _serializeAttributes(node: Element, refs: {
     map: NamespacePrefixMap,
     prefixIndex: number,
     localPrefixesMap: Map<string, string>
-  }, ignoreNamespaceDefinitionAttribute: boolean): PreSerializedAttr[] {
+  }, ignoreNamespaceDefinitionAttribute: boolean,
+    requireWellFormed: boolean): PreSerializedAttr[] {
 
     const result: PreSerializedAttr[] = []
 
@@ -464,6 +769,12 @@ export class PreSerializer {
        * consisting of attr's namespaceURI attribute and localName attribute, 
        * then throw an exception; the serialization of this attr would fail to
        * produce a well-formed element serialization.
+       */
+      if (requireWellFormed && localNameSet.has([attr.namespaceURI, attr.localName])) {
+        throw new Error("Element contains duplicate attributes (well-formed required).")
+      }
+
+      /**
        * 3.2. Create a new tuple consisting of attr's namespaceURI attribute and 
        * localName attribute, and add it to the localname set.
        * 3.3. Let attribute namespace be the value of attr's namespaceURI value.
@@ -558,16 +869,16 @@ export class PreSerializer {
           candidatePrefix = this._generatePrefix(attributeNamespace, generateRefs)
           refs.prefixIndex = generateRefs.prefixIndex
 
-           /** 
-            * 3.5.3.2. Append the following to result, in the order listed:
-            * 3.5.3.2.1. " " (U+0020 SPACE);
-            * 3.5.3.2.2. The string "xmlns:";
-            * 3.5.3.2.3. The value of candidate prefix;
-            * 3.5.3.2.4. "="" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
-            * 3.5.3.2.5. The result of serializing an attribute value given 
-            * attribute namespace and the require well-formed flag as input;
-            * 3.5.3.2.6. """ (U+0022 QUOTATION MARK).
-           */
+          /** 
+           * 3.5.3.2. Append the following to result, in the order listed:
+           * 3.5.3.2.1. " " (U+0020 SPACE);
+           * 3.5.3.2.2. The string "xmlns:";
+           * 3.5.3.2.3. The value of candidate prefix;
+           * 3.5.3.2.4. "="" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
+           * 3.5.3.2.5. The result of serializing an attribute value given 
+           * attribute namespace and the require well-formed flag as input;
+           * 3.5.3.2.6. """ (U+0022 QUOTATION MARK).
+          */
           result.push({ name: 'xmlns:' + candidatePrefix, value: attributeNamespace })
         }
       }

@@ -1,13 +1,13 @@
 import {
-  WriterOptions, XMLBuilderOptions, PreSerializedNode, 
-  PreSerializedAttr
+  WriterOptions, XMLBuilderOptions
 } from "../interfaces"
 import {
   Node, XMLDocument, Element, DocumentType, Text, CDATASection,
   Comment, ProcessingInstruction, DocumentFragment, NodeType
 } from "../../dom/interfaces"
-import { PreSerializer, Char } from "../util"
+import { Char } from "../util"
 import { applyDefaults } from "../../util"
+import { PreSerializer, PreSerializedNode, PreSerializedAttr } from "../../dom/serializer"
 
 /**
  * Represents string writer options.
@@ -72,7 +72,8 @@ export class StringWriterImpl {
       noDoubleEncoding: false
     })
 
-    let markup =  this._serializeNode(PreSerializer.Serialize(node), options,
+    const pre = new PreSerializer(this._builderOptions.version)
+    let markup =  this._serializeNode(pre.serialize(node, false), options,
       { suppressPrettyCount: 0 })
 
     // remove trailing newline
@@ -347,7 +348,7 @@ export class StringWriterImpl {
   /**
    * Produces an XML serialization of an attribute.
    * 
-   * @param preNode - current node
+   * @param preAttr - current attribute
    * @param options - serialization options
    * @param refs - reference parameters
    */

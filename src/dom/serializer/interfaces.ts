@@ -1,4 +1,4 @@
-import { Node } from "../interfaces"
+import { Node, Attr } from "../interfaces"
 
 /**
  * Represents an XML serializer.
@@ -49,4 +49,24 @@ export interface RecordNamespaceRef {
    * Duplicate namespace prefix definition.
    */
   duplicatePrefixDefinition: string | null
+}
+
+/**
+ * Represents an attribute ready to be serialized.
+ */
+export interface PreSerializedAttr {
+  attr?: Attr
+  name: string
+  value: string
+}
+
+/**
+ * Represents a node ready to be serialized.
+ */
+export interface PreSerializedNode<T extends Node> {
+  node: T
+  level: number
+  name?: string
+  attributes: PreSerializedAttr[]
+  children: PreSerializedNode<Node>[]
 }

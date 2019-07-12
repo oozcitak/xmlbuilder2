@@ -3,6 +3,53 @@ import { Node, Attr } from "../dom/interfaces"
 /**
  * Defines the options used while creating an XML document.
  */
+export interface XMLBuilderCreateOptions {
+  /**
+   * A version number string, e.g. `"1.0"`
+   */
+  version?: "1.0" | "1.1"
+  /**
+   * Encoding declaration, e.g. `"UTF-8"`
+   */
+  encoding?: string
+  /**
+   * Standalone document declaration: `true` or `false`
+   */
+  standalone?: boolean
+    /**
+    * DocType node identifiers
+    */
+   docType?: DTDOptions  
+  /**
+   * Whether child nodes inherit their parent namespace
+   */
+  inheritNS?: boolean
+  /**
+   * Whether nodes with `null` values will be kept or ignored
+   */
+  keepNullNodes?: boolean
+  /**
+   * Whether attributes with `null` values will be kept or ignored
+   */
+  keepNullAttributes?: boolean
+  /** 
+   * Whether converter strings will be ignored when converting JS 
+   * objects to nodes
+   */
+  ignoreConverters?: boolean
+  /** 
+   * Defines string keys used while converting JS objects to nodes.
+   */
+  convert?: Partial<ConvertOptions>
+  /**
+   * Contains functions that validate character data in XML nodes.
+   */
+  validate?: ValidateOptions
+}
+
+/**
+ * Defines the options used while creating an XML document.
+ */
 export interface XMLBuilderOptions {
   /**
    * A version number string, e.g. `"1.0"`
@@ -306,26 +353,6 @@ export interface Validator {
    * @param debugInfo - optional debug information
    */
   namespace: ValidatorFunction
-}
-
-/**
- * Represents an attribute ready to be serialized.
- */
-export interface PreSerializedAttr {
-  attr?: Attr
-  name: string
-  value: string
-}
-
-/**
- * Represents a node ready to be serialized.
- */
-export interface PreSerializedNode<T extends Node> {
-  node: T
-  level: number
-  name?: string
-  attributes: PreSerializedAttr[]
-  children: PreSerializedNode<Node>[]
 }
 
 /**

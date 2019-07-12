@@ -1,12 +1,12 @@
 import {
-  WriterOptions, XMLSerializedValue, PreSerializedNode, XMLBuilderOptions
+  WriterOptions, XMLSerializedValue, XMLBuilderOptions
 } from "../interfaces"
 import {
   Node, Element, Text, CDATASection, Comment, ProcessingInstruction, 
   NodeType, CharacterData
 } from "../../dom/interfaces"
-import { PreSerializer } from "../util"
 import { applyDefaults } from "../../util"
+import { PreSerializer, PreSerializedNode } from "../../dom/serializer"
 
 /**
  * Serializes XML nodes into maps and arrays.
@@ -35,7 +35,8 @@ export class MapWriterImpl {
       format: "map"
     })
 
-    const preNode = PreSerializer.Serialize(node)
+    const pre = new PreSerializer(this._builderOptions.version)
+    const preNode = pre.serialize(node, false)
 
     switch (preNode.node.nodeType) {
       case NodeType.Element:

@@ -1,5 +1,4 @@
 import $$ from '../TestHelpers'
-import { XMLSerializer } from '../../../src/dom/serializer'
 
 describe('XMLSerializer', function () {
 

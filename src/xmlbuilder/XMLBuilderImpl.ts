@@ -1,7 +1,7 @@
 import {
   XMLBuilderOptions, XMLBuilder, ExpandObject,
   AttributesObject, XMLBuilderNode, Validator,
-  DTDOptions, DefaultBuilderOptions
+  DTDOptions, DefaultBuilderOptions, XMLBuilderCreateOptions
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
 import { ValidatorImpl } from "./util"
@@ -22,12 +22,8 @@ export class XMLBuilderImpl implements XMLBuilder {
    * 
    * @param options - builder options
    */
-  constructor(options?: Partial<XMLBuilderOptions> & {
-    /**
-    * DocType node identifiers
-    */
-    docType?: DTDOptions
-  }) {
+  constructor(options?: XMLBuilderCreateOptions) {
+
     options = options || {}
 
     this._validate = new ValidatorImpl(options.version || "1.0",
