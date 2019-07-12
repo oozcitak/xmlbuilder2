@@ -94,7 +94,16 @@ export interface ConvertOptions {
   ins: string
   /** 
    * When prepended to a JS object key, converts its value to a text node. 
-   * Defaults to `"#"`.
+   * Defaults to `"#"`. For example:
+   * ```js
+   * obj = { monologue: {
+   *   '#': 'Talk to me Goose!',
+   * } }
+   * ```
+   * becomes:
+   * ```xml
+   * <monologue>Talk to me Goose!</monologue>
+   * ````
    * 
    * _Note:_ Since JS objects cannot contain duplicate keys, multiple text 
    * nodes can be created by adding some unique text after each object 
@@ -163,8 +172,7 @@ export interface ConvertOptions {
   /** 
    * When prepended to a JS object key, converts its value to a raw text node.
    * Defaults to `"&"`. Character validation does not apply to raw text nodes.
-   * Note that using raw nodes can potentially result in invalid XML documents.
-   * Example:
+   * For example:
    * ```js
    * obj = { node: { '&': '<&>' } }
    * ```
@@ -172,6 +180,7 @@ export interface ConvertOptions {
    * ```xml
    * <node><&></node>
    * ```
+   * _Note:_ Using raw nodes can potentially result in invalid XML documents.
    */
   raw: string
 }
