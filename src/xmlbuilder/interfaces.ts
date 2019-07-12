@@ -41,7 +41,7 @@ export interface XMLBuilderOptionsAsParams {
   /** 
    * Defines string keys used while converting JS objects to nodes.
    */
-  convert?: ConvertOptionsParams
+  convert?: Partial<ConvertOptions>
   /**
    * Contains functions that validate character data in XML nodes.
    */
@@ -106,58 +106,12 @@ export interface DTDOptions {
 }
 
 /**
- * Defines string keys used while converting JS objects to nodes. Default values
- * will be provided for optional parameters.
- */
-export interface ConvertOptionsParams {
-  /** 
-   * When prepended to a JS object key, converts the key-value pair 
-   * to an attribute. Defaults to `"@"`.
-   */
-  att?: string
-  /** 
-   * When prepended to a JS object key, converts the key-value pair 
-   * to a processing instruction node. Defaults to `"?"`.
-   */
-  ins?: string
-  /** 
-   * When prepended to a JS object key, converts its value to a text node. 
-   * Defaults to `"#"`.
-   * 
-   * _Note:_ Since JS objects cannot contain duplicate keys, multiple text 
-   * nodes can be created by adding some unique text after each object 
-   * key. For example: 
-   * 
-   * @example
-   * 
-   * const textNodes = { '#text1': 'some text', '#text2': 'more text' }
-   */
-  text?: string
-  /** 
-   * When prepended to a JS object key, converts its value to a CDATA 
-   * node. Defaults to `"$"`.
-   */
-  cdata?: string
-  /** 
-   * When prepended to a JS object key, converts its value to a 
-   * comment node. Defaults to `"!"`.
-   */
-  comment?: string
-  /** 
-   * When prepended to a JS object key, converts its value to a 
-   * text node. No character validation is applied to raw nodes.
-   * Defaults to `"&"`.
-   */
-  raw?: string
-}
-
-/**
  * Defines string keys used while converting JS objects to nodes.
  */
 export interface ConvertOptions {
   /** 
    * When prepended to a JS object key, converts its key-value pair 
-   * to an attribute. Defaults to `"@"`. Multiple attribues can also be grouped
+   * to an attribute. Defaults to `"@"`. Multiple attributes can also be grouped
    * under the attribute key. For example:
    * ```js
    * obj1 = { pilot: { '@callsign': 'Maverick', '@rank': 'Lieutenant' } }
@@ -194,14 +148,31 @@ export interface ConvertOptions {
    * nodes can be created by adding some unique text after each object 
    * key. For example: 
    * ```js
-   * obj = { needCourage: {
+   * obj = { monologue: {
    *   '#1': 'Talk to me Goose!',
    *   '#2': 'Talk to me...'
    * } }
    * ```
    * becomes:
    * ```xml
-   * <needCourage>Talk to me Goose!Talk to me...</needCourage>
+   * <monologue>Talk to me Goose!Talk to me...</monologue>
+   * ````
+   * 
+   * _Note:_ `"#"` also allows mixed content. Example:
+   * ```js
+   * obj = { monologue: {
+   *   '#1': 'Talk to me Goose!',
+   *   'cut': 'dog tag shot',
+   *   '#2': 'Talk to me...'
+   * } }
+   * ```
+   * becomes:
+   * ```xml
+   * <monologue>
+   *   Talk to me Goose!
+   *   <cut>dog tag shot</cut>
+   *   Talk to me...
+   * </monologue>
    * ````
    */
   text: string
@@ -240,7 +211,8 @@ export interface ConvertOptions {
   /** 
    * When prepended to a JS object key, converts its value to a raw text node.
    * Defaults to `"&"`. Character validation does not apply to raw text nodes.
-   * This can potentially result in invalid XML documents. Example:
+   * Note that using raw nodes can potentially result in invalid XML documents.
+   * Example:
    * ```js
    * obj = { node: { '&': '<&>' } }
    * ```
@@ -271,101 +243,15 @@ export const DefaultBuilderOptions: XMLBuilderOptionsAsParams = {
   }
 }
 
+/**
+ * Defines a function that validates character data in XML nodes. 
+ */
 type ValidatorFunction = (val: string, debugInfo?: string) => string
 
 /**
  * Contains functions that validate character data in XML nodes.
  */
-export interface ValidateOptions {
-
-  /**
-   * Validates a public identifier.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  pubID?: ValidatorFunction
-
-  /**
-   * Validates a system identifier.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  sysID?: ValidatorFunction
-
-  /**
-   * Validates element and attribute names.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  name?: ValidatorFunction
-
-  /**
-   * Validates text node contents.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  text?: ValidatorFunction
-
-  /**
-   * Validates CDATA node contents.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  cdata?: ValidatorFunction
-
-  /**
-   * Validates comment node contents.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  comment?: ValidatorFunction
-
-  /**
-   * Validates raw text node contents.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  raw?: ValidatorFunction
-
-  /**
-   * Validates attribute values.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  attValue?: ValidatorFunction
-
-  /**
-   * Validates processing instruction node target.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  insTarget?: ValidatorFunction
-
-  /**
-   * Validates processing instruction node value.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  insValue?: ValidatorFunction
-
-  /**
-   * Validates namespace declaration.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  namespace?: ValidatorFunction
-}
+export type ValidateOptions = Partial<Validator>
 
 /**
  * Validates character data in XML nodes.
@@ -618,28 +504,28 @@ export interface XMLBuilder {
    */
   create(obj: ExpandObject): XMLBuilderNode
 
-    /**
-   * Creates a new XML document and returns the document element node for
-   * chain building the document tree.
-   * 
-   * @param name - element name
-   * @param attributes - a JS object with element attributes
-   * 
-   * @returns document element node
-   */
+  /**
+ * Creates a new XML document and returns the document element node for
+ * chain building the document tree.
+ * 
+ * @param name - element name
+ * @param attributes - a JS object with element attributes
+ * 
+ * @returns document element node
+ */
   create(name: string, attributes?: AttributesObject): XMLBuilderNode
 
-    /**
-   * Creates a new XML document and returns the document element node for
-   * chain building the document tree.
-   * 
-   * @param namespace - element namespace
-   * @param name - element name
-   * @param attributes - a JS object with element attributes
-   * 
-   * @returns document element node
-   */
-  create(namespace: string, name: string, 
+  /**
+ * Creates a new XML document and returns the document element node for
+ * chain building the document tree.
+ * 
+ * @param namespace - element namespace
+ * @param name - element name
+ * @param attributes - a JS object with element attributes
+ * 
+ * @returns document element node
+ */
+  create(namespace: string, name: string,
     attributes?: AttributesObject): XMLBuilderNode
 
   /**
@@ -684,7 +570,7 @@ export interface XMLBuilderNode {
    * 
    * @returns the new element node
    */
-  ele(namespace: string, name: string, 
+  ele(namespace: string, name: string,
     attributes?: AttributesObject): XMLBuilderNode
 
   /**
@@ -723,7 +609,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  att(namespace: string, name: string, 
+  att(namespace: string, name: string,
     value: string | (() => string)): XMLBuilderNode
 
   /**

@@ -30,7 +30,7 @@ describe('namespaces', () => {
   })
 
   test('namespace prefix', () => {
-    const xmlnNs = 'http://www.w3.org/2000/xmlns/'
+    const xmlNs = 'http://www.w3.org/2000/xmlns/'
     const ns1 = 'http://example.com/ns1'
     const xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
@@ -49,14 +49,14 @@ describe('namespaces', () => {
       '</root>')
 
     expect(doc.documentElement.namespaceURI).toBe(ns1)
-    expect(doc.documentElement.getAttributeNode("xmlns:xsi").namespaceURI).toBe(xmlnNs)
+    expect(doc.documentElement.getAttributeNode("xmlns:xsi").namespaceURI).toBe(xmlNs)
     expect(doc.documentElement.getAttributeNode("xsi:schemaLocation").namespaceURI).toBe(xsi)
     expect(doc.getElementsByTagName("foo")[0].namespaceURI).toBe(ns1)
     expect(doc.getElementsByTagName("bar")[0].namespaceURI).toBe(ns1)
   })
 
   test('child namespace declared on parent', () => {
-    const xmlnNs = 'http://www.w3.org/2000/xmlns/'
+    const xmlNs = 'http://www.w3.org/2000/xmlns/'
     const svgNs = 'http://www.w3.org/2000/svg'
     const xlinkNs = 'http://www.w3.org/1999/xlink'
 
@@ -72,7 +72,7 @@ describe('namespaces', () => {
       '</svg>')
 
     expect(doc.documentElement.namespaceURI).toBe(svgNs)
-    expect(doc.documentElement.getAttributeNode("xmlns:xlink").namespaceURI).toBe(xmlnNs)
+    expect(doc.documentElement.getAttributeNode("xmlns:xlink").namespaceURI).toBe(xmlNs)
     const script = doc.getElementsByTagName("script")[0]
     expect(script.namespaceURI).toBe(svgNs)
     expect(script.getAttributeNode("type").namespaceURI).toBeNull()
