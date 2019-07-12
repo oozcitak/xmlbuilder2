@@ -2,10 +2,10 @@ import TestHelpersRoot from "../TestHelpers"
 import { XMLSerializer } from '../../src/dom/serializer'
 import { XMLBuilder } from '../../src/xmlbuilder'
 import { isMap, isArray, isObject } from "../../src/util"
-import { XMLBuilderOptionsAsParams } from "../../src/xmlbuilder/interfaces"
+import { XMLBuilderOptions, DTDOptions } from "../../src/xmlbuilder/interfaces"
 
 export default class TestHelpers extends TestHelpersRoot {
-  static xml(options?: XMLBuilderOptionsAsParams): XMLBuilder {
+  static xml(options?: Partial<XMLBuilderOptions> & { docType?: DTDOptions }): XMLBuilder {
     return new XMLBuilder(options) 
   }
   static serialize(node: any): string {

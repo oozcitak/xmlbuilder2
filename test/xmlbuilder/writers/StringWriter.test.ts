@@ -9,7 +9,7 @@ describe('StringWriter', () => {
       person: {
         name: "John",
         '@age': 35,
-        '?': 'pi mypi',
+        '?': 'pi val',
         '!': 'Good guy',
         '$': 'well formed!',
         '&': 'raw<>&',
@@ -34,7 +34,7 @@ describe('StringWriter', () => {
         <ele>simple element</ele>
         <person age="35">
           <name>John</name>
-          <?pi mypi?>
+          <?pi val?>
           <!--Good guy-->
           <![CDATA[well formed!]]>
           raw<>&
@@ -130,12 +130,12 @@ describe('StringWriter', () => {
   })
 
   test('namespaces', () => {
-    const doc = $$.xml().create('myns', 'root')
+    const doc = $$.xml().create('ns', 'root')
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
-      <root xmlns="myns">
+      <root xmlns="ns">
         <foo/>
         <bar xmlns=""/>
       </root>
@@ -169,13 +169,13 @@ describe('StringWriter', () => {
   })
 
   test('attribute with namespace and no prefix', () => {
-    const doc = $$.xml().create('r', { "xmlns:x0": "myns", "xmlns:x2": "myns" })
-      .ele('b', { "xmlns:x1": "myns" })
-      .att('myns', 'name', 'v')
+    const doc = $$.xml().create('r', { "xmlns:x0": "ns", "xmlns:x2": "ns" })
+      .ele('b', { "xmlns:x1": "ns" })
+      .att('ns', 'name', 'v')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
-      <r xmlns:x0="myns" xmlns:x2="myns">
-        <b xmlns:x1="myns" x1:name="v"/>
+      <r xmlns:x0="ns" xmlns:x2="ns">
+        <b xmlns:x1="ns" x1:name="v"/>
       </r>
       `)
   })
@@ -257,7 +257,7 @@ describe('StringWriter', () => {
       `)
   })
 
-  test('prefix redeclared in ancestor element', () => {
+  test('prefix re-declared in ancestor element', () => {
     const doc = $$.xml().create('root')
       .att('http://www.w3.org/2000/xmlns/', 'xmlns:p', 'uri2')
       .ele('uri1', 'p:child')
@@ -327,37 +327,37 @@ describe('StringWriter', () => {
 
   test('Pretty printing with mixed content', () => {
     const doc = $$.xml().create('root')
-      .ele('atttest', { 'att': 'val' }).txt('mixed content')
-        .ele('atttest').att('att', 'val').txt('text').up()
+      .ele('node', { 'att': 'val' }).txt('mixed content')
+        .ele('node').att('att', 'val').txt('text').up()
         .txt('more text after node').doc()
 
     expect(doc.end({ prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <root>
-        <atttest att="val">
+        <node att="val">
           mixed content
-          <atttest att="val">text</atttest>
+          <node att="val">text</node>
           more text after node
-        </atttest>
+        </node>
       </root>
       `)
   })
 
   test('Pretty printing with indentTextOnlyNodes, mixed content', () => {
     const doc = $$.xml().create('root')
-      .ele('atttest', { 'att': 'val' }).txt('mixed content')
-      .ele('atttest').att('att', 'val').txt('text').up()
+      .ele('node', { 'att': 'val' }).txt('mixed content')
+      .ele('node').att('att', 'val').txt('text').up()
       .txt('more text after node').doc()
 
     expect(doc.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
       <root>
-        <atttest att="val">
+        <node att="val">
           mixed content
-          <atttest att="val">
+          <node att="val">
             text
-          </atttest>
+          </node>
           more text after node
-        </atttest>
+        </node>
       </root>
       `)
   })

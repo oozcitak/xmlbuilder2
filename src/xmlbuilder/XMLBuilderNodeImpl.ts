@@ -2,7 +2,7 @@ import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
   XMLBuilderOptions, XMLBuilderNode, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, Validator, DTDOptions,
-  XMLBuilderOptionsAsParams, DefaultBuilderOptions
+  DefaultBuilderOptions
 } from "./interfaces"
 import {
   isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults,
@@ -20,7 +20,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   private _isRawNode: boolean = false
 
   /** @inheritdoc */
-  set(options: XMLBuilderOptionsAsParams): XMLBuilderNode {
+  set(options: Partial<XMLBuilderOptions>): XMLBuilderNode {
     this._options = applyDefaults(
       applyDefaults(this._options, options, true), // apply user settings
       DefaultBuilderOptions) // provide defaults

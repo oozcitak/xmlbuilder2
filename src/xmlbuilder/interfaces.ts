@@ -1,54 +1,6 @@
 import { Node, Attr } from "../dom/interfaces"
 
 /**
- * Defines the options used while creating an XML document. Default values will
- * be provided for optional parameters.
- */
-export interface XMLBuilderOptionsAsParams {
-  /**
-   * A version number string, e.g. `"1.0"`
-   */
-  version?: "1.0" | "1.1"
-  /**
-   * Encoding declaration, e.g. `"UTF-8"`
-   */
-  encoding?: string
-  /**
-   * Standalone document declaration: `true` or `false`
-   */
-  standalone?: boolean
-  /**
-   * DocType node identifiers
-   */
-  docType?: DTDOptions
-  /**
-   * Whether child nodes inherit their parent namespace
-   */
-  inheritNS?: boolean
-  /**
-   * Whether nodes with `null` values will be kept or ignored
-   */
-  keepNullNodes?: boolean
-  /**
-   * Whether attributes with `null` values will be kept or ignored
-   */
-  keepNullAttributes?: boolean
-  /** 
-   * Whether converter strings will be ignored when converting JS 
-   * objects to nodes
-   */
-  ignoreConverters?: boolean
-  /** 
-   * Defines string keys used while converting JS objects to nodes.
-   */
-  convert?: Partial<ConvertOptions>
-  /**
-   * Contains functions that validate character data in XML nodes.
-   */
-  validate?: ValidateOptions
-}
-
-/**
  * Defines the options used while creating an XML document.
  */
 export interface XMLBuilderOptions {
@@ -227,7 +179,7 @@ export interface ConvertOptions {
 /**
  * Defines default values for builder options.
  */
-export const DefaultBuilderOptions: XMLBuilderOptionsAsParams = {
+export const DefaultBuilderOptions: Partial<XMLBuilderOptions> = {
   version: "1.0",
   inheritNS: true,
   keepNullNodes: false,
@@ -560,7 +512,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  set(builderOptions: XMLBuilderOptionsAsParams): XMLBuilderNode
+  set(builderOptions: Partial<XMLBuilderOptions>): XMLBuilderNode
 
   /**
    * Creates a new element node and appends it to the list of child nodes.

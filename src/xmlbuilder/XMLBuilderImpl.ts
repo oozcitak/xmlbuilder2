@@ -1,6 +1,6 @@
 import {
   XMLBuilderOptions, XMLBuilder, ExpandObject,
-  AttributesObject, XMLBuilderNode, XMLBuilderOptionsAsParams, Validator,
+  AttributesObject, XMLBuilderNode, Validator,
   DTDOptions, DefaultBuilderOptions
 } from "./interfaces"
 import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
@@ -22,7 +22,12 @@ export class XMLBuilderImpl implements XMLBuilder {
    * 
    * @param options - builder options
    */
-  constructor(options?: XMLBuilderOptionsAsParams) {
+  constructor(options?: Partial<XMLBuilderOptions> & {
+    /**
+    * DocType node identifiers
+    */
+    docType?: DTDOptions
+  }) {
     options = options || {}
 
     this._validate = new ValidatorImpl(options.version || "1.0",
@@ -53,16 +58,16 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (p1 === undefined) {
       // create()
       [namespace, name, attributes] = [undefined, undefined, undefined]
-    } else if(isObject(p1)) {
+    } else if (isObject(p1)) {
       // create(obj: ExpandObject)
       [namespace, name, attributes] = [undefined, p1, undefined]
-    } else if(isString(p1) && isString(p2)) {
+    } else if (isString(p1) && isString(p2)) {
       // create(namespace: string, name: string, attributes?: AttributesObject)
       [namespace, name, attributes] = [p1, p2, p3]
-    } else if(isString(p1) && isObject(p2)) {
+    } else if (isString(p1) && isObject(p2)) {
       // create(name: string, attributes: AttributesObject)
       [namespace, name, attributes] = [undefined, p1, p2]
-    } else if(isString(p1)) {
+    } else if (isString(p1)) {
       // create(name: string)
       [namespace, name, attributes] = [undefined, p1, undefined]
     }
