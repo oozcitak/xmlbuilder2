@@ -1,4 +1,6 @@
-import { XMLSerializer, PreSerializedNode, PreSerializedAttr } from "./interfaces"
+import { 
+  XMLSerializer, PreSerializedNode, PreSerializedAttr 
+} from "./interfaces"
 import {
   Node, NodeType, Document, DocumentType, Comment, ProcessingInstruction,
   DocumentFragment, Text, Element, CDATASection
@@ -26,7 +28,7 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Produces an XML serialization of the given node.
    * 
-   * @param root - node to serialize
+   * @param node - node to serialize
    */
   serializeToString(node: Node): string {
     const pre = new PreSerializer(this._xmlVersion)
@@ -36,7 +38,7 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Produces an XML serialization of `node`.
    * 
-   * @param node - node to serialize
+   * @param preNode - node to serialize
    */
   private _serializeNode(preNode: PreSerializedNode<Node>): string {
 
@@ -65,7 +67,7 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Produces an XML serialization of the given node's children.
    * 
-   * @param preNode - current node
+   * @param preNode - node to serialize
    */
   private _serializeChildNodes(preNode: PreSerializedNode<Node>): string {
     let markup = ''
@@ -78,7 +80,7 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Produces an XML serialization of the given node's attributes.
    * 
-   * @param preNode - current node
+   * @param preNode - the node whose attributes to serialize
    */
   private _serializeAttributes(preNode: PreSerializedNode<Node>): string {
     let markup = ''
@@ -91,14 +93,14 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Produces an XML serialization of an attribute.
    * 
-   * @param preAttr - current node
+   * @param preAttr - attribute node to serialize
    */
   private _serializeAttribute(preAttr: PreSerializedAttr): string {
     return `${preAttr.name}="${this._serializeAttributeValue(preAttr.value)}"`
   }
 
   /**
-   * Produces an XML serialization of an attribute.
+   * Produces an XML serialization of an attribute value.
    * 
    * @param value - attribute value
    */
@@ -114,7 +116,7 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Produces an XML serialization of an element node.
    * 
-   * @param node - element node to serialize
+   * @param preNode - element node to serialize
    */
   private _serializeElement(preNode: PreSerializedNode<Element>): string {
 
@@ -123,13 +125,11 @@ export class XMLSerializerImpl implements XMLSerializer {
 
     if (preNode.children.length === 0) {
       markup += "/>"
-
       return markup
     } else {
       markup += ">"
       markup += this._serializeChildNodes(preNode)
       markup += `</${preNode.name}>`
-
       return markup
     }
   }
@@ -137,7 +137,7 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Produces an XML serialization of a document node.
    * 
-   * @param preNode - current node
+   * @param preNode - document node to serialize
    */
   private _serializeDocument(preNode: PreSerializedNode<Document>): string {
     return this._serializeChildNodes(preNode)
@@ -146,7 +146,7 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Produces an XML serialization of a comment node.
    * 
-   * @param node - comment node to serialize
+   * @param preNode - comment node to serialize
    */
   private _serializeComment(preNode: PreSerializedNode<Comment>): string {
     return `<!--${preNode.node.data}-->`
@@ -155,7 +155,7 @@ export class XMLSerializerImpl implements XMLSerializer {
   /**
    * Produces an XML serialization of a text node.
    * 
-   * @param node - text node to serialize
+   * @param preNode - text node to serialize
    */
   private _serializeText(preNode: PreSerializedNode<Text>): string {
     return preNode.node.data.replace("&", "&amp;")

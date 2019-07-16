@@ -1,16 +1,18 @@
 import {
-  Node, Element, NodeType, Document, Comment, Text, DocumentFragment, DocumentType, ProcessingInstruction, CDATASection
+  Node, Element, NodeType, Document, Comment, Text, DocumentFragment, 
+  DocumentType, ProcessingInstruction, CDATASection
 } from "../../dom/interfaces"
 import { Namespace, XMLSpec } from "../../dom/spec"
 import { TupleSet } from "../../util"
 import { NamespacePrefixMap } from './NamespacePrefixMap'
 import { PreSerializedNode, PreSerializedAttr } from "./interfaces"
+import { DOMException } from ".."
 
-interface NodeParamRefs {
-  prefixMap: NamespacePrefixMap,
-  prefixIndex: number,
-  namespace: string | null
-}
+/**
+ * Stores the last generated prefix. An object is used instead of a number so
+ * that the value can be passed by reference.
+ */
+type PrefixIndex = { value: number }
 
 /**
  * Pre-serializes XML nodes.
@@ -56,52 +58,57 @@ export class PreSerializer {
      * serialize a node's namespaceURI (or the namespaceURI of one of node's 
      * attributes). See the generate a prefix algorithm.
      */
-    const refs: NodeParamRefs = {
-      prefixMap: new NamespacePrefixMap(),
-      prefixIndex: 1,
-      namespace: null
-    }
-    refs.prefixMap.set("xml", Namespace.XML)
+    const namespace: string | null = null
+    const prefixMap = new NamespacePrefixMap([["xml", Namespace.XML]])
+    const prefixIndex: PrefixIndex = { value : 1 }
 
     /**
      * 5. Return the result of running the XML serialization algorithm on node 
      * passing the context namespace namespace, namespace prefix map prefix map,
-     *  generated namespace prefix index reference to prefix index, and the 
+     * generated namespace prefix index reference to prefix index, and the 
      * flag require well-formed. If an exception occurs during the execution 
      * of the algorithm, then catch that exception and throw an 
      * "InvalidStateError" DOMException.
      */
-    return this._serializeNode(node, refs, 0, requireWellFormed)
+    try {
+      return this._serializeNode(node, namespace, prefixMap, prefixIndex,
+        requireWellFormed)
+    } catch {
+      throw DOMException.InvalidStateError
+    }
   }
 
   /**
    * Produces an XML serialization of a node.
    * 
    * @param node - node to serialize
-   * @param refs - reference parameters
-   * @param level - current depth of the XML tree
+   * @param namespace - context namespace
+   * @param prefixMap - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
+   * @param level - current depth of the XML tree
    */
-  private _serializeNode(node: Node, refs: NodeParamRefs, level: number,
-    requireWellFormed: boolean): PreSerializedNode<Node> {
+  private _serializeNode(node: Node, namespace: string | null, 
+    prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
+    requireWellFormed: boolean, level: number = 0): PreSerializedNode<Node> {
 
     switch (node.nodeType) {
       case NodeType.Element:
-        return this._serializeElement(<Element>node, refs, level, requireWellFormed)
+        return this._serializeElement(<Element>node, namespace, prefixMap, prefixIndex, requireWellFormed, level)
       case NodeType.Document:
-        return this._serializeDocument(<Document>node, refs, level, requireWellFormed)
+        return this._serializeDocument(<Document>node, namespace, prefixMap, prefixIndex, requireWellFormed, level)
       case NodeType.Comment:
-        return this._serializeComment(<Comment>node, refs, level, requireWellFormed)
+        return this._serializeComment(<Comment>node, namespace, prefixMap, prefixIndex, requireWellFormed, level)
       case NodeType.Text:
-        return this._serializeText(<Text>node, refs, level, requireWellFormed)
+        return this._serializeText(<Text>node, namespace, prefixMap, prefixIndex, requireWellFormed, level)
       case NodeType.DocumentFragment:
-        return this._serializeDocumentFragment(<DocumentFragment>node, refs, level, requireWellFormed)
+        return this._serializeDocumentFragment(<DocumentFragment>node, namespace, prefixMap, prefixIndex, requireWellFormed, level)
       case NodeType.DocumentType:
-        return this._serializeDocumentType(<DocumentType>node, refs, level, requireWellFormed)
+        return this._serializeDocumentType(<DocumentType>node, namespace, prefixMap, prefixIndex, requireWellFormed, level)
       case NodeType.ProcessingInstruction:
-        return this._serializeProcessingInstruction(<ProcessingInstruction>node, refs, level, requireWellFormed)
+        return this._serializeProcessingInstruction(<ProcessingInstruction>node, namespace, prefixMap, prefixIndex, requireWellFormed, level)
       case NodeType.CData:
-        return this._serializeCData(<CDATASection>node, refs, level, requireWellFormed)
+        return this._serializeCData(<CDATASection>node, namespace, prefixMap, prefixIndex, requireWellFormed, level)
       default:
         return {
           node: node,
@@ -116,12 +123,15 @@ export class PreSerializer {
    * Produces an XML serialization of an element node.
    * 
    * @param node - node to serialize
-   * @param refs - reference parameters
-   * @param level - current depth of the XML tree
+   * @param namespace - context namespace
+   * @param prefixMap - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
+   * @param level - current depth of the XML tree
    */
-  private _serializeElement(node: Element, refs: NodeParamRefs, level: number,
-    requireWellFormed: boolean): PreSerializedNode<Element> {
+  private _serializeElement(node: Element, namespace: string | null, 
+    prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
+    requireWellFormed: boolean, level: number = 0): PreSerializedNode<Element> {
 
     const attributes: PreSerializedAttr[] = []
     const children: PreSerializedNode<Node>[] = []
@@ -164,13 +174,13 @@ export class PreSerializer {
      */
     let qualifiedName = ''
     let ignoreNamespaceDefinitionAttribute = false
-    let map = refs.prefixMap.copy()
+    let map = prefixMap.copy()
     let localPrefixesMap = new Map<string, string>()
     let localDefaultNamespace = this._recordNamespaceInformation(node,
       {
         map: map, localPrefixesMap: localPrefixesMap
       })
-    let inheritedNS = refs.namespace
+    let inheritedNS = namespace
     let ns = node.namespaceURI
 
     /** 11. If inherited ns is equal to ns, then: */
@@ -269,12 +279,7 @@ export class PreSerializer {
          * input map, ns, and prefix index.
          */
         if (localPrefixesMap.has(prefix)) {
-          const generateRefs = {
-            namespacePrefixMap: map,
-            prefixIndex: refs.prefixIndex
-          }
-          prefix = this._generatePrefix(ns, generateRefs)
-          refs.prefixIndex = generateRefs.prefixIndex
+          prefix = this._generatePrefix(ns, map, prefixIndex)
         }
 
         /**
@@ -372,14 +377,8 @@ export class PreSerializer {
      * attributes given map, prefix index, local prefixes map, ignore namespace
      * definition attribute flag, and require well-formed flag.
      */
-    const attRefs = {
-      map: map,
-      prefixIndex: refs.prefixIndex,
-      localPrefixesMap: localPrefixesMap
-    }
-    const eleAttributes = this._serializeAttributes(
-      node, attRefs, ignoreNamespaceDefinitionAttribute, requireWellFormed)
-    refs.prefixIndex = attRefs.prefixIndex
+    const eleAttributes = this._serializeAttributes(node, map, prefixIndex, 
+      localPrefixesMap, ignoreNamespaceDefinitionAttribute, requireWellFormed)
     attributes.push(...eleAttributes)
 
     /**
@@ -413,13 +412,8 @@ export class PreSerializer {
      * flag.
      */
     for (const childNode of node.childNodes) {
-      const childRefs = {
-        prefixMap: map,
-        prefixIndex: refs.prefixIndex,
-        namespace: inheritedNS
-      }
-      children.push(this._serializeNode(childNode, childRefs, level + 1, requireWellFormed))
-      refs.prefixIndex = childRefs.prefixIndex
+      children.push(this._serializeNode(childNode, inheritedNS, map, 
+        prefixIndex, requireWellFormed, level + 1))
     }
 
     /**
@@ -442,12 +436,15 @@ export class PreSerializer {
    * Produces an XML serialization of a document node.
    * 
    * @param node - node to serialize
-   * @param refs - reference parameters
-   * @param level - current depth of the XML tree
+   * @param namespace - context namespace
+   * @param prefixMap - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
+   * @param level - current depth of the XML tree
    */
-  private _serializeDocument(node: Document, refs: NodeParamRefs, level: number,
-    requireWellFormed: boolean): PreSerializedNode<Document> {
+  private _serializeDocument(node: Document, namespace: string | null, 
+    prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
+    requireWellFormed: boolean, level: number = 0): PreSerializedNode<Document> {
 
     /**
      * If the require well-formed flag is set (its value is true), and this node
@@ -474,7 +471,8 @@ export class PreSerializer {
     */
     const children: PreSerializedNode<Node>[] = []
     for (const childNode of node.childNodes) {
-      children.push(this._serializeNode(childNode, refs, level, requireWellFormed))
+      children.push(this._serializeNode(childNode, namespace, prefixMap, 
+        prefixIndex, requireWellFormed, level))
     }
     return {
       node: node,
@@ -488,12 +486,15 @@ export class PreSerializer {
    * Produces an XML serialization of a comment node.
    * 
    * @param node - node to serialize
-   * @param refs - reference parameters
-   * @param level - current depth of the XML tree
+   * @param namespace - context namespace
+   * @param prefixMap - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
+   * @param level - current depth of the XML tree
    */
-  private _serializeComment(node: Comment, refs: NodeParamRefs, level: number,
-    requireWellFormed: boolean): PreSerializedNode<Comment> {
+  private _serializeComment(node: Comment, namespace: string | null, 
+    prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
+    requireWellFormed: boolean, level: number = 0): PreSerializedNode<Comment> {
 
     /**
      * If the require well-formed flag is set (its value is true), and node's 
@@ -522,12 +523,15 @@ export class PreSerializer {
    * Produces an XML serialization of a text node.
    * 
    * @param node - node to serialize
-   * @param refs - reference parameters
-   * @param level - current depth of the XML tree
+   * @param namespace - context namespace
+   * @param prefixMap - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
+   * @param level - current depth of the XML tree
    */
-  private _serializeText(node: Text, refs: NodeParamRefs, level: number,
-    requireWellFormed: boolean): PreSerializedNode<Text> {
+  private _serializeText(node: Text, namespace: string | null, 
+    prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
+    requireWellFormed: boolean, level: number = 0): PreSerializedNode<Text> {
 
     /**
      * 1. If the require well-formed flag is set (its value is true), and 
@@ -558,13 +562,16 @@ export class PreSerializer {
    * Produces an XML serialization of a document fragment node.
    * 
    * @param node - node to serialize
-   * @param refs - reference parameters
-   * @param level - current depth of the XML tree
+   * @param namespace - context namespace
+   * @param prefixMap - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
+   * @param level - current depth of the XML tree
    */
-  private _serializeDocumentFragment(node: DocumentFragment,
-    refs: NodeParamRefs, level: number,
-    requireWellFormed: boolean): PreSerializedNode<DocumentFragment> {
+  private _serializeDocumentFragment(node: DocumentFragment, 
+    namespace: string | null, 
+    prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
+    requireWellFormed: boolean, level: number = 0): PreSerializedNode<DocumentFragment> {
 
     /**
      * 1. Let markup the empty string.
@@ -575,7 +582,8 @@ export class PreSerializer {
      */
     const children: PreSerializedNode<Node>[] = []
     for (const childNode of node.childNodes) {
-      children.push(this._serializeNode(childNode, refs, level, requireWellFormed))
+      children.push(this._serializeNode(childNode, namespace, prefixMap, 
+        prefixIndex, requireWellFormed, level))
     }
     return {
       node: node,
@@ -589,13 +597,15 @@ export class PreSerializer {
    * Produces an XML serialization of a document type node.
    * 
    * @param node - node to serialize
-   * @param refs - reference parameters
-   * @param level - current depth of the XML tree
+   * @param namespace - context namespace
+   * @param prefixMap - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
+   * @param level - current depth of the XML tree
    */
-  private _serializeDocumentType(node: DocumentType,
-    refs: NodeParamRefs, level: number,
-    requireWellFormed: boolean): PreSerializedNode<DocumentType> {
+  private _serializeDocumentType(node: DocumentType, namespace: string | null, 
+    prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
+    requireWellFormed: boolean, level: number = 0): PreSerializedNode<DocumentType> {
 
     /**
      * 1. If the require well-formed flag is true and the node's publicId 
@@ -660,12 +670,16 @@ export class PreSerializer {
    * Produces an XML serialization of a processing instruction node.
    * 
    * @param node - node to serialize
-   * @param refs - reference parameters
-   * @param level - current depth of the XML tree
+   * @param namespace - context namespace
+   * @param prefixMap - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
+   * @param level - current depth of the XML tree
    */
-  private _serializeProcessingInstruction(node: ProcessingInstruction, refs: NodeParamRefs, level: number,
-    requireWellFormed: boolean): PreSerializedNode<ProcessingInstruction> {
+  private _serializeProcessingInstruction(node: ProcessingInstruction, 
+    namespace: string | null, prefixMap: NamespacePrefixMap, 
+    prefixIndex: PrefixIndex, requireWellFormed: boolean, 
+    level: number = 0): PreSerializedNode<ProcessingInstruction> {
 
     /**
      * 1. If the require well-formed flag is set (its value is true), and node's
@@ -710,12 +724,15 @@ export class PreSerializer {
    * Produces an XML serialization of a CDATA node.
    * 
    * @param node - node to serialize
-   * @param refs - reference parameters
-   * @param level - current depth of the XML tree
+   * @param namespace - context namespace
+   * @param prefixMap - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
+   * @param level - current depth of the XML tree
    */
-  private _serializeCData(node: CDATASection, refs: NodeParamRefs, level: number,
-    requireWellFormed: boolean): PreSerializedNode<CDATASection> {
+  private _serializeCData(node: CDATASection, namespace: string | null, 
+    prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
+    requireWellFormed: boolean, level: number = 0): PreSerializedNode<CDATASection> {
 
     if (requireWellFormed && (node.data.includes("]]>"))) {
       throw new Error("CDATA contains invalid characters (well-formed required).")
@@ -732,16 +749,17 @@ export class PreSerializer {
   /**
   * Produces an XML serialization of the attributes of an element node.
   * 
-  * @param node - element node whose attributes to serialize
-  * @param refs - reference parameters
-  * @param ignoreNamespaceDefinitionAttribute - whether to ignore namespace
-  * @param requireWellFormed - whether to check conformance
+   * @param node - node to serialize
+   * @param map - namespace prefix map
+   * @param prefixIndex - generated namespace prefix index
+   * @param localPrefixesMap - local prefixed map
+   * @param ignoreNamespaceDefinitionAttribute - whether to ignore namespace
+   * attributes
+   * @param requireWellFormed - whether to check conformance
   */
-  private _serializeAttributes(node: Element, refs: {
-    map: NamespacePrefixMap,
-    prefixIndex: number,
-    localPrefixesMap: Map<string, string>
-  }, ignoreNamespaceDefinitionAttribute: boolean,
+  private _serializeAttributes(node: Element, map: NamespacePrefixMap, 
+    prefixIndex: PrefixIndex, localPrefixesMap: Map<string, string>,
+    ignoreNamespaceDefinitionAttribute: boolean, 
     requireWellFormed: boolean): PreSerializedAttr[] {
 
     const result: PreSerializedAttr[] = []
@@ -791,7 +809,7 @@ export class PreSerializer {
          * prefix string from map given namespace attribute namespace with 
          * preferred prefix being attr's prefix value.
          */
-        candidatePrefix = refs.map.get(attr.prefix, attributeNamespace)
+        candidatePrefix = map.get(attr.prefix, attributeNamespace)
 
         /**
          * 3.5.2. If the value of attribute namespace is the XMLNS namespace, 
@@ -823,9 +841,9 @@ export class PreSerializer {
            */
           if (attr.value === Namespace.XML ||
             (attr.prefix === null && ignoreNamespaceDefinitionAttribute) ||
-            (attr.prefix !== null && (!refs.localPrefixesMap.has(attr.localName) ||
-              refs.localPrefixesMap.get(attr.localName) !== attr.value) &&
-              refs.map.has(attr.localName, attr.value)))
+            (attr.prefix !== null && (!localPrefixesMap.has(attr.localName) ||
+              localPrefixesMap.get(attr.localName) !== attr.value) &&
+              map.has(attr.localName, attr.value)))
             continue
 
           /**
@@ -862,12 +880,7 @@ export class PreSerializer {
            * 3.5.3.1. Let candidate prefix be the result of generating a prefix 
            * providing map, attribute namespace, and prefix index as input.
            */
-          const generateRefs = {
-            namespacePrefixMap: refs.map,
-            prefixIndex: refs.prefixIndex
-          }
-          candidatePrefix = this._generatePrefix(attributeNamespace, generateRefs)
-          refs.prefixIndex = generateRefs.prefixIndex
+          candidatePrefix = this._generatePrefix(attributeNamespace, map, prefixIndex)
 
           /** 
            * 3.5.3.2. Append the following to result, in the order listed:
@@ -1040,12 +1053,11 @@ export class PreSerializer {
   * Generates a new prefix for the given namespace.
   * 
   * @param newNamespace - a namespace to generate prefix for
-  * @param refs - reference parameters
+  * @param prefixMap - namespace prefix map
+  * @param prefixIndex - generated namespace prefix index
   */
-  private _generatePrefix(newNamespace: string | null, refs: {
-    namespacePrefixMap: NamespacePrefixMap,
-    prefixIndex: number
-  }): string {
+  private _generatePrefix(newNamespace: string | null,
+    prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex): string {
 
     /**
      * 1. Let generated prefix be the concatenation of the string "ns" and the
@@ -1054,9 +1066,9 @@ export class PreSerializer {
      * 3. Add to map the generated prefix given the new namespace namespace.
      * 4. Return the value of generated prefix.
      */
-    let generatedPrefix = "ns" + refs.prefixIndex
-    refs.prefixIndex++
-    refs.namespacePrefixMap.set(generatedPrefix, newNamespace)
+    let generatedPrefix = "ns" + prefixIndex.value
+    prefixIndex.value++
+    prefixMap.set(generatedPrefix, newNamespace)
     return generatedPrefix
   }
 

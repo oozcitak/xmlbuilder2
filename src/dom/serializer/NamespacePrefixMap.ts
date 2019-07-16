@@ -21,8 +21,14 @@ export class NamespacePrefixMap {
   /**
    * Initializes a new instance of `NamespacePrefixMap`.
    */
-  constructor() {
+  constructor(items?: [[string, string | null]]) {
     this._items = new Map<string | null, Array<string>>()
+
+    if (items !== undefined) {
+      for (const item of items) {
+        this.set(item[0], item[1])
+      }
+    }
   }
 
   /**
