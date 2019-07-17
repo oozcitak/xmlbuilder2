@@ -81,26 +81,16 @@ describe('XMLSerializer', function () {
   test('namespace prefix', function () {
     const ns = 'uri:myns'
     const doc = $$.dom.createDocument(ns, 'root')
-    const node1 = doc.createElementNS(ns, 'node1')
     if (doc.documentElement) {
       doc.documentElement.setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'xsi:schemaLocation', 'uri:myschema.xsd')
-      doc.documentElement.appendChild(node1)
     }
-    const node2 = doc.createElementNS(ns, 'node2')
-    node1.appendChild(node2)
-    node2.appendChild(doc.createTextNode('text'))
 
     const serializer = new $$.XMLSerializer()
     expect(serializer.serializeToString(doc)).toBe(
-      '<root xmlns="uri:myns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="uri:myschema.xsd">' +
-      '<node1><node2>text</node2></node1>' +
-      '</root>'
+      '<root xmlns="uri:myns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="uri:myschema.xsd"/>'
     )
     expect($$.printTree(doc)).toBe($$.t`
       root (ns:uri:myns) xsi:schemaLocation="uri:myschema.xsd" (ns:http://www.w3.org/2001/XMLSchema-instance)
-        node1 (ns:uri:myns)
-          node2 (ns:uri:myns)
-            # text
       `)
   })
 

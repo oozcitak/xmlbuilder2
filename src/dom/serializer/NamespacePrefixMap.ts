@@ -117,6 +117,21 @@ export class NamespacePrefixMap {
   }
 
   /**
+   * Checks if a prefix string is found in the namespace prefix map.
+   * 
+   * @param prefix - prefix string
+   */
+  hasPrefix(prefix: string): boolean {
+    for (const [, candidatesList] of this._items) {
+      if (candidatesList.includes(prefix)) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  /**
    * Adds a prefix string associated with a namespace to the prefix map.
    * 
    * @param prefix - prefix string
