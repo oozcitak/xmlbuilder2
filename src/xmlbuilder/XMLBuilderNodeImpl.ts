@@ -6,10 +6,12 @@ import {
 } from "./interfaces"
 import {
   isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults,
-  forEachArray, forEachObject, isMap, getObjectValue, removeObjectValue
+  forEachArray, forEachObject, isMap
 } from "../util"
 import { Namespace } from "../dom/spec"
-import { StringWriterImpl, MapWriterImpl, ObjectWriterImpl } from "./writers"
+import { 
+  StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
+} from "./writers"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -498,6 +500,9 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       return writer.serialize(this._asNode, writerOptions)
     } else if (writerOptions.format === "object") {
       const writer = new ObjectWriterImpl(this._options)
+      return writer.serialize(this._asNode, writerOptions)
+    } else if (writerOptions.format === "json") {
+      const writer = new JSONWriterImpl(this._options)
       return writer.serialize(this._asNode, writerOptions)
     } else {
       return ''
