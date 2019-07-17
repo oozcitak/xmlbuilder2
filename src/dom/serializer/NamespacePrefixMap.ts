@@ -92,7 +92,8 @@ export class NamespacePrefixMap {
   }
 
   /**
-   * Checks if a prefix string is found in the namespace prefix map.
+   * Checks if a prefix string is found in the namespace prefix map associated
+   * with the given namespace.
    * 
    * @param prefix - prefix string
    * @param ns - namespace
