@@ -168,7 +168,7 @@ describe('JSONWriter', () => {
   test('unknown node', () => {
     const ele = $$.xml().create('root').ele('alien')
     Object.defineProperty(ele, "nodeType", { value: 1001, writable: false })
-    expect(() => ele.end({ format: "object" })).toThrow
+    expect(() => ele.end({ format: "object" })).toThrow()
   })
   
 })
