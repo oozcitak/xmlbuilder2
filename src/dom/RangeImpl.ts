@@ -1,11 +1,13 @@
-import { Node, Range, NodeType, BoundaryPosition, HowToCompare, DocumentFragment, CharacterData } from './interfaces'
+import {
+  Node, Range, NodeType, BoundaryPosition, HowToCompare,
+  DocumentFragment, CharacterData
+} from './interfaces'
 import { AbstractRangeImpl } from './AbstractRangeImpl'
-import { TreeQuery } from './util/TreeQuery';
+import { TreeQuery } from './util/TreeQuery'
 import { DOMException } from '.'
-import { BoundaryPoint } from './util/BoundaryPoint';
-import { RangeQuery } from './util/RangeQuery';
-import { CharacterDataUtility } from './util/CharacterDataUtility';
-import { randomBytes } from 'crypto';
+import { BoundaryPoint } from './util/BoundaryPoint'
+import { RangeQuery } from './util/RangeQuery'
+import { CharacterDataUtility } from './util/CharacterDataUtility'
 
 /**
  * Represents a live range.
@@ -43,41 +45,12 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
 
   /** @inheritdoc */
   setStart(node: Node, offset: number): void {
-    if (node.nodeType === NodeType.DocumentType) {
-      throw DOMException.InvalidNodeTypeError
-    }
-    if (offset > TreeQuery.nodeLength(node)) {
-      throw DOMException.IndexSizeError
-    }
-
-    const bp: [Node, number] = [node, offset]
-
-    if (BoundaryPoint.position(bp, this._end) === BoundaryPosition.After ||
-      RangeQuery.root(this) !== TreeQuery.rootNode(node)) {
-      this._end = bp
-    }
-
-    this._start = bp
+    RangeQuery.setStart(this, node, offset)
   }
 
   /** @inheritdoc */
   setEnd(node: Node, offset: number): void {
-    if (node.nodeType === NodeType.DocumentType) {
-      throw DOMException.InvalidNodeTypeError
-    }
-
-    if (offset > TreeQuery.nodeLength(node)) {
-      throw DOMException.IndexSizeError
-    }
-
-    const bp: [Node, number] = [node, offset]
-
-    if (BoundaryPoint.position(bp, this._start) === BoundaryPosition.Before ||
-      RangeQuery.root(this) !== TreeQuery.rootNode(node)) {
-      this._start = bp
-    }
-
-    this._end = bp
+    RangeQuery.setEnd(this, node, offset)
   }
 
   /** @inheritdoc */
@@ -86,7 +59,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
     if (parent === null) {
       throw DOMException.InvalidNodeTypeError
     }
-    this.setStart(parent, TreeQuery.index(node))
+    RangeQuery.setStart(this, parent, TreeQuery.index(node))
   }
 
   /** @inheritdoc */
@@ -95,7 +68,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
     if (parent === null) {
       throw DOMException.InvalidNodeTypeError
     }
-    this.setStart(parent, TreeQuery.index(node) + 1)
+    RangeQuery.setStart(this, parent, TreeQuery.index(node) + 1)
   }
 
   /** @inheritdoc */
@@ -104,7 +77,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
     if (parent === null) {
       throw DOMException.InvalidNodeTypeError
     }
-    this.setEnd(parent, TreeQuery.index(node))
+    RangeQuery.setEnd(this, parent, TreeQuery.index(node))
   }
 
   /** @inheritdoc */
@@ -113,7 +86,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
     if (parent === null) {
       throw DOMException.InvalidNodeTypeError
     }
-    this.setEnd(parent, TreeQuery.index(node) + 1)
+    RangeQuery.setEnd(this, parent, TreeQuery.index(node) + 1)
   }
 
   /** @inheritdoc */
@@ -127,14 +100,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
 
   /** @inheritdoc */
   selectNode(node: Node): void {
-    let parent = node.parentNode
-    if (parent === null) {
-      throw DOMException.InvalidNodeTypeError
-    }
-
-    let index = TreeQuery.index(node)
-    this._start = [parent, index]
-    this._end = [parent, index + 1]
+    RangeQuery.selectNode(this, node)
   }
 
   /** @inheritdoc */
@@ -156,7 +122,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
     let thisPoint: [Node, number]
     let otherPoint: [Node, number]
 
-    switch(how) {
+    switch (how) {
       case HowToCompare.StartToStart:
         thisPoint = this._start
         otherPoint = [sourceRange.startContainer, sourceRange.startOffset]
@@ -194,9 +160,9 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
     const [originalStartNode, originalStartOffset] = this._start
     const [originalEndNode, originalEndOffset] = this._end
 
-    if (originalStartNode === originalEndNode && 
-      (originalStartNode.nodeType === NodeType.Text || 
-        originalStartNode.nodeType === NodeType.ProcessingInstruction || 
+    if (originalStartNode === originalEndNode &&
+      (originalStartNode.nodeType === NodeType.Text ||
+        originalStartNode.nodeType === NodeType.ProcessingInstruction ||
         originalStartNode.nodeType === NodeType.Comment)) {
       CharacterDataUtility.replaceData(<CharacterData>originalStartNode, originalStartOffset, originalEndOffset, '')
       return
@@ -216,10 +182,10 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
 
     if (TreeQuery.isAncestorOf(originalEndNode, originalStartNode, true)) {
       newNode = originalStartNode
-      newOffset = originalStartOffset  
+      newOffset = originalStartOffset
     } else {
       let referenceNode = originalStartNode
-      while (referenceNode.parentNode !== null && 
+      while (referenceNode.parentNode !== null &&
         TreeQuery.isAncestorOf(originalEndNode, referenceNode.parentNode, true)) {
         referenceNode = referenceNode.parentNode
       }
@@ -231,11 +197,11 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       newOffset = TreeQuery.index(referenceNode) + 1
     }
 
-    if (originalStartNode.nodeType === NodeType.Text || 
-        originalStartNode.nodeType === NodeType.ProcessingInstruction || 
-        originalStartNode.nodeType === NodeType.Comment) {
-      CharacterDataUtility.replaceData(<CharacterData>originalStartNode, 
-        originalStartOffset, 
+    if (originalStartNode.nodeType === NodeType.Text ||
+      originalStartNode.nodeType === NodeType.ProcessingInstruction ||
+      originalStartNode.nodeType === NodeType.Comment) {
+      CharacterDataUtility.replaceData(<CharacterData>originalStartNode,
+        originalStartOffset,
         TreeQuery.nodeLength(originalStartNode) - originalStartOffset, '')
       return
     }
@@ -246,18 +212,18 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       }
     }
 
-    if (originalEndNode.nodeType === NodeType.Text || 
-      originalEndNode.nodeType === NodeType.ProcessingInstruction || 
+    if (originalEndNode.nodeType === NodeType.Text ||
+      originalEndNode.nodeType === NodeType.ProcessingInstruction ||
       originalEndNode.nodeType === NodeType.Comment) {
-    CharacterDataUtility.replaceData(<CharacterData>originalEndNode, 
-      0, originalEndOffset, '')
-    return
+      CharacterDataUtility.replaceData(<CharacterData>originalEndNode,
+        0, originalEndOffset, '')
+      return
+    }
+
+    this._start = [newNode, newOffset]
+    this._end = [newNode, newOffset]
   }
 
-  this._start = [newNode, newOffset]
-  this._end = [newNode, newOffset]
-  }
-  
   /** @inheritdoc */
   extractContents(): DocumentFragment {
     throw new Error("Method not implemented.");

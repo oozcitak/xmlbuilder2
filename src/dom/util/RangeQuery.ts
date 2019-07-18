@@ -1,6 +1,7 @@
-import { Node, Range, BoundaryPosition } from '../interfaces'
+import { Node, Range, BoundaryPosition, NodeType } from '../interfaces'
 import { TreeQuery } from './TreeQuery'
-import { BoundaryPoint } from './BoundaryPoint';
+import { BoundaryPoint } from './BoundaryPoint'
+import { DOMException } from '../DOMException'
 
 /**
  * Includes methods to query ranges.
@@ -14,6 +15,76 @@ export class RangeQuery {
    */
   static root(range: Range): Node {
     return TreeQuery.rootNode(range.startContainer)
+  }
+
+  /** 
+   * Sets the start boundary point of a range.
+   * 
+   * @param range - a range
+   * @param node - a node
+   * @param offset - an offset on node
+   */
+  static setStart(range: Range, node: Node, offset: number): void {
+    if (node.nodeType === NodeType.DocumentType) {
+      throw DOMException.InvalidNodeTypeError
+    }
+    if (offset > TreeQuery.nodeLength(node)) {
+      throw DOMException.IndexSizeError
+    }
+
+    const bp: [Node, number] = [node, offset]
+    const rangeAsAny = <any><unknown>range
+
+    if (BoundaryPoint.position(bp, rangeAsAny._end) === BoundaryPosition.After ||
+      RangeQuery.root(range) !== TreeQuery.rootNode(node)) {
+      rangeAsAny._end = bp
+    }
+
+    rangeAsAny._start = bp
+  }
+
+  /** 
+   * Sets the end boundary point of a range.
+   * 
+   * @param range - a range
+   * @param node - a node
+   * @param offset - an offset on node
+   */
+  static setEnd(range: Range, node: Node, offset: number): void {
+    if (node.nodeType === NodeType.DocumentType) {
+      throw DOMException.InvalidNodeTypeError
+    }
+
+    if (offset > TreeQuery.nodeLength(node)) {
+      throw DOMException.IndexSizeError
+    }
+
+    const bp: [Node, number] = [node, offset]
+    const rangeAsAny = <any><unknown>range
+
+    if (BoundaryPoint.position(bp, rangeAsAny._start) === BoundaryPosition.Before ||
+      RangeQuery.root(range) !== TreeQuery.rootNode(node)) {
+      rangeAsAny._start = bp
+    }
+
+    rangeAsAny._end = bp
+  }
+
+  /** Selects a node.
+   * 
+   * @param range - a range
+   * @param node - a node
+   */
+  static selectNode(range: Range, node: Node): void {
+    let parent = node.parentNode
+    if (parent === null) {
+      throw DOMException.InvalidNodeTypeError
+    }
+
+    let index = TreeQuery.index(node)
+    const rangeAsAny = <any><unknown>range
+    rangeAsAny._start = [parent, index]
+    rangeAsAny._end = [parent, index + 1]
   }
 
   /**
