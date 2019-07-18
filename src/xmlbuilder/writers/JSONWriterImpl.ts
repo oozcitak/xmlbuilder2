@@ -2,9 +2,9 @@ import {
   WriterOptions, XMLBuilderOptions, XMLSerializedValue
 } from "../interfaces"
 import { Node } from "../../dom/interfaces"
-import { 
-  applyDefaults, isString, isMap, isArray, forEachObject, 
-  forEachArray, isObject 
+import {
+  applyDefaults, isString, isMap, isArray, forEachObject,
+  forEachArray, isObject, objectLength
 } from "../../util"
 import { MapWriterImpl } from "./MapWriterImpl"
 
@@ -54,13 +54,13 @@ export class JSONWriterImpl {
     const mapWriter = new MapWriterImpl(this._builderOptions)
     const obj = mapWriter.serialize(node, writerOptions)
 
-    let markup = this._serializeObject(obj, options)
+    let markup = this._beginLine(options, 0) + this._serializeObject(obj, options)
 
     // remove trailing newline
     if (options.prettyPrint && markup.slice(-options.newline.length) === options.newline) {
-        markup = markup.slice(0, -options.newline.length)
+      markup = markup.slice(0, -options.newline.length)
     }
-    
+
     return markup
   }
 
@@ -76,36 +76,48 @@ export class JSONWriterImpl {
     let markup = ''
     const isLeaf = this._isLeafNode(obj)
 
-    if (isMap(obj)) {
-      markup += '{'
-      const len = obj.size
-      let i = 0
-      for (const [key, val] of obj) {
-        markup += (isLeaf ? ' ' : this._endLine(options, level + 1) + this._beginLine(options, level + 1)) + '"' + key + '": ' + this._serializeObject(val, options, level + 1)
-        if (i < len - 1) { markup += ',' }
-        i++
-      }
-      markup += (isLeaf ? ' ' : this._endLine(options, level) + this._beginLine(options, level)) + '}'
-    } else if (isArray(obj)) {
+    if (isArray(obj)) {
       markup += '['
       const len = obj.length
-      let i = 0      
-      for (const val of obj) {
-        markup += (isLeaf ? ' ' : this._endLine(options, level + 1) + this._beginLine(options, level + 1)) + this._serializeObject(val, options, level + 1)
-        if (i < len - 1) { markup += ',' }
-        i++
-      }
-      markup += (isLeaf ? ' ' : this._endLine(options, level) + this._beginLine(options, level)) + ']'
-    } else if (isObject(obj)) {
-      markup += '{'
-      const len = Object.keys(obj).length
       let i = 0
-      for (const [key, val] of Object.entries(obj)) {
-        markup += (isLeaf ? ' ' : this._endLine(options, level + 1) + this._beginLine(options, level + 1)) + '"' + key + '": ' + this._serializeObject(val, options, level + 1)
+      for (const val of obj) {
+        if (isLeaf && options.prettyPrint) {
+          markup += ' '
+        } else {
+          markup += this._endLine(options, level + 1) + this._beginLine(options, level + 1)
+        }
+        markup += this._serializeObject(val, options, level + 1)
         if (i < len - 1) { markup += ',' }
         i++
       }
-      markup += (isLeaf ? ' ' : this._endLine(options, level) + this._beginLine(options, level)) + '}'
+      if (isLeaf && options.prettyPrint) {
+        markup += ' '
+      } else {
+        markup += this._endLine(options, level) + this._beginLine(options, level)
+      }
+      markup += ']'
+    } else if (isMap(obj) || isObject(obj)) {
+      markup += '{'
+      const len = objectLength(obj)
+      let i = 0
+      for (const [key, val] of forEachObject(obj)) {
+        if (isLeaf && options.prettyPrint) {
+          markup += ' '
+        } else {
+          markup += this._endLine(options, level + 1) + this._beginLine(options, level + 1)
+        }
+        markup += '"' + key + '":'
+        if (options.prettyPrint) { markup += ' ' }
+        markup += this._serializeObject(val, options, level + 1)
+        if (i < len - 1) { markup += ',' }
+        i++
+      }
+      if (isLeaf && options.prettyPrint) {
+        markup += ' '
+      } else {
+        markup += this._endLine(options, level) + this._beginLine(options, level)
+      }
+      markup += '}'
     } else {
       markup += '"' + obj + '"'
     }

@@ -17,7 +17,7 @@ describe('MapWriter', () => {
           street: "End of long and winding road"
         },
         contact: {
-          phone: [ "555-1234", "555-1235" ]
+          phone: ["555-1234", "555-1235"]
         },
         id: () => 42,
         details: {
@@ -170,5 +170,5 @@ describe('MapWriter', () => {
     Object.defineProperty(ele, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end({ format: "map" })).toThrow()
   })
-  
+
 })

@@ -110,6 +110,20 @@ export function *forEachObject<T>(obj: Map<string, T> | { [key: string]: T}):
 }
 
 /**
+ * Returns the number of entries in a map or object.
+ * 
+ * @param obj - map or object
+ */
+export function objectLength(obj: Map<string, any> | { [key: string]: any}): 
+  number {
+  if (isMap(obj)) {
+    return obj.size
+  } else {
+    return Object.keys(obj).length
+  }
+}
+
+/**
  * Gets the value of a key from a map or object.
  * 
  * @param obj - map or object

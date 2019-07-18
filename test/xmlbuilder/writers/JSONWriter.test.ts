@@ -58,22 +58,59 @@ describe('JSONWriter', () => {
       `)
   })
 
+  test('offset', () => {
+    const obj = {
+      ele: "simple element",
+      person: {
+        name: "John",
+        '@age': 35,
+      }
+    }
+
+    expect($$.xml().create('root').ele(obj).root().
+      toString({ format: "json", prettyPrint: true, offset: 2 })).toBe(
+      '    {\n' +
+      '      "root": {\n' +
+      '        "ele": "simple element",\n' +
+      '        "person": {\n' +
+      '          "@age": "35",\n' +
+      '          "name": "John"\n' +
+      '        }\n' +
+      '      }\n' +
+      '    }'
+      )
+  })
+
+  test('negative offset', () => {
+    const obj = {
+      ele: "simple element",
+      person: {
+        name: "John",
+        '@age': 35,
+      }
+    }
+
+    expect($$.xml().create('root').ele(obj).root().
+      toString({ format: "json", prettyPrint: true, offset: -4 })).toBe(
+      '{\n' +
+      '"root": {\n' +
+      '"ele": "simple element",\n' +
+      '"person": {\n' +
+      '"@age": "35",\n' +
+      '"name": "John"\n' +
+      '}\n' +
+      '}\n' +
+      '}'
+      )
+  })
+
   test('duplicate tag names', () => {
     const result = $$.xml().create('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
-      .end({ format: "object" })
+      .end({ format: "json" })
 
-    expect($$.printMap(result)).toBe($$.t`
-      {
-        people: {
-          person: [
-            { @name: xxx },
-            { @name: yyy }
-          ]
-        }
-      }
-      `)
+    expect(result).toBe('{"people":{"person":[{"@name":"xxx"},{"@name":"yyy"}]}}')
   })
 
   test('mixed content', () => {
@@ -81,17 +118,9 @@ describe('JSONWriter', () => {
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
-      .end({ format: "object" })
+      .end({ format: "json" })
 
-    expect($$.printMap(result)).toBe($$.t`
-      {
-        people: {
-          #1: hello,
-          person: { @name: xxx },
-          #2: world
-        }
-      }
-      `)
+    expect(result).toBe('{"people":{"#1":"hello","person":{"@name":"xxx"},"#2":"world"}}')
   })
 
   test('mixed content and duplicate tags', () => {
@@ -100,17 +129,17 @@ describe('JSONWriter', () => {
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .txt('world')
-      .end({ format: "object" })
+      .end({ format: "json", prettyPrint: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    expect(result).toBe($$.t`
       {
-        people: {
-          #1: hello,
-          person: [
-            { @name: xxx },
-            { @name: yyy }
+        "people": {
+          "#1": "hello",
+          "person": [
+            { "@name": "xxx" },
+            { "@name": "yyy" }
           ],
-          #2: world
+          "#2": "world"
         }
       }
       `)
@@ -122,17 +151,17 @@ describe('JSONWriter', () => {
       .ele('person', { name: "xxx" }).up()
       .txt('world')
       .ele('person', { name: "yyy" }).up()
-      .end({ format: "object" })
+      .end({ format: "json", prettyPrint: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
-        people: {
-          #1: hello,
-          person: [
-            { @name: xxx },
-            { @name: yyy }
+        "people": {
+          "#1": "hello",
+          "person": [
+            { "@name": "xxx" },
+            { "@name": "yyy" }
           ],
-          #2: world
+          "#2": "world"
         }
       }
       `)
@@ -140,11 +169,9 @@ describe('JSONWriter', () => {
 
   test('doctype', () => {
     const result = $$.xml({ docType: { pubID: "pub", sysID: "sys" } })
-      .create('root').end({ format: "object" })
+      .create('root').end({ format: "json" })
 
-    expect($$.printMap(result)).toBe($$.t`
-      { root: { } }
-      `)
+    expect(result).toBe('{"root":{}}')
   })
 
   test('namespaces', () => {
@@ -152,14 +179,14 @@ describe('JSONWriter', () => {
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
-      .end({ format: "object" })
+      .end({ format: "json", prettyPrint: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    expect(result).toBe($$.t`
       {
-        root: {
-          @xmlns: myns,
-          foo: { },
-          bar: { @xmlns:  }
+        "root": {
+          "@xmlns": "myns",
+          "foo": { },
+          "bar": { "@xmlns": "" }
         }
       }
       `)
@@ -168,7 +195,7 @@ describe('JSONWriter', () => {
   test('unknown node', () => {
     const ele = $$.xml().create('root').ele('alien')
     Object.defineProperty(ele, "nodeType", { value: 1001, writable: false })
-    expect(() => ele.end({ format: "object" })).toThrow()
+    expect(() => ele.end({ format: "json" })).toThrow()
   })
   
 })
