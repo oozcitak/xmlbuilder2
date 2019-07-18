@@ -809,7 +809,7 @@ export interface Document extends Node, NonElementParentNode,
   /**
    * Creates a new Range object.
    */
-  createRange(): never
+  createRange(): Range
 
   /**
    * Creates a new `NodeIterator` object.
@@ -1836,8 +1836,23 @@ export interface Range extends AbstractRange {
   /**
    * Compares the boundary points of this range with another one.
    * 
-   * @param how - comparison method
+   * @param how - comparison method:
+   * * `EndToEnd` - compares the end boundary-point of `sourceRange` to the end
+   * boundary-point of this range.
+   * * `EndToStart` - compares the end boundary-point of `sourceRange` to the
+   * start boundary-point of this range.
+   * * `StartToEnd` - compares the start boundary-point of `sourceRange` to the
+   * end boundary-point of this range.
+   * * `StartToStart` - compares the start boundary-point of `sourceRange` to
+   * the start boundary-point of this range.
    * @param sourceRange - the range to compare to
+   * 
+   * @returns a number depending on boundaries of ranges relative to each other:
+   * * `-1` if the corresponding boundary point of this is range comes before
+   * that of `sourceRange`
+   * * `1` if the corresponding boundary point of this is range comes after
+   * that of `sourceRange`
+   * * `0` if corresponding boundary points of both ranges are equal
    */
   compareBoundaryPoints(how: HowToCompare, sourceRange: Range): number
 
@@ -1904,6 +1919,15 @@ export interface Range extends AbstractRange {
    * @param node - the node to check
    */
   intersectsNode(node: Node): boolean
+}
+
+/**
+ * Defines the position of a boundary point relative to another.
+ */
+export enum BoundaryPosition {
+  Before,
+  Equal,
+  After
 }
 
 /**

@@ -243,7 +243,6 @@ describe('Document', function () {
 
   test('Unsupported Methods', function () {
     expect(() => { doc.createEvent('mouseevent') }).toThrow()
-    expect(() => { doc.createRange() }).toThrow()
   })
 
   test('createNodeIterator()', function () {

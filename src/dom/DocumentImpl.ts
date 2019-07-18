@@ -2,7 +2,7 @@ import {
   Document, DOMImplementation, DocumentType, Element, Text,
   NodeFilter, NodeType, Node, HTMLCollection, DocumentFragment,
   NodeList, WhatToShow, Attr, ProcessingInstruction, Comment,
-  CDATASection, NodeIterator, TreeWalker, FilterResult
+  CDATASection, NodeIterator, TreeWalker, FilterResult, Range
 } from './interfaces'
 import { NodeImpl } from './NodeImpl'
 import { DOMException } from './DOMException'
@@ -20,6 +20,7 @@ import { TreeQuery } from './util/TreeQuery'
 import { TreeMutation } from './util/TreeMutation'
 import { NodeIteratorImpl } from './NodeIteratorImpl'
 import { TreeWalkerImpl } from './TreeWalkerImpl'
+import { RangeImpl } from './RangeImpl'
 
 /**
  * Represents a document node.
@@ -365,12 +366,9 @@ export class DocumentImpl extends NodeImpl implements Document {
 
   /**
    * Creates a new Range object.
-   * 
-   * This method is not supported by this module and will throw an
-   * exception.
    */
-  createRange(): never {
-    throw DOMException.NotSupportedError
+  createRange(): Range {
+    return new RangeImpl([this, 0], [this, 0])
   }
 
   /**

@@ -365,6 +365,29 @@ export class TreeQuery {
   }
 
   /**
+   * Determines whether `other` is a child node of `node`.
+   * 
+   * @param node - a node
+   * @param other - the node to check
+   */
+  static isChildOf(node: Node, other: Node): boolean {
+    if (node.parentNode === null || other.parentNode === null) {
+      return false
+    }
+
+    if (node.parentNode !== other.parentNode) {
+      return false
+    }
+
+    for (const child of node.childNodes) {
+      if (child === other)
+        return true
+    }
+
+    return false
+  }
+
+  /**
    * Returns the first child node of `node` or null if it has no
    * children.
    * 
@@ -402,4 +425,22 @@ export class TreeQuery {
 
     return -1
   }
+
+  /**
+   * Determines the index of`node`. The index of an object is its number of 
+   * preceding siblings, or 0 if it has none.
+   * 
+   * @param node - a node
+   * @param other - the node to check
+   */
+  static index(node: Node): number {
+    let n = 0
+
+    while (node.previousSibling !== null) {
+      n++
+      node = node.previousSibling
+    }
+
+    return n
+  }  
 }

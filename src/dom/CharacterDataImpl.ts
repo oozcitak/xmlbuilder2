@@ -1,5 +1,7 @@
 import { CharacterData, Document, Element, Node } from "./interfaces"
 import { NodeImpl } from "./NodeImpl"
+import { CharacterDataUtility } from "./util/CharacterDataUtility";
+import { TreeQuery } from "./util/TreeQuery";
 
 /**
  * Represents a generic text node.
@@ -49,7 +51,9 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * Gets or sets the text data of the node. 
    */
   get data(): string { return this._data }
-  set data(value: string) { this._data = value }
+  set data(value: string) {
+    CharacterDataUtility.replaceData(this, 0, this._data.length, value)
+  }
 
   /** 
    * Returns the number of code units in {@link data}.
@@ -62,7 +66,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param data - the string of text to add to node data
    */
   appendData(data: string): void {
-    this.data += data
+    CharacterDataUtility.replaceData(this, this._data.length, 0, data)
   }
 
   /**
@@ -73,10 +77,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param data - the string of text to add to node data
    */
   insertData(offset: number, data: string): void {
-    this.data =
-      this.data.slice(0, offset) +
-      data +
-      this.data.slice(offset)
+    CharacterDataUtility.replaceData(this, offset, 0, data)
   }
 
   /**
@@ -87,9 +88,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param count - the number of characters to delete
    */
   deleteData(offset: number, count: number): void {
-    this.data =
-      this.data.slice(0, offset) +
-      this.data.slice(offset + count)
+    CharacterDataUtility.replaceData(this, offset, count, '')
   }
 
   /**
@@ -101,10 +100,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param data - the string of text to add to node data
    */
   replaceData(offset: number, count: number, data: string): void {
-    this.data =
-      this.data.slice(0, offset) +
-      data +
-      this.data.slice(offset + count)
+    CharacterDataUtility.replaceData(this, offset, count, data)
   }
 
   /**
@@ -115,7 +111,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param count - the number of characters to return
    */
   substringData(offset: number, count: number): string {
-    return this.data.substr(offset, count)
+    return CharacterDataUtility.substringData(this, offset, count)
   }
 
   // MIXIN: NonDocumentTypeChildNode
