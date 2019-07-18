@@ -131,7 +131,7 @@ export class PreSerializer {
    */
   private _serializeElement(node: Element, namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean, level: number = 0): PreSerializedNode<Element> {
+    requireWellFormed: boolean, level: number): PreSerializedNode<Element> {
 
     const attributes: PreSerializedAttr[] = []
     const children: PreSerializedNode<Node>[] = []
@@ -441,7 +441,7 @@ export class PreSerializer {
    */
   private _serializeDocument(node: Document, namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean, level: number = 0): PreSerializedNode<Document> {
+    requireWellFormed: boolean, level: number): PreSerializedNode<Document> {
 
     /**
      * If the require well-formed flag is set (its value is true), and this node
@@ -491,7 +491,7 @@ export class PreSerializer {
    */
   private _serializeComment(node: Comment, namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean, level: number = 0): PreSerializedNode<Comment> {
+    requireWellFormed: boolean, level: number): PreSerializedNode<Comment> {
 
     /**
      * If the require well-formed flag is set (its value is true), and node's 
@@ -528,7 +528,7 @@ export class PreSerializer {
    */
   private _serializeText(node: Text, namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean, level: number = 0): PreSerializedNode<Text> {
+    requireWellFormed: boolean, level: number): PreSerializedNode<Text> {
 
     /**
      * 1. If the require well-formed flag is set (its value is true), and 
@@ -568,7 +568,7 @@ export class PreSerializer {
   private _serializeDocumentFragment(node: DocumentFragment,
     namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean, level: number = 0): PreSerializedNode<DocumentFragment> {
+    requireWellFormed: boolean, level: number): PreSerializedNode<DocumentFragment> {
 
     /**
      * 1. Let markup the empty string.
@@ -602,7 +602,7 @@ export class PreSerializer {
    */
   private _serializeDocumentType(node: DocumentType, namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean, level: number = 0): PreSerializedNode<DocumentType> {
+    requireWellFormed: boolean, level: number): PreSerializedNode<DocumentType> {
 
     /**
      * 1. If the require well-formed flag is true and the node's publicId 
@@ -676,7 +676,7 @@ export class PreSerializer {
   private _serializeProcessingInstruction(node: ProcessingInstruction,
     namespace: string | null, prefixMap: NamespacePrefixMap,
     prefixIndex: PrefixIndex, requireWellFormed: boolean,
-    level: number = 0): PreSerializedNode<ProcessingInstruction> {
+    level: number): PreSerializedNode<ProcessingInstruction> {
 
     /**
      * 1. If the require well-formed flag is set (its value is true), and node's
@@ -729,7 +729,7 @@ export class PreSerializer {
    */
   private _serializeCData(node: CDATASection, namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean, level: number = 0): PreSerializedNode<CDATASection> {
+    requireWellFormed: boolean, level: number): PreSerializedNode<CDATASection> {
 
     if (requireWellFormed && (node.data.includes("]]>"))) {
       throw new Error("CDATA contains invalid characters (well-formed required).")
