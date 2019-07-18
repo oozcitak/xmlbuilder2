@@ -26,7 +26,7 @@ export class PreSerializer {
    * 
    * @param xmlVersion - XML specification version
    */
-  constructor(xmlVersion: "1.0" | "1.1" = "1.0") {
+  constructor(xmlVersion: "1.0" | "1.1") {
     this._xmlVersion = xmlVersion
   }
 
