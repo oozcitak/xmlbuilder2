@@ -54,14 +54,7 @@ export class JSONWriterImpl {
     const mapWriter = new MapWriterImpl(this._builderOptions)
     const obj = mapWriter.serialize(node, writerOptions)
 
-    let markup = this._beginLine(options, 0) + this._serializeObject(obj, options)
-
-    // remove trailing newline
-    if (options.prettyPrint && markup.slice(-options.newline.length) === options.newline) {
-      markup = markup.slice(0, -options.newline.length)
-    }
-
-    return markup
+    return this._beginLine(options, 0) + this._serializeObject(obj, options)
   }
 
   /**
@@ -81,20 +74,13 @@ export class JSONWriterImpl {
       const len = obj.length
       let i = 0
       for (const val of obj) {
-        if (isLeaf && options.prettyPrint) {
-          markup += ' '
-        } else {
-          markup += this._endLine(options, level + 1) + this._beginLine(options, level + 1)
-        }
-        markup += this._serializeObject(val, options, level + 1)
+        markup += this._endLine(options, level + 1) + 
+          this._beginLine(options, level + 1) +
+          this._serializeObject(val, options, level + 1)
         if (i < len - 1) { markup += ',' }
         i++
       }
-      if (isLeaf && options.prettyPrint) {
-        markup += ' '
-      } else {
-        markup += this._endLine(options, level) + this._beginLine(options, level)
-      }
+      markup += this._endLine(options, level) + this._beginLine(options, level)
       markup += ']'
     } else if (isMap(obj) || isObject(obj)) {
       markup += '{'

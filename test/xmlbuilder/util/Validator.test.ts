@@ -11,6 +11,7 @@ describe('Validator', () => {
       text: (val: string) => '#' + val + '#',
       cdata: (val: string) => '$' + val + '$',
       comment: (val: string) => '!' + val + '!',
+      raw: (val: string) => '&' + val + '&',
       attValue: (val: string) => '@' + val + '@',
       insTarget: (val: string) => '?' + val + '?',
       insValue: (val: string) => '??' + val + '??',
@@ -23,6 +24,7 @@ describe('Validator', () => {
     expect(validate.text('val')).toBe('#val#')
     expect(validate.cdata('val')).toBe('$val$')
     expect(validate.comment('val')).toBe('!val!')
+    expect(validate.raw('val')).toBe('&val&')
     expect(validate.attValue('val')).toBe('@val@')
     expect(validate.insTarget('val')).toBe('?val?')
     expect(validate.insValue('val')).toBe('??val??')
