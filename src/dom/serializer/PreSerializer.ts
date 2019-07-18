@@ -143,6 +143,13 @@ export class PreSerializer {
      * node's localName attribute contains the character ":" (U+003A COLON) or 
      * does not match the XML Name production, then throw an exception; the 
      * serialization of this node would not be a well-formed element.
+     */
+    if (requireWellFormed && (node.localName.includes(":") ||
+      !XMLSpec.isName(node.localName))) {
+      throw new Error("Node local name contains invalid characters (well-formed required).")
+    }
+
+    /**
      * 2. Let markup be the string "<" (U+003C LESS-THAN SIGN).
      * 3. Let qualified name be an empty string.
      * 4. Let skip end tag be a boolean flag with value false.
@@ -223,6 +230,12 @@ export class PreSerializer {
          * 12.3.1. If the require well-formed flag is set, then throw an error.
          * An Element with prefix "xmlns" will not legally round-trip in a 
          * conforming XML parser.
+         */
+        if (requireWellFormed) {
+          throw new Error("An element cannot have the 'xmlns' prefix (well-formed required).")
+        }
+
+        /**
          * 12.3.2. Let candidate prefix be the value of prefix.
          */
         candidatePrefix = prefix
@@ -884,7 +897,7 @@ export class PreSerializer {
            * all attributes with namespaces.
            */
         } else if (candidatePrefix === null) {
-          if (attr.prefix !== null && 
+          if (attr.prefix !== null &&
             (!map.hasPrefix(attr.prefix) ||
               map.has(attr.prefix, attributeNamespace))) {
             /**
@@ -920,12 +933,27 @@ export class PreSerializer {
        * 3.6. Append a " " (U+0020 SPACE) to result.
        * 3.7. If candidate prefix is not null, then append to result the 
        * concatenation of candidate prefix with ":" (U+003A COLON).
+       */
+      let attrName = ''
+      if (candidatePrefix !== null) {
+        attrName = candidatePrefix + ':'
+      }
+
+      /**
        * 3.8. If the require well-formed flag is set (its value is true), and 
        * this attr's localName attribute contains the character 
        * ":" (U+003A COLON) or does not match the XML Name production or 
        * equals "xmlns" and attribute namespace is null, then throw an 
        * exception; the serialization of this attr would not be a 
        * well-formed attribute.
+       */
+      if (requireWellFormed && (attr.localName.includes(":") ||
+        !XMLSpec.isName(attr.localName) || 
+        (attr.localName === "xmlns" && attributeNamespace === null))) {
+        throw new Error("Attribute local name contains invalid characters (well-formed required).")
+      }
+
+      /**
        * 3.9. Append the following strings to result, in the order listed:
        * 3.9.1. The value of attr's localName;
        * 3.9.2. "="" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
@@ -933,10 +961,6 @@ export class PreSerializer {
        * attribute and the require well-formed flag as input;
        * 3.9.4. """ (U+0022 QUOTATION MARK).
        */
-      let attrName = ''
-      if (candidatePrefix !== null) {
-        attrName = candidatePrefix + ':'
-      }
       attrName += attr.localName
       result.push({ attr: attr, name: attrName, value: attr.value })
     }
