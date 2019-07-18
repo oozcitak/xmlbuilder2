@@ -60,10 +60,8 @@ export class NamespacePrefixMap {
      * there exists a key in map that matches the value of ns or if there is no 
      * such key, then stop running these steps, and return the null value.
      */
-    let candidatesList: Array<string>
-    if (this._items.has(ns)) {
-      candidatesList = this._items.get(ns) || []
-    } else {
+    const candidatesList = this._items.get(ns) || null
+    if (candidatesList === null) {
       return null
     }
     /**
@@ -72,23 +70,22 @@ export class NamespacePrefixMap {
      * 
      * _Note:_ There will always be at least one prefix value in the list.
      */
-    let i = 0
-    const len = candidatesList.length
-    for (const prefix of candidatesList) {
+    let prefix: string | null = null
+    for (prefix of candidatesList) {
       /**
        * 2.1. If prefix matches preferred prefix, then stop running these steps
        * and return prefix.
-       * 2.2. If prefix is the last item in the candidates list, then stop
-       * running these steps and return prefix.
        */
-      if (prefix === preferredPrefix || i === len - 1) {
+      if (prefix === preferredPrefix) {
         return prefix
       }
-
-      i++
     }
 
-    return null
+    /**
+    * 2.2. If prefix is the last item in the candidates list, then stop
+    * running these steps and return prefix.
+    */
+    return prefix
   }
 
   /**
@@ -104,10 +101,8 @@ export class NamespacePrefixMap {
      * there exists a key in map that matches the value of ns or if there is
      * no such key, then stop running these steps, and return false.
      */
-    let candidatesList: Array<string>
-    if (this._items.has(ns)) {
-      candidatesList = this._items.get(ns) || []
-    } else {
+    const candidatesList = this._items.get(ns) || null
+    if (candidatesList === null) {
       return false
     }
     /**
@@ -144,10 +139,7 @@ export class NamespacePrefixMap {
      * there exists a key in map that matches the value of ns or if there is
      * no such key, then let candidates list be null.
      */
-    let candidatesList: Array<string> | null = null
-    if (this._items.has(ns)) {
-      candidatesList = this._items.get(ns) || null
-    }
+    const candidatesList = this._items.get(ns) || null
 
     /**
      * 2. If candidates list is null, then create a new list with prefix as the 
@@ -161,8 +153,7 @@ export class NamespacePrefixMap {
      * (and that's OK).
      */
     if (candidatesList === null) {
-      candidatesList = [prefix]
-      this._items.set(ns, candidatesList)
+      this._items.set(ns, [prefix])
     } else {
       candidatesList.push(prefix)
     }
