@@ -19,6 +19,7 @@ import { Node as NodeImpl } from '../../src/dom'
 import { NodeList as NodeListImpl } from '../../src/dom'
 import { ProcessingInstruction as ProcessingInstructionImpl } from '../../src/dom'
 import { ShadowRoot as ShadowRootImpl } from '../../src/dom'
+import { StaticRange as StaticRangeImpl } from '../../src/dom'
 import { Text as TextImpl } from '../../src/dom'
 import { XMLDocument as XMLDocumentImpl } from '../../src/dom'
 import { DOMImplementationInstance } from '../../src/dom'
@@ -45,6 +46,7 @@ export default class TestHelpers extends TestHelpersRoot {
   static NodeList = NodeListImpl
   static ProcessingInstruction = ProcessingInstructionImpl
   static ShadowRoot = ShadowRootImpl
+  static StaticRange = StaticRangeImpl
   static Text = TextImpl
   static XMLDocument = XMLDocumentImpl
 

@@ -27,8 +27,10 @@ import { NonDocumentTypeChildNodeImpl } from './NonDocumentTypeChildNodeImpl'
 import { NonElementParentNodeImpl } from './NonElementParentNodeImpl'
 import { ParentNodeImpl } from './ParentNodeImpl'
 import { ProcessingInstructionImpl } from './ProcessingInstructionImpl'
+import { RangeImpl } from './RangeImpl'
 import { ShadowRootImpl } from './ShadowRootImpl'
 import { SlotableImpl } from './SlotableImpl'
+import { StaticRangeImpl } from './StaticRangeImpl'
 import { TextImpl } from './TextImpl'
 import { XMLDocumentImpl } from './XMLDocumentImpl'
 
@@ -76,7 +78,9 @@ export { NodeFilterImpl as NodeFilter }
 export { NodeImpl as Node }
 export { NodeListImpl as NodeList }
 export { ProcessingInstructionImpl as ProcessingInstruction }
+export { RangeImpl as Range }
 export { ShadowRootImpl as ShadowRoot }
+export { StaticRangeImpl as StaticRange }
 export { TextImpl as Text }
 export { XMLDocumentImpl as XMLDocument }
 export { DOMImplementationInstance }
