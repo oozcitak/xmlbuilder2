@@ -235,10 +235,7 @@ export class TreeMutation {
       nodes.push(node)
     }
 
-    /**
-     * TODO: If node is a DocumentFragment node, then queue a tree 
-     * mutation record for node with [ ], nodes, null, and null.
-     */
+    TreeMutation.queueTreeMutationRecord(node, [], nodes, null, null)
 
     const previousSibling = (child ? child.previousSibling : parent.lastChild)
 
@@ -281,11 +278,7 @@ export class TreeMutation {
        */
     }
 
-    /**
-     * TODO: If suppress observers flag is unset, then queue a tree 
-     * mutation record for parent with nodes, [ ], previousSibling,
-     * and child.
-     */
+    TreeMutation.queueTreeMutationRecord(parent, nodes, [], previousSibling, child)
   }
 
   /**
@@ -423,8 +416,7 @@ export class TreeMutation {
 
     TreeMutation.insertNode(node, parent, referenceChild, true)
 
-    // TODO: Queue a tree mutation record for parent with 
-    // nodes, removedNodes, previousSibling, and reference child.
+    TreeMutation.queueTreeMutationRecord(parent, nodes, removedNodes, previousSibling, referenceChild)
 
     return child
   }
@@ -465,8 +457,7 @@ export class TreeMutation {
       TreeMutation.insertNode(node, parent, null, true)
     }
 
-    // TODO: Queue a tree mutation record for parent with
-    // addedNodes, removedNodes, null, and null.
+    TreeMutation.queueTreeMutationRecord(parent, addedNodes, removedNodes, null, null)
   }
 
   /**
@@ -565,14 +556,65 @@ export class TreeMutation {
      * observer is registered's observer, options is registered's 
      * options, and source is registered to node's registered
      * observer list.
-     * 
-     * If suppress observers flag is unset, then queue a tree 
-     * mutation record for parent with 
-     * [ ], [ node ], oldPreviousSibling, and oldNextSibling.
      */
+
+    TreeMutation.queueTreeMutationRecord(parent, [], [node], oldPreviousSibling, oldNextSibling)
 
     if (TextUtility.isTextNode(node)) {
       TextUtility.childTextContentChanged(parent)
     }
   }
+
+  /**
+   * Queues a mutation record of the given type for target.
+   * 
+   * @param type - mutation record type
+   * @param target - target node
+   * @param name - name before mutation
+   * @param namespace - namespace before mutation
+   * @param oldValue - attribute value before mutation
+   * @param addedNodes - a list od added nodes
+   * @param removedNodes - a list of removed nodes
+   * @param previousSibling - previous sibling of target before mutation
+   * @param nextSibling - next sibling of target before mutation
+   */
+  static queueMutationRecord(type: string, target: Node, name: string | null,
+    namespace: string | null, oldValue: string | null,
+    addedNodes: Node[], removedNodes: Node[],
+    previousSibling: Node | null, nextSibling: Node | null): void {
+    // TODO: Implement queueMutationRecord
+  }
+
+  /**
+   * Queues a tree mutation record for target.
+   * 
+   * @param target - target node
+   * @param addedNodes - a list od added nodes
+   * @param removedNodes - a list of removed nodes
+   * @param previousSibling - previous sibling of target before mutation
+   * @param nextSibling - next sibling of target before mutation
+   */
+  static queueTreeMutationRecord(target: Node,
+    addedNodes: Node[], removedNodes: Node[],
+    previousSibling: Node | null, nextSibling: Node | null): void {
+
+    TreeMutation.queueMutationRecord("childList", target, null, null, null,
+      addedNodes, removedNodes, previousSibling, nextSibling)
+  }
+
+  /**
+   * Queues an attribute mutation record for target.
+   * 
+   * @param target - target node
+   * @param name - name before mutation
+   * @param namespace - namespace before mutation
+   * @param oldValue - attribute value before mutation
+   */
+  static queueAttributeMutationRecord(target: Node, name: string | null,
+    namespace: string | null, oldValue: string | null): void {
+
+    TreeMutation.queueMutationRecord("attributes", target, name, namespace,
+      oldValue, [], [], null, null)
+  }
+
 }

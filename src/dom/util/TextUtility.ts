@@ -27,10 +27,8 @@ export class TextUtility {
       count = length - offset
     }
 
-    /**
-     * TODO: Queue a mutation record of "characterData" for node with 
-     * null, null, node's data, « », « », null, and null.
-     */
+    TreeMutation.queueMutationRecord("characterData", node, null, null,
+      node.data, [], [], null, null)
 
     const newData = node.data.substring(0, offset) + data + node.data.substring(offset + count)
     const nodeAsAny = <any><unknown>node
@@ -197,6 +195,6 @@ export class TextUtility {
    * @param node - a parent node whose child text nodes were changed
    */
   static childTextContentChanged(node: Node): void {
-    
+
   }
 }
