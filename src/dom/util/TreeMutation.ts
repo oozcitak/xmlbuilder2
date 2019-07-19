@@ -193,8 +193,11 @@ export class TreeMutation {
    * @param node - node to insert
    * @param parent - parent node to receive node
    * @param child - child node to insert node before
+   * @param suppressObservers - whether to notify observers
    */
-  static insertNode(node: Node, parent: Node, child: Node | null): void {
+  static insertNode(node: Node, parent: Node, child: Node | null,
+    suppressObservers?: boolean): void {
+
     const count = (node.nodeType === NodeType.DocumentFragment ?
       node.childNodes.length : 1)
 
@@ -225,7 +228,9 @@ export class TreeMutation {
         nodes.push(childNode)
       }
       // remove child nodes
-      (<any>node)._firstChild = null
+      while (node.firstChild) {
+        TreeMutation.removeNode(node.firstChild, node, true)
+      }
     } else {
       nodes.push(node)
     }
@@ -246,11 +251,17 @@ export class TreeMutation {
       /**
        * TODO: If parent is a shadow host and node is a slotable, then 
        * assign a slot for node.
-       * 
+       */
+
+      /**
        * If node is a Text node, run the child text content change 
        * steps for parent.
-       * 
-       * If parent's root is a shadow root, and parent is a slot 
+       */
+      if (TextUtility.isTextNode(node)) {
+        TextUtility.childTextContentChanged(parent)
+      }
+      /**
+       * TODO: If parent's root is a shadow root, and parent is a slot 
        * whose assigned nodes is the empty list, then run signal
        * a slot change for parent.
        * 
@@ -398,9 +409,7 @@ export class TreeMutation {
 
     if (child.parentNode) {
       removedNodes.push(child)
-      // TODO: Remove child from its parent with the suppress 
-      // observers flag set.
-      TreeMutation.removeNode(child, parent)
+      TreeMutation.removeNode(child, parent, true)
     }
 
     const nodes: Node[] = []
@@ -412,9 +421,7 @@ export class TreeMutation {
       nodes.push(node)
     }
 
-    // TODO: Insert node into parent before reference child with
-    // the suppress observers flag set.
-    TreeMutation.insertNode(node, parent, referenceChild)
+    TreeMutation.insertNode(node, parent, referenceChild, true)
 
     // TODO: Queue a tree mutation record for parent with 
     // nodes, removedNodes, previousSibling, and reference child.
@@ -451,15 +458,11 @@ export class TreeMutation {
     }
 
     for (const childNode of removedNodes) {
-      // TODO: Remove all parent's children, in tree order, 
-      // with the suppress observers flag set.
-      TreeMutation.removeNode(childNode, parent)
+      TreeMutation.removeNode(childNode, parent, true)
     }
 
     if (node) {
-      // TODO: If node is not null, then insert node into parent
-      // before null with the suppress observers flag set.
-      TreeMutation.insertNode(node, parent, null)
+      TreeMutation.insertNode(node, parent, null, true)
     }
 
     // TODO: Queue a tree mutation record for parent with
@@ -487,8 +490,9 @@ export class TreeMutation {
    * 
    * @param node - node to remove
    * @param parent - parent node
+   * @param suppressObservers - whether to notify observers
    */
-  static removeNode(node: Node, parent: Node): void {
+  static removeNode(node: Node, parent: Node, suppressObservers?: boolean): void {
     /**
      * For each live range whose start node is an inclusive
      * descendant of node, set its start to (parent, index).
@@ -517,7 +521,7 @@ export class TreeMutation {
       if (range._end[0] === parent && range._end[1] > index) {
         range._end[1]--
       }
-    }    
+    }
     /**
      * TODO: For each NodeIterator object iterator whose root's node 
      * document is node's node document, run the NodeIterator 
@@ -566,7 +570,7 @@ export class TreeMutation {
      * mutation record for parent with 
      * [ ], [ node ], oldPreviousSibling, and oldNextSibling.
      */
-    
+
     if (TextUtility.isTextNode(node)) {
       TextUtility.childTextContentChanged(parent)
     }

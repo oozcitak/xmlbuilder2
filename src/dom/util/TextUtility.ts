@@ -70,7 +70,7 @@ export class TextUtility {
     }
 
     /**
-     * TODO: If node is a Text node and its parent is not null, run the child
+     * If node is a Text node and its parent is not null, run the child
      * text content change steps for node's parent.
      */
     if (TextUtility.isTextNode(node) && node.parentNode !== null) {

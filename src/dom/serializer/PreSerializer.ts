@@ -904,7 +904,7 @@ export class PreSerializer {
              * Check if we can use the attribute's own prefix.  
              * We deviate from the spec here.
              * TODO: This is not an efficient way of searching for prefixes.
-             * Check developments to the spec.
+             * Follow developments to the spec.
              */
             candidatePrefix = attr.prefix
           } else {
