@@ -41,8 +41,6 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
   _baseURI = ''
   protected _childNodes: NodeList
 
-  private static _compareCache = new Map<[Node | null, Node | null], boolean>()
-
   /**
    * Initializes a new instance of `Node`.
    *
@@ -285,25 +283,23 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
       }
     }
 
-    if (!node1 || !node2 || (node1.getRootNode() !== node2.getRootNode())) {
-      // nodes are null or disconnected
-      // return a random result but cache the value for consistency
-      let cached1 = NodeImpl._compareCache.get([node1, node2])
-      let cached2 = NodeImpl._compareCache.get([node2, node1])
-      if (cached1 === undefined && cached2 === undefined) {
-        const value = Math.random() > 0.5
-        NodeImpl._compareCache.set([node1, node2], value)
-        cached1 = value
-        cached2 = !value
-      }
+    // nodes are null
+    if (node1 === null && node2 === null) {
+      return Position.Disconnected | Position.ImplementationSpecific |
+        Position.Preceding
+    } else if (node1 === null) {
+      return Position.Disconnected | Position.ImplementationSpecific |
+        Position.Preceding
+    } else if (node2 === null) {
+      return Position.Disconnected | Position.ImplementationSpecific |
+        Position.Following
+    }
 
-      if (cached1) {
-        return Position.Disconnected | Position.ImplementationSpecific |
-          Position.Preceding
-      } else {
-        return Position.Disconnected | Position.ImplementationSpecific |
-          Position.Following
-      }
+    if (node1.getRootNode() !== node2.getRootNode()) {
+      // TODO: nodes are disconnected
+      // return a random result but cache the value for consistency
+      return Position.Disconnected | Position.ImplementationSpecific |
+        Position.Preceding
     }
 
     if ((!attr1 && TreeQuery.isAncestorOf(node2, node1)) ||
