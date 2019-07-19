@@ -1,7 +1,6 @@
 import { CharacterData, Document, Element, Node } from "./interfaces"
 import { NodeImpl } from "./NodeImpl"
-import { CharacterDataUtility } from "./util/CharacterDataUtility";
-import { TreeQuery } from "./util/TreeQuery";
+import { TextUtility } from "./util/TextUtility"
 
 /**
  * Represents a generic text node.
@@ -52,7 +51,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    */
   get data(): string { return this._data }
   set data(value: string) {
-    CharacterDataUtility.replaceData(this, 0, this._data.length, value)
+    TextUtility.replaceData(this, 0, this._data.length, value)
   }
 
   /** 
@@ -66,7 +65,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param data - the string of text to add to node data
    */
   appendData(data: string): void {
-    CharacterDataUtility.replaceData(this, this._data.length, 0, data)
+    TextUtility.replaceData(this, this._data.length, 0, data)
   }
 
   /**
@@ -77,7 +76,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param data - the string of text to add to node data
    */
   insertData(offset: number, data: string): void {
-    CharacterDataUtility.replaceData(this, offset, 0, data)
+    TextUtility.replaceData(this, offset, 0, data)
   }
 
   /**
@@ -88,7 +87,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param count - the number of characters to delete
    */
   deleteData(offset: number, count: number): void {
-    CharacterDataUtility.replaceData(this, offset, count, '')
+    TextUtility.replaceData(this, offset, count, '')
   }
 
   /**
@@ -100,7 +99,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param data - the string of text to add to node data
    */
   replaceData(offset: number, count: number, data: string): void {
-    CharacterDataUtility.replaceData(this, offset, count, data)
+    TextUtility.replaceData(this, offset, count, data)
   }
 
   /**
@@ -111,7 +110,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
    * @param count - the number of characters to return
    */
   substringData(offset: number, count: number): string {
-    return CharacterDataUtility.substringData(this, offset, count)
+    return TextUtility.substringData(this, offset, count)
   }
 
   // MIXIN: NonDocumentTypeChildNode

@@ -1,7 +1,8 @@
-import { NodeType, Node, Document, Element } from "../interfaces"
+import { NodeType, Node, Document, Element, Range } from "../interfaces"
 import { DOMException } from "../DOMException"
 import { List } from "./List"
 import { TreeQuery } from "./TreeQuery"
+import { TextUtility } from "./TextUtility";
 
 /**
  * Contains tree mutation algorithms.
@@ -176,8 +177,7 @@ export class TreeMutation {
         }
 
         /**
-         * TODO:
-         * For each inclusiveDescendant in node's shadow - including 
+         * TODO: For each inclusiveDescendant in node's shadow - including 
          * inclusive descendants that is custom, enqueue a custom
          * element callback reaction with inclusiveDescendant, 
          * callback name "adoptedCallback", and an argument list 
@@ -198,16 +198,26 @@ export class TreeMutation {
     const count = (node.nodeType === NodeType.DocumentFragment ?
       node.childNodes.length : 1)
 
-    /**
-     * TODO:
-     * 1. If child is non-null, then:
-     *    For each live range whose start node is parent and start 
-     *    offset is greater than child's index, increase its start 
-     *    offset by count.
-     * 2. For each live range whose end node is parent and end 
-     *    offset is greater than child's index, increase its end 
-     *    offset by count.
-     */
+    if (child !== null && parent.ownerDocument !== null) {
+      /**
+       * 1. For each live range whose start node is parent and start 
+       * offset is greater than child's index, increase its start 
+       * offset by count.
+       * 2. For each live range whose end node is parent and end 
+       * offset is greater than child's index, increase its end 
+       * offset by count.
+       */
+      const docAsAny = <any><unknown>parent.ownerDocument
+      const index = TreeQuery.index(child)
+      for (const range of docAsAny._rangeList) {
+        if (range._start[0] === parent && range._start[1] > index) {
+          range._start[1] += count
+        }
+        if (range._end[0] === parent && range._end[1] > index) {
+          range._end[1] += count
+        }
+      }
+    }
 
     const nodes: Node[] = []
     if (node.nodeType === NodeType.DocumentFragment) {
@@ -221,8 +231,7 @@ export class TreeMutation {
     }
 
     /**
-     * TODO:
-     * If node is a DocumentFragment node, then queue a tree 
+     * TODO: If node is a DocumentFragment node, then queue a tree 
      * mutation record for node with [ ], nodes, null, and null.
      */
 
@@ -235,7 +244,7 @@ export class TreeMutation {
         List.insert(node, parent, child)
 
       /**
-       * If parent is a shadow host and node is a slotable, then 
+       * TODO: If parent is a shadow host and node is a slotable, then 
        * assign a slot for node.
        * 
        * If node is a Text node, run the child text content change 
@@ -262,8 +271,7 @@ export class TreeMutation {
     }
 
     /**
-     * TODO:
-     * If suppress observers flag is unset, then queue a tree 
+     * TODO: If suppress observers flag is unset, then queue a tree 
      * mutation record for parent with nodes, [ ], previousSibling,
      * and child.
      */
@@ -482,9 +490,6 @@ export class TreeMutation {
    */
   static removeNode(node: Node, parent: Node): void {
     /**
-     * TODO:
-     * Let index be node's index.
-     * 
      * For each live range whose start node is an inclusive
      * descendant of node, set its start to (parent, index).
      * 
@@ -496,21 +501,36 @@ export class TreeMutation {
      * 
      * For each live range whose end node is parent and end offset 
      * is greater than index, decrease its end offset by 1.
-     * 
-     * For each NodeIterator object iterator whose root's node 
+     */
+    const index = TreeQuery.index(node)
+    const docAsAny = <any><unknown>parent.ownerDocument
+    for (const range of docAsAny._rangeList) {
+      if (TreeQuery.isDescendantOf(node, range._start[0], true)) {
+        range._start = [parent, index]
+      }
+      if (TreeQuery.isDescendantOf(node, range._end[0], true)) {
+        range._end = [parent, index]
+      }
+      if (range._start[0] === parent && range._start[1] > index) {
+        range._start[1]--
+      }
+      if (range._end[0] === parent && range._end[1] > index) {
+        range._end[1]--
+      }
+    }    
+    /**
+     * TODO: For each NodeIterator object iterator whose root's node 
      * document is node's node document, run the NodeIterator 
      * pre-removing steps given node and iterator.
-     * 
-     * Let oldPreviousSibling be node's previous sibling.
-     * 
-     * Let oldNextSibling be node's next sibling.
      */
+
+    const oldPreviousSibling = node.previousSibling
+    const oldNextSibling = node.nextSibling
 
     List.remove(node, parent)
 
     /**
-     * TODO:
-     * If node is assigned, then run assign slotables for node's 
+     * TODO: If node is assigned, then run assign slotables for node's 
      * assigned slot.
      *
      * If parent's root is a shadow root, and parent is a slot whose
@@ -545,9 +565,10 @@ export class TreeMutation {
      * If suppress observers flag is unset, then queue a tree 
      * mutation record for parent with 
      * [ ], [ node ], oldPreviousSibling, and oldNextSibling.
-     * 
-     * If node is a Text node, then run the child text content 
-     * change steps for parent.
      */
+    
+    if (TextUtility.isTextNode(node)) {
+      TextUtility.childTextContentChanged(parent)
+    }
   }
 }

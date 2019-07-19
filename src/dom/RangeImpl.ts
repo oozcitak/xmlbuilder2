@@ -8,7 +8,7 @@ import { TreeMutation } from './util/TreeMutation'
 import { DOMException } from './DOMException'
 import { BoundaryPoint } from './util/BoundaryPoint'
 import { RangeQuery } from './util/RangeQuery'
-import { CharacterDataUtility } from './util/CharacterDataUtility'
+import { TextUtility } from './util/TextUtility'
 
 /**
  * Represents a live range.
@@ -170,8 +170,8 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
     const [originalEndNode, originalEndOffset] = this._end
 
     if (originalStartNode === originalEndNode &&
-      CharacterDataUtility.isCharacterDataNode(originalStartNode)) {
-      CharacterDataUtility.replaceData(originalStartNode,
+      TextUtility.isCharacterDataNode(originalStartNode)) {
+      TextUtility.replaceData(originalStartNode,
         originalStartOffset, originalEndOffset, '')
       return
     }
@@ -205,8 +205,8 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       newOffset = TreeQuery.index(referenceNode) + 1
     }
 
-    if (CharacterDataUtility.isCharacterDataNode(originalStartNode)) {
-      CharacterDataUtility.replaceData(originalStartNode,
+    if (TextUtility.isCharacterDataNode(originalStartNode)) {
+      TextUtility.replaceData(originalStartNode,
         originalStartOffset,
         TreeQuery.nodeLength(originalStartNode) - originalStartOffset, '')
       return
@@ -218,8 +218,8 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       }
     }
 
-    if (CharacterDataUtility.isCharacterDataNode(originalEndNode)) {
-      CharacterDataUtility.replaceData(originalEndNode,
+    if (TextUtility.isCharacterDataNode(originalEndNode)) {
+      TextUtility.replaceData(originalEndNode,
         0, originalEndOffset, '')
       return
     }

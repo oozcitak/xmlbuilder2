@@ -7,7 +7,6 @@ import { TextUtility } from './TextUtility'
 import { BoundaryPoint } from './BoundaryPoint'
 import { DOMException } from '../DOMException'
 import { DocumentFragmentImpl } from '../DocumentFragmentImpl'
-import { CharacterDataUtility } from './CharacterDataUtility'
 import { RangeImpl } from '../RangeImpl'
 
 /**
@@ -197,13 +196,13 @@ export class RangeQuery {
 
     // range starts and ends over a single node
     if (originalStartNode === originalEndNode &&
-      CharacterDataUtility.isCharacterDataNode(originalStartNode)) {
+      TextUtility.isCharacterDataNode(originalStartNode)) {
       const clone = <CharacterData>originalStartNode.cloneNode()
-      clone.data = CharacterDataUtility.substringData(
+      clone.data = TextUtility.substringData(
         <CharacterData>originalStartNode, originalStartOffset,
         originalEndOffset - originalStartOffset)
       fragment.append(clone)
-      CharacterDataUtility.replaceData(
+      TextUtility.replaceData(
         <CharacterData>originalStartNode, originalStartOffset,
         originalEndOffset - originalStartOffset, '')
       return fragment
@@ -253,9 +252,9 @@ export class RangeQuery {
     }
 
     if (firstPartiallyContainedChild !== null &&
-      CharacterDataUtility.isCharacterDataNode(firstPartiallyContainedChild)) {
+      TextUtility.isCharacterDataNode(firstPartiallyContainedChild)) {
       const clone = <CharacterData>originalStartNode.cloneNode()
-      clone.data = CharacterDataUtility.substringData(
+      clone.data = TextUtility.substringData(
         <CharacterData>originalStartNode, originalStartOffset,
         TreeQuery.nodeLength(originalStartNode) - originalStartOffset)
       fragment.append(clone)
@@ -274,9 +273,9 @@ export class RangeQuery {
     }
 
     if (lastPartiallyContainedChild !== null &&
-      CharacterDataUtility.isCharacterDataNode(lastPartiallyContainedChild)) {
+      TextUtility.isCharacterDataNode(lastPartiallyContainedChild)) {
       const clone = <CharacterData>originalEndNode.cloneNode()
-      clone.data = CharacterDataUtility.substringData(
+      clone.data = TextUtility.substringData(
         <CharacterData>originalEndNode, 0, originalEndOffset)
       fragment.append(clone)
     } else if (lastPartiallyContainedChild !== null) {
@@ -308,9 +307,9 @@ export class RangeQuery {
 
     // range starts and ends over a single node
     if (originalStartNode === originalEndNode &&
-      CharacterDataUtility.isCharacterDataNode(originalStartNode)) {
+      TextUtility.isCharacterDataNode(originalStartNode)) {
       const clone = <CharacterData>originalStartNode.cloneNode()
-      clone.data = CharacterDataUtility.substringData(
+      clone.data = TextUtility.substringData(
         <CharacterData>originalStartNode, originalStartOffset,
         originalEndOffset - originalStartOffset)
       fragment.append(clone)
@@ -361,9 +360,9 @@ export class RangeQuery {
     }
 
     if (firstPartiallyContainedChild !== null &&
-      CharacterDataUtility.isCharacterDataNode(firstPartiallyContainedChild)) {
+      TextUtility.isCharacterDataNode(firstPartiallyContainedChild)) {
       const clone = <CharacterData>originalStartNode.cloneNode()
-      clone.data = CharacterDataUtility.substringData(
+      clone.data = TextUtility.substringData(
         <CharacterData>originalStartNode, originalStartOffset,
         TreeQuery.nodeLength(originalStartNode) - originalStartOffset)
       fragment.append(clone)
@@ -382,9 +381,9 @@ export class RangeQuery {
     }
 
     if (lastPartiallyContainedChild !== null &&
-      CharacterDataUtility.isCharacterDataNode(lastPartiallyContainedChild)) {
+      TextUtility.isCharacterDataNode(lastPartiallyContainedChild)) {
       const clone = <CharacterData>originalEndNode.cloneNode()
-      clone.data = CharacterDataUtility.substringData(
+      clone.data = TextUtility.substringData(
         <CharacterData>originalEndNode, 0, originalEndOffset)
       fragment.append(clone)
     } else if (lastPartiallyContainedChild !== null) {
