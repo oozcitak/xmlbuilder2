@@ -41,7 +41,6 @@ describe('Text', function () {
     expect(node5.data).toBe('at')
     expect(node6.data).toBe('home')
     expect(node.wholeText).toBe('peaceathome')
-    expect(() => node.splitText(-1)).toThrow()
     expect(() => node.splitText(1001)).toThrow()
 
     node.textContent = 'peaceathome'

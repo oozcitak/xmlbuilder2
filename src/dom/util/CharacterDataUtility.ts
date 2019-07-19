@@ -1,4 +1,4 @@
-import { CharacterData } from '../interfaces'
+import { CharacterData, Node, NodeType } from '../interfaces'
 import { TreeQuery } from './TreeQuery'
 import { DOMException } from '../DOMException'
 
@@ -81,4 +81,17 @@ export class CharacterDataUtility {
     }
   }
 
+  /**
+   * Determines if the given node is a character data node.
+   * 
+   * @param node - a node
+   */
+  static isCharacterDataNode(node: Node): node is CharacterData {
+    const type = node.nodeType
+
+    return (type === NodeType.Text ||
+      type === NodeType.ProcessingInstruction ||
+      type === NodeType.Comment ||
+      type === NodeType.CData)
+  }
 }

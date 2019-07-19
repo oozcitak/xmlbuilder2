@@ -1666,7 +1666,12 @@ export interface NodeIterator extends Traverser {
   previousNode(): Node | null
 
   /**
-   * This method is a no-op and is not used.
+   * Removes a range object from its owner document.
+   * 
+   * _Note:_ According to the specification, this method is a no-op.
+   * However, since JavaScript lacks weak references, there is no reliable
+   * method of detecting out-of-scope variables. So, it is recommended to
+   * manually `detach` range objects after using them.
    */
   detach(): void
 }

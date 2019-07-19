@@ -1,6 +1,6 @@
 import { Text, Document, Node, NodeType } from "./interfaces"
 import { CharacterDataImpl } from "./CharacterDataImpl"
-import { DOMException } from "./DOMException"
+import { TextUtility } from "./util/TextUtility"
 
 /**
  * Represents a text node.
@@ -58,18 +58,7 @@ export class TextImpl extends CharacterDataImpl implements Text {
    * @param offset - the offset at which to split nodes.
    */
   splitText(offset: number): Text {
-    if (offset < 0 || offset > this.data.length)
-      throw DOMException.IndexSizeError
-
-    const newData = this.data.slice(offset)
-    this.data = this.data.slice(0, offset)
-
-    const newNode = new TextImpl(this.ownerDocument, newData)
-
-    if (this.parentNode)
-      this.parentNode.insertBefore(newNode, this.nextSibling)
-
-    return newNode
+    return TextUtility.splitText(this, offset)
   }
 
   /**

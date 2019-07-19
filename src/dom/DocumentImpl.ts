@@ -32,6 +32,7 @@ export class DocumentImpl extends NodeImpl implements Document {
   _compatMode: string = 'CSS1Compat'
   _characterSet: string = 'UTF-8'
   _contentType: string = 'application/xml'
+  _rangeList: Range[] = []
 
   /**
    * Initializes a new instance of `Document`.
@@ -368,7 +369,9 @@ export class DocumentImpl extends NodeImpl implements Document {
    * Creates a new Range object.
    */
   createRange(): Range {
-    return new RangeImpl([this, 0], [this, 0])
+    const range = new RangeImpl([this, 0], [this, 0])
+    this._rangeList.push(range)
+    return range
   }
 
   /**
@@ -446,6 +449,16 @@ export class DocumentImpl extends NodeImpl implements Document {
       return this.documentElement.lookupNamespaceURI(prefix)
 
     return null
+  }
+
+  /**
+   * Removes a range object.
+   */
+  _removeRange(range: Range): void {
+    const index = this._rangeList.indexOf(range)
+    if (index > -1) {
+      this._rangeList.splice(index, 1)
+    }
   }
 
   // MIXIN: NonElementParentNode

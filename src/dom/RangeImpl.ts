@@ -1,10 +1,11 @@
 import {
   Node, Range, NodeType, BoundaryPosition, HowToCompare,
-  DocumentFragment, CharacterData
+  DocumentFragment, Document
 } from './interfaces'
 import { AbstractRangeImpl } from './AbstractRangeImpl'
 import { TreeQuery } from './util/TreeQuery'
-import { DOMException } from '.'
+import { TreeMutation } from './util/TreeMutation'
+import { DOMException } from './DOMException'
 import { BoundaryPoint } from './util/BoundaryPoint'
 import { RangeQuery } from './util/RangeQuery'
 import { CharacterDataUtility } from './util/CharacterDataUtility'
@@ -13,6 +14,8 @@ import { CharacterDataUtility } from './util/CharacterDataUtility'
  * Represents a live range.
  */
 export class RangeImpl extends AbstractRangeImpl implements Range {
+
+  private _ownerDocument: Document | null
 
   static readonly START_TO_START: number = 0
   static readonly START_TO_END: number = 1
@@ -24,6 +27,12 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
    */
   constructor(start?: [Node, number], end?: [Node, number]) {
     super([<Node><unknown>null, 0], [<Node><unknown>null, 0])
+
+    if (start) {
+      this._ownerDocument = start[0].ownerDocument
+    } else {
+      this._ownerDocument = null
+    }
 
     if (start) { this.setStart(start[0], start[1]) }
     if (end) { this.setEnd(end[0], end[1]) }
@@ -161,10 +170,9 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
     const [originalEndNode, originalEndOffset] = this._end
 
     if (originalStartNode === originalEndNode &&
-      (originalStartNode.nodeType === NodeType.Text ||
-        originalStartNode.nodeType === NodeType.ProcessingInstruction ||
-        originalStartNode.nodeType === NodeType.Comment)) {
-      CharacterDataUtility.replaceData(<CharacterData>originalStartNode, originalStartOffset, originalEndOffset, '')
+      CharacterDataUtility.isCharacterDataNode(originalStartNode)) {
+      CharacterDataUtility.replaceData(originalStartNode,
+        originalStartOffset, originalEndOffset, '')
       return
     }
 
@@ -197,10 +205,8 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       newOffset = TreeQuery.index(referenceNode) + 1
     }
 
-    if (originalStartNode.nodeType === NodeType.Text ||
-      originalStartNode.nodeType === NodeType.ProcessingInstruction ||
-      originalStartNode.nodeType === NodeType.Comment) {
-      CharacterDataUtility.replaceData(<CharacterData>originalStartNode,
+    if (CharacterDataUtility.isCharacterDataNode(originalStartNode)) {
+      CharacterDataUtility.replaceData(originalStartNode,
         originalStartOffset,
         TreeQuery.nodeLength(originalStartNode) - originalStartOffset, '')
       return
@@ -212,10 +218,8 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       }
     }
 
-    if (originalEndNode.nodeType === NodeType.Text ||
-      originalEndNode.nodeType === NodeType.ProcessingInstruction ||
-      originalEndNode.nodeType === NodeType.Comment) {
-      CharacterDataUtility.replaceData(<CharacterData>originalEndNode,
+    if (CharacterDataUtility.isCharacterDataNode(originalEndNode)) {
+      CharacterDataUtility.replaceData(originalEndNode,
         0, originalEndOffset, '')
       return
     }
@@ -226,39 +230,128 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
 
   /** @inheritdoc */
   extractContents(): DocumentFragment {
-    throw new Error("Method not implemented.");
-  }
-  /** @inheritdoc */
-  cloneContents(): DocumentFragment {
-    throw new Error("Method not implemented.");
-  }
-  /** @inheritdoc */
-  insertNode(node: Node): void {
-    throw new Error("Method not implemented.");
-  }
-  /** @inheritdoc */
-  surroundContents(newParent: Node): void {
-    throw new Error("Method not implemented.");
-  }
-  /** @inheritdoc */
-  cloneRange(): Range {
-    throw new Error("Method not implemented.");
-  }
-  /** @inheritdoc */
-  detach(): void {
-    throw new Error("Method not implemented.");
-  }
-  /** @inheritdoc */
-  isPointInRange(node: Node, offset: number): boolean {
-    throw new Error("Method not implemented.");
-  }
-  /** @inheritdoc */
-  comparePoint(node: Node, offset: number): number {
-    throw new Error("Method not implemented.");
-  }
-  /** @inheritdoc */
-  intersectsNode(node: Node): boolean {
-    throw new Error("Method not implemented.");
+    return RangeQuery.extractContents(this)
   }
 
+  /** @inheritdoc */
+  cloneContents(): DocumentFragment {
+    return RangeQuery.cloneContents(this)
+  }
+
+  /** @inheritdoc */
+  insertNode(node: Node): void {
+    RangeQuery.insert(this, node)
+  }
+
+  /** @inheritdoc */
+  surroundContents(newParent: Node): void {
+    for (const node of RangeQuery.getPartiallyContainedNodes(this)) {
+      if (node.nodeType !== NodeType.Text) {
+        throw DOMException.InvalidStateError
+      }
+    }
+
+    if (newParent.nodeType === NodeType.Document ||
+      newParent.nodeType === NodeType.DocumentType ||
+      newParent.nodeType === NodeType.DocumentFragment) {
+      throw DOMException.InvalidNodeTypeError
+    }
+
+    const fragment = RangeQuery.extractContents(this)
+
+    if (newParent.hasChildNodes) {
+      TreeMutation.replaceAllNode(null, newParent)
+    }
+
+    RangeQuery.insert(this, newParent)
+    newParent.appendChild(fragment)
+
+    RangeQuery.selectNode(this, newParent)
+  }
+
+  /** @inheritdoc */
+  cloneRange(): Range {
+    return new RangeImpl(this._start, this._end)
+  }
+
+  /** @inheritdoc */
+  detach(): void {
+    const doc = <any><unknown>this._start[0].ownerDocument
+    if (doc !== null) {
+      doc._removeRange(this)
+    }
+  }
+
+  /** @inheritdoc */
+  isPointInRange(node: Node, offset: number): boolean {
+    if (TreeQuery.rootNode(node) !== TreeQuery.rootNode(this._start[0])) {
+      return false
+    }
+
+    if (node.nodeType === NodeType.DocumentType) {
+      throw DOMException.InvalidNodeTypeError
+    }
+
+    if (offset > TreeQuery.nodeLength(node)) {
+      throw DOMException.IndexSizeError
+    }
+
+    const bp: [Node, number] = [node, offset]
+    if (BoundaryPoint.position(bp, this._start) === BoundaryPosition.Before ||
+      BoundaryPoint.position(bp, this._end) === BoundaryPosition.After) {
+      return false
+    }
+
+    return true
+  }
+
+  /** @inheritdoc */
+  comparePoint(node: Node, offset: number): number {
+    if (TreeQuery.rootNode(node) !== TreeQuery.rootNode(this._start[0])) {
+      throw DOMException.WrongDocumentError
+    }
+
+    if (node.nodeType === NodeType.DocumentType) {
+      throw DOMException.InvalidNodeTypeError
+    }
+
+    if (offset > TreeQuery.nodeLength(node)) {
+      throw DOMException.IndexSizeError
+    }
+
+    const bp: [Node, number] = [node, offset]
+    if (BoundaryPoint.position(bp, this._start) === BoundaryPosition.Before) {
+      return -1
+    } else if (BoundaryPoint.position(bp, this._end) === BoundaryPosition.After) {
+      return 1
+    }
+
+    return 0
+  }
+
+  /** @inheritdoc */
+  intersectsNode(node: Node): boolean {
+    if (TreeQuery.rootNode(node) !== TreeQuery.rootNode(this._start[0])) {
+      return false
+    }
+
+    const parent = node.parentNode
+
+    if (parent === null) {
+      return true
+    }
+
+    const offset = TreeQuery.index(node)
+
+    if (BoundaryPoint.position([parent, offset], this._end) === BoundaryPosition.Before &&
+      BoundaryPoint.position([parent, offset + 1], this._start) === BoundaryPosition.After) {
+      return true
+    }
+
+    return false
+  }
+
+  toString(): string {
+    return RangeQuery.stringify(this)
+  }
 }
