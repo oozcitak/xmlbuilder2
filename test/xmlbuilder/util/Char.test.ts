@@ -1,5 +1,5 @@
 import $$ from '../TestHelpers'
-import { Char } from '../../../src/xmlbuilder/util';
+import { Char } from '../../../src/xmlbuilder/util'
 
 describe('Char', () => {
 

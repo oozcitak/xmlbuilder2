@@ -2,7 +2,7 @@ import { NodeType, Node, Document, Element, Range } from "../interfaces"
 import { DOMException } from "../DOMException"
 import { List } from "./List"
 import { TreeQuery } from "./TreeQuery"
-import { TextUtility } from "./TextUtility";
+import { TextUtility } from "./TextUtility"
 
 /**
  * Contains tree mutation algorithms.

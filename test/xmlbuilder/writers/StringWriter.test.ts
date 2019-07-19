@@ -1,5 +1,4 @@
 import $$ from '../TestHelpers'
-import { inherits } from 'util';
 
 describe('StringWriter', () => {
 
