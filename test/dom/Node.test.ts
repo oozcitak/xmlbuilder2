@@ -213,11 +213,17 @@ describe('Node', function () {
     const otherele = otherdoc.createElement('otherele')
     otherde.appendChild(otherele)
 
-    // Position.Disconnected | Position.ImplementationSpecific | Position.Preceding
-    expect(child1.compareDocumentPosition(otherele)).toBe(0x20 + 0x01 + 0x02)
-    // TODO: for consistency this should return
-    // Position.Disconnected | Position.ImplementationSpecific | Position.Following
-    expect(otherele.compareDocumentPosition(child1)).toBe(0x20 + 0x01 + 0x02)
+    // If one returns Position.Preceding the other should return 
+    // Position.Following for consistency
+    const pos1 = child1.compareDocumentPosition(otherele)
+    const pos2 = otherele.compareDocumentPosition(child1)
+    // jest doesn't allow .toBeEither type of assertions, hence the following workaround
+    expect(pos1 + pos2).toBe(0x20 + 0x01 + 0x02 + 0x20 + 0x01 + 0x04)
+    if (pos1 === 0x20 + 0x01 + 0x02) {
+      expect(pos2).toBe(0x20 + 0x01 + 0x04)
+    } else {
+      expect(pos2).toBe(0x20 + 0x01 + 0x02)
+    }
   })
 
   test('contains()', function () {
