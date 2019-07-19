@@ -290,7 +290,7 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
       // return a random result but cache the value for consistency
       let cached1 = NodeImpl._compareCache.get([node1, node2])
       let cached2 = NodeImpl._compareCache.get([node2, node1])
-      if (cached1 === undefined || cached2 === undefined) {
+      if (cached1 === undefined && cached2 === undefined) {
         const value = Math.random() > 0.5
         NodeImpl._compareCache.set([node1, node2], value)
         cached1 = value
