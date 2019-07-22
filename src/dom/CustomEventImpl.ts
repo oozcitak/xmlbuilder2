@@ -13,9 +13,8 @@ export class CustomEventImpl extends EventImpl implements CustomEvent {
    */
   constructor(type: string, eventInit?: CustomEventInit) {
     super(type, eventInit)
-    if (eventInit) {
-      this._detail = eventInit.detail || null
-    }
+
+    this._detail = (eventInit && eventInit.detail) || null
   }
 
   /**
@@ -34,9 +33,8 @@ export class CustomEventImpl extends EventImpl implements CustomEvent {
   initCustomEvent(type: string, bubbles = false, cancelable = false, detail = null): void {
     if (this._dispatch) return
 
-    this._type = type
-    this._bubbles = bubbles
-    this._cancelable = cancelable
+    EventImpl._initialize(this, type, bubbles, cancelable)
+
     this._detail = detail
   }
 

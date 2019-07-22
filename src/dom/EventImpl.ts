@@ -2,6 +2,18 @@ import {
   Event, EventInit, EventTarget, EventPhase
 } from './interfaces'
 
+type PotentialEventTarget = EventTarget | null
+
+type EventPathItem = {
+  invocationTarget: EventTarget
+  invocationTargetInShadowTree: boolean
+  shadowAdjustedTarget: EventTarget | null
+  relatedTarget: EventTarget | null
+  touchTargetList: PotentialEventTarget[]
+  rootOfClosedTree: boolean
+  slotInClosedTree: boolean
+}
+
 /**
  * Represents a generic XML node.
  */
@@ -14,20 +26,25 @@ export class EventImpl implements Event {
 
   protected _type: string
 
-  protected _target: EventTarget | null = null
-  protected _currentTarget: EventTarget | null = null
+  protected _target: PotentialEventTarget = null
+  protected _relatedTarget: PotentialEventTarget = null
+  protected _touchTargetList: PotentialEventTarget[] = []
+  protected _path: EventPathItem[] = []
+  protected _currentTarget: PotentialEventTarget = null
   protected _eventPhase: EventPhase = EventPhase.None
-  
+
   protected _bubbles: boolean = false
   protected _cancelable: boolean = false
+
   protected _stopPropagation: boolean = false
   protected _stopImmediatePropagation: boolean = false
   protected _canceled: boolean = false
   protected _inPassiveListener: boolean = false
   protected _composed: boolean = false
-  public _initialized: boolean = false
-  public _dispatch: boolean = false
-  public _isTrusted: boolean = false
+  protected _initialized: boolean = false
+  protected _dispatch: boolean = false
+
+  protected _isTrusted: boolean = false
   protected _timeStamp: number
 
   /**
@@ -71,8 +88,84 @@ export class EventImpl implements Event {
    * shadow root was created with its `mode` `"closed"`.
    */
   composedPath(): EventTarget[] {
-    // TODO: Implementation
-    return []
+
+    const composedPath: EventTarget[] = []
+
+    const path = this._path
+
+    if (path.length == 0) return composedPath
+
+    const currentTarget = this.currentTarget
+    if (currentTarget === null) {
+      throw new Error("Event currentTarget is null.")
+    }
+    composedPath.push(currentTarget)
+
+    let currentTargetIndex = 0
+    let currentTargetHiddenSubtreeLevel = 0
+
+    let index = path.length - 1
+    while (index >= 0) {
+      if (path[index].rootOfClosedTree) {
+        currentTargetHiddenSubtreeLevel++
+      }
+      if (path[index].invocationTarget === currentTarget) {
+        currentTargetIndex = index
+        break
+      }
+      if (path[index].slotInClosedTree) {
+        currentTargetHiddenSubtreeLevel--
+      }
+      index--
+    }
+
+    let currentHiddenLevel = currentTargetHiddenSubtreeLevel
+    let maxHiddenLevel = currentTargetHiddenSubtreeLevel
+
+    index = currentTargetIndex - 1
+    while (index >= 0) {
+      if (path[index].rootOfClosedTree) {
+        currentHiddenLevel++
+      }
+
+      if (currentHiddenLevel <= maxHiddenLevel) {
+        composedPath.unshift(path[index].invocationTarget)
+      }
+
+      if (path[index].slotInClosedTree) {
+        currentHiddenLevel--
+        if (currentHiddenLevel < maxHiddenLevel) {
+          maxHiddenLevel = currentHiddenLevel
+        }
+      }
+
+      index--
+    }
+
+    currentHiddenLevel = currentTargetHiddenSubtreeLevel
+    maxHiddenLevel = currentTargetHiddenSubtreeLevel
+    index = currentTargetIndex + 1
+
+    while (index < path.length) {
+      if (path[index].slotInClosedTree) {
+        currentHiddenLevel++
+      }
+
+      if (currentHiddenLevel <= maxHiddenLevel) {
+        composedPath.push(path[index].invocationTarget)
+      }
+
+      if (path[index].rootOfClosedTree) {
+        currentHiddenLevel--
+        if (currentHiddenLevel < maxHiddenLevel) {
+          maxHiddenLevel = currentHiddenLevel
+        }
+      }
+
+      index++
+    }
+
+    return composedPath
   }
 
   /**
@@ -96,9 +189,9 @@ export class EventImpl implements Event {
    * Prevents event from reaching any registered event listeners after 
    * the current one finishes running.
    */
-  stopImmediatePropagation(): void { 
-    this._stopPropagation = true 
-    this._stopImmediatePropagation = true 
+  stopImmediatePropagation(): void {
+    this._stopPropagation = true
+    this._stopImmediatePropagation = true
   }
 
   /**
@@ -115,16 +208,13 @@ export class EventImpl implements Event {
   /**
    * Historical property.
    */
-  get returnValue(): boolean { return !this._cancelable }
-  set returnValue(value: boolean) { if (!value) this.preventDefault }
+  get returnValue(): boolean { return !this._canceled }
+  set returnValue(value: boolean) { if (!value) EventImpl._setCanceled(this) }
 
   /**
    * Cancels the event (if it is cancelable).
    */
-  preventDefault(): void {
-    if (this.cancelable && !this._inPassiveListener)
-      this._canceled = true
-  }
+  preventDefault(): void { EventImpl._setCanceled(this) }
 
   /**
    * Indicates whether the event was cancelled with `preventDefault()`.
@@ -158,9 +248,42 @@ export class EventImpl implements Event {
   initEvent(type: string, bubbles = false, cancelable = false): void {
     if (this._dispatch) return
 
-    this._type = type
-    this._bubbles = bubbles
-    this._cancelable = cancelable
+    EventImpl._initialize(this, type, bubbles, cancelable)
   }
 
+  /**
+   * Sets the canceled flag of an event.
+   * 
+   * @param event - an event
+   */
+  protected static _setCanceled(event: Event): void {
+    const impl = <EventImpl>event
+
+    if (impl._cancelable && !impl._inPassiveListener) {
+      impl._canceled = true
+    }
+  }
+
+  /**
+   * Initializes the value of an event.
+   * 
+   * @param event - an event to initialize
+   * @param type - the type of event
+   * @param bubbles - whether the event propagates in reverse
+   * @param cancelable - whether the event can be cancelled
+   */
+  protected static _initialize(event: Event, type: string, bubbles: boolean, cancelable: boolean): void {
+    const impl = <EventImpl>event
+
+    impl._initialized = true
+    impl._stopPropagation = false
+    impl._stopImmediatePropagation = false
+    impl._canceled = false
+    impl._isTrusted = false
+    impl._target = null
+
+    impl._type = type
+    impl._bubbles = bubbles
+    impl._cancelable = cancelable
+  }
 }
