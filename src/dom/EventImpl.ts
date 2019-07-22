@@ -4,6 +4,9 @@ import {
 
 type PotentialEventTarget = EventTarget | null
 
+/**
+ * Represents an object on the event path.
+ */
 type EventPathItem = {
   invocationTarget: EventTarget
   invocationTargetInShadowTree: boolean

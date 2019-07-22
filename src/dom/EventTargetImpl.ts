@@ -1,6 +1,18 @@
 import {
-  Event, EventListener, EventTarget, EventListenerEntry
+  Event, EventListener, EventTarget
 } from './interfaces'
+
+/**
+ * Defines an entry in the event listeners list.
+ */
+type EventListenerEntry = {
+  type: string
+  callback: EventListener
+  capture: boolean
+  passive: boolean
+  once: boolean
+  removed: boolean
+}
 
 /**
  * Represents a generic XML node.

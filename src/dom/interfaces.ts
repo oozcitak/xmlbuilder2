@@ -2053,15 +2053,3 @@ export type MutationCallback = (mutations: MutationRecord[], observer: MutationO
  * Defines the mode of a shadow root.
  */
 export type ShadowRootMode = 'open' | 'closed'
-
-/**
- * Defines an entry in the event listeners list.
- */
-export type EventListenerEntry = {
-  type: string
-  callback: EventListener
-  capture: boolean
-  passive: boolean
-  once: boolean
-  removed: boolean
-}
