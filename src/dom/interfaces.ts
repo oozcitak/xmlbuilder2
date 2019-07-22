@@ -2037,17 +2037,45 @@ export interface CustomEventInit extends EventInit {
   detail?: any
 }
 
+/**
+ * Defines the criteria for the mutations to observe.
+ */
 export interface MutationObserverInit {
   childList: boolean
-  attributes: boolean
-  characterData: boolean
+  attributes?: boolean
+  characterData?: boolean
   subtree: boolean
-  attributeOldValue: boolean
-  characterDataOldValue: boolean
-  attributeFilter: string[]
+  attributeOldValue?: boolean
+  characterDataOldValue?: boolean
+  attributeFilter?: string[]
 }
 
+/**
+ * Defines a callback function which is invoked after nodes registered with the
+ * observe() method, are mutated.
+ * 
+ * @param mutations - a list of `MutationRecord` objects
+ * @param observer - the constructed `MutationObserver` object
+ */
 export type MutationCallback = (mutations: MutationRecord[], observer: MutationObserver) => void
+
+/**
+ * Represents a registered observer associated with a node.
+ */
+export type RegisteredObserver = { 
+  observer: MutationObserver, 
+  options: MutationObserverInit 
+}
+
+/**
+ * Represents a transient registered observer associated with a node.
+ * Transient registered observers are used to track mutations within a given 
+ * node's descendants after node has been removed so they do not get lost when
+ * subtree is set to true on node's parent.
+ */
+export type TransientRegisteredObserver = RegisteredObserver & { 
+  source: RegisteredObserver 
+}
 
 /**
  * Defines the mode of a shadow root.

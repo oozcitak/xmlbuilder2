@@ -1,6 +1,6 @@
 import {
   Node, NodeList, Element, Attr, Text, Document, NodeType,
-  Position, GetRootNodeOptions
+  Position, GetRootNodeOptions, RegisteredObserver, TransientRegisteredObserver
 } from './interfaces'
 import { EventTargetImpl } from './EventTargetImpl'
 import { NodeListImpl } from './NodeListImpl'
@@ -40,6 +40,7 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
   _ownerDocument: Document | null = null
   _baseURI = ''
   protected _childNodes: NodeList
+  protected _registeredObservers: Array<RegisteredObserver | TransientRegisteredObserver> = []
 
   /**
    * Initializes a new instance of `Node`.

@@ -1,4 +1,4 @@
-import { NodeType, Node, Document, Element, Range } from "../interfaces"
+import { NodeType, Node, Document, Element, Range, RegisteredObserver, MutationObserver, MutationRecord } from "../interfaces"
 import { DOMException } from "../DOMException"
 import { List } from "./List"
 import { TreeQuery } from "./TreeQuery"
@@ -582,7 +582,48 @@ export class TreeMutation {
     namespace: string | null, oldValue: string | null,
     addedNodes: Node[], removedNodes: Node[],
     previousSibling: Node | null, nextSibling: Node | null): void {
-    // TODO: Implement queueMutationRecord
+
+    const interestedObservers = new Map<MutationObserver, string | null>()
+    for (const node of TreeQuery.getAncestorNodes(target, true)) {
+      const observers: Array<RegisteredObserver> =
+        (<any><unknown>target)._registeredObservers
+      for (const registered of observers) {
+        const options = registered.options
+
+        if (node !== target && !options.subtree) continue
+        if (type === "attributes" && !options.attributes) continue
+        if (type === "attributes" && options.attributeFilter && (!options.attributeFilter.includes(name || '') || namespace !== null)) continue
+        if (type === "characterData" && !options.characterData) continue
+        if (type === "childList" && !options.childList) continue
+
+        const mo = registered.observer
+        if (!interestedObservers.has(mo)) {
+          interestedObservers.set(mo, null)
+        }
+        if ((type === "attributes" && options.attributeOldValue) || (type === "characterData" && options.characterDataOldValue)) {
+          interestedObservers.set(mo, oldValue)
+        }
+      }
+    }
+    for (const [observer, mappedOldValue] of interestedObservers) {
+      const record: MutationRecord = {
+        type: type,
+        target: target,
+        attributeName: name,
+        attributeNamespace: namespace,
+        oldValue: mappedOldValue,
+        addedNodes: addedNodes,
+        removedNodes: removedNodes,
+        previousSibling: previousSibling,
+        nextSibling: nextSibling
+      }
+
+      const queue: MutationRecord[] = (<any><unknown>observer)._recordQueue
+      queue.push(record)
+    }
+
+    // TODO: Queue a mutation observer microtask.
+    // See: https://dom.spec.whatwg.org/#queue-a-mutation-observer-compound-microtask
   }
 
   /**

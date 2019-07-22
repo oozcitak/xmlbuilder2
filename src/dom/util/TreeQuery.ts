@@ -89,6 +89,26 @@ export class TreeQuery {
   }
 
   /**
+   * Traverses through all ancestor nodes `node`.
+   * 
+   * @param node - root node of the tree
+   * @param self - whether to include `node` in traversal
+   * @param filter - a function to filter nodes
+   */
+  static *getAncestorNodes(node: Node, self: boolean = false,
+    filter?: (ancestorNode: Node) => any): IterableIterator<Node> {
+
+    if (self && (!filter || !!filter(node)))
+      yield node
+
+    const parent = node.parentNode
+    while (parent !== null) {
+      if (!filter || !!filter(node))
+        yield node
+    }
+  }
+
+  /**
    * Returns the node following `node` in depth-first preorder.
    * 
    * @param root - root of the subtree
@@ -442,5 +462,5 @@ export class TreeQuery {
     }
 
     return n
-  }  
+  }
 }

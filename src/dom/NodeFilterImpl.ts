@@ -1,4 +1,4 @@
-import { NodeFilter, Node, FilterResult, WhatToShow } from "./interfaces"
+import { NodeFilter, Node, FilterResult } from "./interfaces"
 
 /**
  * Represents a node filter.
