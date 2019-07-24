@@ -89,7 +89,7 @@ export class TreeQuery {
   }
 
   /**
-   * Traverses through all ancestor nodes `node`.
+   * Traverses through all ancestor nodes `node` in reverse tree order.
    * 
    * @param node - root node of the tree
    * @param self - whether to include `node` in traversal
@@ -101,10 +101,11 @@ export class TreeQuery {
     if (self && (!filter || !!filter(node)))
       yield node
 
-    const parent = node.parentNode
+    let parent = node.parentNode
     while (parent !== null) {
       if (!filter || !!filter(node))
         yield node
+      parent = parent.parentNode
     }
   }
 

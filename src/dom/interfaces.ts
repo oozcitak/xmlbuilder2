@@ -1547,38 +1547,9 @@ export interface NodeList extends Iterable<Node> {
   item(index: number): Node | null
 
   /**
-   * Returns an iterator for node indices.
-   */
-  keys(): IterableIterator<number>
-
-  /**
-   * Returns an iterator for nodes.
-   */
-  values(): IterableIterator<Node>
-
-  /**
-   * Returns an iterator for indices and nodes.
-   */
-  entries(): IterableIterator<[number, Node]>
-
-  /**
    * Returns an iterator for the node list.
    */
   [Symbol.iterator](): IterableIterator<Node>
-
-  /**
-   * Calls the callback function for each node in the list. The callback
-   * receives arguments as follows:
-   *   - the current node
-   *   - index of the current node
-   *   - the node list object
-   * 
-   * @param callback - function to execute for each node 
-   * @param thisArg - value to use as `this` when executing callback 
-   */
-  forEach(callback: (node: Node, index: number, list: NodeList) => any,
-    thisArg: any): void
-
 }
 
 /**

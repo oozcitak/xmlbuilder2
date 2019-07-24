@@ -1,8 +1,12 @@
-import { NodeType, Node, Document, Element, Range, RegisteredObserver, MutationObserver, MutationRecord } from "../interfaces"
+import {
+  NodeType, Node, Document, Element, RegisteredObserver,
+  MutationObserver, MutationRecord
+} from "../interfaces"
 import { DOMException } from "../DOMException"
 import { List } from "./List"
 import { TreeQuery } from "./TreeQuery"
 import { TextUtility } from "./TextUtility"
+import { NodeListStaticImpl } from "../NodeListStaticImpl"
 
 /**
  * Contains tree mutation algorithms.
@@ -558,7 +562,8 @@ export class TreeMutation {
      * observer list.
      */
 
-    TreeMutation.queueTreeMutationRecord(parent, [], [node], oldPreviousSibling, oldNextSibling)
+    TreeMutation.queueTreeMutationRecord(parent, [], [node], 
+      oldPreviousSibling, oldNextSibling)
 
     if (TextUtility.isTextNode(node)) {
       TextUtility.childTextContentChanged(parent)
@@ -592,7 +597,8 @@ export class TreeMutation {
 
         if (node !== target && !options.subtree) continue
         if (type === "attributes" && !options.attributes) continue
-        if (type === "attributes" && options.attributeFilter && (!options.attributeFilter.includes(name || '') || namespace !== null)) continue
+        if (type === "attributes" && options.attributeFilter &&
+          (!options.attributeFilter.includes(name || '') || namespace !== null)) continue
         if (type === "characterData" && !options.characterData) continue
         if (type === "childList" && !options.childList) continue
 
@@ -612,8 +618,8 @@ export class TreeMutation {
         attributeName: name,
         attributeNamespace: namespace,
         oldValue: mappedOldValue,
-        addedNodes: addedNodes,
-        removedNodes: removedNodes,
+        addedNodes: new NodeListStaticImpl(addedNodes),
+        removedNodes: new NodeListStaticImpl(removedNodes),
         previousSibling: previousSibling,
         nextSibling: nextSibling
       }
