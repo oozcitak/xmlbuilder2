@@ -56,32 +56,15 @@ applyMixin(ElementImpl, ParentNodeImpl)
 applyMixin(TextImpl, SlotableImpl)
 applyMixin(ElementImpl, SlotableImpl)
 
-// Export classes and drop `Impl`
-export { AbstractRangeImpl as AbstractRange }
-export { AttrImpl as Attr }
-export { CDATASectionImpl as CDATASection }
-export { CharacterDataImpl as CharacterData }
-export { CommentImpl as Comment }
-export { CustomEventImpl as CustomEvent }
-export { DocumentFragmentImpl as DocumentFragment }
-export { DocumentImpl as Document }
-export { DocumentTypeImpl as DocumentType }
-export { DOMException as DOMException }
-export { DOMImplementationImpl as DOMImplementation }
-export { DOMTokenListImpl as DOMTokenList }
-export { ElementImpl as Element }
-export { EventImpl as Event }
-export { EventTargetImpl as EventTarget }
-export { HTMLCollectionImpl as HTMLCollection }
-export { NamedNodeMapImpl as NamedNodeMap }
-export { NodeFilterImpl as NodeFilter }
-export { NodeImpl as Node }
-export { NodeListImpl as NodeList }
-export { ProcessingInstructionImpl as ProcessingInstruction }
-export { RangeImpl as Range }
-export { ShadowRootImpl as ShadowRoot }
-export { StaticRangeImpl as StaticRange }
-export { TextImpl as Text }
-export { XMLDocumentImpl as XMLDocument }
+// Export classes
+export { 
+  AbstractRangeImpl, AttrImpl, CDATASectionImpl, CharacterDataImpl, 
+  CommentImpl, CustomEventImpl, DocumentFragmentImpl, DocumentImpl, 
+  DocumentTypeImpl, DOMException, DOMImplementationImpl, DOMTokenListImpl, 
+  ElementImpl, EventImpl, EventTargetImpl, HTMLCollectionImpl, 
+  NamedNodeMapImpl, NodeFilterImpl, NodeImpl, NodeListImpl, 
+  ProcessingInstructionImpl, RangeImpl, ShadowRootImpl, 
+  StaticRangeImpl, TextImpl, XMLDocumentImpl
+}
 export { DOMImplementationInstance }
 export { DOMParser, MimeType } from './parser'
