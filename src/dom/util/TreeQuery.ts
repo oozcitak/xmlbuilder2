@@ -1,6 +1,7 @@
 import {
   Node, CharacterData, ShadowRoot, Element, NodeType
 } from '../interfaces'
+import { Guard } from './Guard'
 
 /**
  * Includes query and traversal methods for trees.
@@ -292,7 +293,7 @@ export class TreeQuery {
    * @param node - a node
    * @param other - the node to check
    * @param self - if `true`, traversal includes `node` itself
-   * @param shadow - if truthy, traversal includes the 
+   * @param shadow - if `true`, traversal includes the 
    * node's and its descendant's shadow trees as well.
    */
   static isDescendantOf(node: Node, other: Node,
@@ -314,7 +315,7 @@ export class TreeQuery {
    * @param node - a node
    * @param other - the node to check
    * @param self - if `true`, traversal includes `node` itself
-   * @param shadow - if truthy, traversal includes the 
+   * @param shadow - if `true`, traversal includes the 
    * node's and its descendant's shadow trees as well.
    */
   static isAncestorOf(node: Node, other: Node,
@@ -448,7 +449,7 @@ export class TreeQuery {
   }
 
   /**
-   * Determines the index of`node`. The index of an object is its number of 
+   * Determines the index of `node`. The index of an object is its number of 
    * preceding siblings, or 0 if it has none.
    * 
    * @param node - a node
@@ -464,4 +465,42 @@ export class TreeQuery {
 
     return n
   }
+
+  /**
+   * Retargets an object against another object.
+   * 
+   * @param a - an object to retarget
+   * @param b - an object to retarget against
+   */
+  static retarget(a: any, b: any): any {
+    /**
+     * To retarget an object A against an object B, repeat these steps until
+     * they return an object:
+     * 1. If one of the following is true
+     * - A is not a node
+     * - A's root is not a shadow root
+     * - B is a node and A's root is a shadow-including inclusive ancestor
+     * of B
+     * then return A.
+     * 2. Set A to A's root's host.
+     */
+
+    while (true) {
+      if (!Guard.isNode(a)) {
+        return a
+      }
+
+      const rootOfA = TreeQuery.rootNode(a)
+      if (!Guard.isShadowRoot(rootOfA)) {
+        return a
+      }
+
+      if (Guard.isNode(b) && TreeQuery.isAncestorOf(rootOfA, b, true, true)) {
+        return a
+      }
+      
+      a = rootOfA.host
+    }
+  }
+
 }

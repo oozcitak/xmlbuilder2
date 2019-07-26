@@ -20,7 +20,7 @@ export class MutationObserverImpl implements MutationObserver {
    */
   public constructor(callback: MutationCallback) {
     this._callback = callback
-    // TODO: Append this to relevant agent’s mutation observers.
+    // TODO: Append this to relevant agent's mutation observers.
   }
 
   /** @inheritdoc */

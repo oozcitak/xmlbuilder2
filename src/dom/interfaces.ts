@@ -2009,6 +2009,21 @@ export interface CustomEventInit extends EventInit {
 }
 
 /**
+ * Defines event listener options.
+ */
+export interface EventListenerOptions {
+  capture?: boolean
+}
+
+/**
+ * Defines options for the `addEventListener` function.
+ */
+export interface AddEventListenerOptions extends EventListenerOptions {
+  passive?: boolean
+  once?: boolean
+}
+
+/**
  * Defines the criteria for the mutations to observe.
  */
 export interface MutationObserverInit {
@@ -2052,3 +2067,21 @@ export type TransientRegisteredObserver = RegisteredObserver & {
  * Defines the mode of a shadow root.
  */
 export type ShadowRootMode = 'open' | 'closed'
+
+/**
+ * Represents a potential event target.
+ */
+export type PotentialEventTarget = EventTarget | null
+
+/**
+ * Represents an object on the event path.
+ */
+export type EventPathItem = {
+  invocationTarget: EventTarget
+  invocationTargetInShadowTree: boolean
+  shadowAdjustedTarget: PotentialEventTarget
+  relatedTarget: PotentialEventTarget
+  touchTargetList: PotentialEventTarget[]
+  rootOfClosedTree: boolean
+  slotInClosedTree: boolean
+}

@@ -1,21 +1,6 @@
 import {
-  Event, EventInit, EventTarget, EventPhase
+  Event, EventInit, EventTarget, EventPhase, PotentialEventTarget, EventPathItem
 } from './interfaces'
-
-type PotentialEventTarget = EventTarget | null
-
-/**
- * Represents an object on the event path.
- */
-type EventPathItem = {
-  invocationTarget: EventTarget
-  invocationTargetInShadowTree: boolean
-  shadowAdjustedTarget: EventTarget | null
-  relatedTarget: EventTarget | null
-  touchTargetList: PotentialEventTarget[]
-  rootOfClosedTree: boolean
-  slotInClosedTree: boolean
-}
 
 /**
  * Represents a generic XML node.
