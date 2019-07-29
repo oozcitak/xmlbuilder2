@@ -1539,6 +1539,21 @@ export interface NodeList extends Iterable<Node> {
    */
   readonly length: number
 
+  /**
+   * Returns an iterator for node indices.
+   */
+  keys(): IterableIterator<number>
+
+  /**
+   * Returns an iterator for nodes.
+   */
+  values(): IterableIterator<Node>
+
+  /**
+   * Returns an iterator for indices and nodes.
+   */
+  entries(): IterableIterator<[number, Node]>
+
   /** 
    * Returns the node with index `index` from the collection.
    * 
@@ -1550,6 +1565,19 @@ export interface NodeList extends Iterable<Node> {
    * Returns an iterator for the node list.
    */
   [Symbol.iterator](): IterableIterator<Node>
+
+  /**
+   * Calls the callback function for each node in the list. The callback
+   * receives arguments as follows:
+   *   - the current node
+   *   - index of the current node
+   *   - the node list object
+   * 
+   * @param callback - function to execute for each node 
+   * @param thisArg - value to use as `this` when executing callback 
+   */
+  forEach(callback: (node: Node, index: number, list: NodeList) => any,
+    thisArg: any): void
 }
 
 /**
@@ -1756,7 +1784,7 @@ export interface Range extends AbstractRange {
    * 
    * @param node - node of the boundary point
    * @param offset - offset of the boundary point along node's content
-   */  
+   */
   setEnd(node: Node, offset: number): void
 
   /**
@@ -2048,9 +2076,9 @@ export type MutationCallback = (mutations: MutationRecord[], observer: MutationO
 /**
  * Represents a registered observer associated with a node.
  */
-export type RegisteredObserver = { 
-  observer: MutationObserver, 
-  options: MutationObserverInit 
+export type RegisteredObserver = {
+  observer: MutationObserver,
+  options: MutationObserverInit
 }
 
 /**
@@ -2059,8 +2087,8 @@ export type RegisteredObserver = {
  * node's descendants after node has been removed so they do not get lost when
  * subtree is set to true on node's parent.
  */
-export type TransientRegisteredObserver = RegisteredObserver & { 
-  source: RegisteredObserver 
+export type TransientRegisteredObserver = RegisteredObserver & {
+  source: RegisteredObserver
 }
 
 /**

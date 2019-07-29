@@ -1,14 +1,11 @@
 import {
   Event, EventListener, EventTarget, AddEventListenerOptions,
-  EventListenerOptions,
-  EventPathItem,
-  EventPhase,
-  PotentialEventTarget
+  EventListenerOptions, EventPathItem, EventPhase, PotentialEventTarget
 } from './interfaces'
 import { isBoolean } from '../util'
 import { DOMException } from './DOMException'
-import { TreeQuery } from './util/TreeQuery';
-import { Guard } from './util/Guard';
+import { TreeQuery } from './util/TreeQuery'
+import { Guard } from './util/Guard'
 
 /**
  * Defines an entry in the event listeners list.
@@ -20,6 +17,13 @@ type EventListenerEntry = {
   passive: boolean
   once: boolean
   removed: boolean
+}
+
+/**
+ * Defines a boolean out variable of a function.
+ */
+type OutputFlag = {
+  value: boolean
 }
 
 /**
@@ -270,12 +274,15 @@ export abstract class EventTargetImpl implements EventTarget {
   /**
    * Dispatches an event to an event target.
    * 
-   * @param event - the event to dispatch.
+   * @param event - the event to dispatch
    * @param target - event target
+   * @param legacyTargetOverrideFlag - legacy target override flag
+   * @param legacyOutputDidListenersThrowFlag - legacy output flag that returns
+   * whether the event listener's callback threw an exception
    */
   protected static _dispatchEvent(event: Event, target: EventTarget,
-    legacyTargetOverrideFlag?: boolean,
-    legacyOutputDidListenersThrowFlag?: boolean): boolean {
+    legacyTargetOverrideFlag: boolean = false,
+    legacyOutputDidListenersThrowFlag: OutputFlag = { value: false }): boolean {
 
     const eventImpl = <any><unknown>event
     const targetImpl = <any><unknown>target
@@ -494,9 +501,9 @@ export abstract class EventTargetImpl implements EventTarget {
       while (i >= 0) {
         const struct = path[i]
         /**
-         * 5.13.1. If struct’s shadow-adjusted target is non-null, then set 
-         * event’s eventPhase attribute to AT_TARGET.
-         * 5.13.2. Otherwise, set event’s eventPhase attribute to 
+         * 5.13.1. If struct's shadow-adjusted target is non-null, then set 
+         * event's eventPhase attribute to AT_TARGET.
+         * 5.13.2. Otherwise, set event's eventPhase attribute to 
          * CAPTURING_PHASE.
          * 5.13.3. Invoke with struct, event, "capturing", and 
          * legacyOutputDidListenersThrowFlag if given.
@@ -507,7 +514,7 @@ export abstract class EventTargetImpl implements EventTarget {
           eventImpl._eventPhase = EventPhase.Capturing
         }
 
-        EventTargetImpl._invoke(struct, event, "capturing",
+        EventTargetImpl._invokeEvent(struct, event, "capturing",
           legacyOutputDidListenersThrowFlag)
 
         i--
@@ -518,11 +525,11 @@ export abstract class EventTargetImpl implements EventTarget {
        */
       for (const struct of path) {
         /**
-         * 5.14.1. If struct’s shadow-adjusted target is non-null, then set
-         * event’s eventPhase attribute to AT_TARGET.
+         * 5.14.1. If struct's shadow-adjusted target is non-null, then set
+         * event's eventPhase attribute to AT_TARGET.
          * 5.14.2. Otherwise:
-         * 5.14.2.1. If event’s bubbles attribute is false, then continue.
-         * 5.14.2.2. Set event’s eventPhase attribute to BUBBLING_PHASE.
+         * 5.14.2.1. If event's bubbles attribute is false, then continue.
+         * 5.14.2.2. Set event's eventPhase attribute to BUBBLING_PHASE.
          * 5.14.3. Invoke with struct, event, "bubbling", and 
          * legacyOutputDidListenersThrowFlag if given.
          */
@@ -533,7 +540,7 @@ export abstract class EventTargetImpl implements EventTarget {
           eventImpl._eventPhase = EventPhase.Bubbling
         }
 
-        EventTargetImpl._invoke(struct, event, "bubbling",
+        EventTargetImpl._invokeEvent(struct, event, "bubbling",
           legacyOutputDidListenersThrowFlag)
 
         i--
@@ -541,10 +548,10 @@ export abstract class EventTargetImpl implements EventTarget {
     }
 
     /**
-     * 6. Set event’s eventPhase attribute to NONE.
-     * 7. Set event’s currentTarget attribute to null.
-     * 8. Set event’s path to the empty list.
-     * 9. Unset event’s dispatch flag, stop propagation flag, and stop 
+     * 6. Set event's eventPhase attribute to NONE.
+     * 7. Set event's currentTarget attribute to null.
+     * 8. Set event's path to the empty list.
+     * 9. Unset event's dispatch flag, stop propagation flag, and stop 
      * immediate propagation flag.
      */
     eventImpl._eventPhase = EventPhase.None
@@ -556,9 +563,9 @@ export abstract class EventTargetImpl implements EventTarget {
 
     /**
      * 10. If clearTargets, then:
-     * 10.1. Set event’s target to null.
-     * 10.2. Set event’s relatedTarget to null.
-     * 10.3. Set event’s touch target list to the empty list.
+     * 10.1. Set event's target to null.
+     * 10.2. Set event's relatedTarget to null.
+     * 10.3. Set event's touch target list to the empty list.
      */
     if (clearTargets) {
       eventImpl._target = null
@@ -568,10 +575,10 @@ export abstract class EventTargetImpl implements EventTarget {
 
     /**
      * 11. If activationTarget is non-null, then:
-     * 11.1. If event’s canceled flag is unset, then run activationTarget’s 
+     * 11.1. If event's canceled flag is unset, then run activationTarget's 
      * activation behavior with event.
      * 11.2. Otherwise, if activationTarget has legacy-canceled-activation 
-     * behavior, then run activationTarget’s legacy-canceled-activation
+     * behavior, then run activationTarget's legacy-canceled-activation
      * behavior.
      */
     if (activationTarget !== null) {
@@ -584,7 +591,7 @@ export abstract class EventTargetImpl implements EventTarget {
     }
 
     /**
-     * 12. Return false if event’s canceled flag is set, and true otherwise.
+     * 12. Return false if event's canceled flag is set, and true otherwise.
      */
     return !eventImpl._canceled
   }
@@ -627,7 +634,7 @@ export abstract class EventTargetImpl implements EventTarget {
     }
 
     /**
-     * 5. Append a new struct to event’s path whose invocation target is
+     * 5. Append a new struct to event's path whose invocation target is
      * invocationTarget, invocation-target-in-shadow-tree is
      * invocationTargetInShadowTree, shadow-adjusted target is
      * shadowAdjustedTarget, relatedTarget is relatedTarget,
@@ -645,5 +652,222 @@ export abstract class EventTargetImpl implements EventTarget {
       rootOfClosedTree: rootOfClosedTree,
       slotInClosedTree: slotInClosedTree
     })
+  }
+
+  /**
+   * Invokes an event.
+   * 
+   * @param struct - a struct defining event's path
+   * @param event - the event to invoke
+   * @param phase - event phase
+   * @param legacyOutputDidListenersThrowFlag - legacy output flag that returns
+   * whether the event listener's callback threw an exception
+   */
+  protected static _invokeEvent(struct: EventPathItem, event: Event,
+    phase: "capturing" | "bubbling",
+    legacyOutputDidListenersThrowFlag: OutputFlag = { value: false }): void {
+
+    /**
+     * 1. Set event's target to the shadow-adjusted target of the last struct 
+     * in event's path, that is either struct or preceding struct, whose 
+     * shadow-adjusted target is non-null.
+     */
+    const eventImpl = <any><unknown>event
+    const path: EventPathItem[] = eventImpl._path
+    let index = -1
+    for (let i = 0; i < path.length; i++) {
+      if (path[i] === struct) {
+        index = i
+        break
+      }
+    }
+    if (index !== -1) {
+      let item = path[index]
+      if (item.shadowAdjustedTarget !== null) {
+        eventImpl._target = item.shadowAdjustedTarget
+      } else if (index > 0) {
+        item = path[index - 1]
+        if (item.shadowAdjustedTarget !== null) {
+          eventImpl._target = item.shadowAdjustedTarget
+        }
+      }
+    }
+
+    /**
+     * 2. Set event's relatedTarget to struct's relatedTarget.
+     * 3. Set event's touch target list to struct's touch target list.
+     * 4. If event's stop propagation flag is set, then return.
+     * 5. Initialize event's currentTarget attribute to struct's invocation
+     * target.
+     * 6. Let listeners be a clone of event's currentTarget attribute value's
+     * event listener list.
+     * 
+     * _Note:_ This avoids event listeners added after this point from being
+     * run. Note that removal still has an effect due to the removed field.
+     */
+    eventImpl._relatedTarget = struct.relatedTarget
+    eventImpl._touchTargetList = struct.touchTargetList
+    if (eventImpl._stopPropagation) return
+    eventImpl._currentTarget = struct.invocationTarget
+    const targetListeners: EventListenerEntry[] = eventImpl._currentTarget._eventListenerList
+    let listeners: EventListenerEntry[] = new Array(...targetListeners)
+
+    /**
+     * 7. Let found be the result of running inner invoke with event, listeners,
+     * phase, and legacyOutputDidListenersThrowFlag if given.
+     */
+    const found = EventTargetImpl._innerInvokeEvent(event, listeners, phase,
+      legacyOutputDidListenersThrowFlag)
+
+    /**
+     * 8. If found is false and event's isTrusted attribute is true, then:
+     */
+    if (!found && eventImpl._isTrusted) {
+      /**
+       * 8.1. Let originalEventType be event's type attribute value.
+       * 8.2. If event's type attribute value is a match for any of the strings
+       * in the first column in the following table, set event's type attribute
+       * value to the string in the second column on the same row as the matching
+       * string, and return otherwise.
+       * 
+       * Event type           | Legacy event type
+       * -------------------------------------------------
+       * "animationend"       | "webkitAnimationEnd"
+       * "animationiteration" | "webkitAnimationIteration"
+       * "animationstart"     | "webkitAnimationStart"
+       * "transitionend"      | "webkitTransitionEnd"
+       */
+      const originalEventType: string = eventImpl._type
+      if (originalEventType === "animationend") {
+        eventImpl._type = "webkitAnimationEnd"
+      } else if (originalEventType === "animationiteration") {
+        eventImpl._type = "webkitAnimationIteration"
+      } else if (originalEventType === "animationstart") {
+        eventImpl._type = "webkitAnimationStart"
+      } else if (originalEventType === "transitionend") {
+        eventImpl._type = "webkitTransitionEnd"
+      }
+
+      /**
+       * 8.3. Inner invoke with event, listeners, phase, and
+       * legacyOutputDidListenersThrowFlag if given.
+       * 8.4. Set event's type attribute value to originalEventType.
+       */
+      EventTargetImpl._innerInvokeEvent(event, listeners, phase,
+        legacyOutputDidListenersThrowFlag)
+      eventImpl._type = originalEventType
+    }
+  }
+
+  /**
+   * Invokes an event.
+   * 
+   * @param event - the event to invoke
+   * @param listeners - event listeners
+   * @param phase - event phase
+   * @param legacyOutputDidListenersThrowFlag - legacy output flag that returns
+   * whether the event listener's callback threw an exception
+   */
+  protected static _innerInvokeEvent(event: Event,
+    listeners: EventListenerEntry[], phase: "capturing" | "bubbling",
+    legacyOutputDidListenersThrowFlag: OutputFlag = { value: false }): boolean {
+
+    /**
+     * 1. Let found be false.
+     * 2. For each listener in listeners, whose removed is false:
+     */
+    let found = false
+
+    for (const listener of listeners) {
+      if (!listener.removed) {
+        /**
+         * 2.1. If event's type attribute value is not listener's type, then
+         * continue.
+         * 2.2. Set found to true.
+         * 2.3. If phase is "capturing" and listener's capture is false, then
+         * continue.
+         * 2.4. If phase is "bubbling" and listener's capture is true, then
+         * continue.
+         */
+        if (event.type !== listener.type) continue
+        found = true
+        if (phase === "capturing" && !listener.capture) continue
+        if (phase === "bubbling" && listener.capture) continue
+
+        /**
+         * 2.5. If listener's once is true, then remove listener from event's
+         * currentTarget attribute value's event listener list.
+         */
+        if (listener.once && event.currentTarget !== null) {
+          const impl = event.currentTarget as EventTargetImpl
+          let index = -1
+          for (let i = 0; i < impl._eventListenerList.length; i++) {
+            if (impl._eventListenerList[i] === listener) {
+              index = i
+              break
+            }
+          }
+          if (index !== -1) {
+            impl._eventListenerList.splice(index, 1)
+          }
+        }
+
+        /**
+         * TODO: Set current global event of Window
+         * 
+         * 2.6. Let global be listener callback's associated Realm's global
+         * object.
+         * 2.7. Let currentEvent be undefined.
+         * 2.8. If global is a Window object, then:
+         * 2.8.1. Set currentEvent to global's current event.
+         * 2.8.2. If struct's invocation-target-in-shadow-tree is false, then
+         * set global's current event to event.
+         */
+
+        /**
+         * 2.9. If listener's passive is true, then set event's in passive
+         * listener flag.
+         * 2.10. Call a user object's operation with listener's callback, 
+         * "handleEvent", « event », and event's currentTarget attribute value.
+         * If this throws an exception, then:
+         * 2.10.1. Report the exception.
+         * 2.10.2. Set legacyOutputDidListenersThrowFlag if given.
+         * 
+         * _Note:_ The legacyOutputDidListenersThrowFlag is only used by 
+         * Indexed Database API.
+         */
+        const eventImpl = event as any
+        if (listener.passive) eventImpl._inPassiveListener = true
+        try {
+          listener.callback.handleEvent.call(event.currentTarget, event)
+        } catch (err) {
+          /**
+           * TODO: Report the error.
+           * See: https://html.spec.whatwg.org/multipage/webappapis.html#runtime-script-errors-in-documents
+           */
+          legacyOutputDidListenersThrowFlag.value = true
+        }
+
+        /**
+         * 2.11. Unset event's in passive listener flag.
+         */
+        if (listener.passive) eventImpl._inPassiveListener = false
+        /**
+         * TODO: Set current window's current event
+         * 
+         * 2.12. If global is a Window object, then set global's current event to currentEvent.
+         */
+
+        /**
+         * 2.13. If event's stop immediate propagation flag is set, then return found.
+         */
+        if (eventImpl._stopImmediatePropagation) return found
+      }
+    }
+
+    /**
+     * 3. Return found.
+     */
+    return found
   }
 }
