@@ -1642,7 +1642,7 @@ export interface Traverser {
  */
 export interface NodeIterator extends Traverser {
   /**
-   * Gets the node current nofe of the.
+   * Gets the node current node of the.
    */
   readonly referenceNode: Node
 
