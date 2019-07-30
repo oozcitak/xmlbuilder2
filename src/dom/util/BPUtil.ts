@@ -1,10 +1,10 @@
-import { Node, BoundaryPosition } from '../interfaces'
+import { Node, BoundaryPosition, BoundaryPoint } from '../interfaces'
 import { TreeQuery } from './TreeQuery'
 
 /**
  * Includes common methods for boundary points.
  */
-export class BoundaryPoint {
+export class BPUtil {
 
   /**
    * Defines the position of a boundary point relative to another.
@@ -12,7 +12,7 @@ export class BoundaryPoint {
    * @param bp - a boundary point
    * @param relativeTo - a boundary point to compare to
    */
-  static position(bp: [Node, number], relativeTo: [Node, number]): BoundaryPosition {
+  static position(bp: BoundaryPoint, relativeTo: BoundaryPoint): BoundaryPosition {
 
     const nodeA = bp[0]
     const offsetA = bp[1]
@@ -34,7 +34,7 @@ export class BoundaryPoint {
     }
 
     if (TreeQuery.isFollowing(nodeB, nodeA)) {
-      if (BoundaryPoint.position(relativeTo, bp) === BoundaryPosition.Before) {
+      if (BPUtil.position(relativeTo, bp) === BoundaryPosition.Before) {
         return BoundaryPosition.After
       } else {
         return BoundaryPosition.Before
@@ -65,7 +65,7 @@ export class BoundaryPoint {
    * 
    * @param node - a node
    */
-  static nodeStart(node: Node): [Node, number] {
+  static nodeStart(node: Node): BoundaryPoint {
     return [node, 0]
   }
 
@@ -74,7 +74,7 @@ export class BoundaryPoint {
    * 
    * @param node - a node
    */
-  static nodeEnd(node: Node): [Node, number] {
+  static nodeEnd(node: Node): BoundaryPoint {
     return [node, TreeQuery.nodeLength(node)]
   }
 }

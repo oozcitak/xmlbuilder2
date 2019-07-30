@@ -3,7 +3,7 @@ import {
 } from './interfaces'
 
 /**
- * Represents a generic XML node.
+ * Represents a DOM event.
  */
 export class EventImpl implements Event {
 

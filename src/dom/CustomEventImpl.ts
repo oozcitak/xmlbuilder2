@@ -2,7 +2,7 @@ import { CustomEvent, CustomEventInit } from './interfaces'
 import { EventImpl } from './EventImpl'
 
 /**
- * Represents a generic XML node.
+ * Represents and event that carries custom data.
  */
 export class CustomEventImpl extends EventImpl implements CustomEvent {
 

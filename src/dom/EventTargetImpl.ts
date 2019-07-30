@@ -1,23 +1,12 @@
 import {
   Event, EventListener, EventTarget, AddEventListenerOptions,
-  EventListenerOptions, EventPathItem, EventPhase, PotentialEventTarget
+  EventListenerOptions, EventPathItem, EventPhase, PotentialEventTarget,
+  EventListenerEntry
 } from './interfaces'
 import { isBoolean } from '../util'
 import { DOMException } from './DOMException'
 import { TreeQuery } from './util/TreeQuery'
 import { Guard } from './util/Guard'
-
-/**
- * Defines an entry in the event listeners list.
- */
-type EventListenerEntry = {
-  type: string
-  callback: EventListener
-  capture: boolean
-  passive: boolean
-  once: boolean
-  removed: boolean
-}
 
 /**
  * Defines a boolean out variable of a function.

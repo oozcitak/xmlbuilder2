@@ -250,6 +250,38 @@ export interface EventTarget {
 }
 
 /**
+ * Represents a controller that allows to abort DOM requests.
+ */
+export interface AbortController {
+  /**
+   * Returns the AbortSignal object associated with this object.
+   */
+  readonly signal: AbortSignal
+
+  /**
+   * Sets the aborted flag and signals any observers that the associated
+   * activity is to be aborted.
+   */
+  abort(): void
+}
+
+/**
+ * Represents a signal object that communicates with a DOM request and abort
+ * it through an AbortController.
+ */
+export interface AbortSignal {
+  /**
+   * Returns `true` if the controller is to abort, and `false` otherwise.
+   */
+  readonly aborted: boolean
+
+  /**
+   * Raises an event when the controller has aborted.
+   */
+  onabort: (event: Event) => void
+}
+
+/**
  * Represents a generic XML node.
  */
 export interface Node extends EventTarget {
@@ -555,7 +587,7 @@ export interface Text extends CharacterData, Slotable {
 /**
  * Represents a collection of elements.
  */
-export interface HTMLCollection extends Iterable<Element> {
+export interface HTMLCollection extends Collection, Iterable<Element> {
 
   /** 
    * Returns the number of elements in the collection.
@@ -1530,9 +1562,16 @@ export interface NodeFilter {
 }
 
 /**
+ * Represents a collection of nodes.
+ */
+export interface Collection {
+
+}
+
+/**
  * Represents an ordered list of nodes.
  */
-export interface NodeList extends Iterable<Node> {
+export interface NodeList extends Collection, Iterable<Node> {
 
   /**
    * Returns the number of nodes in the list.
@@ -1727,7 +1766,7 @@ export interface TreeWalker extends Traverser {
 }
 
 /**
- * Represents an abstract range.
+ * Represents an abstract range with a start and end boundary point.
  */
 export interface AbstractRange {
   /**
@@ -2063,6 +2102,24 @@ export interface MutationObserverInit {
   characterDataOldValue?: boolean
   attributeFilter?: string[]
 }
+
+/**
+ * Defines an entry in the event listeners list.
+ */
+export type EventListenerEntry = {
+  type: string
+  callback: EventListener
+  capture: boolean
+  passive: boolean
+  once: boolean
+  removed: boolean
+}
+
+/**
+ * Defines a boundary point which is a tuple consisting of a node and an offset
+ * into the node's contents.
+ */
+export type BoundaryPoint = [Node, number]
 
 /**
  * Defines a callback function which is invoked after nodes registered with the

@@ -1,10 +1,10 @@
 import {
-  Node, Range, BoundaryPosition, NodeType, CharacterData, DocumentFragment
+  Node, Range, BoundaryPosition, NodeType, CharacterData, DocumentFragment, BoundaryPoint
 } from '../interfaces'
 import { TreeQuery } from './TreeQuery'
 import { TreeMutation } from './TreeMutation'
 import { TextUtility } from './TextUtility'
-import { BoundaryPoint } from './BoundaryPoint'
+import { BPUtil } from './BPUtil'
 import { DOMException } from '../DOMException'
 import { DocumentFragmentImpl } from '../DocumentFragmentImpl'
 import { RangeImpl } from '../RangeImpl'
@@ -38,10 +38,10 @@ export class RangeQuery {
       throw DOMException.IndexSizeError
     }
 
-    const bp: [Node, number] = [node, offset]
+    const bp: BoundaryPoint = [node, offset]
     const rangeAsAny = <any><unknown>range
 
-    if (BoundaryPoint.position(bp, rangeAsAny._end) === BoundaryPosition.After ||
+    if (BPUtil.position(bp, rangeAsAny._end) === BoundaryPosition.After ||
       RangeQuery.root(range) !== TreeQuery.rootNode(node)) {
       rangeAsAny._end = bp
     }
@@ -65,10 +65,10 @@ export class RangeQuery {
       throw DOMException.IndexSizeError
     }
 
-    const bp: [Node, number] = [node, offset]
+    const bp: BoundaryPoint = [node, offset]
     const rangeAsAny = <any><unknown>range
 
-    if (BoundaryPoint.position(bp, rangeAsAny._start) === BoundaryPosition.Before ||
+    if (BPUtil.position(bp, rangeAsAny._start) === BoundaryPosition.Before ||
       RangeQuery.root(range) !== TreeQuery.rootNode(node)) {
       rangeAsAny._start = bp
     }
@@ -103,15 +103,15 @@ export class RangeQuery {
     const container = range.commonAncestorContainer
 
     const rangeAsAny = <any><unknown>range
-    const start: [Node, number] = rangeAsAny._start
-    const end: [Node, number] = rangeAsAny._end
+    const start: BoundaryPoint = rangeAsAny._start
+    const end: BoundaryPoint = rangeAsAny._end
 
     for (const node of TreeQuery.getDescendantNodes(container)) {
       if (root === TreeQuery.rootNode(node)) {
-        const nodeStart = BoundaryPoint.nodeStart(node)
-        const nodeEnd = BoundaryPoint.nodeEnd(node)
-        if (BoundaryPoint.position(nodeStart, start) === BoundaryPosition.After &&
-          BoundaryPoint.position(nodeEnd, end) === BoundaryPosition.Before) {
+        const nodeStart = BPUtil.nodeStart(node)
+        const nodeEnd = BPUtil.nodeEnd(node)
+        if (BPUtil.position(nodeStart, start) === BoundaryPosition.After &&
+          BPUtil.position(nodeEnd, end) === BoundaryPosition.Before) {
           yield node
         }
       }
@@ -147,14 +147,14 @@ export class RangeQuery {
     const root = RangeQuery.root(range)
 
     const rangeAsAny = <any><unknown>range
-    const start: [Node, number] = rangeAsAny._start
-    const end: [Node, number] = rangeAsAny._end
+    const start: BoundaryPoint = rangeAsAny._start
+    const end: BoundaryPoint = rangeAsAny._end
 
     if (root === TreeQuery.rootNode(node)) {
-      const nodeStart = BoundaryPoint.nodeStart(node)
-      const nodeEnd = BoundaryPoint.nodeEnd(node)
-      if (BoundaryPoint.position(nodeStart, start) === BoundaryPosition.After &&
-        BoundaryPoint.position(nodeEnd, end) === BoundaryPosition.Before) {
+      const nodeStart = BPUtil.nodeStart(node)
+      const nodeEnd = BPUtil.nodeEnd(node)
+      if (BPUtil.position(nodeStart, start) === BoundaryPosition.After &&
+        BPUtil.position(nodeEnd, end) === BoundaryPosition.Before) {
         return true
       }
     }
@@ -406,8 +406,8 @@ export class RangeQuery {
    */
   static insert(range: Range, node: Node): void {
     const rangeAsAny = <any><unknown>range
-    const start: [Node, number] = rangeAsAny._start
-    const end: [Node, number] = rangeAsAny._end
+    const start: BoundaryPoint = rangeAsAny._start
+    const end: BoundaryPoint = rangeAsAny._end
 
     if (start[0].nodeType === NodeType.ProcessingInstruction ||
       start[0].nodeType === NodeType.Comment ||
@@ -474,8 +474,8 @@ export class RangeQuery {
    */
   static stringify(range: Range): string {
     const rangeAsAny = <any><unknown>range
-    const start: [Node, number] = rangeAsAny._start
-    const end: [Node, number] = rangeAsAny._end
+    const start: BoundaryPoint = rangeAsAny._start
+    const end: BoundaryPoint = rangeAsAny._end
 
     if (start[0] === end[0] && TextUtility.isTextNode(start[0])) {
       return start[0].data.substring(start[1], end[1])

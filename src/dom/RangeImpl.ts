@@ -1,12 +1,12 @@
 import {
   Node, Range, NodeType, BoundaryPosition, HowToCompare,
-  DocumentFragment, Document
+  DocumentFragment, Document, BoundaryPoint
 } from './interfaces'
 import { AbstractRangeImpl } from './AbstractRangeImpl'
 import { TreeQuery } from './util/TreeQuery'
 import { TreeMutation } from './util/TreeMutation'
 import { DOMException } from './DOMException'
-import { BoundaryPoint } from './util/BoundaryPoint'
+import { BPUtil } from './util/BPUtil'
 import { RangeQuery } from './util/RangeQuery'
 import { TextUtility } from './util/TextUtility'
 
@@ -25,7 +25,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
   /**
    * Initializes a new instance of `Range`.
    */
-  constructor(start?: [Node, number], end?: [Node, number]) {
+  constructor(start?: BoundaryPoint, end?: BoundaryPoint) {
     super([<Node><unknown>null, 0], [<Node><unknown>null, 0])
 
     if (start) {
@@ -128,8 +128,8 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       throw DOMException.WrongDocumentError
     }
 
-    let thisPoint: [Node, number]
-    let otherPoint: [Node, number]
+    let thisPoint: BoundaryPoint
+    let otherPoint: BoundaryPoint
 
     switch (how) {
       case HowToCompare.StartToStart:
@@ -149,7 +149,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
         throw DOMException.NotSupportedError
     }
 
-    const position = BoundaryPoint.position(thisPoint, otherPoint)
+    const position = BPUtil.position(thisPoint, otherPoint)
 
     if (position === BoundaryPosition.Before) {
       return -1
@@ -296,9 +296,9 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       throw DOMException.IndexSizeError
     }
 
-    const bp: [Node, number] = [node, offset]
-    if (BoundaryPoint.position(bp, this._start) === BoundaryPosition.Before ||
-      BoundaryPoint.position(bp, this._end) === BoundaryPosition.After) {
+    const bp: BoundaryPoint = [node, offset]
+    if (BPUtil.position(bp, this._start) === BoundaryPosition.Before ||
+      BPUtil.position(bp, this._end) === BoundaryPosition.After) {
       return false
     }
 
@@ -319,10 +319,10 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       throw DOMException.IndexSizeError
     }
 
-    const bp: [Node, number] = [node, offset]
-    if (BoundaryPoint.position(bp, this._start) === BoundaryPosition.Before) {
+    const bp: BoundaryPoint = [node, offset]
+    if (BPUtil.position(bp, this._start) === BoundaryPosition.Before) {
       return -1
-    } else if (BoundaryPoint.position(bp, this._end) === BoundaryPosition.After) {
+    } else if (BPUtil.position(bp, this._end) === BoundaryPosition.After) {
       return 1
     }
 
@@ -343,8 +343,8 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
 
     const offset = TreeQuery.index(node)
 
-    if (BoundaryPoint.position([parent, offset], this._end) === BoundaryPosition.Before &&
-      BoundaryPoint.position([parent, offset + 1], this._start) === BoundaryPosition.After) {
+    if (BPUtil.position([parent, offset], this._end) === BoundaryPosition.Before &&
+      BPUtil.position([parent, offset + 1], this._start) === BoundaryPosition.After) {
       return true
     }
 
