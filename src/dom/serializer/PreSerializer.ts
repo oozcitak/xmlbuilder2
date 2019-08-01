@@ -3,7 +3,7 @@ import {
   DocumentType, ProcessingInstruction, CDATASection
 } from "../../dom/interfaces"
 import { Namespace, XMLSpec } from "../../dom/spec"
-import { TupleSet } from "../../util"
+import { TupleSet } from "./TupleSet"
 import { NamespacePrefixMap } from './NamespacePrefixMap'
 import { PreSerializedNode, PreSerializedAttr } from "./interfaces"
 import { DOMException } from ".."

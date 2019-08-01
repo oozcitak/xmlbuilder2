@@ -2,7 +2,7 @@ import {
   Node, CharacterData, ShadowRoot, Element, NodeType
 } from '../interfaces'
 import { Guard } from './Guard'
-import { ElementInternal } from '../interfacesInternal';
+import { ElementInternal } from '../interfacesInternal'
 
 /**
  * Includes query and traversal methods for trees.

@@ -23,7 +23,7 @@ import { NodeIteratorImpl } from './NodeIteratorImpl'
 import { TreeWalkerImpl } from './TreeWalkerImpl'
 import { RangeImpl } from './RangeImpl'
 import { DocumentInternal, NodeInternal } from './interfacesInternal'
-import { Guard } from './util/Guard';
+import { Guard } from './util/Guard'
 
 /**
  * Represents a document node.

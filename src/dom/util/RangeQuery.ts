@@ -10,7 +10,7 @@ import { DOMException } from '../DOMException'
 import { DocumentFragmentImpl } from '../DocumentFragmentImpl'
 import { RangeImpl } from '../RangeImpl'
 import { RangeInternal, DocumentInternal, NodeInternal } from '../interfacesInternal'
-import { Guard } from './Guard';
+import { Guard } from './Guard'
 
 /**
  * Includes methods to query ranges.

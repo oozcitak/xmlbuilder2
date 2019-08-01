@@ -1,5 +1,3 @@
-export { TupleSet } from './TupleSet'
-
 /**
  * Applies the mixin to a given class.
  * 

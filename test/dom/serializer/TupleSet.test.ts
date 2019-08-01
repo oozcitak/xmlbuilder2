@@ -1,4 +1,4 @@
-import { TupleSet } from '../../src/util'
+import { TupleSet } from '../../../src/dom/serializer/TupleSet'
 
 describe('TupleSet', function () {
 

@@ -1,6 +1,6 @@
 import {
   Node, Range, NodeType, BoundaryPosition, HowToCompare,
-  DocumentFragment, Document, BoundaryPoint
+  DocumentFragment, BoundaryPoint
 } from './interfaces'
 import { AbstractRangeImpl } from './AbstractRangeImpl'
 import { TreeQuery } from './util/TreeQuery'
@@ -9,8 +9,8 @@ import { DOMException } from './DOMException'
 import { BPUtil } from './util/BPUtil'
 import { RangeQuery } from './util/RangeQuery'
 import { TextUtility } from './util/TextUtility'
-import { RangeInternal, DocumentInternal, NodeInternal } from './interfacesInternal'
-import { Guard } from './util/Guard';
+import { RangeInternal, NodeInternal } from './interfacesInternal'
+import { Guard } from './util/Guard'
 
 /**
  * Represents a live range.
