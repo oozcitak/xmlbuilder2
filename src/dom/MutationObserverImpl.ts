@@ -1,17 +1,18 @@
 import {
-  MutationObserver, Node, MutationObserverInit, MutationRecord,
+  Node, MutationObserverInit, MutationRecord,
   MutationCallback, RegisteredObserver, TransientRegisteredObserver
 } from "./interfaces"
+import { MutationObserverInternal, NodeInternal } from "./interfacesInternal"
 
 /**
  * Represents an object that can be used to observe mutations to the tree of
  * nodes.
  */
-export class MutationObserverImpl implements MutationObserver {
+export class MutationObserverImpl implements MutationObserverInternal {
 
-  private _callback: MutationCallback
-  private _nodeList: Node[] = []
-  private _recordQueue: MutationRecord[] = []
+  _callback: MutationCallback
+  _nodeList: Node[] = []
+  _recordQueue: MutationRecord[] = []
 
   /**
    * Initializes a new instance of `MutationObserver`.
@@ -24,7 +25,7 @@ export class MutationObserverImpl implements MutationObserver {
   }
 
   /** @inheritdoc */
-  observe(target: Node, options?: MutationObserverInit): void {
+  observe(target: NodeInternal, options?: MutationObserverInit): void {
     options = options || {
       childList: false,
       subtree: false
@@ -50,8 +51,7 @@ export class MutationObserverImpl implements MutationObserver {
       throw new TypeError()
     }
 
-    const observers: Array<RegisteredObserver | TransientRegisteredObserver> =
-      (<any><unknown>target)._registeredObservers
+    const observers = target._registeredObserverList
 
     let isRegistered = false
     for (const registered of observers) {
@@ -59,8 +59,7 @@ export class MutationObserverImpl implements MutationObserver {
         isRegistered = true
         for (const node of this._nodeList) {
           const toRemove: Array<TransientRegisteredObserver> = []
-          const transientObservers: Array<RegisteredObserver | TransientRegisteredObserver> =
-            (<any><unknown>node)._registeredObservers
+          const transientObservers = (node as NodeInternal)._registeredObserverList
           for (const transient of transientObservers) {
             if ((<TransientRegisteredObserver>transient).source === registered) {
               toRemove.push(<TransientRegisteredObserver>transient)
@@ -85,8 +84,7 @@ export class MutationObserverImpl implements MutationObserver {
   disconnect(): void {
     for (const node of this._nodeList) {
       const toRemove: Array<RegisteredObserver> = []
-      const observers: Array<RegisteredObserver> =
-        (<any><unknown>node)._registeredObservers
+      const observers = (node as NodeInternal)._registeredObserverList
       for (const observer of observers) {
         if (observer.observer = this) {
           toRemove.push(observer)

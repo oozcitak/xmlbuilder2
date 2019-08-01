@@ -1,7 +1,6 @@
 import {
-  Attr, NamedNodeMap, DOMTokenList, Document,
-  ShadowRoot, NodeType, Node, Element,
-  HTMLCollection, NodeList, ShadowRootMode
+  Attr, NamedNodeMap, DOMTokenList, Document, ShadowRoot, NodeType, Node, 
+  Element, HTMLCollection, NodeList, ShadowRootMode
 } from './interfaces'
 import { HTMLSpec } from './spec'
 import { TextImpl } from './TextImpl'
@@ -15,17 +14,26 @@ import { Namespace } from './spec/Namespace'
 import { OrderedSet } from './util/OrderedSet'
 import { TreeMutation } from './util/TreeMutation'
 import { ShadowRootImpl } from './ShadowRootImpl'
+import { ElementInternal, AttrInternal } from './interfacesInternal'
+import { HTMLSlotElement } from '../htmldom/interfaces'
 
 /**
  * Represents an element node.
  */
-export class ElementImpl extends NodeImpl implements Element {
+export class ElementImpl extends NodeImpl implements ElementInternal {
 
-  protected _namespaceURI: string | null
-  protected _prefix: string | null
-  protected _localName: string
-  protected _attributes: NamedNodeMap = new NamedNodeMapImpl(this)
-  protected _shadowRoot: ShadowRoot | null = null
+  _namespace: string | null
+  _namespacePrefix: string | null
+  _localName: string
+  _shadowRoot: ShadowRoot | null = null
+  _attributeList: NamedNodeMap = new NamedNodeMapImpl(this)
+
+  _customElementState: "undefined" | "failed" | "uncustomized" | "custom" = "undefined"
+  _customElementDefinition  = ElementImpl
+  _is: string = ""
+
+  _uniqueIdentifier?: string | undefined;
+
 
   /**
    * Initializes a new instance of `Element`.
@@ -40,8 +48,8 @@ export class ElementImpl extends NodeImpl implements Element {
     super(ownerDocument)
 
     this._localName = localName
-    this._namespaceURI = namespaceURI
-    this._prefix = prefix || null
+    this._namespace = namespaceURI
+    this._namespacePrefix = prefix || null
   }
 
   /** 
@@ -52,17 +60,17 @@ export class ElementImpl extends NodeImpl implements Element {
   /** 
    * Returns a string appropriate for the type of node. 
    */
-  get nodeName(): string { return this.tagName }
+  get nodeName(): string { return this._qualifiedName }
 
   /** 
    * Gets the namespace URI.
    */
-  get namespaceURI(): string | null { return this._namespaceURI }
+  get namespaceURI(): string | null { return this._namespace }
 
   /** 
    * Gets the namespace prefix.
    */
-  get prefix(): string | null { return this._prefix }
+  get prefix(): string | null { return this._namespacePrefix }
 
   /** 
    * Gets the local name.
@@ -70,15 +78,9 @@ export class ElementImpl extends NodeImpl implements Element {
   get localName(): string { return this._localName }
 
   /** 
-   * If namespace prefix is not `null`, returns the concatenation of
-   * namespace prefix, `":"`, and local name. Otherwise it returns the
-   * local name.
+   * Gets the qualified name.
    */
-  get tagName(): string {
-    return (this._prefix ?
-      this._prefix + ':' + this.localName :
-      this.localName)
-  }
+  get tagName(): string { return this._qualifiedName }
 
   /** 
    * Gets or sets the identifier of this element.
@@ -106,7 +108,7 @@ export class ElementImpl extends NodeImpl implements Element {
   /** 
    * Returns a {@link NamedNodeMap} of attributes.
    */
-  get attributes(): NamedNodeMap { return this._attributes }
+  get attributes(): NamedNodeMap { return this._attributeList }
 
   /**
    * Determines if the element node contains any attributes.
@@ -160,7 +162,7 @@ export class ElementImpl extends NodeImpl implements Element {
     if (attr) {
       attr.value = value
     } else {
-      attr = new AttrImpl(this.ownerDocument, this, name,
+      attr = new AttrImpl(this._nodeDocument, this, name,
         null, null, value)
       this.attributes.setNamedItem(attr)
     }
@@ -180,7 +182,7 @@ export class ElementImpl extends NodeImpl implements Element {
     if (attr) {
       attr.value = value
     } else {
-      attr = new AttrImpl(this.ownerDocument, this, names.localName,
+      attr = new AttrImpl(this._nodeDocument, this, names.localName,
         namespace, names.prefix, value)
       this.attributes.setNamedItemNS(attr)
     }
@@ -271,9 +273,9 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param attr - attribute to set
    */
   setAttributeNode(attr: Attr): Attr | null {
-    const attrImpl = <AttrImpl>attr
-    attrImpl._ownerDocument = this.ownerDocument
-    attrImpl._ownerElement = this
+    const attrImpl = <AttrInternal>attr
+    attrImpl._nodeDocument = this._nodeDocument
+    attrImpl._element = this
     return this.attributes.setNamedItem(attrImpl)
   }
 
@@ -283,9 +285,9 @@ export class ElementImpl extends NodeImpl implements Element {
    * @param attr - attribute to set
    */
   setAttributeNodeNS(attr: Attr): Attr | null {
-    const attrImpl = <AttrImpl>attr
-    attrImpl._ownerDocument = this.ownerDocument
-    attrImpl._ownerElement = this
+    const attrImpl = <AttrInternal>attr
+    attrImpl._nodeDocument = this._nodeDocument
+    attrImpl._element = this
     return this.attributes.setNamedItemNS(attrImpl)
   }
 
@@ -306,12 +308,12 @@ export class ElementImpl extends NodeImpl implements Element {
   attachShadow(init: { mode: ShadowRootMode }): ShadowRoot {
     if (this.namespaceURI !== Namespace.HTML)
       throw DOMException.NotSupportedError
-    if(!HTMLSpec.isValidCustomElementName(this.localName) && !HTMLSpec.isValidElementName(this.localName))
+    if (!HTMLSpec.isValidCustomElementName(this.localName) && !HTMLSpec.isValidElementName(this.localName))
       throw DOMException.NotSupportedError
-    if(this._shadowRoot)
+    if (this._shadowRoot)
       throw DOMException.InvalidStateError
 
-    const shadow = new ShadowRootImpl(this.ownerDocument, this, init.mode)
+    const shadow = new ShadowRootImpl(this._nodeDocument, this, init.mode)
     this._shadowRoot = shadow
     return shadow
   }
@@ -371,7 +373,7 @@ export class ElementImpl extends NodeImpl implements Element {
     return str
   }
   set textContent(value: string | null) {
-    const node = new TextImpl(this.ownerDocument, value || '')
+    const node = new TextImpl(this._nodeDocument, value || '')
     TreeMutation.replaceAllNode(node, this)
   }
 
@@ -385,7 +387,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    const clonedSelf = new ElementImpl(this.ownerDocument,
+    const clonedSelf = new ElementImpl(this._nodeDocument,
       this.localName, this.namespaceURI, this.prefix)
 
     // clone attributes
@@ -546,7 +548,7 @@ export class ElementImpl extends NodeImpl implements Element {
    * @returns the inserted element
    */
   insertAdjacentText(where: string, data: string): void {
-    const text = new TextImpl(this.ownerDocument, data)
+    const text = new TextImpl(this._nodeDocument, data)
 
     switch (where.toLowerCase()) {
       case 'beforebegin':
@@ -620,6 +622,28 @@ export class ElementImpl extends NodeImpl implements Element {
     return null
   }
 
+
+  /** 
+   * Returns the qualified name.
+   */
+  get _qualifiedName(): string {
+    return (this._namespacePrefix ?
+      this._namespacePrefix + ':' + this.localName :
+      this.localName)
+  }
+
+  /**
+   * Returns the upper-cased qualified name for a html element.
+   */
+  get _htmlUppercasedQualifiedName(): string {
+    let qualifiedName = this._qualifiedName
+    if (this._namespace === Namespace.HTML && this._nodeDocument._type === "html") {
+      // TODO: https://infra.spec.whatwg.org/#ascii-uppercase
+      qualifiedName = qualifiedName.toUpperCase()
+    }
+    return qualifiedName
+  }
+
   // MIXIN: ParentNode
   /* istanbul ignore next */
   get children(): HTMLCollection { throw new Error("Mixin: ParentNode not implemented.") }
@@ -656,6 +680,6 @@ export class ElementImpl extends NodeImpl implements Element {
 
   // MIXIN: Slotable
   /* istanbul ignore next */
-  get assignedSlot(): undefined { throw new Error("Mixin: Slotable not implemented.") }
+  get assignedSlot(): HTMLSlotElement | null { throw new Error("Mixin: Slotable not implemented.") }
 
 }

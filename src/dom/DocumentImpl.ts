@@ -1,8 +1,9 @@
 import {
-  Document, DOMImplementation, DocumentType, Element, Text,
+  DOMImplementation, DocumentType, Element, Text,
   NodeFilter, NodeType, Node, HTMLCollection, DocumentFragment,
   NodeList, WhatToShow, Attr, ProcessingInstruction, Comment,
-  CDATASection, NodeIterator, TreeWalker, FilterResult, Range
+  CDATASection, NodeIterator, TreeWalker, FilterResult, Range, Event,
+  EventTarget
 } from './interfaces'
 import { NodeImpl } from './NodeImpl'
 import { DOMException } from './DOMException'
@@ -21,17 +22,22 @@ import { TreeMutation } from './util/TreeMutation'
 import { NodeIteratorImpl } from './NodeIteratorImpl'
 import { TreeWalkerImpl } from './TreeWalkerImpl'
 import { RangeImpl } from './RangeImpl'
+import { DocumentInternal, NodeInternal } from './interfacesInternal'
+import { Guard } from './util/Guard';
 
 /**
  * Represents a document node.
  */
-export class DocumentImpl extends NodeImpl implements Document {
+export class DocumentImpl extends NodeImpl implements DocumentInternal {
 
+  _encoding: string = "UTF-8"
+  _contentType: string = 'application/xml'
   _URL: string = 'about:blank'
   _origin: string = ''
+  _type: "xml" | "html" = "xml"
+  _mode: string = "no-quirks"
   _compatMode: string = 'CSS1Compat'
-  _characterSet: string = 'UTF-8'
-  _contentType: string = 'application/xml'
+
   _rangeList: Range[] = []
 
   /**
@@ -39,6 +45,8 @@ export class DocumentImpl extends NodeImpl implements Document {
    */
   public constructor() {
     super(null)
+
+    this._nodeDocument = this
   }
 
   /**
@@ -60,7 +68,7 @@ export class DocumentImpl extends NodeImpl implements Document {
   /**
    * Returns the character set.
    */
-  get characterSet(): string { return this._characterSet }
+  get characterSet(): string { return this._encoding }
 
   /**
    * Returns the MIME type of the document.
@@ -88,17 +96,17 @@ export class DocumentImpl extends NodeImpl implements Document {
   /**
    * Gets or sets the document's URL.
    */
-  get documentURI(): string { return this.URL }
+  get documentURI(): string { return this._URL }
 
   /**
    * Gets or sets the character set.
    */
-  get charset(): string { return this.characterSet }
+  get charset(): string { return this._encoding }
 
   /**
    * Returns the character set.
    */
-  get inputEncoding(): string { return this.characterSet }
+  get inputEncoding(): string { return this._encoding }
 
   /** 
    * Returns the {@link DocType} or `null` if there is none.
@@ -285,16 +293,16 @@ export class DocumentImpl extends NodeImpl implements Document {
     if (node.nodeType === NodeType.Document)
       throw DOMException.NotSupportedError
 
-    if ((<any>node).host) // ShadowRoot
+    if (Guard.isShadowRoot(node))
       throw DOMException.NotSupportedError
 
     const clonedNode = node.cloneNode(deep)
 
     for (const child of TreeQuery.getDescendantNodes(clonedNode, true, false)) {
-      (<NodeImpl>child)._ownerDocument = this
+      (<NodeImpl>child)._nodeDocument = this
       if (child.nodeType === NodeType.Element) {
         for (const attr of (<ElementImpl>child).attributes) {
-          (<AttrImpl>attr)._ownerDocument = this
+          (<AttrImpl>attr)._nodeDocument = this
         }
       }
     }
@@ -314,10 +322,10 @@ export class DocumentImpl extends NodeImpl implements Document {
     if (node.nodeType === NodeType.Document)
       throw DOMException.NotSupportedError
 
-    if ((<any>node).host) // ShadowRoot
+    if (Guard.isShadowRoot(node))
       throw DOMException.HierarchyRequestError
 
-    TreeMutation.adoptNode(node, this)
+    TreeMutation.adoptNode(node as NodeInternal, this)
 
     return node
   }
@@ -452,12 +460,16 @@ export class DocumentImpl extends NodeImpl implements Document {
   }
 
   /**
-   * Removes a range object.
+   * Gets the parent event target for the given event.
+   * 
+   * @param event - an event
    */
-  _removeRange(range: Range): void {
-    const index = this._rangeList.indexOf(range)
-    if (index > -1) {
-      this._rangeList.splice(index, 1)
+  _getTheParent(event: Event): EventTarget | null {
+    if (event.type === "load") {
+      return null
+    } else {
+      // TODO: return the document's relevant global object 
+      return null
     }
   }
 

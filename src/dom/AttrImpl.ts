@@ -1,16 +1,17 @@
 import { Attr, Node, Element, Document, NodeType } from "./interfaces"
 import { NodeImpl } from "./NodeImpl"
+import { AttrInternal } from "./interfacesInternal"
 
 /**
  * Represents an attribute of an element node.
  */
-export class AttrImpl extends NodeImpl implements Attr {
+export class AttrImpl extends NodeImpl implements AttrInternal {
 
-  protected _namespaceURI: string | null
-  protected _prefix: string | null
-  protected _localName: string
-  protected _value: string
-  _ownerElement: Element | null
+  _namespace: string | null
+  _namespacePrefix: string | null
+  _element: Element | null
+  _localName: string
+  _value: string
 
   /** 
    * Always returns true.
@@ -20,9 +21,12 @@ export class AttrImpl extends NodeImpl implements Attr {
   /**
    * Initializes a new instance of `Attr`.
    *
+   * @param ownerDocument - owner document
+   * @param ownerElement - owner element node
    * @param localName - the local name of the element
    * @param namespaceURI - the namespace URI
    * @param prefix - the namespace prefix
+   * @param value - attribute value
    */
   public constructor(ownerDocument: Document | null,
     ownerElement: Element | null, localName: string,
@@ -30,11 +34,11 @@ export class AttrImpl extends NodeImpl implements Attr {
     value: string) {
     super(ownerDocument)
 
-    this._ownerElement = ownerElement
+    this._element = ownerElement
 
     this._localName = localName
-    this._namespaceURI = namespaceURI || null
-    this._prefix = prefix || null
+    this._namespace = namespaceURI || null
+    this._namespacePrefix = prefix || null
     this._value = value
   }
 
@@ -52,17 +56,17 @@ export class AttrImpl extends NodeImpl implements Attr {
   /** 
    * Gets the owner element node.
    */
-  get ownerElement(): Element | null { return this._ownerElement }
+  get ownerElement(): Element | null { return this._element }
 
   /** 
    * Gets the namespace URI.
    */
-  get namespaceURI(): string | null { return this._namespaceURI }
+  get namespaceURI(): string | null { return this._namespace }
 
   /** 
    * Gets the namespace prefix.
    */
-  get prefix(): string | null { return this._prefix }
+  get prefix(): string | null { return this._namespacePrefix }
 
   /** 
    * Gets the local name.
@@ -70,15 +74,9 @@ export class AttrImpl extends NodeImpl implements Attr {
   get localName(): string { return this._localName }
 
   /** 
-   * If namespace prefix is not `null`, returns the concatenation of
-   * namespace prefix, `":"`, and local name. Otherwise it returns the
-   * local name.
+   * Gets the qualified name.
    */
-  get name(): string {
-    return (this._prefix ?
-      this._prefix + ':' + this.localName :
-      this.localName)
-  }
+  get name(): string { return this._qualifiedName }
 
   /** 
    * Gets or sets the attribute value.
@@ -155,5 +153,14 @@ export class AttrImpl extends NodeImpl implements Attr {
     return (other && this.namespaceURI === other.namespaceURI &&
       this.localName === other.localName &&
       this.value === other.value)
+  }
+
+  /** 
+   * Returns the qualified name.
+   */
+  get _qualifiedName(): string  {
+    return (this._namespacePrefix ?
+      this._namespacePrefix + ':' + this.localName :
+      this.localName)
   }
 }

@@ -2,6 +2,7 @@ import {
   Node, CharacterData, ShadowRoot, Element, NodeType
 } from '../interfaces'
 import { Guard } from './Guard'
+import { ElementInternal } from '../interfacesInternal';
 
 /**
  * Includes query and traversal methods for trees.
@@ -58,7 +59,7 @@ export class TreeQuery {
 
     for (const child of TreeQuery.getDescendantNodes(node, self, shadow,
       (node) => { return node.nodeType === NodeType.Element })) {
-      const ele = <Element><unknown>child
+      const ele = child as ElementInternal
       if (!filter || !!filter(ele))
         yield ele
     }
@@ -498,7 +499,7 @@ export class TreeQuery {
       if (Guard.isNode(b) && TreeQuery.isAncestorOf(rootOfA, b, true, true)) {
         return a
       }
-      
+
       a = rootOfA.host
     }
   }

@@ -303,7 +303,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.raw(content, this._debugInfo())
 
     const child = this._doc.createTextNode(content)
-    const builder = (<XMLBuilderNodeImpl><unknown>child)
+    const builder = XMLBuilderNodeImpl._FromNode(child) as XMLBuilderNodeImpl
     builder._isRawNode = true
     this._asElement.appendChild(child)
 
@@ -597,6 +597,9 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    */
   protected get _doc(): Document {
     const node = this._asNode
+    if (node.nodeType === NodeType.Document) {
+      return <Document>node
+    }
     const doc = node.ownerDocument
     if (!doc) {
       throw new Error("Document is null. " + this._debugInfo())
@@ -615,7 +618,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * Returns the underlying DOM node.
    */
   protected get _asNode(): Node {
-    const node = <Node><unknown>this
+    const node = this as unknown as Node
 
     if (!node.nodeType) {
       throw new Error("This function can only be applied to a DOM node." + this._debugInfo())
@@ -628,7 +631,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * Returns the underlying element node.
    */
   protected get _asElement(): Element {
-    const ele = <Element><unknown>this
+    const ele = this as unknown as Element
 
     if (!ele.nodeType || ele.nodeType !== NodeType.Element) {
       throw new Error("This function can only be applied to an element node." + this._debugInfo())
@@ -641,7 +644,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * Returns the underlying document node.
    */
   protected get _asDocument(): Document {
-    const doc = <Document><unknown>this
+    const doc = this as unknown as Document
 
     if (!doc.nodeType || doc.nodeType !== NodeType.Document) {
       throw new Error("This function can only be applied to a document node." + this._debugInfo())
@@ -654,7 +657,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * Converts a DOM node to an `XMLBuilder`.
    */
   protected static _FromNode(node: Node): XMLBuilderNode {
-    return <XMLBuilderNode><unknown>node
+    return node as unknown as XMLBuilderNode
   }
 
   /**

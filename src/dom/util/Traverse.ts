@@ -15,7 +15,7 @@ export class Traverse {
    * @param node - the node to filter
    */
   static filterNode(traverser: NodeIterator | TreeWalker, node: Node): FilterResult {
-    if (traverser.active) {
+    if (traverser._activeFlag) {
       throw DOMException.InvalidStateError
     }
 
@@ -30,13 +30,13 @@ export class Traverse {
 
     let result: FilterResult = FilterResult.Reject
     try {
-      traverser.active = true
+      traverser._activeFlag = true
       result = traverser.filter.acceptNode(node)
     } catch (err) {
-      traverser.active = false
+      traverser._activeFlag = false
       throw err
     } finally {
-      traverser.active = false
+      traverser._activeFlag = false
     }
 
     return result

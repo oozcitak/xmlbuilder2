@@ -1,12 +1,17 @@
 import {
-  NodeType, Node, Document, Element, RegisteredObserver,
-  MutationObserver, MutationRecord
+  NodeType, Node, Element, RegisteredObserver,
+  MutationObserver, MutationRecord, Document
 } from "../interfaces"
 import { DOMException } from "../DOMException"
 import { List } from "./List"
 import { TreeQuery } from "./TreeQuery"
 import { TextUtility } from "./TextUtility"
 import { NodeListStaticImpl } from "../NodeListStaticImpl"
+import {
+  NodeInternal, DocumentInternal, RangeInternal,
+  MutationObserverInternal, AttrInternal
+} from "../interfacesInternal"
+import { Guard } from "./Guard"
 
 /**
  * Contains tree mutation algorithms.
@@ -142,14 +147,12 @@ export class TreeMutation {
    */
   static preInsert(node: Node, parent: Node, child: Node | null): Node {
     TreeMutation.ensurePreInsertionValidity(node, parent, child)
-    if (!parent.ownerDocument)
-      throw DOMException.HierarchyRequestError
 
     let referenceChild = child
     if (referenceChild === node)
       referenceChild = node.nextSibling
 
-    TreeMutation.adoptNode(node, parent.ownerDocument)
+    TreeMutation.adoptNode(node, (parent as NodeInternal)._nodeDocument)
     TreeMutation.insertNode(node, parent, referenceChild)
 
     return node
@@ -164,19 +167,19 @@ export class TreeMutation {
    * @param document - document to receive the node and its subtree
    */
   static adoptNode(node: Node, document: Document): void {
-    const oldDocument = node.ownerDocument
+    const oldDocument = (node as NodeInternal)._nodeDocument
 
     if (node.parentNode)
       TreeMutation.removeNode(node, node.parentNode)
 
     if (document !== oldDocument) {
       for (const inclusiveDescendant of TreeQuery.getDescendantNodes(node, true, true)) {
-        (<any>inclusiveDescendant)._ownerDocument = document
+        (inclusiveDescendant as NodeInternal)._nodeDocument = document as DocumentInternal
 
         if (inclusiveDescendant.nodeType === NodeType.Element) {
           const ele = <Element>inclusiveDescendant
           for (const attr of ele.attributes) {
-            (<any>attr)._ownerDocument = document
+            (attr as AttrInternal)._nodeDocument = document as DocumentInternal
           }
         }
 
@@ -205,7 +208,7 @@ export class TreeMutation {
     const count = (node.nodeType === NodeType.DocumentFragment ?
       node.childNodes.length : 1)
 
-    if (child !== null && parent.ownerDocument !== null) {
+    if (child !== null) {
       /**
        * 1. For each live range whose start node is parent and start 
        * offset is greater than child's index, increase its start 
@@ -214,9 +217,10 @@ export class TreeMutation {
        * offset is greater than child's index, increase its end 
        * offset by count.
        */
-      const docAsAny = <any><unknown>parent.ownerDocument
+      const doc = (parent as NodeInternal)._nodeDocument
       const index = TreeQuery.index(child)
-      for (const range of docAsAny._rangeList) {
+      for (const item of doc._rangeList) {
+        const range = item as RangeInternal
         if (range._start[0] === parent && range._start[1] > index) {
           range._start[1] += count
         }
@@ -258,7 +262,7 @@ export class TreeMutation {
        * If node is a Text node, run the child text content change 
        * steps for parent.
        */
-      if (TextUtility.isTextNode(node)) {
+      if (Guard.isTextNode(node)) {
         TextUtility.childTextContentChanged(parent)
       }
       /**
@@ -397,10 +401,7 @@ export class TreeMutation {
     if (referenceChild === node) referenceChild = node.nextSibling
     let previousSibling = child.previousSibling
 
-    if (!parent.ownerDocument)
-      throw DOMException.HierarchyRequestError
-
-    TreeMutation.adoptNode(node, parent.ownerDocument)
+    TreeMutation.adoptNode(node, (parent as NodeInternal)._nodeDocument)
 
     const removedNodes: Node[] = []
 
@@ -433,10 +434,7 @@ export class TreeMutation {
    */
   static replaceAllNode(node: Node | null, parent: Node): void {
     if (node) {
-      if (!parent.ownerDocument)
-        throw DOMException.HierarchyRequestError
-
-      TreeMutation.adoptNode(node, parent.ownerDocument)
+      TreeMutation.adoptNode(node, (parent as NodeInternal)._nodeDocument)
     }
 
     const removedNodes: Node[] = []
@@ -502,8 +500,9 @@ export class TreeMutation {
      * is greater than index, decrease its end offset by 1.
      */
     const index = TreeQuery.index(node)
-    const docAsAny = <any><unknown>parent.ownerDocument
-    for (const range of docAsAny._rangeList) {
+    const doc = (parent as NodeInternal)._nodeDocument as DocumentInternal
+    for (const item of doc._rangeList) {
+      const range = item as RangeInternal
       if (TreeQuery.isDescendantOf(node, range._start[0], true)) {
         range._start = [parent, index]
       }
@@ -562,10 +561,10 @@ export class TreeMutation {
      * observer list.
      */
 
-    TreeMutation.queueTreeMutationRecord(parent, [], [node], 
+    TreeMutation.queueTreeMutationRecord(parent, [], [node],
       oldPreviousSibling, oldNextSibling)
 
-    if (TextUtility.isTextNode(node)) {
+    if (Guard.isTextNode(node)) {
       TextUtility.childTextContentChanged(parent)
     }
   }
@@ -591,7 +590,7 @@ export class TreeMutation {
     const interestedObservers = new Map<MutationObserver, string | null>()
     for (const node of TreeQuery.getAncestorNodes(target, true)) {
       const observers: Array<RegisteredObserver> =
-        (<any><unknown>target)._registeredObservers
+        (<NodeInternal>target)._registeredObserverList
       for (const registered of observers) {
         const options = registered.options
 
@@ -624,7 +623,7 @@ export class TreeMutation {
         nextSibling: nextSibling
       }
 
-      const queue: MutationRecord[] = (<any><unknown>observer)._recordQueue
+      const queue: MutationRecord[] = (observer as MutationObserverInternal)._recordQueue
       queue.push(record)
     }
 

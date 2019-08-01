@@ -1,12 +1,14 @@
-import { Element, Document, ShadowRoot, ShadowRootMode } from "./interfaces"
+import { Element, Document, ShadowRootMode } from "./interfaces"
 import { DocumentFragmentImpl } from "./DocumentFragmentImpl"
+import { ShadowRootInternal } from "./interfacesInternal"
 
 /**
  * Represents a shadow root.
  */
-export class ShadowRootImpl extends DocumentFragmentImpl implements ShadowRoot {
-  protected _host: Element
-  protected _mode: ShadowRootMode
+export class ShadowRootImpl extends DocumentFragmentImpl implements ShadowRootInternal {
+
+  _host: Element
+  _mode: ShadowRootMode
 
   /**
    * Initializes a new instance of `ShadowRoot`.

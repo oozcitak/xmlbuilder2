@@ -1,13 +1,14 @@
-import { Node, NodeFilter, WhatToShow, TreeWalker, FilterResult } from "./interfaces"
+import { Node, NodeFilter, WhatToShow, FilterResult } from "./interfaces"
 import { TraverserImpl } from "./TraverserImpl"
 import { Traverse } from "./util/Traverse"
+import { TreeWalkerInternal } from "./interfacesInternal"
 
 /**
  * Represents the nodes of a subtree and a position within them.
  */
-export class TreeWalkerImpl extends TraverserImpl implements TreeWalker {
+export class TreeWalkerImpl extends TraverserImpl implements TreeWalkerInternal {
 
-  private _current: Node
+  _current: Node
 
   /**
    * Initializes a new instance of `TreeWalker`.

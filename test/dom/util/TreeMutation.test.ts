@@ -1,5 +1,6 @@
 import $$ from '../TestHelpers'
 import { TreeMutation } from '../../../src/dom/util/TreeMutation'
+import { ElementInternal } from '../../../src/dom/interfacesInternal'
 
 describe('TreeMutation', function () {
 
@@ -116,12 +117,6 @@ describe('TreeMutation', function () {
   })
 
   test('preInsert()', function () {
-    const node = new $$.Element(null, 'node', '')
-    const parentNode = new $$.Element(null, 'parent', '')
-
-    // cannot insert into a parent node not attached to a document
-    expect(() => TreeMutation.preInsert(node, parentNode, null)).toThrow()
-
     const doc = $$.dom.createDocument('my ns', 'root')
     if (!doc.documentElement)
       throw new Error("documentElement is null")
@@ -285,18 +280,6 @@ describe('TreeMutation', function () {
     doc9.appendChild(ele9b)
     const node9 = $$.dom.createDocumentType('name', 'pubId', 'sysId')
     expect(() => TreeMutation.replaceNode(ele9b, node9, doc9)).toThrow()
-    // parent should be attached to a document
-    const doc5 = $$.dom.createDocument('my ns', '')
-    const ele5 = doc5.createElement('ele1')
-    const ele5a = doc5.createComment('ele2')
-    const ele5b = doc5.createComment('ele3')
-    doc5.appendChild(ele5)
-    ele5.appendChild(ele5a)
-    ele5.appendChild(ele5b)
-    const anyEle5 = (<any>ele5)
-    anyEle5._ownerDocument = null
-    const node5 = doc5.createElement('name')
-    expect(() => TreeMutation.replaceNode(ele5a, node5, ele5)).toThrow()
     // replace with self
     const doc18 = $$.dom.createDocument('my ns', '')
     const ele18 = doc18.createElement('ele1')
@@ -318,7 +301,6 @@ describe('TreeMutation', function () {
   })
 
   test('replaceAllNode()', function () {
-    // parent should be attached to a document
     const doc5 = $$.dom.createDocument('my ns', '')
     const ele5 = doc5.createElement('ele1')
     const ele5a = doc5.createComment('ele2')
@@ -326,11 +308,7 @@ describe('TreeMutation', function () {
     doc5.appendChild(ele5)
     ele5.appendChild(ele5a)
     ele5.appendChild(ele5b)
-    const anyEle5 = (<any>ele5)
-    anyEle5._ownerDocument = null
-    const node5 = doc5.createElement('name')
-    expect(() => TreeMutation.replaceAllNode(node5, ele5)).toThrow()
-    // replace with documene fragment
+    // replace with document fragment
     const doc2 = $$.dom.createDocument('my ns', '')
     const ele2 = doc5.createElement('ele1')
     const ele2a = doc5.createComment('ele2')

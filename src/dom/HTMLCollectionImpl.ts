@@ -1,24 +1,28 @@
-import { Node, Element, HTMLCollection, NodeType } from "./interfaces"
+import { Node, Element, HTMLCollection } from "./interfaces"
 import { TreeQuery } from "./util/TreeQuery"
+import { HTMLCollectionInternal } from "./interfacesInternal"
 
 /**
  * Represents a collection of elements.
  */
-export class HTMLCollectionImpl implements HTMLCollection {
+export class HTMLCollectionImpl implements HTMLCollectionInternal {
 
-  protected static reservedNames = ['_parent', '_filter', 'length',
+  _live: boolean = true
+  _root: Node
+  _filter: ((element: Element) => any)
+
+  protected static reservedNames = ['_root', '_live', '_filter', 'length',
     'item', 'namedItem', 'get']
-
-  protected _parent: Node
-  protected _filter: (element: Element) => any
 
   /**
    * Initializes a new instance of `HTMLCollection`.
    *
-   * @param nodes - the associated {@link NodeList}.
+   * @param root - the root node
+   * @param filter - a node filter
    */
-  public constructor(parent: Node, filter?: (element: Element) => any) {
-    this._parent = parent
+  public constructor(root: Node, filter?: (element: Element) => any) {
+    this._root = root
+
     this._filter = filter || function (element: Element) { return true }
 
     return new Proxy<HTMLCollectionImpl>(this, this)
@@ -73,7 +77,7 @@ export class HTMLCollectionImpl implements HTMLCollection {
    * Returns an iterator for nodes.
    */
   *[Symbol.iterator](): IterableIterator<Element> {
-    yield* TreeQuery.getDescendantElements(this._parent, false, false,
+    yield* TreeQuery.getDescendantElements(this._root, false, false,
       (ele) => { return !!this._filter(ele) })
   }
 

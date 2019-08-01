@@ -1,18 +1,21 @@
-import { StaticRange, Node } from './interfaces'
 import { AbstractRangeImpl } from './AbstractRangeImpl'
 import { DOMException } from './DOMException'
+import { StaticRangeInternal } from './interfacesInternal'
+import { Node, BoundaryPoint } from './interfaces'
 
 /**
- * Represents a generic XML node.
+ * Represents a static range.
  */
-export class StaticRangeImpl extends AbstractRangeImpl implements StaticRange {
+export class StaticRangeImpl extends AbstractRangeImpl implements StaticRangeInternal {
+  
+  _start: BoundaryPoint = [<Node><unknown>undefined, 0]
+  _end: BoundaryPoint = [<Node><unknown>undefined, 0]
 
   /**
    * Initializes a new instance of `StaticRange`.
    */
   constructor() {
-    super([<Node><unknown>null, 0], [<Node><unknown>null, 0])
-
+    super()
     throw DOMException.NotSupportedError
   }
 

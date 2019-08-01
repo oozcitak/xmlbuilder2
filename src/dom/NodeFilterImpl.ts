@@ -1,9 +1,10 @@
-import { NodeFilter, Node, FilterResult } from "./interfaces"
+import { Node, FilterResult } from "./interfaces"
+import { NodeFilterInternal } from "./interfacesInternal"
 
 /**
  * Represents a node filter.
  */
-export class NodeFilterImpl implements NodeFilter {
+export class NodeFilterImpl implements NodeFilterInternal {
 
   static readonly FILTER_ACCEPT: number = 1
   static readonly FILTER_REJECT: number = 2

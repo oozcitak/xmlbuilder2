@@ -1,18 +1,25 @@
 import { Node, NodeList } from "./interfaces"
+import { NodeListInternal } from "./interfacesInternal"
 
 /**
  * Represents an ordered list of nodes.
  * This is a static implementation of `NodeList`.
  */
-export class NodeListStaticImpl implements NodeList {
+export class NodeListStaticImpl implements NodeListInternal {
 
+  _live: boolean = false
+  _root: Node
+  _filter: ((element: Node) => any)
   _items: Node[] = []
+  _length = 0
 
   /**
    * Initializes a new instance of `NodeList`.
    */
   constructor(items: Node[]) {
     this._items = items
+    this._root = <Node><unknown>undefined
+    this._filter = function (node: Node) { return true }
   }
 
   /**

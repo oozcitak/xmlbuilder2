@@ -1,5 +1,6 @@
 import {
-  Node, Range, BoundaryPosition, NodeType, CharacterData, DocumentFragment, BoundaryPoint
+  Node, BoundaryPosition, NodeType, CharacterData,
+  DocumentFragment, BoundaryPoint
 } from '../interfaces'
 import { TreeQuery } from './TreeQuery'
 import { TreeMutation } from './TreeMutation'
@@ -8,20 +9,13 @@ import { BPUtil } from './BPUtil'
 import { DOMException } from '../DOMException'
 import { DocumentFragmentImpl } from '../DocumentFragmentImpl'
 import { RangeImpl } from '../RangeImpl'
+import { RangeInternal, DocumentInternal, NodeInternal } from '../interfacesInternal'
+import { Guard } from './Guard';
 
 /**
  * Includes methods to query ranges.
  */
 export class RangeQuery {
-
-  /**
-   * Gets the root node of a range.
-   * 
-   * @param range - a range
-   */
-  static root(range: Range): Node {
-    return TreeQuery.rootNode(range.startContainer)
-  }
 
   /** 
    * Sets the start boundary point of a range.
@@ -30,7 +24,7 @@ export class RangeQuery {
    * @param node - a node
    * @param offset - an offset on node
    */
-  static setStart(range: Range, node: Node, offset: number): void {
+  static setStart(range: RangeInternal, node: Node, offset: number): void {
     if (node.nodeType === NodeType.DocumentType) {
       throw DOMException.InvalidNodeTypeError
     }
@@ -39,14 +33,13 @@ export class RangeQuery {
     }
 
     const bp: BoundaryPoint = [node, offset]
-    const rangeAsAny = <any><unknown>range
 
-    if (BPUtil.position(bp, rangeAsAny._end) === BoundaryPosition.After ||
-      RangeQuery.root(range) !== TreeQuery.rootNode(node)) {
-      rangeAsAny._end = bp
+    if (BPUtil.position(bp, range._end) === BoundaryPosition.After ||
+      range._root !== TreeQuery.rootNode(node)) {
+      range._end = bp
     }
 
-    rangeAsAny._start = bp
+    range._start = bp
   }
 
   /** 
@@ -56,7 +49,7 @@ export class RangeQuery {
    * @param node - a node
    * @param offset - an offset on node
    */
-  static setEnd(range: Range, node: Node, offset: number): void {
+  static setEnd(range: RangeInternal, node: Node, offset: number): void {
     if (node.nodeType === NodeType.DocumentType) {
       throw DOMException.InvalidNodeTypeError
     }
@@ -66,14 +59,13 @@ export class RangeQuery {
     }
 
     const bp: BoundaryPoint = [node, offset]
-    const rangeAsAny = <any><unknown>range
 
-    if (BPUtil.position(bp, rangeAsAny._start) === BoundaryPosition.Before ||
-      RangeQuery.root(range) !== TreeQuery.rootNode(node)) {
-      rangeAsAny._start = bp
+    if (BPUtil.position(bp, range._start) === BoundaryPosition.Before ||
+      range._root !== TreeQuery.rootNode(node)) {
+      range._start = bp
     }
 
-    rangeAsAny._end = bp
+    range._end = bp
   }
 
   /** Selects a node.
@@ -81,16 +73,15 @@ export class RangeQuery {
    * @param range - a range
    * @param node - a node
    */
-  static selectNode(range: Range, node: Node): void {
+  static selectNode(range: RangeInternal, node: Node): void {
     let parent = node.parentNode
     if (parent === null) {
       throw DOMException.InvalidNodeTypeError
     }
 
     let index = TreeQuery.index(node)
-    const rangeAsAny = <any><unknown>range
-    rangeAsAny._start = [parent, index]
-    rangeAsAny._end = [parent, index + 1]
+    range._start = [parent, index]
+    range._end = [parent, index + 1]
   }
 
   /**
@@ -98,13 +89,12 @@ export class RangeQuery {
    * 
    * @param range - a range
    */
-  static *getContainedNodes(range: Range): IterableIterator<Node> {
-    const root = RangeQuery.root(range)
+  static *getContainedNodes(range: RangeInternal): IterableIterator<Node> {
+    const root = range._root
     const container = range.commonAncestorContainer
 
-    const rangeAsAny = <any><unknown>range
-    const start: BoundaryPoint = rangeAsAny._start
-    const end: BoundaryPoint = rangeAsAny._end
+    const start: BoundaryPoint = range._start
+    const end: BoundaryPoint = range._end
 
     for (const node of TreeQuery.getDescendantNodes(container)) {
       if (root === TreeQuery.rootNode(node)) {
@@ -123,7 +113,7 @@ export class RangeQuery {
    * 
    * @param range - a range
    */
-  static *getPartiallyContainedNodes(range: Range): IterableIterator<Node> {
+  static *getPartiallyContainedNodes(range: RangeInternal): IterableIterator<Node> {
     const container = range.commonAncestorContainer
 
     for (const node of TreeQuery.getDescendantNodes(container)) {
@@ -143,12 +133,11 @@ export class RangeQuery {
    * @param range - a range
    * @param node - the node to check
    */
-  static isContained(range: Range, node: Node): boolean {
-    const root = RangeQuery.root(range)
+  static isContained(range: RangeInternal, node: Node): boolean {
+    const root = range._root
 
-    const rangeAsAny = <any><unknown>range
-    const start: BoundaryPoint = rangeAsAny._start
-    const end: BoundaryPoint = rangeAsAny._end
+    const start: BoundaryPoint = range._start
+    const end: BoundaryPoint = range._end
 
     if (root === TreeQuery.rootNode(node)) {
       const nodeStart = BPUtil.nodeStart(node)
@@ -172,7 +161,7 @@ export class RangeQuery {
    * @param range - a range
    * @param node - the node to check
    */
-  static isPartiallyContained(range: Range, node: Node): boolean {
+  static isPartiallyContained(range: RangeInternal, node: Node): boolean {
     const startCheck = TreeQuery.isAncestorOf(range.startContainer, node, true)
     const endCheck = TreeQuery.isAncestorOf(range.endContainer, node, true)
 
@@ -184,26 +173,26 @@ export class RangeQuery {
    * 
    * @param range - a range
    */
-  static extractContents(range: Range): DocumentFragment {
-    const fragment = new DocumentFragmentImpl(range.startContainer.ownerDocument)
+  static extractContents(range: RangeInternal): DocumentFragment {
+    const fragment = new DocumentFragmentImpl((range._root as NodeInternal)._nodeDocument)
 
     if (range.collapsed) {
       return fragment
     }
 
-    const [originalStartNode, originalStartOffset] = [range.startContainer, range.startOffset]
-    const [originalEndNode, originalEndOffset] = [range.endContainer, range.endOffset]
+    const [originalStartNode, originalStartOffset] = range._start
+    const [originalEndNode, originalEndOffset] = range._end
 
     // range starts and ends over a single node
     if (originalStartNode === originalEndNode &&
-      TextUtility.isCharacterDataNode(originalStartNode)) {
+      Guard.isCharacterDataNode(originalStartNode)) {
       const clone = <CharacterData>originalStartNode.cloneNode()
       clone.data = TextUtility.substringData(
-        <CharacterData>originalStartNode, originalStartOffset,
+        originalStartNode, originalStartOffset,
         originalEndOffset - originalStartOffset)
       fragment.append(clone)
       TextUtility.replaceData(
-        <CharacterData>originalStartNode, originalStartOffset,
+        originalStartNode, originalStartOffset,
         originalEndOffset - originalStartOffset, '')
       return fragment
     }
@@ -252,7 +241,7 @@ export class RangeQuery {
     }
 
     if (firstPartiallyContainedChild !== null &&
-      TextUtility.isCharacterDataNode(firstPartiallyContainedChild)) {
+      Guard.isCharacterDataNode(firstPartiallyContainedChild)) {
       const clone = <CharacterData>originalStartNode.cloneNode()
       clone.data = TextUtility.substringData(
         <CharacterData>originalStartNode, originalStartOffset,
@@ -273,7 +262,7 @@ export class RangeQuery {
     }
 
     if (lastPartiallyContainedChild !== null &&
-      TextUtility.isCharacterDataNode(lastPartiallyContainedChild)) {
+      Guard.isCharacterDataNode(lastPartiallyContainedChild)) {
       const clone = <CharacterData>originalEndNode.cloneNode()
       clone.data = TextUtility.substringData(
         <CharacterData>originalEndNode, 0, originalEndOffset)
@@ -295,22 +284,22 @@ export class RangeQuery {
    * 
    * @param range - a range
    */
-  static cloneContents(range: Range): DocumentFragment {
-    const fragment = new DocumentFragmentImpl(range.startContainer.ownerDocument)
+  static cloneContents(range: RangeInternal): DocumentFragment {
+    const fragment = new DocumentFragmentImpl((range._root as NodeInternal)._nodeDocument)
 
     if (range.collapsed) {
       return fragment
     }
 
-    const [originalStartNode, originalStartOffset] = [range.startContainer, range.startOffset]
-    const [originalEndNode, originalEndOffset] = [range.endContainer, range.endOffset]
+    const [originalStartNode, originalStartOffset] = range._start
+    const [originalEndNode, originalEndOffset] = range._end
 
     // range starts and ends over a single node
     if (originalStartNode === originalEndNode &&
-      TextUtility.isCharacterDataNode(originalStartNode)) {
+      Guard.isCharacterDataNode(originalStartNode)) {
       const clone = <CharacterData>originalStartNode.cloneNode()
       clone.data = TextUtility.substringData(
-        <CharacterData>originalStartNode, originalStartOffset,
+        originalStartNode, originalStartOffset,
         originalEndOffset - originalStartOffset)
       fragment.append(clone)
       return fragment
@@ -360,7 +349,7 @@ export class RangeQuery {
     }
 
     if (firstPartiallyContainedChild !== null &&
-      TextUtility.isCharacterDataNode(firstPartiallyContainedChild)) {
+      Guard.isCharacterDataNode(firstPartiallyContainedChild)) {
       const clone = <CharacterData>originalStartNode.cloneNode()
       clone.data = TextUtility.substringData(
         <CharacterData>originalStartNode, originalStartOffset,
@@ -381,7 +370,7 @@ export class RangeQuery {
     }
 
     if (lastPartiallyContainedChild !== null &&
-      TextUtility.isCharacterDataNode(lastPartiallyContainedChild)) {
+      Guard.isCharacterDataNode(lastPartiallyContainedChild)) {
       const clone = <CharacterData>originalEndNode.cloneNode()
       clone.data = TextUtility.substringData(
         <CharacterData>originalEndNode, 0, originalEndOffset)
@@ -404,14 +393,14 @@ export class RangeQuery {
    * @param range - a range
    * @param node - node to insert
    */
-  static insert(range: Range, node: Node): void {
-    const rangeAsAny = <any><unknown>range
-    const start: BoundaryPoint = rangeAsAny._start
-    const end: BoundaryPoint = rangeAsAny._end
+  static insert(range: RangeInternal, node: Node): void {
+    const start: BoundaryPoint = range._start
+    const end: BoundaryPoint = range._end
 
     if (start[0].nodeType === NodeType.ProcessingInstruction ||
       start[0].nodeType === NodeType.Comment ||
-      (start[0].nodeType === NodeType.Text && (node.parentNode === null || node.parentNode === node))) {
+      (start[0].nodeType === NodeType.Text &&
+        (node.parentNode === null || node.parentNode === node))) {
       throw DOMException.HierarchyRequestError
     }
 
@@ -441,7 +430,7 @@ export class RangeQuery {
 
     TreeMutation.ensurePreInsertionValidity(node, parent, referenceNode)
 
-    if (TextUtility.isTextNode(start[0])) {
+    if (Guard.isTextNode(start[0])) {
       referenceNode = TextUtility.splitText(start[0], start[1])
     }
 
@@ -463,7 +452,7 @@ export class RangeQuery {
     TreeMutation.preInsert(node, parent, referenceNode)
 
     if (range.collapsed) {
-      rangeAsAny._end = [parent, newOffset]
+      range._end = [parent, newOffset]
     }
   }
 
@@ -472,31 +461,42 @@ export class RangeQuery {
    * 
    * @param range - a range
    */
-  static stringify(range: Range): string {
-    const rangeAsAny = <any><unknown>range
-    const start: BoundaryPoint = rangeAsAny._start
-    const end: BoundaryPoint = rangeAsAny._end
+  static stringify(range: RangeInternal): string {
+    const start: BoundaryPoint = range._start
+    const end: BoundaryPoint = range._end
 
-    if (start[0] === end[0] && TextUtility.isTextNode(start[0])) {
+    if (start[0] === end[0] && Guard.isTextNode(start[0])) {
       return start[0].data.substring(start[1], end[1])
     }
 
     let s = ''
-    if (TextUtility.isTextNode(start[0])) {
+    if (Guard.isTextNode(start[0])) {
       s += start[0].data.substring(start[1])
     }
 
     for (const child of RangeQuery.getContainedNodes(range)) {
-      if (TextUtility.isTextNode(child)) {
+      if (Guard.isTextNode(child)) {
         s += child.data
       }
     }
 
-    if (TextUtility.isTextNode(end[0])) {
+    if (Guard.isTextNode(end[0])) {
       s += end[0].data.substring(0, end[1])
     }
 
     return s
   }
 
+  /**
+   * Removes a range object from the given document.
+   * 
+   * @param doc - owner document
+   * @param range - the range to remove
+   */
+  static removeRange(doc: DocumentInternal, range: RangeInternal): void {
+    const index = doc._rangeList.indexOf(range)
+    if (index > -1) {
+      doc._rangeList.splice(index, 1)
+    }
+  }
 }

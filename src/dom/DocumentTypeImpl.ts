@@ -1,15 +1,16 @@
-import { DocumentType, Node, Document, NodeType } from "./interfaces"
+import { Node, Document, NodeType } from "./interfaces"
 import { NodeImpl } from './NodeImpl'
+import { DocumentTypeInternal } from "./interfacesInternal"
 
 /**
  * Represents an object providing methods which are not dependent on 
  * any particular document
  */
-export class DocumentTypeImpl extends NodeImpl implements DocumentType {
+export class DocumentTypeImpl extends NodeImpl implements DocumentTypeInternal {
 
-  protected _nodeName: string
-  protected _publicId: string
-  protected _systemId: string
+  _name: string
+  _publicId: string
+  _systemId: string
 
   /**
    * Initializes a new instance of `DocumentType`.
@@ -23,7 +24,7 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
     name: string, publicId: string = '', systemId: string = '') {
     super(ownerDocument)
 
-    this._nodeName = name
+    this._name = name
     this._publicId = publicId
     this._systemId = systemId
   }
@@ -36,12 +37,12 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
   /** 
    * Returns a string appropriate for the type of node. 
    */
-  get nodeName(): string { return this._nodeName }
+  get nodeName(): string { return this._name }
 
   /**
    * Returns the name of the node.
    */
-  get name(): string { return this._nodeName }
+  get name(): string { return this._name }
 
   /**
    * Returns the `PUBLIC` identifier of the node.
@@ -63,7 +64,7 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    return new DocumentTypeImpl(this.ownerDocument, this.name,
+    return new DocumentTypeImpl(this._nodeDocument, this.name,
       this.publicId, this.systemId)
   }
 
@@ -76,10 +77,10 @@ export class DocumentTypeImpl extends NodeImpl implements DocumentType {
     if (!super.isEqualNode(node))
       return false
 
-    const other = <DocumentType>node
-    if (!other || this.name !== other.name ||
-      this.publicId !== other.publicId ||
-      this.systemId !== other.systemId)
+    const other = <DocumentTypeInternal>node
+    if (!other || this._name !== other._name ||
+      this._publicId !== other._publicId ||
+      this._systemId !== other._systemId)
       return false
     else
       return true

@@ -1,3 +1,5 @@
+import { HTMLSlotElement } from "../htmldom/interfaces"
+
 /**
  * Represents a DOM event.
  */
@@ -622,7 +624,6 @@ export interface HTMLCollection extends Collection, Iterable<Element> {
   [key: string]: any
 
 }
-
 
 /**
  * Represents a document node.
@@ -1312,7 +1313,7 @@ export interface Slotable {
   /**
    * Returns the <slot> element which this node is inserted in.
    */
-  readonly assignedSlot: any
+  readonly assignedSlot: HTMLSlotElement | null
 }
 
 /**
@@ -1657,7 +1658,7 @@ export interface Traverser {
   /**
    * A flag to avoid recursive invocations.
    */
-  active: boolean
+  _activeFlag: boolean
 
   /**
    * Gets the root node of the subtree.

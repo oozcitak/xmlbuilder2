@@ -1,18 +1,24 @@
 import { Node, NodeList } from "./interfaces"
+import { NodeListInternal } from "./interfacesInternal"
 
 /**
  * Represents an ordered list of nodes.
  */
-export class NodeListImpl implements NodeList {
+export class NodeListImpl implements NodeListInternal {
 
-  _length = 0 // internal
-  protected _parentNode: Node
+  _live: boolean = true
+  _root: Node
+  _filter: ((node: Node) => any)
+  _length = 0
 
   /**
    * Initializes a new instance of `NodeList`.
+   * 
+   * @param root - root node
    */
-  constructor(parentNode: Node) {
-    this._parentNode = parentNode
+  constructor(root: Node) {
+    this._root = root
+    this._filter = function (node: Node) { return true }
   }
 
   /**
@@ -32,7 +38,7 @@ export class NodeListImpl implements NodeList {
 
     if (index < this.length / 2) {
       let i = 0
-      let node = this._parentNode.firstChild
+      let node = this._root.firstChild
       while (node !== null && i !== index) {
         node = node.nextSibling
         i++
@@ -41,7 +47,7 @@ export class NodeListImpl implements NodeList {
     }
     else {
       let i = this.length - 1
-      let node = this._parentNode.lastChild
+      let node = this._root.lastChild
       while (node !== null && i !== index) {
         node = node.previousSibling
         i--
@@ -81,7 +87,7 @@ export class NodeListImpl implements NodeList {
    * Returns an iterator for the node list.
    */
   *[Symbol.iterator](): IterableIterator<Node> {
-    let child = this._parentNode.firstChild
+    let child = this._root.firstChild
     while (child) {
       yield child
       child = child.nextSibling

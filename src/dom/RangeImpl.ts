@@ -9,13 +9,17 @@ import { DOMException } from './DOMException'
 import { BPUtil } from './util/BPUtil'
 import { RangeQuery } from './util/RangeQuery'
 import { TextUtility } from './util/TextUtility'
+import { RangeInternal, DocumentInternal, NodeInternal } from './interfacesInternal'
+import { Guard } from './util/Guard';
 
 /**
  * Represents a live range.
  */
-export class RangeImpl extends AbstractRangeImpl implements Range {
+export class RangeImpl extends AbstractRangeImpl implements RangeInternal {
 
-  private _ownerDocument: Document | null
+  _start: BoundaryPoint = [<Node><unknown>undefined, 0]
+  _end: BoundaryPoint = [<Node><unknown>undefined, 0]
+  get _root(): Node { return TreeQuery.rootNode(this._startNode) }
 
   static readonly START_TO_START: number = 0
   static readonly START_TO_END: number = 1
@@ -26,14 +30,12 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
    * Initializes a new instance of `Range`.
    */
   constructor(start?: BoundaryPoint, end?: BoundaryPoint) {
-    super([<Node><unknown>null, 0], [<Node><unknown>null, 0])
-
-    if (start) {
-      this._ownerDocument = start[0].ownerDocument
-    } else {
-      this._ownerDocument = null
-    }
-
+    super()
+    /**
+     * TODO: The Range() constructor, when invoked, must return a new live 
+     * range with (current global object’s associated Document, 0) as its 
+     * start and end.
+     */
     if (start) { this.setStart(start[0], start[1]) }
     if (end) { this.setEnd(end[0], end[1]) }
   }
@@ -123,8 +125,8 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
   }
 
   /** @inheritdoc */
-  compareBoundaryPoints(how: HowToCompare, sourceRange: Range): number {
-    if (RangeQuery.root(this) !== RangeQuery.root(sourceRange)) {
+  compareBoundaryPoints(how: HowToCompare, sourceRange: RangeInternal): number {
+    if (this._root !== sourceRange._root) {
       throw DOMException.WrongDocumentError
     }
 
@@ -170,7 +172,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
     const [originalEndNode, originalEndOffset] = this._end
 
     if (originalStartNode === originalEndNode &&
-      TextUtility.isCharacterDataNode(originalStartNode)) {
+      Guard.isCharacterDataNode(originalStartNode)) {
       TextUtility.replaceData(originalStartNode,
         originalStartOffset, originalEndOffset, '')
       return
@@ -205,7 +207,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       newOffset = TreeQuery.index(referenceNode) + 1
     }
 
-    if (TextUtility.isCharacterDataNode(originalStartNode)) {
+    if (Guard.isCharacterDataNode(originalStartNode)) {
       TextUtility.replaceData(originalStartNode,
         originalStartOffset,
         TreeQuery.nodeLength(originalStartNode) - originalStartOffset, '')
@@ -218,7 +220,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
       }
     }
 
-    if (TextUtility.isCharacterDataNode(originalEndNode)) {
+    if (Guard.isCharacterDataNode(originalEndNode)) {
       TextUtility.replaceData(originalEndNode,
         0, originalEndOffset, '')
       return
@@ -276,10 +278,7 @@ export class RangeImpl extends AbstractRangeImpl implements Range {
 
   /** @inheritdoc */
   detach(): void {
-    const doc = <any><unknown>this._start[0].ownerDocument
-    if (doc !== null) {
-      doc._removeRange(this)
-    }
+    RangeQuery.removeRange((this._root as NodeInternal)._nodeDocument, this)
   }
 
   /** @inheritdoc */

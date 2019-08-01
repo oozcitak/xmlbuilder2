@@ -1,4 +1,5 @@
 import { Node } from "../interfaces"
+import { NodeInternal, NodeListInternal } from "../interfacesInternal"
 
 /**
  * Contains methods for manipulating a {@link NodeList}.
@@ -28,11 +29,11 @@ export class List {
         return
     }
 
-    const nodeImpl = <any>node
+    const nodeImpl = node as NodeInternal
     nodeImpl._parentNode = parent
 
-    const parentImpl = <any>parent
-    const childImpl = <any>parent.childNodes
+    const parentImpl = parent as NodeInternal
+    const childImpl = parent.childNodes as NodeListInternal
     if (!parentImpl.firstChild) {
       nodeImpl._previousSibling = null
       nodeImpl._nextSibling = null
@@ -41,14 +42,14 @@ export class List {
       parentImpl._lastChild = nodeImpl
       childImpl._length = 1
     } else {
-      const prev = (refChild ? refChild.previousSibling : parentImpl.lastChild)
-      const next = (refChild ? refChild : null)
+      const prev = (refChild ? refChild.previousSibling : parentImpl.lastChild) as NodeInternal | null
+      const next = (refChild ? refChild : null) as NodeInternal | null
 
       nodeImpl._previousSibling = prev
       nodeImpl._nextSibling = next
 
-      if (prev) (<any>prev)._nextSibling = nodeImpl
-      if (next) (<any>next)._previousSibling = nodeImpl
+      if (prev) prev._nextSibling = nodeImpl
+      if (next) next._previousSibling = nodeImpl
 
       if (!prev) parentImpl._firstChild = nodeImpl
       if (!next) parentImpl._lastChild = nodeImpl
@@ -63,11 +64,11 @@ export class List {
    * @param parent - parent node
    */
   static remove(node: Node, parent: Node): void {
-    const nodeImpl = <any>node
+    const nodeImpl = node as NodeInternal
     nodeImpl._parentNode = null
 
-    const prev = <any>(nodeImpl.previousSibling)
-    const next = <any>(nodeImpl.nextSibling)
+    const prev = nodeImpl.previousSibling as NodeInternal | null
+    const next = nodeImpl.nextSibling as NodeInternal | null
 
     nodeImpl._previousSibling = null
     nodeImpl._nextSibling = null
@@ -75,11 +76,11 @@ export class List {
     if (prev) prev._nextSibling = next
     if (next) next._previousSibling = prev
 
-    const parentImpl = <any>parent
+    const parentImpl = parent as NodeInternal
     if (!prev) parentImpl._firstChild = next
     if (!next) parentImpl._lastChild = prev
 
-    const childImpl = <any>(parentImpl.childNodes)
+    const childImpl = parentImpl.childNodes as NodeListInternal
     childImpl._length--
   }
 }

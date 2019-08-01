@@ -1,15 +1,13 @@
-import {
-  Node, Document, ProcessingInstruction,
-  NodeType
-} from "./interfaces"
+import { Node, Document, ProcessingInstruction, NodeType } from "./interfaces"
 import { CharacterDataImpl } from "./CharacterDataImpl"
+import { ProcessingInstructionInternal } from "./interfacesInternal"
 
 /**
  * Represents a processing instruction node.
  */
-export class ProcessingInstructionImpl extends CharacterDataImpl implements ProcessingInstruction {
+export class ProcessingInstructionImpl extends CharacterDataImpl implements ProcessingInstructionInternal {
 
-  protected _target: string
+  _target: string
 
   /**
    * Initializes a new instance of `ProcessingInstruction`.
@@ -48,7 +46,7 @@ export class ProcessingInstructionImpl extends CharacterDataImpl implements Proc
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    return new ProcessingInstructionImpl(this.ownerDocument,
+    return new ProcessingInstructionImpl(this._nodeDocument,
       this.target, this.data)
   }
 

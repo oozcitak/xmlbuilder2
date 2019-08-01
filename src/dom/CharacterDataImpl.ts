@@ -1,13 +1,14 @@
-import { CharacterData, Document, Element, Node } from "./interfaces"
+import { Document, Element, Node } from "./interfaces"
 import { NodeImpl } from "./NodeImpl"
 import { TextUtility } from "./util/TextUtility"
+import { CharacterDataInternal } from "./interfacesInternal"
 
 /**
  * Represents a generic text node.
  */
-export abstract class CharacterDataImpl extends NodeImpl implements CharacterData {
+export abstract class CharacterDataImpl extends NodeImpl implements CharacterDataInternal {
 
-  protected _data: string
+  _data: string
 
   /**
    * Initializes a new instance of `CharacterData`.
@@ -31,7 +32,7 @@ export abstract class CharacterDataImpl extends NodeImpl implements CharacterDat
     if (!super.isEqualNode(node))
       return false
 
-    return (this.data === (<CharacterData>node).data)
+    return (this._data === (<CharacterDataInternal>node)._data)
   }
 
   /** 

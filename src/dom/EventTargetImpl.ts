@@ -7,6 +7,7 @@ import { isBoolean } from '../util'
 import { DOMException } from './DOMException'
 import { TreeQuery } from './util/TreeQuery'
 import { Guard } from './util/Guard'
+import { EventTargetInternal, EventInternal } from './interfacesInternal'
 
 /**
  * Defines a boolean out variable of a function.
@@ -18,9 +19,9 @@ type OutputFlag = {
 /**
  * Represents a target to which an event can be dispatched.
  */
-export abstract class EventTargetImpl implements EventTarget {
+export abstract class EventTargetImpl implements EventTargetInternal {
 
-  protected _eventListenerList: EventListenerEntry[] = []
+  _eventListenerList: EventListenerEntry[] = []
 
   /**
    * Initializes a new instance of `EventTarget`.
@@ -105,12 +106,11 @@ export abstract class EventTargetImpl implements EventTarget {
    * 
    * @param event - the event to dispatch.
    */
-  dispatchEvent(event: Event): boolean {
-    const eventAsAny = <any><unknown>event
-    if (eventAsAny._dispatch || !eventAsAny._initialized) {
+  dispatchEvent(event: EventInternal): boolean {
+    if (event._dispatchFlag || !event._initializedFlag) {
       throw DOMException.InvalidStateError
     }
-    eventAsAny._isTrusted = false
+    event._isTrustedFlag = false
 
     return EventTargetImpl._dispatchEvent(event, this)
   }
@@ -120,7 +120,7 @@ export abstract class EventTargetImpl implements EventTarget {
    * 
    * @param event - an event
    */
-  protected _getTheParent(event: Event): EventTarget | null {
+  _getTheParent(event: Event): EventTarget | null {
     return null
   }
 
@@ -135,7 +135,7 @@ export abstract class EventTargetImpl implements EventTarget {
    * 
    * @param event - an event
    */
-  protected _activationBehavior?(event: Event): void
+  _activationBehavior?(event: Event): void
 
   /**
    * Defines optional legacy pre-activation behavior for the given event.
@@ -145,7 +145,7 @@ export abstract class EventTargetImpl implements EventTarget {
    * 
    * @param event - an event
    */
-  protected _legacyPreActivationBehavior?(event: Event): void
+  _legacyPreActivationBehavior?(event: Event): void
 
   /**
    * Defines optional legacy canceled activation behavior for the given event.
@@ -155,7 +155,7 @@ export abstract class EventTargetImpl implements EventTarget {
    * 
    * @param event - an event
    */
-  protected _legacyCanceledActivationBehavior?(event: Event): void
+  _legacyCanceledActivationBehavior?(event: Event): void
 
   /**
    * Flattens the given options argument.
@@ -269,19 +269,17 @@ export abstract class EventTargetImpl implements EventTarget {
    * @param legacyOutputDidListenersThrowFlag - legacy output flag that returns
    * whether the event listener's callback threw an exception
    */
-  protected static _dispatchEvent(event: Event, target: EventTarget,
+  protected static _dispatchEvent(event: EventInternal,
+    target: EventTargetInternal,
     legacyTargetOverrideFlag: boolean = false,
     legacyOutputDidListenersThrowFlag: OutputFlag = { value: false }): boolean {
-
-    const eventImpl = <any><unknown>event
-    const targetImpl = <any><unknown>target
 
     let clearTargets = false
 
     /**
      * 1. Set event's dispatch flag.
      */
-    eventImpl._dispatch = true
+    event._dispatchFlag = true
 
     /** 
      * 2. Let targetOverride be target, if legacy target override flag is not
@@ -302,9 +300,9 @@ export abstract class EventTargetImpl implements EventTarget {
      * then:
     */
     let activationTarget: EventTarget | null = null
-    let relatedTarget = TreeQuery.retarget(eventImpl._relatedTarget, target) as EventTarget
+    let relatedTarget = TreeQuery.retarget(event._relatedTarget, target) as EventTarget
 
-    if (target !== relatedTarget || target === eventImpl._relatedTarget) {
+    if (target !== relatedTarget || target === event._relatedTarget) {
       /**
        * 5.1. Let touchTargets be a new list.
        * 5.2. For each touchTarget of event's touch target list, append the 
@@ -322,21 +320,21 @@ export abstract class EventTargetImpl implements EventTarget {
        * event.
        */
       let touchTargets = []
-      for (const touchTarget of eventImpl._touchTargetList) {
+      for (const touchTarget of event._touchTargetList) {
         touchTargets.push(TreeQuery.retarget(touchTarget, target))
       }
 
-      const isActivationEvent = (Guard.isMouseEvent(eventImpl) && eventImpl.type === "click")
-      if (isActivationEvent && targetImpl._activationBehavior !== undefined) {
+      const isActivationEvent = (Guard.isMouseEvent(event) && event.type === "click")
+      if (isActivationEvent && target._activationBehavior !== undefined) {
         activationTarget = target
       }
 
       let slotable: EventTarget | null =
-        (Guard.isSlotable(targetImpl) && targetImpl._assignedSlot !== null) ?
+        (Guard.isSlotable(target) && target._assignedSlot !== null) ?
           target : null
 
       let slotInClosedTree = false
-      let parent = targetImpl._getTheParent(event)
+      let parent: EventTargetInternal | null = <EventTargetInternal>target._getTheParent(event)
 
       /**
        * 5.9. While parent is non-null:
@@ -354,8 +352,8 @@ export abstract class EventTargetImpl implements EventTarget {
             throw new Error("Parent node of a slotable should be a slot.")
           }
           slotable = null
-          if (Guard.isShadowRoot(TreeQuery.rootNode(parent, true))
-            && parent.mode === "closed") {
+          const root = TreeQuery.rootNode(parent, true)
+          if (Guard.isShadowRoot(root) && root.mode === "closed") {
             slotInClosedTree = true
           }
         }
@@ -372,10 +370,10 @@ export abstract class EventTargetImpl implements EventTarget {
         if (Guard.isSlotable(parent) && parent._assignedSlot !== null) {
           slotable = parent
         }
-        relatedTarget = TreeQuery.retarget(eventImpl._relatedTarget, parent)
+        relatedTarget = TreeQuery.retarget(event._relatedTarget, parent)
 
         touchTargets = []
-        for (const touchTarget of eventImpl._touchTargetList) {
+        for (const touchTarget of event._touchTargetList) {
           touchTargets.push(TreeQuery.retarget(touchTarget, parent))
         }
 
@@ -400,7 +398,8 @@ export abstract class EventTargetImpl implements EventTarget {
             relatedTarget, touchTargets, slotInClosedTree)
         } else if (parent === relatedTarget) {
           /**
-           * 5.9.7. Otherwise, if parent is relatedTarget, then set parent to null.
+           * 5.9.7. Otherwise, if parent is relatedTarget, 
+           * then set parent to null.
            */
           parent = null
         } else {
@@ -414,7 +413,7 @@ export abstract class EventTargetImpl implements EventTarget {
            */
           target = parent
           if (isActivationEvent && activationTarget === null &&
-            targetImpl._activationBehavior) {
+            target._activationBehavior) {
             activationTarget = target
           }
           EventTargetImpl._appendToEventPath(event, parent, target,
@@ -427,7 +426,7 @@ export abstract class EventTargetImpl implements EventTarget {
          * 5.9.10. Set slot-in-closed-tree to false.
          */
         if (parent !== null) {
-          parent = parent._getTheParent(event)
+          parent = <EventTargetInternal>parent._getTheParent(event)
         }
         slotInClosedTree = false
       }
@@ -437,7 +436,7 @@ export abstract class EventTargetImpl implements EventTarget {
        * shadow-adjusted target is non-null.
        */
       let clearTargetsStruct: EventPathItem | null = null
-      const path: EventPathItem[] = eventImpl._path
+      const path: EventPathItem[] = event._path
       let i = path.length - 1
       while (i >= 0) {
         const struct = path[i]
@@ -498,9 +497,9 @@ export abstract class EventTargetImpl implements EventTarget {
          * legacyOutputDidListenersThrowFlag if given.
          */
         if (struct.shadowAdjustedTarget !== null) {
-          eventImpl._eventPhase = EventPhase.AtTarget
+          event._eventPhase = EventPhase.AtTarget
         } else {
-          eventImpl._eventPhase = EventPhase.Capturing
+          event._eventPhase = EventPhase.Capturing
         }
 
         EventTargetImpl._invokeEvent(struct, event, "capturing",
@@ -523,10 +522,10 @@ export abstract class EventTargetImpl implements EventTarget {
          * legacyOutputDidListenersThrowFlag if given.
          */
         if (struct.shadowAdjustedTarget !== null) {
-          eventImpl._eventPhase = EventPhase.AtTarget
+          event._eventPhase = EventPhase.AtTarget
         } else {
-          if (!eventImpl._bubbles) continue
-          eventImpl._eventPhase = EventPhase.Bubbling
+          if (!event.bubbles) continue
+          event._eventPhase = EventPhase.Bubbling
         }
 
         EventTargetImpl._invokeEvent(struct, event, "bubbling",
@@ -543,12 +542,12 @@ export abstract class EventTargetImpl implements EventTarget {
      * 9. Unset event's dispatch flag, stop propagation flag, and stop 
      * immediate propagation flag.
      */
-    eventImpl._eventPhase = EventPhase.None
-    eventImpl._currentTarget = null
-    eventImpl._path = []
-    eventImpl._dispatch = false
-    eventImpl._stopPropagation = false
-    eventImpl._stopImmediatePropagation = false
+    event._eventPhase = EventPhase.None
+    event._currentTarget = null
+    event._path = []
+    event._dispatchFlag = false
+    event._stopPropagationFlag = false
+    event._stopImmediatePropagationFlag = false
 
     /**
      * 10. If clearTargets, then:
@@ -557,9 +556,9 @@ export abstract class EventTargetImpl implements EventTarget {
      * 10.3. Set event's touch target list to the empty list.
      */
     if (clearTargets) {
-      eventImpl._target = null
-      eventImpl._relatedTarget = null
-      eventImpl._touchTargetList = []
+      event._target = null
+      event._relatedTarget = null
+      event._touchTargetList = []
     }
 
     /**
@@ -572,7 +571,7 @@ export abstract class EventTargetImpl implements EventTarget {
      */
     if (activationTarget !== null) {
       const atImpl = activationTarget as EventTargetImpl
-      if (!eventImpl._canceled && atImpl._activationBehavior !== undefined) {
+      if (!event._canceledFlag && atImpl._activationBehavior !== undefined) {
         atImpl._activationBehavior(event)
       } else if (atImpl._legacyCanceledActivationBehavior !== undefined) {
         atImpl._legacyCanceledActivationBehavior(event)
@@ -582,7 +581,7 @@ export abstract class EventTargetImpl implements EventTarget {
     /**
      * 12. Return false if event's canceled flag is set, and true otherwise.
      */
-    return !eventImpl._canceled
+    return !event._canceledFlag
   }
 
   /**
@@ -595,7 +594,7 @@ export abstract class EventTargetImpl implements EventTarget {
    * @param touchTargets - a list of touch targets
    * @param slotInClosedTree - if the target's parent is a closed shadow root
    */
-  protected static _appendToEventPath(event: Event,
+  protected static _appendToEventPath(event: EventInternal,
     invocationTarget: EventTarget, shadowAdjustedTarget: PotentialEventTarget,
     relatedTarget: PotentialEventTarget, touchTargets: PotentialEventTarget[],
     slotInClosedTree: boolean): void {
@@ -630,8 +629,7 @@ export abstract class EventTargetImpl implements EventTarget {
      * touch target list is touchTargets, root-of-closed-tree is
      * root-of-closed-tree, and slot-in-closed-tree is slot-in-closed-tree.
      */
-    const eventImpl = <any><unknown>event
-    const path: EventPathItem[] = eventImpl._path
+    const path: EventPathItem[] = event._path
     path.push({
       invocationTarget: invocationTarget,
       invocationTargetInShadowTree: invocationTargetInShadowTree,
@@ -652,7 +650,7 @@ export abstract class EventTargetImpl implements EventTarget {
    * @param legacyOutputDidListenersThrowFlag - legacy output flag that returns
    * whether the event listener's callback threw an exception
    */
-  protected static _invokeEvent(struct: EventPathItem, event: Event,
+  protected static _invokeEvent(struct: EventPathItem, event: EventInternal,
     phase: "capturing" | "bubbling",
     legacyOutputDidListenersThrowFlag: OutputFlag = { value: false }): void {
 
@@ -661,8 +659,7 @@ export abstract class EventTargetImpl implements EventTarget {
      * in event's path, that is either struct or preceding struct, whose 
      * shadow-adjusted target is non-null.
      */
-    const eventImpl = <any><unknown>event
-    const path: EventPathItem[] = eventImpl._path
+    const path: EventPathItem[] = event._path
     let index = -1
     for (let i = 0; i < path.length; i++) {
       if (path[i] === struct) {
@@ -673,11 +670,11 @@ export abstract class EventTargetImpl implements EventTarget {
     if (index !== -1) {
       let item = path[index]
       if (item.shadowAdjustedTarget !== null) {
-        eventImpl._target = item.shadowAdjustedTarget
+        event._target = item.shadowAdjustedTarget
       } else if (index > 0) {
         item = path[index - 1]
         if (item.shadowAdjustedTarget !== null) {
-          eventImpl._target = item.shadowAdjustedTarget
+          event._target = item.shadowAdjustedTarget
         }
       }
     }
@@ -694,11 +691,12 @@ export abstract class EventTargetImpl implements EventTarget {
      * _Note:_ This avoids event listeners added after this point from being
      * run. Note that removal still has an effect due to the removed field.
      */
-    eventImpl._relatedTarget = struct.relatedTarget
-    eventImpl._touchTargetList = struct.touchTargetList
-    if (eventImpl._stopPropagation) return
-    eventImpl._currentTarget = struct.invocationTarget
-    const targetListeners: EventListenerEntry[] = eventImpl._currentTarget._eventListenerList
+    event._relatedTarget = struct.relatedTarget
+    event._touchTargetList = struct.touchTargetList
+    if (event._stopPropagationFlag) return
+    event._currentTarget = struct.invocationTarget
+    const currentTarget = event._currentTarget as EventTargetInternal
+    const targetListeners: EventListenerEntry[] = currentTarget._eventListenerList
     let listeners: EventListenerEntry[] = new Array(...targetListeners)
 
     /**
@@ -711,7 +709,7 @@ export abstract class EventTargetImpl implements EventTarget {
     /**
      * 8. If found is false and event's isTrusted attribute is true, then:
      */
-    if (!found && eventImpl._isTrusted) {
+    if (!found && event.isTrusted) {
       /**
        * 8.1. Let originalEventType be event's type attribute value.
        * 8.2. If event's type attribute value is a match for any of the strings
@@ -726,15 +724,15 @@ export abstract class EventTargetImpl implements EventTarget {
        * "animationstart"     | "webkitAnimationStart"
        * "transitionend"      | "webkitTransitionEnd"
        */
-      const originalEventType: string = eventImpl._type
+      const originalEventType: string = event._type
       if (originalEventType === "animationend") {
-        eventImpl._type = "webkitAnimationEnd"
+        event._type = "webkitAnimationEnd"
       } else if (originalEventType === "animationiteration") {
-        eventImpl._type = "webkitAnimationIteration"
+        event._type = "webkitAnimationIteration"
       } else if (originalEventType === "animationstart") {
-        eventImpl._type = "webkitAnimationStart"
+        event._type = "webkitAnimationStart"
       } else if (originalEventType === "transitionend") {
-        eventImpl._type = "webkitTransitionEnd"
+        event._type = "webkitTransitionEnd"
       }
 
       /**
@@ -744,7 +742,7 @@ export abstract class EventTargetImpl implements EventTarget {
        */
       EventTargetImpl._innerInvokeEvent(event, listeners, phase,
         legacyOutputDidListenersThrowFlag)
-      eventImpl._type = originalEventType
+      event._type = originalEventType
     }
   }
 

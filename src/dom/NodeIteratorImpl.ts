@@ -1,15 +1,18 @@
-import { NodeIterator, Node, NodeFilter, WhatToShow, FilterResult } from "./interfaces"
+import { Node, NodeFilter, WhatToShow, FilterResult } from "./interfaces"
 import { TraverserImpl } from "./TraverserImpl"
 import { Traverse } from "./util/Traverse"
+import { NodeIteratorInternal, CollectionInternal } from "./interfacesInternal"
+import { NodeListImpl } from ".";
 
 /**
  * Represents an object which can be used to iterate through the nodes
  * of a subtree.
  */
-export class NodeIteratorImpl extends TraverserImpl implements NodeIterator {
+export class NodeIteratorImpl extends TraverserImpl implements NodeIteratorInternal {
 
-  private _reference: Node
-  private _pointerBeforeReference: boolean
+  _iteratorCollection: CollectionInternal
+  _reference: Node
+  _pointerBeforeReference: boolean
 
   /**
    * Initializes a new instance of `NodeIterator`.
@@ -22,6 +25,7 @@ export class NodeIteratorImpl extends TraverserImpl implements NodeIterator {
     ((node: Node) => FilterResult) | null) {
     super(root, whatToShow, filter)
 
+    this._iteratorCollection = new NodeListImpl(root)
     this._reference = root
     this._pointerBeforeReference = true
   }

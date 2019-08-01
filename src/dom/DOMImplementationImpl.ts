@@ -1,19 +1,17 @@
-import {
-  DOMImplementation, DocumentType,
-  Document, XMLDocument
-} from "./interfaces"
+import { DocumentType, Document, XMLDocument } from "./interfaces"
 import { DocumentTypeImpl } from "./DocumentTypeImpl"
 import { DocumentImpl } from "./DocumentImpl"
 import { XMLDocumentImpl } from "./XMLDocumentImpl"
 import { TextImpl } from "./TextImpl"
 import { ElementImpl } from "./ElementImpl"
 import { Namespace } from './spec'
+import { DOMImplementationInternal } from "./interfacesInternal"
 
 /**
  * Represents an object providing methods which are not dependent on 
  * any particular document.
  */
-export class DOMImplementationImpl implements DOMImplementation {
+export class DOMImplementationImpl implements DOMImplementationInternal {
 
   /**
    * Creates and returns a {@link DocType}.

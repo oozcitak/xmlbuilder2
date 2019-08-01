@@ -35,13 +35,13 @@ export function clone<T>(obj: T): T {
   if (isFunction(obj)) {
     return obj
   } else if (isArray(obj)) {
-    const result = [ ]
+    const result: any = []
     for (const item of obj) {
       result.push(clone(item))
     }
-    return <T><unknown>result
+    return result
   } else if (isObject(obj)) {
-    const result: any = { }
+    const result: any = {}
     for (const [key, val] of Object.entries(obj)) {
       result[key] = clone(val)
     }
@@ -60,9 +60,9 @@ export function clone<T>(obj: T): T {
  * values, whether they are `undefined` or not.
  */
 export function applyDefaults<T>(
-  obj: { [key: string]: any } | undefined, 
+  obj: { [key: string]: any } | undefined,
   defaults: { [key: string]: any }, overwrite: boolean = false): T {
-    
+
   const result = clone(obj || {})
 
   for (const [key, val] of Object.entries(defaults)) {
@@ -83,7 +83,7 @@ export function applyDefaults<T>(
  * 
  * @param arr - array to iterate
  */
-export function *forEachArray<T>(arr: Array<T>): IterableIterator<T> {
+export function* forEachArray<T>(arr: Array<T>): IterableIterator<T> {
   for (let i = 0, len = arr.length; i < len; i++) {
     yield arr[i]
   }
@@ -94,7 +94,7 @@ export function *forEachArray<T>(arr: Array<T>): IterableIterator<T> {
  * 
  * @param obj - map or object to iterate
  */
-export function *forEachObject<T>(obj: Map<string, T> | { [key: string]: T}): 
+export function* forEachObject<T>(obj: Map<string, T> | { [key: string]: T }):
   IterableIterator<[string, T]> {
   if (isMap(obj)) {
     for (const [key, val] of obj.entries()) {
@@ -114,7 +114,7 @@ export function *forEachObject<T>(obj: Map<string, T> | { [key: string]: T}):
  * 
  * @param obj - map or object
  */
-export function objectLength(obj: Map<string, any> | { [key: string]: any}): 
+export function objectLength(obj: Map<string, any> | { [key: string]: any }):
   number {
   if (isMap(obj)) {
     return obj.size
@@ -129,8 +129,8 @@ export function objectLength(obj: Map<string, any> | { [key: string]: any}):
  * @param obj - map or object
  * @param key - the key to retrieve
  */
-export function getObjectValue<T>(obj: Map<string, T> | 
-  { [key: string]: T}, key: string): T | undefined {
+export function getObjectValue<T>(obj: Map<string, T> |
+{ [key: string]: T }, key: string): T | undefined {
   if (isMap(obj)) {
     return obj.get(key)
   } else {
@@ -144,8 +144,8 @@ export function getObjectValue<T>(obj: Map<string, T> |
  * @param obj - map or object
  * @param key - the key to remove
  */
-export function removeObjectValue<T>(obj: Map<string, T> | 
-  { [key: string]: T}, key: string): void {
+export function removeObjectValue<T>(obj: Map<string, T> |
+{ [key: string]: T }, key: string): void {
   if (isMap(obj)) {
     obj.delete(key)
   } else {

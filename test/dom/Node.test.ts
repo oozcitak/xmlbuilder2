@@ -43,7 +43,7 @@ describe('Node', function () {
 
   test('ownerDocument', function () {
     expect(ele1.ownerDocument).toBe(doc)
-    expect(doc.ownerDocument).toBe(doc)
+    expect(doc.ownerDocument).toBeNull()
   })
 
   test('getRootNode()', function () {

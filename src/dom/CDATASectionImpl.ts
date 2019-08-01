@@ -1,10 +1,11 @@
-import { CDATASection, Node, Document, NodeType } from "./interfaces"
+import { Node, Document, NodeType } from "./interfaces"
 import { TextImpl } from "./TextImpl"
+import { CDATASectionInternal } from "./interfacesInternal"
 
 /**
  * Represents a CDATA node.
  */
-export class CDATASectionImpl extends TextImpl implements CDATASection {
+export class CDATASectionImpl extends TextImpl implements CDATASectionInternal {
   /**
    * Initializes a new instance of `CDATASection`.
    *
@@ -36,6 +37,6 @@ export class CDATASectionImpl extends TextImpl implements CDATASection {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    return new CDATASectionImpl(this.ownerDocument, this.data)
+    return new CDATASectionImpl(this._nodeDocument, this.data)
   }
 }

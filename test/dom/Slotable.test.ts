@@ -15,8 +15,8 @@ describe('Slotable', function () {
   de.appendChild(child2)
 
   test('assignedSlot', function () {
-    expect(() => child1.assignedSlot).toThrow()
-    expect(() => child2.assignedSlot).toThrow()
+    expect(child1.assignedSlot).toBeNull()
+    expect(child2.assignedSlot).toBeNull()
   })
 
 })

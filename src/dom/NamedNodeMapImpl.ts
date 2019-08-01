@@ -1,30 +1,36 @@
-import { NamedNodeMap, Element, Attr } from "./interfaces"
+import { Element, Attr } from "./interfaces"
 import { DOMException } from "./DOMException"
+import { NamedNodeMapInternal } from "./interfacesInternal"
 
 /**
  * Represents a collection of nodes.
  */
-export class NamedNodeMapImpl implements NamedNodeMap {
+export class NamedNodeMapImpl implements NamedNodeMapInternal {
 
-  protected _ownerElement: Element
-  protected _items: Attr[]
+  _element: Element
+  _attributeList: Attr[]
 
+  /**
+   * Initializes a new instance of `NamedNodeMap`.
+   * 
+   * @param ownerElement - owner element node
+   */
   constructor(ownerElement: Element) {
-    this._ownerElement = ownerElement
-    this._items = []
+    this._element = ownerElement
+    this._attributeList = []
   }
 
   /** 
    * Returns the number of attribute in the collection.
    */
-  get length(): number { return this._items.length }
+  get length(): number { return this._attributeList.length }
 
   /** 
    * Returns the attribute with index `index` from the collection.
    * 
    * @param index - the zero-based index of the attribute to return
    */
-  item(index: number): Attr | null { return this._items[index] || null }
+  item(index: number): Attr | null { return this._attributeList[index] || null }
 
   /**
    * Returns the attribute with the given `qualifiedName`.
@@ -32,7 +38,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
    * @param qualifiedName - qualified name to search for
    */
   getNamedItem(qualifiedName: string): Attr | null {
-    for (const att of this._items) {
+    for (const att of this._attributeList) {
       if (att.name === qualifiedName) return att
     }
     return null
@@ -46,7 +52,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
    * @param localName - local name to search for
    */
   getNamedItemNS(namespace: string | null, localName: string): Attr | null {
-    for (const att of this._items) {
+    for (const att of this._attributeList) {
       if (att.namespaceURI === namespace && att.localName === localName)
         return att
     }
@@ -68,16 +74,16 @@ export class NamedNodeMapImpl implements NamedNodeMap {
    * @param attr - attribute to set
    */
   setNamedItemNS(attr: Attr): Attr | null {
-    if (attr.ownerElement && attr.ownerElement !== this._ownerElement)
+    if (attr.ownerElement && attr.ownerElement !== this._element)
       throw DOMException.InUseAttributeError
 
     const oldAttr = this.getNamedItemNS(attr.namespaceURI, attr.localName)
     if (oldAttr === attr) return attr
     if (oldAttr) {
-      const index = this._items.indexOf(oldAttr)
-      this._items[index] = attr
+      const index = this._attributeList.indexOf(oldAttr)
+      this._attributeList[index] = attr
     } else {
-      this._items.push(attr)
+      this._attributeList.push(attr)
     }
 
     return oldAttr
@@ -91,7 +97,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
   removeNamedItem(qualifiedName: string): Attr {
     let index = -1
     for (let i = 0; i < this.length; i++) {
-      const att = this._items[i]
+      const att = this._attributeList[i]
       if (att.name === qualifiedName) {
         index = i
         break
@@ -101,8 +107,8 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     if (index === -1)
       throw DOMException.NotFoundError
 
-    const removed = this._items[index]
-    this._items.splice(index, 1)
+    const removed = this._attributeList[index]
+    this._attributeList.splice(index, 1)
     return removed
   }
 
@@ -116,7 +122,7 @@ export class NamedNodeMapImpl implements NamedNodeMap {
   removeNamedItemNS(namespace: string, localName: string): Attr {
     let index = -1
     for (let i = 0; i < this.length; i++) {
-      const att = this._items[i]
+      const att = this._attributeList[i]
       if (att.namespaceURI === namespace && att.localName === localName) {
         index = i
         break
@@ -126,8 +132,8 @@ export class NamedNodeMapImpl implements NamedNodeMap {
     if (index === -1)
       throw DOMException.NotFoundError
 
-    const removed = this._items[index]
-    this._items.splice(index, 1)
+    const removed = this._attributeList[index]
+    this._attributeList.splice(index, 1)
     return removed
   }
 
@@ -135,6 +141,6 @@ export class NamedNodeMapImpl implements NamedNodeMap {
    * Returns an iterator for nodes.
    */
   *[Symbol.iterator](): IterableIterator<Attr> {
-    yield* this._items
+    yield* this._attributeList
   }
 }

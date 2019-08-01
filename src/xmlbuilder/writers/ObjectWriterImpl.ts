@@ -96,8 +96,12 @@ export class ObjectWriterImpl {
    */
   private _serializeElement(preNode: PreSerializedNode<Node>,
     options: XMLBuilderOptions): XMLSerializedValue {
+
     const markup: { [key:string]: any } = { }
-    markup[<string><unknown>preNode.name] = this._serializeChildNodes(preNode, options)
+    if (preNode.name === undefined) {
+      throw new Error("Pre-serialized node name is undefined.")
+    }
+    markup[preNode.name] = this._serializeChildNodes(preNode, options)
     return markup
   }
 
@@ -184,7 +188,7 @@ export class ObjectWriterImpl {
    * string to provide uniqueness.
    */
   private _getNodeKey(preNode: PreSerializedNode<Node>): [string, boolean] {
-    const isRaw = (<any><unknown>preNode.node)._isRawNode
+    const isRaw = (preNode.node as any)._isRawNode
 
     if (isRaw) {
       return [this._builderOptions.convert.raw, true]

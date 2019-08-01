@@ -1,16 +1,19 @@
 import {
-  Traverser, Node, NodeFilter, WhatToShow, FilterResult
+  Node, NodeFilter, WhatToShow, FilterResult
 } from "./interfaces"
 import { NodeFilterImpl } from "./NodeFilterImpl"
+import { TraverserInternal } from "./interfacesInternal"
 
 /**
  * Represents an object which can be used to iterate through the nodes
  * of a subtree.
  */
-export abstract class TraverserImpl implements Traverser {
-  private _root: Node
-  private _whatToShow: WhatToShow
-  private _filter: NodeFilter | null
+export abstract class TraverserImpl implements TraverserInternal {
+
+  _activeFlag: boolean
+  _root: Node
+  _whatToShow: WhatToShow
+  _filter: NodeFilter | null
 
   /**
    * Initializes a new instance of `TraverserImpl`.
@@ -21,7 +24,7 @@ export abstract class TraverserImpl implements Traverser {
    */
   constructor(root: Node, whatToShow: WhatToShow, filter: NodeFilter |
     ((node: Node) => FilterResult) | null) {
-    this.active = false
+    this._activeFlag = false
     this._root = root
     this._whatToShow = whatToShow
     if (filter instanceof Function) {
@@ -30,11 +33,6 @@ export abstract class TraverserImpl implements Traverser {
       this._filter = filter
     }
   }
-
-  /**
-   * A flag to avoid recursive invocations.
-   */
-  active: boolean
 
   /**
    * Gets the root node of the subtree.

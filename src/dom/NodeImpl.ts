@@ -6,11 +6,12 @@ import { EventTargetImpl } from './EventTargetImpl'
 import { NodeListImpl } from './NodeListImpl'
 import { TreeMutation } from './util/TreeMutation'
 import { TreeQuery } from './util/TreeQuery'
+import { NodeInternal, DocumentInternal } from './interfacesInternal'
 
 /**
  * Represents a generic XML node.
  */
-export abstract class NodeImpl extends EventTargetImpl implements Node {
+export abstract class NodeImpl extends EventTargetImpl implements NodeInternal {
 
   static readonly ELEMENT_NODE: number = 1
   static readonly ATTRIBUTE_NODE: number = 2
@@ -32,16 +33,19 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
   static readonly DOCUMENT_POSITION_CONTAINED_BY: number = 0x10
   static readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: number = 0x20
 
+  protected _baseURI = ''
+  protected _childNodes: NodeList
+
+  _nodeDocument: DocumentInternal
+  _registeredObserverList:
+    Array<RegisteredObserver | TransientRegisteredObserver> = []
+
   _parentNode: Node | null = null
   _firstChild: Node | null = null
   _lastChild: Node | null = null
   _previousSibling: Node | null = null
   _nextSibling: Node | null = null
-  _ownerDocument: Document | null = null
-  _baseURI = ''
-  protected _childNodes: NodeList
-  protected _registeredObservers: Array<RegisteredObserver | TransientRegisteredObserver> = []
-
+  
   /**
    * Initializes a new instance of `Node`.
    *
@@ -49,7 +53,8 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
    */
   protected constructor(ownerDocument: Document | null) {
     super()
-    this._ownerDocument = ownerDocument
+    // TODO: Set document to global object's document
+    this._nodeDocument = <DocumentInternal>(ownerDocument || null)
     this._childNodes = new NodeListImpl(this)
   }
 
@@ -81,9 +86,9 @@ export abstract class NodeImpl extends EventTargetImpl implements Node {
    */
   get ownerDocument(): Document | null {
     if (this.nodeType === NodeType.Document)
-      return <Document><unknown>this
+      return null
     else
-      return this._ownerDocument
+      return this._nodeDocument
   }
 
   /**

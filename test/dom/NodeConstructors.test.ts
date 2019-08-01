@@ -51,7 +51,7 @@ describe('Node Constructors', function () {
 
   test('Document constructor()', function () {
     const node = new $$.Document()
-    expect(node.ownerDocument).toBe(node)
+    expect(node.ownerDocument).toBeNull()
   })
 
   test('DocumentType constructor()', function () {
@@ -102,7 +102,7 @@ describe('Node Constructors', function () {
 
   test('XMLDocument constructor()', function () {
     const node = new $$.XMLDocument()
-    expect(node.ownerDocument).toBe(node)
+    expect(node.ownerDocument).toBeNull()
   })
 
 })

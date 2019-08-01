@@ -1,20 +1,22 @@
-import { Node, ChildNode } from './interfaces'
+import { Node } from './interfaces'
 import { Convert } from './util/Convert'
 import { TreeMutation } from './util/TreeMutation'
+import { ChildNodeInternal } from './interfacesInternal'
+import { Cast } from './util/Cast'
 
 /**
  * Represents a mixin that extends child nodes that can have siblings
  * including doctypes. This mixin is implemented by {@link Element},
  * {@link CharacterData} and {@link DocumentType}.
  */
-export class ChildNodeImpl implements ChildNode {
+export class ChildNodeImpl implements ChildNodeInternal {
 
   /**
    * Inserts nodes just before this node, while replacing strings in
    * nodes with equivalent text nodes.
    */
   before(...nodes: (Node | string)[]): void {
-    const context = <Node><unknown>this
+    const context = Cast.asNode(this)
 
     const parent = context.parentNode
     if (!parent) return
@@ -32,16 +34,14 @@ export class ChildNodeImpl implements ChildNode {
       }
     }
 
-    if (context.ownerDocument) {
-      const node = Convert.nodesIntoNode(nodes, context.ownerDocument)
+    const node = Convert.nodesIntoNode(nodes, context._nodeDocument)
 
-      if (!viablePreviousSibling)
-        viablePreviousSibling = parent.firstChild
-      else
-        viablePreviousSibling = viablePreviousSibling.nextSibling
+    if (!viablePreviousSibling)
+      viablePreviousSibling = parent.firstChild
+    else
+      viablePreviousSibling = viablePreviousSibling.nextSibling
 
-      TreeMutation.preInsert(node, parent, viablePreviousSibling)
-    }
+    TreeMutation.preInsert(node, parent, viablePreviousSibling)
   }
 
   /**
@@ -49,7 +49,7 @@ export class ChildNodeImpl implements ChildNode {
    * nodes with equivalent text nodes.
    */
   after(...nodes: (Node | string)[]): void {
-    const context = <Node><unknown>this
+    const context = Cast.asNode(this)
 
     const parent = context.parentNode
     if (!parent) return
@@ -67,11 +67,9 @@ export class ChildNodeImpl implements ChildNode {
       }
     }
 
-    if (context.ownerDocument) {
-      const node = Convert.nodesIntoNode(nodes, context.ownerDocument)
+    const node = Convert.nodesIntoNode(nodes, context._nodeDocument)
 
-      TreeMutation.preInsert(node, parent, viableNextSibling)
-    }
+    TreeMutation.preInsert(node, parent, viableNextSibling)
   }
 
   /**
@@ -79,7 +77,7 @@ export class ChildNodeImpl implements ChildNode {
    * nodes with equivalent text nodes.
    */
   replaceWith(...nodes: (Node | string)[]): void {
-    const context = <Node><unknown>this
+    const context = Cast.asNode(this)
 
     const parent = context.parentNode
     if (!parent) return
@@ -97,22 +95,20 @@ export class ChildNodeImpl implements ChildNode {
       }
     }
 
-    if (context.ownerDocument) {
-      const node = Convert.nodesIntoNode(nodes, context.ownerDocument)
+    const node = Convert.nodesIntoNode(nodes, context._nodeDocument)
 
-      // Note: Context object could have been inserted into node.
-      if (context.parentNode === parent)
-        TreeMutation.replaceNode(context, node, parent)
-      else
-        TreeMutation.preInsert(node, parent, viableNextSibling)
-    }
+    // Note: Context object could have been inserted into node.
+    if (context.parentNode === parent)
+      TreeMutation.replaceNode(context, node, parent)
+    else
+      TreeMutation.preInsert(node, parent, viableNextSibling)
   }
 
   /**
    * Removes this node form its tree.
    */
   remove(): void {
-    const context = <Node><unknown>this
+    const context = Cast.asNode(this)
 
     const parent = context.parentNode
     if (!parent) return

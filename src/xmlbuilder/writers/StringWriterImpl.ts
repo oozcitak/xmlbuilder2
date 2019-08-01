@@ -93,7 +93,7 @@ export class StringWriterImpl {
    */
   private _serializeNode(preNode: PreSerializedNode<Node>,
     options: StringWriterOptions, refs: StringWriterRefs): string {
-    const isRaw = (<any><unknown>preNode.node)._isRawNode
+    const isRaw = (preNode.node as any)._isRawNode
 
     if (isRaw) {
       return this._serializeRaw(<PreSerializedNode<Text>>preNode, options, refs)

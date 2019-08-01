@@ -1,11 +1,13 @@
 import { Text, Document, Node, NodeType } from "./interfaces"
 import { CharacterDataImpl } from "./CharacterDataImpl"
 import { TextUtility } from "./util/TextUtility"
+import { TextInternal } from "./interfacesInternal"
+import { HTMLSlotElement } from "../htmldom/interfaces"
 
 /**
  * Represents a text node.
  */
-export class TextImpl extends CharacterDataImpl implements Text {
+export class TextImpl extends CharacterDataImpl implements TextInternal {
 
   /**
    * Initializes a new instance of `Text`.
@@ -71,11 +73,11 @@ export class TextImpl extends CharacterDataImpl implements Text {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    return new TextImpl(this.ownerDocument, this.data)
+    return new TextImpl(this._nodeDocument, this.data)
   }
 
   // MIXIN: Slotable
   /* istanbul ignore next */
-  get assignedSlot(): undefined { throw new Error("Mixin: Slotable not implemented.") }
+  get assignedSlot(): HTMLSlotElement | null { throw new Error("Mixin: Slotable not implemented.") }
 
 }

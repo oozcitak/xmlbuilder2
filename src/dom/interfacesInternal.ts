@@ -6,8 +6,11 @@ import {
   NamedNodeMap, Attr, CharacterData, ProcessingInstruction, BoundaryPoint,
   Range, AbstractRange, NodeIterator, Traverser, WhatToShow, NodeFilter,
   Collection, NodeList, HTMLCollection, TreeWalker, DOMTokenList, CustomEvent,
-  DOMImplementation, Text, CDATASection, Comment, StaticRange
+  DOMImplementation, Text, CDATASection, Comment, StaticRange, Slotable, 
+  ChildNode, NonDocumentTypeChildNode, ParentNode, DocumentOrShadowRoot, 
+  NonElementParentNode, EventPhase, XMLDocument
 } from "./interfaces"
+import { HTMLSlotElement } from "../htmldom/interfaces"
 
 /**
  * Represents a DOM event.
@@ -25,6 +28,13 @@ export interface EventInternal extends Event {
   _composedFlag: boolean
   _initializedFlag: boolean
   _dispatchFlag: boolean
+  
+  _isTrustedFlag: boolean
+
+  _currentTarget: PotentialEventTarget
+  _eventPhase: EventPhase
+
+  _type: string
 }
 
 /**
@@ -92,14 +102,17 @@ export interface AbortSignalInternal extends AbortSignal {
 export interface CollectionInternal extends Collection {
   _live: boolean
   _root: Node
-  _filter: NodeFilter | null
+  _filter: ((element: Element) => any) | null
 }
 
 /**
  * Represents an ordered list of nodes.
  */
 export interface NodeListInternal extends CollectionInternal, NodeList {
-
+  /**
+   * Used to keep track of child node count. This is a non-standard property.
+   */    
+  _length: number
 }
 
 /**
@@ -129,8 +142,18 @@ export interface MutationRecordInternal extends MutationRecord {
  * Represents a generic XML node.
  */
 export interface NodeInternal extends EventTargetInternal, Node {
-  _nodeDocument: Document
+  _nodeDocument: DocumentInternal
   _registeredObserverList: Array<RegisteredObserver | TransientRegisteredObserver>
+
+  /**
+   * Used to keep track of parent-child relations in the tree. This is a 
+   * non-standard property.
+   */  
+  _parentNode: Node | null
+  _firstChild: Node | null
+  _lastChild: Node | null
+  _previousSibling: Node | null
+  _nextSibling: Node | null
 }
 
 /**
@@ -141,8 +164,21 @@ export interface DocumentInternal extends NodeInternal, Document {
   _contentType: string
   _URL: string
   _origin: string
-  _type: string
+  _type: "xml" | "html"
   _mode: string
+
+  /**
+   * Used to keep track of live ranges and clean up memory. This is a 
+   * non-standard property.
+   */
+  _rangeList: Range[]
+}
+
+/**
+ * Represents a XML document node.
+ */
+export interface XMLDocumentInternal extends NodeInternal, XMLDocument {
+
 }
 
 /**
@@ -186,8 +222,8 @@ export interface ElementInternal extends NodeInternal, Element {
   _namespacePrefix: string | null
   _localName: string
   _customElementState: "undefined" | "failed" | "uncustomized" | "custom"
-  _customElementDefinition: FunctionConstructor
-  _is: any
+  _customElementDefinition: any
+  _is: string
   _shadowRoot: ShadowRoot | null
 
   readonly _qualifiedName: string
@@ -329,3 +365,56 @@ export interface DOMTokenListInternal extends DOMTokenList {
   _localName: string
 }
 
+/**
+ * Represents a mixin that extends non-element parent nodes. This mixin
+ * is implemented by {@link Document} and {@link DocumentFragment}.
+ */
+export interface NonElementParentNodeInternal extends NonElementParentNode {
+
+}
+
+/**
+ * Represents a mixin for an interface to be used to share APIs between
+ * documents and shadow roots. This mixin is implemented by
+ * {@link Document} and {@link ShadowRoot}.
+ */
+export interface DocumentOrShadowRootInternal extends DocumentOrShadowRoot {
+
+}
+
+/**
+ * Represents a mixin that extends parent nodes that can have children.
+ * This mixin is implemented by {@link Element}, {@link Document} and
+ * {@link DocumentFragment}.
+ */
+export interface ParentNodeInternal extends ParentNode {
+
+}
+
+/**
+ * Represents a mixin that extends child nodes that can have siblings
+ * other than doctypes. This mixin is implemented by {@link Element} and
+ * {@link CharacterData}.
+ */
+export interface NonDocumentTypeChildNodeInternal extends NonDocumentTypeChildNode {
+
+}
+
+/**
+ * Represents a mixin that extends child nodes that can have siblings
+ * including doctypes. This mixin is implemented by {@link Element},
+ * {@link CharacterData} and {@link DocumentType}.
+ */
+export interface ChildNodeInternal extends ChildNode {
+
+}
+
+/**
+ * Represents a mixin that allows nodes to become the contents of
+ * a <slot> element. This mixin is implemented by {@link Element} and
+ * {@link Text}.
+ */
+export interface SlotableInternal extends Slotable {
+  _name: string
+  _assignedSlot: HTMLSlotElement | null
+}

@@ -1,10 +1,11 @@
-import { Comment, Node, Document, NodeType } from "./interfaces"
+import { Node, Document, NodeType } from "./interfaces"
 import { CharacterDataImpl } from "./CharacterDataImpl"
+import { CommentInternal } from "./interfacesInternal"
 
 /**
  * Represents a comment node.
  */
-export class CommentImpl extends CharacterDataImpl implements Comment {
+export class CommentImpl extends CharacterDataImpl implements CommentInternal {
 
   /**
    * Initializes a new instance of `Comment`.
@@ -37,6 +38,6 @@ export class CommentImpl extends CharacterDataImpl implements Comment {
    * attributes, if it is an {@link Element}).
    */
   cloneNode(deep: boolean = false): Node {
-    return new CommentImpl(this.ownerDocument, this.data)
+    return new CommentImpl(this._nodeDocument, this.data)
   }
 }

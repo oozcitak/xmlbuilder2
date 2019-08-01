@@ -1,15 +1,16 @@
-import { CustomEvent, CustomEventInit } from './interfaces'
+import { CustomEventInit } from './interfaces'
 import { EventImpl } from './EventImpl'
+import { CustomEventInternal } from './interfacesInternal'
 
 /**
  * Represents and event that carries custom data.
  */
-export class CustomEventImpl extends EventImpl implements CustomEvent {
+export class CustomEventImpl extends EventImpl implements CustomEventInternal {
 
   protected _detail: any = null
 
   /**
-   * Initializes a new instance of `Event`.
+   * Initializes a new instance of `CustomEvent`.
    */
   constructor(type: string, eventInit?: CustomEventInit) {
     super(type, eventInit)
@@ -31,7 +32,7 @@ export class CustomEventImpl extends EventImpl implements CustomEvent {
    * @param detail - custom event data
    */
   initCustomEvent(type: string, bubbles = false, cancelable = false, detail = null): void {
-    if (this._dispatch) return
+    if (this._dispatchFlag) return
 
     EventImpl._initialize(this, type, bubbles, cancelable)
 

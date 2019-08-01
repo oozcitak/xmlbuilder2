@@ -1,7 +1,11 @@
-import { Node, NodeType, Text, CharacterData } from '../interfaces'
+import { Node, Text, CharacterData } from '../interfaces'
 import { DOMException } from '../DOMException'
 import { TreeMutation } from './TreeMutation'
 import { TreeQuery } from './TreeQuery'
+import {
+  CharacterDataInternal, DocumentInternal, TextInternal, RangeInternal
+} from '../interfacesInternal'
+import { Guard } from './Guard'
 
 /**
  * Includes common methods to manipulate text nodes.
@@ -16,7 +20,7 @@ export class TextUtility {
    * @param count - count of characters to replace
    * @param data - new data
    */
-  static replaceData(node: CharacterData, offset: number, count: number, data: string): void {
+  static replaceData(node: CharacterDataInternal, offset: number, count: number, data: string): void {
     const length = TreeQuery.nodeLength(node)
 
     if (offset > length) {
@@ -31,8 +35,7 @@ export class TextUtility {
       node.data, [], [], null, null)
 
     const newData = node.data.substring(0, offset) + data + node.data.substring(offset + count)
-    const nodeAsAny = <any><unknown>node
-    nodeAsAny._data = newData
+    node._data = newData
 
     /**
      * For each live range whose start node is node and start offset is greater
@@ -51,8 +54,9 @@ export class TextUtility {
      * than offset plus count, increase its end offset by data's length and
      * decrease it by count.
      */
-    const docAsAny = <any><unknown>node.ownerDocument
-    for (const range of docAsAny._rangeList) {
+    const doc = node._nodeDocument
+    for (const item of doc._rangeList) {
+      const range = item as RangeInternal
       if (range._start[0] === node && range._start[1] > offset && range._start[1] <= offset + count) {
         range._start[1] += offset
       }
@@ -71,7 +75,7 @@ export class TextUtility {
      * If node is a Text node and its parent is not null, run the child
      * text content change steps for node's parent.
      */
-    if (TextUtility.isTextNode(node) && node.parentNode !== null) {
+    if (Guard.isTextNode(node) && node.parentNode !== null) {
       TextUtility.childTextContentChanged(node.parentNode)
     }
 
@@ -100,26 +104,12 @@ export class TextUtility {
   }
 
   /**
-   * Determines if the given node is a character data node.
-   * 
-   * @param node - a node
-   */
-  static isCharacterDataNode(node: Node): node is CharacterData {
-    const type = node.nodeType
-
-    return (type === NodeType.Text ||
-      type === NodeType.ProcessingInstruction ||
-      type === NodeType.Comment ||
-      type === NodeType.CData)
-  }
-
-  /**
    * Splits data at the given offset and returns the remainder as a text
    * node.
    * 
    * @param offset - the offset at which to split nodes.
    */
-  static splitText(node: Text, offset: number): Text {
+  static splitText(node: TextInternal, offset: number): Text {
     const length = node.data.length
 
     if (offset > length) {
@@ -128,10 +118,7 @@ export class TextUtility {
 
     const count = length - offset
     const newData = TextUtility.substringData(node, offset, count)
-    if (node.ownerDocument === null) {
-      throw new Error("Document is null.")
-    }
-    const newNode = node.ownerDocument.createTextNode(newData)
+    const newNode = node._nodeDocument.createTextNode(newData)
 
     const parent = node.parentNode
 
@@ -153,8 +140,9 @@ export class TextUtility {
        * For each live range whose end node is parent and end offset is equal
        * to the index of node plus 1, increase its end offset by 1.
        */
-      const docAsAny = <any><unknown>node.ownerDocument
-      for (const range of docAsAny._rangeList) {
+      const doc = node._nodeDocument
+      for (const item of doc._rangeList) {
+        const range = item as RangeInternal
         if (range._start[0] === node && range._start[1] > offset) {
           range._start[0] = newNode
           range._start[1] -= offset
@@ -176,16 +164,6 @@ export class TextUtility {
     TextUtility.replaceData(node, offset, count, '')
 
     return newNode
-  }
-
-
-  /**
-   * Determines if the given node is a text node.
-   * 
-   * @param node - a node
-   */
-  static isTextNode(node: Node): node is Text {
-    return (node.nodeType === NodeType.Text)
   }
 
   /**

@@ -1,38 +1,38 @@
 import {
   Event, EventInit, EventTarget, EventPhase, PotentialEventTarget, EventPathItem
 } from './interfaces'
+import { EventInternal } from './interfacesInternal'
 
 /**
  * Represents a DOM event.
  */
-export class EventImpl implements Event {
+export class EventImpl implements EventInternal {
 
   static readonly NONE: number = 0
   static readonly CAPTURING_PHASE: number = 1
   static readonly AT_TARGET: number = 2
   static readonly BUBBLING_PHASE: number = 3
 
-  protected _type: string
+  _target: PotentialEventTarget = null
+  _relatedTarget: PotentialEventTarget = null
+  _touchTargetList: PotentialEventTarget[] = []
+  _path: EventPathItem[] = []
+  _currentTarget: PotentialEventTarget = null
+  _eventPhase: EventPhase = EventPhase.None
 
-  protected _target: PotentialEventTarget = null
-  protected _relatedTarget: PotentialEventTarget = null
-  protected _touchTargetList: PotentialEventTarget[] = []
-  protected _path: EventPathItem[] = []
-  protected _currentTarget: PotentialEventTarget = null
-  protected _eventPhase: EventPhase = EventPhase.None
+  _stopPropagationFlag: boolean = false
+  _stopImmediatePropagationFlag: boolean = false
+  _canceledFlag: boolean = false
+  _inPassiveListenerFlag: boolean = false
+  _composedFlag: boolean = false
+  _initializedFlag: boolean = false
+  _dispatchFlag: boolean = false
 
+  _isTrustedFlag: boolean = false
+  
+  _type: string
   protected _bubbles: boolean = false
   protected _cancelable: boolean = false
-
-  protected _stopPropagation: boolean = false
-  protected _stopImmediatePropagation: boolean = false
-  protected _canceled: boolean = false
-  protected _inPassiveListener: boolean = false
-  protected _composed: boolean = false
-  protected _initialized: boolean = false
-  protected _dispatch: boolean = false
-
-  protected _isTrusted: boolean = false
   protected _timeStamp: number
 
   /**
@@ -43,9 +43,9 @@ export class EventImpl implements Event {
     if (eventInit) {
       this._bubbles = eventInit.bubbles || false
       this._cancelable = eventInit.cancelable || false
-      this._composed = eventInit.composed || false
+      this._composedFlag = eventInit.composed || false
     }
-    this._initialized = true
+    this._initializedFlag = true
     this._timeStamp = new Date().getTime()
   }
 
@@ -165,12 +165,12 @@ export class EventImpl implements Event {
    * Prevents event from reaching any objects other than the current 
    * object.
    */
-  stopPropagation(): void { this._stopPropagation = true }
+  stopPropagation(): void { this._stopPropagationFlag = true }
 
   /**
    * Historical alias of `stopPropagation()`.
    */
-  get cancelBubble(): boolean { return this._stopPropagation }
+  get cancelBubble(): boolean { return this._stopPropagationFlag }
   set cancelBubble(value: boolean) { if (value) this.stopPropagation() }
 
   /**
@@ -178,8 +178,8 @@ export class EventImpl implements Event {
    * the current one finishes running.
    */
   stopImmediatePropagation(): void {
-    this._stopPropagation = true
-    this._stopImmediatePropagation = true
+    this._stopPropagationFlag = true
+    this._stopImmediatePropagationFlag = true
   }
 
   /**
@@ -196,7 +196,7 @@ export class EventImpl implements Event {
   /**
    * Historical property.
    */
-  get returnValue(): boolean { return !this._canceled }
+  get returnValue(): boolean { return !this._canceledFlag }
   set returnValue(value: boolean) { if (!value) EventImpl._setCanceled(this) }
 
   /**
@@ -207,18 +207,18 @@ export class EventImpl implements Event {
   /**
    * Indicates whether the event was cancelled with `preventDefault()`.
    */
-  get defaultPrevented(): boolean { return this._canceled }
+  get defaultPrevented(): boolean { return this._canceledFlag }
 
   /**
    * Determines whether the event can bubble to the shadow DOM.
    */
-  get composed(): boolean { return this._composed }
+  get composed(): boolean { return this._composedFlag }
 
   /**
    * Returns `true` if event was dispatched by the user agent, and
    * `false` otherwise.
    */
-  get isTrusted(): boolean { return this._isTrusted }
+  get isTrusted(): boolean { return this._isTrustedFlag }
 
   /**
    * Returns the the number of milliseconds measured relative to the
@@ -234,7 +234,7 @@ export class EventImpl implements Event {
    * @param cancelable - whether the event can be cancelled.
    */
   initEvent(type: string, bubbles = false, cancelable = false): void {
-    if (this._dispatch) return
+    if (this._dispatchFlag) return
 
     EventImpl._initialize(this, type, bubbles, cancelable)
   }
@@ -247,8 +247,8 @@ export class EventImpl implements Event {
   protected static _setCanceled(event: Event): void {
     const impl = <EventImpl>event
 
-    if (impl._cancelable && !impl._inPassiveListener) {
-      impl._canceled = true
+    if (impl._cancelable && !impl._inPassiveListenerFlag) {
+      impl._canceledFlag = true
     }
   }
 
@@ -263,11 +263,11 @@ export class EventImpl implements Event {
   protected static _initialize(event: Event, type: string, bubbles: boolean, cancelable: boolean): void {
     const impl = <EventImpl>event
 
-    impl._initialized = true
-    impl._stopPropagation = false
-    impl._stopImmediatePropagation = false
-    impl._canceled = false
-    impl._isTrusted = false
+    impl._initializedFlag = true
+    impl._stopPropagationFlag = false
+    impl._stopImmediatePropagationFlag = false
+    impl._canceledFlag = false
+    impl._isTrustedFlag = false
     impl._target = null
 
     impl._type = type

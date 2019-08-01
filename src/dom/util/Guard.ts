@@ -1,6 +1,8 @@
-import {
-  Node, ShadowRoot, NodeType, Text, Element
-} from '../interfaces'
+import { NodeType } from '../interfaces'
+import { HTMLSlotElement } from '../../htmldom/interfaces'
+import { 
+  SlotableInternal, NodeInternal, TextInternal, ElementInternal, ShadowRootInternal, CharacterDataInternal 
+} from '../interfacesInternal'
 
 /**
  * Contains user-defined type guards for DOM objects.
@@ -12,16 +14,31 @@ export class Guard {
    * 
    * @param a - the object to check
    */
-  static isNode(a: any): a is Node {
+  static isNode(a: any): a is NodeInternal {
     return (a.nodeType !== undefined)
   }
 
+
+  /**
+   * Determines if the given node is a `CharacterData` node.
+   * 
+   * @param a - the object to check
+   */
+  static isCharacterDataNode(a: any): a is CharacterDataInternal {
+    const type = a.nodeType
+
+    return (type === NodeType.Text ||
+      type === NodeType.ProcessingInstruction ||
+      type === NodeType.Comment ||
+      type === NodeType.CData)
+  }
+  
   /**
    * Determines if the given object is a `Text`.
    * 
    * @param a - the object to check
    */
-  static isTextNode(a: any): a is Text {
+  static isTextNode(a: any): a is TextInternal {
     return (a.nodeType === NodeType.Text)
   }
 
@@ -30,7 +47,7 @@ export class Guard {
    * 
    * @param a - the object to check
    */
-  static isElementNode(a: any): a is Element {
+  static isElementNode(a: any): a is ElementInternal {
     return (a.nodeType === NodeType.Element)
   }
 
@@ -39,7 +56,7 @@ export class Guard {
    * 
    * @param a - the object to check
    */
-  static isShadowRoot(a: any): a is ShadowRoot {
+  static isShadowRoot(a: any): a is ShadowRootInternal {
     return (a.host !== undefined)
   }
 
@@ -63,19 +80,16 @@ export class Guard {
    * 
    * @param a - the object to check
    */
-  static isSlotable(a: any): boolean {
+  static isSlotable(a: any): a is SlotableInternal {
     return a.name !== undefined && (Guard.isTextNode(a) || Guard.isElementNode(a))
   }
 
   /**
    * Determines if the given object is a slot.
    * 
-   * TODO: change return type to guard for `HTMLSlotElement` when the HTML DOM 
-   * is implemented. 
-   * 
    * @param a - the object to check
    */
-  static isSlot(a: any): boolean {
+  static isSlot(a: any): a is HTMLSlotElement {
     return a.name !== undefined && a.assignedNodes !== undefined
   }
 

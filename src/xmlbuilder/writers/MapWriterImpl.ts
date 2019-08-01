@@ -2,7 +2,7 @@ import {
   WriterOptions, XMLSerializedValue, XMLBuilderOptions
 } from "../interfaces"
 import {
-  Node, Element, Text, CDATASection, Comment, ProcessingInstruction, 
+  Node, Element, Text, CDATASection, Comment, ProcessingInstruction,
   NodeType, CharacterData
 } from "../../dom/interfaces"
 import { applyDefaults } from "../../util"
@@ -46,12 +46,12 @@ export class MapWriterImpl {
       case NodeType.Comment:
       case NodeType.Text:
       case NodeType.CData:
-        return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0], 
-          (<CharacterData>node).data]])
+        return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0],
+        (<CharacterData>node).data]])
       case NodeType.ProcessingInstruction:
         const pi = <ProcessingInstruction>node
-        return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0], 
-          `${pi.target} ${pi.data}`]])
+        return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0],
+        `${pi.target} ${pi.data}`]])
       /* istanbul ignore next */
       default:
         throw new Error("Invalid node type.")
@@ -96,8 +96,13 @@ export class MapWriterImpl {
    */
   private _serializeElement(preNode: PreSerializedNode<Node>,
     options: XMLBuilderOptions): XMLSerializedValue {
+
+    if (preNode.name === undefined) {
+      throw new Error("Pre-serialized node name is null.")
+    }
+
     return new Map<string, XMLSerializedValue>([
-      [<string><unknown>preNode.name, this._serializeChildNodes(preNode, options)]
+      [preNode.name, this._serializeChildNodes(preNode, options)]
     ])
   }
 
@@ -184,12 +189,12 @@ export class MapWriterImpl {
    * string to provide uniqueness.
    */
   private _getNodeKey(preNode: PreSerializedNode<Node>): [string, boolean] {
-    const isRaw = (<any><unknown>preNode.node)._isRawNode
+    const isRaw = (preNode.node as any)._isRawNode
 
     if (isRaw) {
       return [this._builderOptions.convert.raw, true]
     }
-        
+
     switch (preNode.node.nodeType) {
       case NodeType.Element:
         return [(<Element>preNode.node).tagName, false]

@@ -1,15 +1,17 @@
-import { DOMTokenList, Element } from "./interfaces"
+import { Element } from "./interfaces"
 import { OrderedSet } from "./util/OrderedSet"
 import { Convert } from "./util/Convert"
 import { DOMException } from "./DOMException"
+import { DOMTokenListInternal } from "./interfacesInternal"
 
 /**
  * Represents a token set.
  */
-export class DOMTokenListImpl implements DOMTokenList {
+export class DOMTokenListImpl implements DOMTokenListInternal {
 
-  protected _ownerElement: Element
-  protected _localName: string
+  _element: Element
+  _localName: string
+  get _tokenSet(): Set<string> { return Convert.attValueToSet(this._element, this._localName) }
 
   /**
    * Initializes a new instance of `DOMTokenList`.
@@ -18,7 +20,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param localName - the local name of the associated attribute
    */
   public constructor(ownerElement: Element, localName: string) {
-    this._ownerElement = ownerElement
+    this._element = ownerElement
     this._localName = localName
   }
 
@@ -26,7 +28,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * Returns the number of tokens.
    */
   get length(): number { 
-    return Convert.attValueToSet(this._ownerElement, this._localName).size 
+    return Convert.attValueToSet(this._element, this._localName).size 
   }
 
   /**
@@ -35,7 +37,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param index - the index to of the token
    */
   item(index: number): string | null {
-    const set = Convert.attValueToSet(this._ownerElement, this._localName)
+    const set = Convert.attValueToSet(this._element, this._localName)
     let i = 0
     for (const token of set) {
       if (i === index) return token
@@ -50,7 +52,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param tokens - the token to check
    */
   contains(token: string): boolean {
-    return Convert.attValueToSet(this._ownerElement, this._localName).has(token)
+    return Convert.attValueToSet(this._element, this._localName).has(token)
   }
 
   /**
@@ -59,11 +61,11 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param tokens - the list of tokens to add
    */
   add(...tokens: string[]): void {
-    const set = Convert.attValueToSet(this._ownerElement, this._localName)
+    const set = Convert.attValueToSet(this._element, this._localName)
     for (const token of tokens) {
       set.add(token)
     }
-    Convert.setToAttValue(this._ownerElement, this._localName, set)
+    Convert.setToAttValue(this._element, this._localName, set)
   }
 
   /**
@@ -72,7 +74,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * @param tokens - the list of tokens to remove
    */
   remove(...tokens: string[]): void {
-    const set = Convert.attValueToSet(this._ownerElement, this._localName)
+    const set = Convert.attValueToSet(this._element, this._localName)
     for (const token of tokens) {
       if (!token)
         throw DOMException.SyntaxError
@@ -81,7 +83,7 @@ export class DOMTokenListImpl implements DOMTokenList {
       else
         set.delete(token)
     }
-    Convert.setToAttValue(this._ownerElement, this._localName, set)
+    Convert.setToAttValue(this._element, this._localName, set)
   }
 
   /**
@@ -98,7 +100,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    */
   toggle(token: string, force: boolean | undefined = undefined): boolean {
     if (force === undefined) {
-      const set = Convert.attValueToSet(this._ownerElement, this._localName)
+      const set = Convert.attValueToSet(this._element, this._localName)
       if (set.has(token)) {
         this.remove(token)
         return false
@@ -131,13 +133,13 @@ export class DOMTokenListImpl implements DOMTokenList {
       newToken.match(OrderedSet.WhiteSpace))
       throw DOMException.InvalidCharacterError
 
-    const set = Convert.attValueToSet(this._ownerElement, this._localName)
+    const set = Convert.attValueToSet(this._element, this._localName)
     if (!set.has(token)) {
       return false
     } else {
       set.delete(token)
       set.add(newToken)
-      Convert.setToAttValue(this._ownerElement, this._localName, set)
+      Convert.setToAttValue(this._element, this._localName, set)
       return true
     }
   }
@@ -158,10 +160,10 @@ export class DOMTokenListImpl implements DOMTokenList {
    */
   get value(): string {
     return OrderedSet.serialize(
-      Convert.attValueToSet(this._ownerElement, this._localName))
+      Convert.attValueToSet(this._element, this._localName))
   }
   set value(value: string) {
-    Convert.setToAttValue(this._ownerElement, this._localName,
+    Convert.setToAttValue(this._element, this._localName,
       OrderedSet.parse(value))
   }
 
@@ -169,7 +171,7 @@ export class DOMTokenListImpl implements DOMTokenList {
    * Returns an iterator for tokens.
    */
   *[Symbol.iterator](): IterableIterator<string> {
-    const set = Convert.attValueToSet(this._ownerElement, this._localName)
+    const set = Convert.attValueToSet(this._element, this._localName)
     yield* set
   }
 }

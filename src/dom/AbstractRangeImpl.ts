@@ -1,47 +1,47 @@
-import { AbstractRange, Node } from './interfaces'
+import { Node, BoundaryPoint } from './interfaces'
+import { AbstractRangeInternal } from './interfacesInternal'
 
 /**
- * Represents a generic XML node.
+ * Represents an abstract range with a start and end boundary point.
  */
-export class AbstractRangeImpl implements AbstractRange {
+export abstract class AbstractRangeImpl implements AbstractRangeInternal {
 
-  protected _start: [Node, number]
-  protected _end: [Node, number]
+  abstract _start: BoundaryPoint
+  abstract _end: BoundaryPoint
 
-  /**
-   * Initializes a new instance of `AbstractRange`.
-   */
-  protected constructor(start: [Node, number], end: [Node, number]) {
-    this._start = start
-    this._end = end
+  get _startNode(): Node { return this._start[0] }
+  get _startOffset(): number { return this._start[1] }
+  get _endNode(): Node { return this._end[0] }
+  get _endOffset(): number { return this._end[1] }
+
+  get _collapsed(): boolean {
+    return (this._start[0] === this._end[0] &&
+      this._start[1] === this._end[1])
   }
 
   /**
    * Returns the start node of the range.
    */
-  get startContainer(): Node { return this._start[0] }
+  get startContainer(): Node { return this._startNode }
 
   /**
    * Returns the start offset of the range.
    */
-  get startOffset(): number { return this._start[1] }
+  get startOffset(): number { return this._startOffset }
 
   /**
    * Returns the end node of the range.
    */
-  get endContainer(): Node { return this._end[0] }
+  get endContainer(): Node { return this._endNode }
 
   /**
    * Returns the end offset of the range.
    */
-  get endOffset(): number { return this._end[1] }
+  get endOffset(): number { return this._endOffset }
 
   /**
    * Returns `true` if the range starts and ends at the same point.
    */
-  get collapsed(): boolean {
-    return (this._start[0] === this._end[0] &&
-      this._start[1] === this._end[1])
-  }
+  get collapsed(): boolean { return this._collapsed }
 
 }

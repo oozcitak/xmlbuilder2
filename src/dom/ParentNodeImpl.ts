@@ -1,29 +1,28 @@
-import {
-  ParentNode, Node, NodeType, HTMLCollection,
-  NodeList, Element
-} from './interfaces'
+import { Node, NodeType, HTMLCollection, NodeList, Element } from './interfaces'
 import { HTMLCollectionImpl } from './HTMLCollectionImpl'
 import { DOMException } from './DOMException'
 import { Convert } from './util/Convert'
+import { ParentNodeInternal } from './interfacesInternal'
+import { Cast } from './util/Cast'
 
 /**
  * Represents a mixin that extends parent nodes that can have children.
  * This mixin is implemented by {@link Element}, {@link Document} and
  * {@link DocumentFragment}.
  */
-export class ParentNodeImpl implements ParentNode {
+export class ParentNodeImpl implements ParentNodeInternal {
   /**
    * Returns the child elements.
    */
   get children(): HTMLCollection {
-    return new HTMLCollectionImpl(<Node><unknown>this)
+    return new HTMLCollectionImpl(Cast.asNode(this))
   }
 
   /**
    * Returns the first child that is an element, and `null` otherwise.
    */
   get firstElementChild(): Element | null {
-    let node = (<Node><unknown>this).firstChild
+    let node = Cast.asNode(this).firstChild
 
     while (node) {
       if (node.nodeType === NodeType.Element)
@@ -38,7 +37,7 @@ export class ParentNodeImpl implements ParentNode {
    * Returns the last child that is an element, and `null` otherwise.
    */
   get lastElementChild(): Element | null {
-    let node = (<Node><unknown>this).lastChild
+    let node = Cast.asNode(this).lastChild
 
     while (node) {
       if (node.nodeType === NodeType.Element)
@@ -53,7 +52,7 @@ export class ParentNodeImpl implements ParentNode {
    * Returns the number of children that are elements.
    */
   get childElementCount(): number {
-    let node = (<Node><unknown>this).firstChild
+    let node = Cast.asNode(this).firstChild
     let count = 0
 
     while (node) {
@@ -73,12 +72,10 @@ export class ParentNodeImpl implements ParentNode {
    * @param nodes - the array of nodes or strings
    */
   prepend(...nodes: (Node | string)[]): void {
-    const node = <Node><unknown>this
+    const node = Cast.asNode(this)
 
-    if (node.ownerDocument) {
-      const childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
-      node.insertBefore(childNode, node.firstChild)
-    }
+    const childNode = Convert.nodesIntoNode(nodes, node._nodeDocument)
+    node.insertBefore(childNode, node.firstChild)
   }
 
   /**
@@ -88,12 +85,10 @@ export class ParentNodeImpl implements ParentNode {
    * @param nodes - the array of nodes or strings
    */
   append(...nodes: (Node | string)[]): void {
-    const node = <Node><unknown>this
+    const node = Cast.asNode(this)
 
-    if (node.ownerDocument) {
-      const childNode = Convert.nodesIntoNode(nodes, node.ownerDocument)
-      node.appendChild(childNode)
-    }
+    const childNode = Convert.nodesIntoNode(nodes, node._nodeDocument)
+    node.appendChild(childNode)
   }
 
   /**
