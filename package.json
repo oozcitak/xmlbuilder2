@@ -50,7 +50,7 @@
     ]
   },
   "scripts": {
-    "compile": "rm -tf ./lib && tsc --version && tsc",
+    "compile": "rm -rf ./lib && tsc --version && tsc",
     "test": "npm run compile && jest",
     "cover": "npm run compile && jest --coverage"
   }
