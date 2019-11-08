@@ -22,6 +22,7 @@
     "node": ">=6.0"
   },
   "dependencies": {
+    "@oozcitak/util": "1.0.3",
     "@oozcitak/dom": "0.0.11",
     "@oozcitak/infra": "1.0.4"
   },
