@@ -11,7 +11,7 @@ import {
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { 
   StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
-} from "./writers"
+} from "../writers"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and

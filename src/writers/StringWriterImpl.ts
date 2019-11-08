@@ -1,7 +1,7 @@
-import { WriterOptions, XMLBuilderOptions } from "../interfaces"
+import { WriterOptions, XMLBuilderOptions } from "../builder/interfaces"
 import { dom, serializer } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
-import { Char } from "../util"
+import { Char } from "../validator"
 
 /**
  * Represents string writer options.

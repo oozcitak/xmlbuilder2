@@ -1,5 +1,5 @@
 import { Char } from "."
-import { Validator, ValidateOptions } from "../interfaces"
+import { Validator, ValidateOptions } from "../builder/interfaces"
 
 /**
  * Validates character data in XML nodes.

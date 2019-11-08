@@ -1,12 +1,12 @@
 import dedent from "dedent"
 import { serializer } from "@oozcitak/dom"
 import { isObject, isArray, isMap } from "@oozcitak/util"
-import { XMLBuilderImpl } from "../src"
-import { XMLBuilderCreateOptions } from "../src/interfaces"
+import { XMLBuilder } from "../src"
+import { XMLBuilderCreateOptions } from "../src/builder/interfaces"
 
 export default class TestHelpers {
-  static xml(options?: XMLBuilderCreateOptions): XMLBuilderImpl {
-    return new XMLBuilderImpl(options) 
+  static xml(options?: XMLBuilderCreateOptions): XMLBuilder {
+    return new XMLBuilder(options) 
   }
   static serialize(node: any): string {
     const s = new serializer.XMLSerializer()

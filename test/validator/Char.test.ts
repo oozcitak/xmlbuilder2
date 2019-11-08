@@ -1,5 +1,5 @@
 import $$ from '../TestHelpers'
-import { Char } from '../../src/util'
+import { Char } from '../../src/validator'
 
 describe('Char', () => {
 

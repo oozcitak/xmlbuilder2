@@ -5,7 +5,7 @@ import {
 } from "./interfaces"
 import { dom, parser, implementation } from "@oozcitak/dom"
 import { applyDefaults, isObject, isString, isMap } from "@oozcitak/util"
-import { ValidatorImpl } from "./util"
+import { ValidatorImpl } from "../validator"
 
 /**
  * Serves as an entry point to builder functions.

@@ -1,6 +1,6 @@
 import {
   WriterOptions, XMLBuilderOptions, XMLSerializedValue
-} from "../interfaces"
+} from "../builder/interfaces"
 import { dom } from "@oozcitak/dom"
 import { MapWriterImpl } from "./MapWriterImpl"
 import {
@@ -121,7 +121,7 @@ export class JSONWriterImpl {
   private _beginLine(options: JSONWriterOptions, level: number): string {
     if (!options.prettyPrint) {
       return ''
-    } else if (options.prettyPrint) {
+    } else {
       const indentLevel = options.offset + level + 1
       if (indentLevel > 0) {
         return new Array(indentLevel).join(options.indent)

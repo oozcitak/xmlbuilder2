@@ -1,6 +1,6 @@
 import {
   WriterOptions, XMLSerializedValue, XMLBuilderOptions
-} from "../interfaces"
+} from "../builder/interfaces"
 import { dom, serializer } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
 
