@@ -21,6 +21,9 @@
   "engines": {
     "node": ">=6.0"
   },
+  "files": [
+    "lib/**/*"
+  ],
   "dependencies": {
     "@oozcitak/util": "1.0.3",
     "@oozcitak/dom": "0.0.11",
@@ -47,7 +50,7 @@
     ]
   },
   "scripts": {
-    "compile": "tsc",
+    "compile": "rm -tf ./lib && tsc --version && tsc",
     "test": "npm run compile && jest",
     "cover": "npm run compile && jest --coverage"
   }
