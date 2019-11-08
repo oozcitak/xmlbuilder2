@@ -3,7 +3,7 @@ import {
   AttributesObject, XMLBuilderNode, Validator,
   DTDOptions, DefaultBuilderOptions, XMLBuilderCreateOptions
 } from "./interfaces"
-import { dom, parser, implementation } from "@oozcitak/dom"
+import { dom, parser, implementation, util } from "@oozcitak/dom"
 import { applyDefaults, isObject, isString, isMap } from "@oozcitak/util"
 import { ValidatorImpl } from "../validator"
 
@@ -90,18 +90,59 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  fragment(): XMLBuilderNode {
+  fragment(contents?: string | ExpandObject): XMLBuilderNode {
     const doc = this._createEmptyDocument()
     this._setOptions(doc)
+    if (contents !== undefined) {
+      if (isString(contents)) {
+        if (/^\s*</.test(contents)) {
+          // XML nodes
+          contents = "<TEMP_ROOT>" + contents + "</TEMP_ROOT>"
+          const domParser = new parser.DOMParser()
+          const doc = domParser.parseFromString(contents, parser.MimeType.XML)
+          /* istanbul ignore else */
+          if (doc.documentElement !== null) {
+            const frag = doc.createDocumentFragment()
+            for (const child of doc.documentElement.childNodes) {
+              const newChild = doc.importNode(child, true)
+              frag.appendChild(newChild)
+            }
+            return <XMLBuilderNode><unknown>frag
+          }
+        } else {
+          // JSON
+          const frag = <XMLBuilderNode><unknown>doc.createDocumentFragment()
+          const obj = JSON.parse(contents) as ExpandObject
+          frag.ele(obj)
+          return frag
+        }
+      } else {
+        // JS object
+        const frag = <XMLBuilderNode><unknown>doc.createDocumentFragment()
+        frag.ele(contents)
+        return frag
+      }
+    }
     return <XMLBuilderNode><unknown>doc.createDocumentFragment()
   }
 
   /** @inheritdoc */
-  parse(document: string): XMLBuilderNode {
-    const domParser = new parser.DOMParser()
-    const builder = <XMLBuilderNode><unknown>domParser.parseFromString(document, parser.MimeType.XML)
-    this._setOptions(builder)
-    return builder.root()
+  parse(document: string | ExpandObject): XMLBuilderNode {
+    if (isString(document)) {
+      if (/^\s*</.test(document)) {
+        // XML document
+        const domParser = new parser.DOMParser()
+        const builder = <XMLBuilderNode><unknown>domParser.parseFromString(document, parser.MimeType.XML)
+        this._setOptions(builder)
+        return builder.root()
+      } else {
+        // JSON
+        const obj = JSON.parse(document) as ExpandObject
+        return this.create(obj)
+      }
+    } else {
+      return this.create(document)
+    }
   }
 
   /**

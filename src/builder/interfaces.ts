@@ -1,48 +1,11 @@
 /**
  * Defines the options used while creating an XML document.
  */
-export interface XMLBuilderCreateOptions {
+export type XMLBuilderCreateOptions = Partial<XMLBuilderOptions> & {
   /**
-   * A version number string, e.g. `"1.0"`
+   * DocType node identifiers
    */
-  version?: "1.0" | "1.1"
-  /**
-   * Encoding declaration, e.g. `"UTF-8"`
-   */
-  encoding?: string
-  /**
-   * Standalone document declaration: `true` or `false`
-   */
-  standalone?: boolean
-    /**
-    * DocType node identifiers
-    */
-   docType?: DTDOptions  
-  /**
-   * Whether child nodes inherit their parent namespace
-   */
-  inheritNS?: boolean
-  /**
-   * Whether nodes with `null` values will be kept or ignored
-   */
-  keepNullNodes?: boolean
-  /**
-   * Whether attributes with `null` values will be kept or ignored
-   */
-  keepNullAttributes?: boolean
-  /** 
-   * Whether converter strings will be ignored when converting JS 
-   * objects to nodes
-   */
-  ignoreConverters?: boolean
-  /** 
-   * Defines string keys used while converting JS objects to nodes.
-   */
-  convert?: Partial<ConvertOptions>
-  /**
-   * Contains functions that validate character data in XML nodes.
-   */
-  validate?: ValidateOptions
+  docType?: DTDOptions
 }
 
 /**
@@ -56,11 +19,11 @@ export interface XMLBuilderOptions {
   /**
    * Encoding declaration, e.g. `"UTF-8"`
    */
-  encoding?: string
+  encoding: string | undefined
   /**
    * Standalone document declaration: `true` or `false`
    */
-  standalone?: boolean
+  standalone: boolean | undefined
   /**
    * Whether child nodes inherit their parent namespace
    */
@@ -523,13 +486,24 @@ export interface XMLBuilder {
   fragment(): XMLBuilderNode
 
   /**
+   * Creates and returns a new document fragment.
+   * 
+   * @param contents - a string containing an XML fragment in either XML or JSON
+   * format or a JS object representing nodes to insert
+   * 
+   * @returns document fragment node
+   */
+  fragment(contents: string | ExpandObject): XMLBuilderNode
+
+  /**
    * Creates an XML document by parsing the given document representation.
    * 
-   * @param document - a string containing an XML document
+   * @param document - a string containing an XML document in either XML or JSON
+   * format or a JS object representing nodes to insert
    * 
    * @returns document element node
    */
-  parse(document: string): XMLBuilderNode
+  parse(document: string | ExpandObject): XMLBuilderNode
 
 }
 
