@@ -50,10 +50,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     let name: string | ExpandObject | undefined
     let attributes: AttributesObject | undefined
 
-    if (p1 === undefined) {
-      // create()
-      [namespace, name, attributes] = [undefined, undefined, undefined]
-    } else if (isObject(p1)) {
+    if (isObject(p1)) {
       // create(obj: ExpandObject)
       [namespace, name, attributes] = [undefined, p1, undefined]
     } else if (isString(p1) && isString(p2)) {
@@ -65,6 +62,9 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else if (isString(p1)) {
       // create(name: string)
       [namespace, name, attributes] = [undefined, p1, undefined]
+    } else {
+      // create()
+      [namespace, name, attributes] = [undefined, undefined, undefined]
     }
 
     let builder = <XMLBuilderNode><unknown>this._createEmptyDocument()
@@ -150,6 +150,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    */
   private _createEmptyDocument(): dom.Interfaces.XMLDocument {
     const doc = implementation.createDocument(null, 'root')
+    /* istanbul ignore else */
     if (doc.documentElement) {
       doc.removeChild(doc.documentElement)
     }
