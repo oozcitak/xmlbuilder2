@@ -1,14 +1,14 @@
-import { Node, Document, Element, NodeType } from "../dom/interfaces"
 import {
   XMLBuilderOptions, XMLBuilderNode, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, Validator, DTDOptions,
   DefaultBuilderOptions
 } from "./interfaces"
+import { dom, algorithm, util } from "@oozcitak/dom"
 import {
-  isArray, isFunction, isObject, isEmpty, getValue, isString, applyDefaults,
-  forEachArray, forEachObject, isMap
-} from "../util"
-import { Namespace } from "../dom/spec"
+  applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty, 
+  getValue, forEachObject, forEachArray
+} from "@oozcitak/util"
+import { namespace as infraNamespace } from "@oozcitak/infra"
 import { 
   StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
 } from "./writers"
@@ -18,6 +18,7 @@ import {
  * chainable document builder methods.
  */
 export class XMLBuilderNodeImpl implements XMLBuilderNode {
+  private static _algo = new algorithm.DOMAlgorithm()
 
   private _isRawNode: boolean = false
 
@@ -98,7 +99,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           const insTarget = (insIndex === -1 ? val : val.substr(0, insIndex))
           const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
           lastChild = this.ins(insTarget, insValue)
-        } else if (Array.isArray(val) && isEmpty(val)) {
+        } else if (isArray(val) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
         } else if (isObject(val) && isEmpty(val)) {
@@ -107,7 +108,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
         } else if (!this._options.keepNullNodes && (val === null)) {
           // skip null and undefined nodes
           lastChild = this._dummy()
-        } else if (Array.isArray(val)) {
+        } else if (isArray(val)) {
           // expand list by creating child nodes
           for (const item of forEachArray(val)) {
             const childNode: { [key: string]: any } = {}
@@ -116,12 +117,12 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           }
         } else if (isObject(val) || isMap(val)) {
           // check for a namespace declaration attribute
-          const qName = Namespace.extractQName(key)
+          const qName = XMLBuilderNodeImpl._algo.namespace.extractQName(key)
           for (const [attName, attValue] of forEachObject(val)) {
             if (attName[0] === this._options.convert.att) {
-              const attQName = Namespace.extractQName(attName.slice(1))
-              if ((attQName.prefix === null && attQName.localName === "xmlns") ||
-                (attQName.prefix === "xmlns" && attQName.localName === qName.prefix)) {
+              const attQName = XMLBuilderNodeImpl._algo.namespace.extractQName(attName.slice(1))
+              if ((attQName[0] === null && attQName[1] === "xmlns") ||
+                (attQName[0] === "xmlns" && attQName[1] === qName[0])) {
                 namespace = attValue
               }
             }
@@ -223,13 +224,13 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     // check if this is a namespace declaration attribute
     if (namespace === undefined) {
-      const attQName = Namespace.extractQName(name)
-      if (attQName.prefix === "xmlns") {
-        namespace = Namespace.XMLNS
-      } else if (attQName.prefix !== null) {
-        namespace = ele.lookupNamespaceURI(attQName.prefix)
+      const attQName = XMLBuilderNodeImpl._algo.namespace.extractQName(name)
+      if (attQName[0] === "xmlns") {
+        namespace = infraNamespace.XMLNS
+      } else if (attQName[0] !== null) {
+        namespace = ele.lookupNamespaceURI(attQName[0])
       } else if (this._options.inheritNS) {
-        namespace = ele.lookupNamespaceURI(attQName.prefix)
+        namespace = ele.lookupNamespaceURI(attQName[0])
       }
     }
 
@@ -374,15 +375,15 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     const importedNode = (<XMLBuilderNodeImpl>node)._asNode
 
-    if (importedNode.nodeType === NodeType.Document) {
+    if (importedNode.nodeType === dom.Interfaces.NodeType.Document) {
       // import document node
-      const elementNode = (<Document>importedNode).documentElement
+      const elementNode = (<dom.Interfaces.Document>importedNode).documentElement
       if (elementNode === null) {
         throw new Error("Imported document has no document node. " + this._debugInfo())
       }
       const clone = hostDoc.importNode(elementNode, true)
       hostNode.appendChild(clone)
-    } else if (importedNode.nodeType === NodeType.DocumentFragment) {
+    } else if (importedNode.nodeType === dom.Interfaces.NodeType.DocumentFragment) {
       // import child nodes
       for (const childNode of importedNode.childNodes) {
         const clone = hostDoc.importNode(childNode, true)
@@ -523,11 +524,11 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     // inherit namespace from parent
     if (namespace === null || namespace === undefined) {
-      const qName = Namespace.extractQName(name)
+      const qName = XMLBuilderNodeImpl._algo.namespace.extractQName(name)
       if (this._options.inheritNS) {
         const parent = this._asNode.parentNode
         if (parent) {
-          namespace = parent.lookupNamespaceURI(qName.prefix)
+          namespace = parent.lookupNamespaceURI(qName[0])
         }
       }
 
@@ -538,8 +539,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           if (attName === "xmlns") {
             namespace = attValue
           } else {
-            const attQName = Namespace.extractQName(attName)
-            if (attQName.prefix === "xmlns" && attQName.localName === qName.prefix) {
+            const attQName = XMLBuilderNodeImpl._algo.namespace.extractQName(attName)
+            if (attQName[0] === "xmlns" && attQName[1] === qName[0]) {
               namespace = attValue
             }
           }
@@ -595,10 +596,10 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   /**
    * Returns the document owning this node.
    */
-  protected get _doc(): Document {
+  protected get _doc(): dom.Interfaces.Document {
     const node = this._asNode
-    if (node.nodeType === NodeType.Document) {
-      return <Document>node
+    if (node.nodeType === dom.Interfaces.NodeType.Document) {
+      return <dom.Interfaces.Document>node
     }
     const doc = node.ownerDocument
     if (!doc) {
@@ -617,46 +618,40 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   /**
    * Returns the underlying DOM node.
    */
-  protected get _asNode(): Node {
-    const node = this as unknown as Node
-
-    if (!node.nodeType) {
+  protected get _asNode(): dom.Interfaces.Node {
+    try {
+      return util.Cast.asNode(this)
+    } catch (e) {
       throw new Error("This function can only be applied to a DOM node." + this._debugInfo())
     }
-
-    return node
   }
 
   /**
    * Returns the underlying element node.
    */
-  protected get _asElement(): Element {
-    const ele = this as unknown as Element
-
-    if (!ele.nodeType || ele.nodeType !== NodeType.Element) {
+  protected get _asElement(): dom.Interfaces.Element {
+    if (util.Guard.isElementNode(this)) {
+      return this
+    } else {
       throw new Error("This function can only be applied to an element node." + this._debugInfo())
     }
-
-    return ele
   }
 
   /**
    * Returns the underlying document node.
    */
-  protected get _asDocument(): Document {
-    const doc = this as unknown as Document
-
-    if (!doc.nodeType || doc.nodeType !== NodeType.Document) {
+  protected get _asDocument(): dom.Interfaces.Document {
+    if (util.Guard.isDocumentNode(this)) {
+      return this
+    } else {
       throw new Error("This function can only be applied to a document node." + this._debugInfo())
     }
-
-    return doc
   }
 
   /**
    * Converts a DOM node to an `XMLBuilder`.
    */
-  protected static _FromNode(node: Node): XMLBuilderNode {
+  protected static _FromNode(node: dom.Interfaces.Node): XMLBuilderNode {
     return node as unknown as XMLBuilderNode
   }
 

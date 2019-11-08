@@ -1,25 +1,21 @@
-import { applyMixin } from '../util'
-import { 
-  CDATASectionImpl, CommentImpl, DocumentFragmentImpl, DocumentImpl, 
-  DocumentTypeImpl, ElementImpl, ProcessingInstructionImpl, TextImpl,
-  CharacterDataImpl, NodeImpl, XMLDocumentImpl
-} from '../dom'
+import { dom } from '@oozcitak/dom'
+import { applyMixin } from '@oozcitak/util'
 import { XMLBuilderNodeImpl } from './XMLBuilderNodeImpl'
 import { XMLBuilderDocumentImpl } from './XMLBuilderDocumentImpl'
 
 // Apply XMLBuilder mixin
-applyMixin(NodeImpl, XMLBuilderNodeImpl, "remove")
-applyMixin(ElementImpl, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.Node, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.Element, XMLBuilderNodeImpl, "remove")
 
-applyMixin(CharacterDataImpl, XMLBuilderNodeImpl, "remove")
-applyMixin(CDATASectionImpl, XMLBuilderNodeImpl, "remove")
-applyMixin(CommentImpl, XMLBuilderNodeImpl, "remove")
-applyMixin(TextImpl, XMLBuilderNodeImpl, "remove")
-applyMixin(ProcessingInstructionImpl, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.CharacterData, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.CDATASection, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.Comment, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.Text, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.ProcessingInstruction, XMLBuilderNodeImpl, "remove")
 
-applyMixin(DocumentTypeImpl, XMLBuilderNodeImpl, "remove")
-applyMixin(DocumentFragmentImpl, XMLBuilderNodeImpl, "remove")
-applyMixin(DocumentImpl, XMLBuilderDocumentImpl, "remove")
-applyMixin(XMLDocumentImpl, XMLBuilderDocumentImpl, "remove")
+applyMixin(dom.DocumentType, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.DocumentFragment, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.Document, XMLBuilderDocumentImpl, "remove")
+applyMixin(dom.XMLDocument, XMLBuilderDocumentImpl, "remove")
 
 export { XMLBuilderImpl } from './XMLBuilderImpl'

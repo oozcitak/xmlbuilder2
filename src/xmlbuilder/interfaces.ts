@@ -1,5 +1,3 @@
-import { Node, Attr } from "../dom/interfaces"
-
 /**
  * Defines the options used while creating an XML document.
  */

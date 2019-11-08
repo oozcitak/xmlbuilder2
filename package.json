@@ -21,7 +21,10 @@
   "engines": {
     "node": ">=6.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@oozcitak/dom": "0.0.11",
+    "@oozcitak/infra": "1.0.4"
+  },
   "devDependencies": {
     "typescript": "*",
     "jest": "*",
@@ -43,7 +46,8 @@
     ]
   },
   "scripts": {
-    "test": "tsc && jest",
-    "cover": "tsc && jest --coverage"
+    "compile": "tsc",
+    "test": "npm run compile && jest",
+    "cover": "npm run compile && jest --coverage"
   }
 }

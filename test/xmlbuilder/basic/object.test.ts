@@ -84,7 +84,7 @@ describe('object', () => {
     details.set("#", "classified")
 
     const doc = $$.xml().create('root').ele(obj).doc()
-
+    
     expect($$.printTree(doc)).toBe($$.t`
       root
         ele

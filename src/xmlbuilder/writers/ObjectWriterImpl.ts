@@ -1,12 +1,8 @@
 import {
   WriterOptions, XMLSerializedValue, XMLBuilderOptions
 } from "../interfaces"
-import {
-  Node, Element, Text, CDATASection, Comment, ProcessingInstruction, 
-  NodeType, CharacterData
-} from "../../dom/interfaces"
-import { applyDefaults } from "../../util"
-import { PreSerializer, PreSerializedNode } from "../../dom/serializer"
+import { dom, serializer } from "@oozcitak/dom"
+import { applyDefaults } from "@oozcitak/util"
 
 /**
  * Serializes XML nodes into objects and arrays.
@@ -30,26 +26,26 @@ export class ObjectWriterImpl {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: Node, writerOptions?: WriterOptions): XMLSerializedValue {
+  serialize(node: dom.Interfaces.Node, writerOptions?: WriterOptions): XMLSerializedValue {
     const options: XMLBuilderOptions = applyDefaults(writerOptions, {
       format: "object"
     })
 
-    const pre = new PreSerializer(this._builderOptions.version)
+    const pre = new serializer.PreSerializer(this._builderOptions.version)
     const preNode = pre.serialize(node, false)
 
     switch (preNode.node.nodeType) {
-      case NodeType.Element:
-      case NodeType.Document:
-      case NodeType.DocumentFragment:
+      case dom.Interfaces.NodeType.Element:
+      case dom.Interfaces.NodeType.Document:
+      case dom.Interfaces.NodeType.DocumentFragment:
         return this._serializeNode(preNode, options)
-      case NodeType.Comment:
-      case NodeType.Text:
-      case NodeType.CData:
+      case dom.Interfaces.NodeType.Comment:
+      case dom.Interfaces.NodeType.Text:
+      case dom.Interfaces.NodeType.CData:
         return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0], 
-          (<CharacterData>node).data]])
-      case NodeType.ProcessingInstruction:
-        const pi = <ProcessingInstruction>node
+          (<dom.Interfaces.CharacterData>node).data]])
+      case dom.Interfaces.NodeType.ProcessingInstruction:
+        const pi = <dom.Interfaces.ProcessingInstruction>node
         return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0], 
           `${pi.target} ${pi.data}`]])          
       /* istanbul ignore next */
@@ -64,24 +60,24 @@ export class ObjectWriterImpl {
    * @param preNode - current node
    * @param options - serialization options
    */
-  protected _serializeNode(preNode: PreSerializedNode<Node>,
+  protected _serializeNode(preNode:serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
     options: XMLBuilderOptions): XMLSerializedValue {
     switch (preNode.node.nodeType) {
-      case NodeType.Element:
+      case dom.Interfaces.NodeType.Element:
         return this._serializeElement(preNode, options)
-      case NodeType.Document:
+      case dom.Interfaces.NodeType.Document:
         return this._serializeChildNodes(preNode, options)
-      case NodeType.Comment:
-        return (<Comment>preNode.node).data
-      case NodeType.Text:
-        return (<Text>preNode.node).data
-      case NodeType.DocumentFragment:
+      case dom.Interfaces.NodeType.Comment:
+        return (<dom.Interfaces.Comment>preNode.node).data
+      case dom.Interfaces.NodeType.Text:
+        return (<dom.Interfaces.Text>preNode.node).data
+      case dom.Interfaces.NodeType.DocumentFragment:
         return this._serializeChildNodes(preNode, options)
-      case NodeType.ProcessingInstruction:
-        const pi = <ProcessingInstruction>preNode.node
+      case dom.Interfaces.NodeType.ProcessingInstruction:
+        const pi = <dom.Interfaces.ProcessingInstruction>preNode.node
         return `${pi.target} ${pi.data}`
-      case NodeType.CData:
-        return (<CDATASection>preNode.node).data
+      case dom.Interfaces.NodeType.CData:
+        return (<dom.Interfaces.CDATASection>preNode.node).data
       /* istanbul ignore next */
       default:
         throw new Error("Invalid node type.")
@@ -94,7 +90,7 @@ export class ObjectWriterImpl {
    * @param preNode - current node
    * @param options - serialization options
    */
-  private _serializeElement(preNode: PreSerializedNode<Node>,
+  private _serializeElement(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
     options: XMLBuilderOptions): XMLSerializedValue {
 
     const markup: { [key:string]: any } = { }
@@ -111,15 +107,15 @@ export class ObjectWriterImpl {
    * @param preNode - current node
    * @param options - serialization options
    */
-  private _serializeChildNodes(preNode: PreSerializedNode<Node>,
+  private _serializeChildNodes(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
     options: XMLBuilderOptions): XMLSerializedValue {
-    const items = new Array<[string, boolean, PreSerializedNode<Node>]>()
+    const items = new Array<[string, boolean, serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>]>()
     const keyCount = new Map<string, number>()
     const keyIndices = new Map<string, number>()
     let hasDuplicateKeys = false
 
     for (const childPreNode of preNode.children) {
-      if (childPreNode.node.nodeType === NodeType.DocumentType) continue
+      if (childPreNode.node.nodeType === dom.Interfaces.NodeType.DocumentType) continue
 
       const [key, canIncrement] = this._getNodeKey(childPreNode)
       items.push([key, canIncrement, childPreNode])
@@ -132,9 +128,9 @@ export class ObjectWriterImpl {
       keyIndices.set(key, 0)
     }
 
-    if (items.length === 1 && items[0][2].node.nodeType === NodeType.Text) {
+    if (items.length === 1 && items[0][2].node.nodeType === dom.Interfaces.NodeType.Text) {
       // an element node with a single text node
-      return (<Text>(items[0][2].node)).data
+      return (<dom.Interfaces.Text>(items[0][2].node)).data
     } else {
       const markup: { [key:string]: any } = { }
       for (const attr of preNode.attributes) {
@@ -143,7 +139,7 @@ export class ObjectWriterImpl {
       }
       for (const [key, canIncrement, node] of items) {
         // serialize child nodes or node contents
-        const nodeResult = node.node.nodeType === NodeType.Element ?
+        const nodeResult = node.node.nodeType === dom.Interfaces.NodeType.Element ?
           this._serializeChildNodes(node, options) :
           this._serializeNode(node, options)
 
@@ -187,7 +183,7 @@ export class ObjectWriterImpl {
    * is a boolean determining whether the key can be prefixed with a random 
    * string to provide uniqueness.
    */
-  private _getNodeKey(preNode: PreSerializedNode<Node>): [string, boolean] {
+  private _getNodeKey(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>): [string, boolean] {
     const isRaw = (preNode.node as any)._isRawNode
 
     if (isRaw) {
@@ -195,15 +191,15 @@ export class ObjectWriterImpl {
     }
 
     switch (preNode.node.nodeType) {
-      case NodeType.Element:
-        return [(<Element>preNode.node).tagName, false]
-      case NodeType.Comment:
+      case dom.Interfaces.NodeType.Element:
+        return [(<dom.Interfaces.Element>preNode.node).tagName, false]
+      case dom.Interfaces.NodeType.Comment:
         return [this._builderOptions.convert.comment, true]
-      case NodeType.Text:
+      case dom.Interfaces.NodeType.Text:
         return [this._builderOptions.convert.text, true]
-      case NodeType.ProcessingInstruction:
+      case dom.Interfaces.NodeType.ProcessingInstruction:
         return [this._builderOptions.convert.ins, true]
-      case NodeType.CData:
+      case dom.Interfaces.NodeType.CData:
         return [this._builderOptions.convert.cdata, true]
       /* istanbul ignore next */
       default:

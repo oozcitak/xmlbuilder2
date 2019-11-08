@@ -1,7 +1,7 @@
 import TestHelpersRoot from "../TestHelpers"
-import { XMLSerializer } from '../../src/dom/serializer'
+import { serializer } from '@oozcitak/dom'
+import { isObject, isArray, isMap } from '@oozcitak/util'
 import { XMLBuilderImpl } from '../../src/xmlbuilder'
-import { isMap, isArray, isObject } from "../../src/util"
 import { XMLBuilderCreateOptions } from "../../src/xmlbuilder/interfaces"
 
 export default class TestHelpers extends TestHelpersRoot {
@@ -9,8 +9,8 @@ export default class TestHelpers extends TestHelpersRoot {
     return new XMLBuilderImpl(options) 
   }
   static serialize(node: any): string {
-    const serializer = new XMLSerializer()
-    return serializer.serializeToString(node)
+    const s = new serializer.XMLSerializer()
+    return s.serializeToString(node)
   }
 
   private static indent(indentLevel: number): string { 

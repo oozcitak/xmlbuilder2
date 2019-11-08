@@ -3,10 +3,9 @@ import {
   AttributesObject, XMLBuilderNode, Validator,
   DTDOptions, DefaultBuilderOptions, XMLBuilderCreateOptions
 } from "./interfaces"
-import { DOMImplementationInstance, DOMParser, MimeType } from "../dom"
+import { dom, parser, implementation } from "@oozcitak/dom"
+import { applyDefaults, isObject, isString, isMap } from "@oozcitak/util"
 import { ValidatorImpl } from "./util"
-import { applyDefaults, isString, isObject, isMap } from "../util"
-import { XMLDocument } from "../dom/interfaces"
 
 /**
  * Serves as an entry point to builder functions.
@@ -99,8 +98,8 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   parse(document: string): XMLBuilderNode {
-    const parser = new DOMParser()
-    const builder = <XMLBuilderNode><unknown>parser.parseFromString(document, MimeType.XML)
+    const domParser = new parser.DOMParser()
+    const builder = <XMLBuilderNode><unknown>domParser.parseFromString(document, parser.MimeType.XML)
     this._setOptions(builder)
     return builder.root()
   }
@@ -108,8 +107,8 @@ export class XMLBuilderImpl implements XMLBuilder {
   /**
    * Creates an XML document without any child nodes.
    */
-  private _createEmptyDocument(): XMLDocument {
-    const doc = DOMImplementationInstance.createDocument(null, 'root')
+  private _createEmptyDocument(): dom.Interfaces.XMLDocument {
+    const doc = implementation.createDocument(null, 'root')
     if (doc.documentElement) {
       doc.removeChild(doc.documentElement)
     }
