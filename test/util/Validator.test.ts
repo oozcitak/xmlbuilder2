@@ -1,5 +1,5 @@
 import $$ from '../TestHelpers'
-import { ValidatorImpl } from '../../../src/xmlbuilder/util'
+import { ValidatorImpl } from '../../src/util'
 
 describe('Validator', () => {
 
