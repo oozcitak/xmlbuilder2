@@ -1,11 +1,50 @@
+import { dom } from "@oozcitak/dom"
+
 /**
  * Defines the options used while creating an XML document.
  */
-export type XMLBuilderCreateOptions = Partial<XMLBuilderOptions> & {
+export interface XMLBuilderCreateOptions {
   /**
-   * DocType node identifiers
+   * A version number string, e.g. `"1.0"`
    */
-  docType?: DTDOptions
+  version?: "1.0" | "1.1"
+  /**
+   * Encoding declaration, e.g. `"UTF-8"`
+   */
+  encoding?: string
+  /**
+   * Standalone document declaration: `true` or `false`
+   */
+  standalone?: boolean
+    /**
+    * DocType node identifiers
+    */
+   docType?: DTDOptions  
+  /**
+   * Whether child nodes inherit their parent namespace
+   */
+  inheritNS?: boolean
+  /**
+   * Whether nodes with `null` values will be kept or ignored
+   */
+  keepNullNodes?: boolean
+  /**
+   * Whether attributes with `null` values will be kept or ignored
+   */
+  keepNullAttributes?: boolean
+  /** 
+   * Whether converter strings will be ignored when converting JS 
+   * objects to nodes
+   */
+  ignoreConverters?: boolean
+  /** 
+   * Defines string keys used while converting JS objects to nodes.
+   */
+  convert?: Partial<ConvertOptions>
+  /**
+   * Contains functions that validate character data in XML nodes.
+   */
+  validate?: ValidateOptions
 }
 
 /**
@@ -438,47 +477,6 @@ export type AttributesObject = Map<string, any> | {
 export interface XMLBuilder {
 
   /**
-   * Creates a new XML document without a document element and returns it.
-   * 
-   * @returns the XML document node
-   */
-  create(): XMLBuilderNode
-
-  /**
-   * Creates a new XML document and returns the document element node for
-   * chain building the document tree.
-   * 
-   * @param obj - a JS object representing nodes to insert
-   * 
-   * @returns document element node
-   */
-  create(obj: ExpandObject): XMLBuilderNode
-
-  /**
- * Creates a new XML document and returns the document element node for
- * chain building the document tree.
- * 
- * @param name - element name
- * @param attributes - a JS object with element attributes
- * 
- * @returns document element node
- */
-  create(name: string, attributes?: AttributesObject): XMLBuilderNode
-
-  /**
- * Creates a new XML document and returns the document element node for
- * chain building the document tree.
- * 
- * @param namespace - element namespace
- * @param name - element name
- * @param attributes - a JS object with element attributes
- * 
- * @returns document element node
- */
-  create(namespace: string, name: string,
-    attributes?: AttributesObject): XMLBuilderNode
-
-  /**
    * Creates and returns a new document fragment.
    * 
    * @returns document fragment node
@@ -496,14 +494,21 @@ export interface XMLBuilder {
   fragment(contents: string | ExpandObject): XMLBuilderNode
 
   /**
+   * Creates an XML document.
+   * 
+   * @returns document node
+   */
+  document(): XMLBuilderNode
+
+  /**
    * Creates an XML document by parsing the given document representation.
    * 
-   * @param document - a string containing an XML document in either XML or JSON
+   * @param contents - a string containing an XML document in either XML or JSON
    * format or a JS object representing nodes to insert
    * 
-   * @returns document element node
+   * @returns document node
    */
-  parse(document: string | ExpandObject): XMLBuilderNode
+  document(contents: string | ExpandObject): XMLBuilderNode
 
 }
 
@@ -512,6 +517,11 @@ export interface XMLBuilder {
  * chainable document builder methods.
  */
 export interface XMLBuilderNode {
+
+  /**
+   * Returns the underlying DOM node.
+   */
+  readonly as: CastAsNode
 
   /**
    * Sets builder options.
@@ -770,4 +780,65 @@ export interface XMLBuilderNode {
    * @param options - serialization options
    */
   end(writerOptions?: WriterOptions): XMLSerializedValue
+}
+
+/**
+ * Returns underlying DOM nodes.
+ */
+export interface CastAsNode {
+  /**
+   * Casts to `any` to call methods without a TypeScript definition.
+   */  
+  readonly any: any
+
+  /**
+   * Returns the underlying DOM node.
+   */  
+  readonly node: dom.Interfaces.Node
+
+  /**
+   * Returns the underlying DOM document node.
+   */
+  readonly document: dom.Interfaces.Document
+
+  /**
+   * Returns the underlying DOM document type node.
+   */
+  readonly documentType: dom.Interfaces.DocumentType
+
+  /**
+   * Returns the underlying DOM document fragment node.
+   */
+  readonly documentFragment: dom.Interfaces.DocumentFragment
+
+  /**
+   * Returns the underlying DOM attr node.
+   */
+  readonly attr: dom.Interfaces.Attr
+
+  /**
+   * Returns the underlying DOM text node.
+   */
+  readonly text: dom.Interfaces.Text
+
+  /**
+   * Returns the underlying DOM cdata section node.
+   */
+  readonly cdataSection: dom.Interfaces.CDATASection
+
+  /**
+   * Returns the underlying DOM comment node.
+   */
+  readonly comment: dom.Interfaces.Comment
+
+  /**
+   * Returns the underlying DOM processing instruction node.
+   */
+  readonly processingInstruction: dom.Interfaces.ProcessingInstruction
+
+  /**
+   * Returns the underlying DOM element node.
+   */
+  readonly element: dom.Interfaces.Element
+
 }

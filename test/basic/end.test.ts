@@ -4,7 +4,8 @@ describe('end()', () => {
 
   test('simple document', () => {
     const xml = $$.xml({ docType: { pubID: "pub", sysID: "sys" } })
-      .create('root')
+      .document()
+      .ele('root')
       .com('comment')
       .ins('target', 'content')
       .dat('cdata node')

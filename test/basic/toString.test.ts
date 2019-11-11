@@ -3,12 +3,12 @@ import $$ from '../TestHelpers'
 describe('toString()', () => {
 
   test('document', () => {
-    const doc = $$.xml().create('root').doc()
+    const doc = $$.xml().document().ele('root').doc()
     expect(doc.toString()).toBe('<?xml version="1.0"?><root/>')
   })
 
   test('document type', () => {
-    const doc = $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).create('root').doc()
+    const doc = $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).document().ele('root').doc()
     expect(doc.toString()).toBe('<?xml version="1.0"?><!DOCTYPE root PUBLIC "pub" "sys"><root/>')
   })
 
@@ -18,37 +18,37 @@ describe('toString()', () => {
   })
 
   test('element', () => {
-    const root = $$.xml().create('root')
+    const root = $$.xml().document().ele('root')
     expect(root.toString()).toBe('<root/>')
   })
 
   test('text', () => {
-    const node = $$.xml().create('root').txt('content')
+    const node = $$.xml().document().ele('root').txt('content')
     expect(node.toString()).toBe('<root>content</root>')
   })
 
   test('cdata', () => {
-    const node = $$.xml().create('root').dat('content')
+    const node = $$.xml().document().ele('root').dat('content')
     expect(node.toString()).toBe('<root><![CDATA[content]]></root>')
   })
 
   test('comment', () => {
-    const node = $$.xml().create('root').com('content')
+    const node = $$.xml().document().ele('root').com('content')
     expect(node.toString()).toBe('<root><!--content--></root>')
   })
 
   test('processing instruction', () => {
-    const node = $$.xml().create('root').ins('target', 'content')
+    const node = $$.xml().document().ele('root').ins('target', 'content')
     expect(node.toString()).toBe('<root><?target content?></root>')
   })
 
   test('raw', () => {
-    const node = $$.xml().create('root').raw('content<>')
+    const node = $$.xml().document().ele('root').raw('content<>')
     expect(node.toString()).toBe('<root>content<></root>')
   })
 
   test('attribute', () => {
-    const root = $$.xml().create('root').att("att", "val")
+    const root = $$.xml().document().ele('root').att("att", "val")
     expect(root.toString()).toBe('<root att="val"/>')
   })
 

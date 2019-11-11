@@ -3,12 +3,12 @@ import $$ from '../TestHelpers'
 describe('import()', () => {
 
   test('document', () => {
-    const root = $$.xml().create('roster')
+    const root = $$.xml().document().ele('roster')
     root.com('fighter pilots')
 
-    const pilot1 = $$.xml().create('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell')
-    const pilot2 = $$.xml().create('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw')
-    const pilot3 = $$.xml().create('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky')
+    const pilot1 = $$.xml().document().ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell')
+    const pilot2 = $$.xml().document().ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw')
+    const pilot3 = $$.xml().document().ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky')
     
     root.import(pilot1.doc())
     root.import(pilot2.doc())
@@ -27,7 +27,7 @@ describe('import()', () => {
   })
 
   test('document fragment', () => {
-    const root = $$.xml().create('roster')
+    const root = $$.xml().document().ele('roster')
     root.com('fighter pilots')
 
     const pilots = $$.xml().fragment()
@@ -50,12 +50,12 @@ describe('import()', () => {
   })
 
   test('node', () => {
-    const root = $$.xml().create('roster')
+    const root = $$.xml().document().ele('roster')
     root.com('fighter pilots')
 
-    const pilot1 = $$.xml().create('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell')
-    const pilot2 = $$.xml().create('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw')
-    const pilot3 = $$.xml().create('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky')
+    const pilot1 = $$.xml().document().ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell')
+    const pilot2 = $$.xml().document().ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw')
+    const pilot3 = $$.xml().document().ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky')
     
     root.import(pilot1)
     root.import(pilot2)

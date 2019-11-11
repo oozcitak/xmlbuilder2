@@ -5,35 +5,35 @@ describe('withOptions()', () => {
   test('XML declaration', () => {
     expect(
       $$.xml({ version: "1.0", encoding: "UTF-8", standalone: true })
-        .create('root').end()).toBe(
+        .document().ele('root').end()).toBe(
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root/>'
         )
 
     expect(
       $$.xml({ version: "1.1", encoding: "UTF-16", standalone: false })
-        .create('root').end()).toBe(
+        .document().ele('root').end()).toBe(
           '<?xml version="1.1" encoding="UTF-16" standalone="no"?><root/>'
         )
   })
 
   test('DocType', () => {
     expect(
-      $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).create('root').end()).toBe(
+      $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).document().ele('root').end()).toBe(
         '<?xml version="1.0"?><!DOCTYPE root PUBLIC "pub" "sys"><root/>'
       )
 
     expect(
-      $$.xml({ docType: { pubID: "pub" } }).create('root').end()).toBe(
+      $$.xml({ docType: { pubID: "pub" } }).document().ele('root').end()).toBe(
         '<?xml version="1.0"?><!DOCTYPE root PUBLIC "pub"><root/>'
       )
 
     expect(
-      $$.xml({ docType: { sysID: "sys" } }).create('root').end()).toBe(
+      $$.xml({ docType: { sysID: "sys" } }).document().ele('root').end()).toBe(
         '<?xml version="1.0"?><!DOCTYPE root SYSTEM "sys"><root/>'
       )
 
     expect(
-      $$.xml({ docType: { } }).create('root').end()).toBe(
+      $$.xml({ docType: { } }).document().ele('root').end()).toBe(
         '<?xml version="1.0"?><!DOCTYPE root><root/>'
       )      
   })

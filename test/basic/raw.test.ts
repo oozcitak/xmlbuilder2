@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('raw()', () => {
 
   test('basic', () => {
-    const root = $$.xml().create().ele('root')
+    const root = $$.xml().document().ele('root')
     const node1 = root.ele('node1')
     node1.raw('node1 raw <>&\'" text').ele('node1-2')
     const node2 = root.ele('node2')

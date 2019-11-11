@@ -1,7 +1,8 @@
 import {
   XMLBuilderOptions, XMLBuilderNode, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, Validator, DTDOptions,
-  DefaultBuilderOptions
+  DefaultBuilderOptions,
+  CastAsNode
 } from "./interfaces"
 import { dom, algorithm, util } from "@oozcitak/dom"
 import {
@@ -12,6 +13,7 @@ import { namespace as infraNamespace } from "@oozcitak/infra"
 import { 
   StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
 } from "../writers"
+import { CastAsNodeImpl } from "./CastAsNode"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -20,7 +22,16 @@ import {
 export class XMLBuilderNodeImpl implements XMLBuilderNode {
   private static _algo = new algorithm.DOMAlgorithm()
 
+  private _castAsNode: CastAsNode | undefined
   private _isRawNode: boolean = false
+
+  /** @inheritdoc */
+  get as(): CastAsNode {
+    if (this._castAsNode === undefined) {
+      this._castAsNode = new CastAsNodeImpl(this)
+    }
+    return this._castAsNode
+  }
 
   /** @inheritdoc */
   set(options: Partial<XMLBuilderOptions>): XMLBuilderNode {
@@ -158,7 +169,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   /** @inheritdoc */
   remove(): XMLBuilderNode {
     const parent = this.up()
-    this._asAny._remove()
+    this.as.any._remove()
     return parent
   }
 
@@ -217,7 +228,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       return this
     }
 
-    const ele = this._asElement
+    const ele = this.as.element
     // character validation
     name = this._validate.name(name, this._debugInfo())
     value = this._validate.attValue(value, this._debugInfo())
@@ -265,10 +276,10 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       }
     } else if (isString(p1) && p2 === undefined) {
       // removeAtt(name: string)
-      this._asElement.removeAttribute(p1)
+      this.as.element.removeAttribute(p1)
     } else if (isString(p1) && isString(p2)) {
       // removeAtt(namespace: string, name: string)
-      this._asElement.removeAttributeNS(p1, p2)
+      this.as.element.removeAttributeNS(p1, p2)
     } else {
       throw new TypeError("Invalid arguments. " + this._debugInfo())
     }
@@ -282,7 +293,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.text(content, this._debugInfo())
 
     const child = this._doc.createTextNode(content)
-    this._asElement.appendChild(child)
+    this.as.element.appendChild(child)
 
     return this
   }
@@ -293,7 +304,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.comment(content, this._debugInfo())
 
     const child = this._doc.createComment(content)
-    this._asElement.appendChild(child)
+    this.as.element.appendChild(child)
 
     return this
   }
@@ -306,7 +317,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     const child = this._doc.createTextNode(content)
     const builder = XMLBuilderNodeImpl._FromNode(child) as XMLBuilderNodeImpl
     builder._isRawNode = true
-    this._asElement.appendChild(child)
+    this.as.element.appendChild(child)
 
     return this
   }
@@ -317,7 +328,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.cdata(content, this._debugInfo())
 
     const child = this._doc.createCDATASection(content)
-    this._asElement.appendChild(child)
+    this.as.element.appendChild(child)
 
     return this
   }
@@ -329,7 +340,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.insValue(content, this._debugInfo())
 
     const child = this._doc.createProcessingInstruction(target, content)
-    this._asElement.appendChild(child)
+    this.as.element.appendChild(child)
 
     return this
   }
@@ -367,13 +378,13 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   import(node: XMLBuilderNode): XMLBuilderNode {
-    const hostNode = this._asNode
+    const hostNode = this.as.node
     const hostDoc = hostNode.ownerDocument
     if (hostDoc === null) {
       throw new Error("Owner document is null. " + this._debugInfo())
     }
 
-    const importedNode = (<XMLBuilderNodeImpl>node)._asNode
+    const importedNode = (<XMLBuilderNodeImpl>node).as.node
 
     if (importedNode.nodeType === dom.Interfaces.NodeType.Document) {
       // import document node
@@ -414,7 +425,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   up(): XMLBuilderNode {
-    const parent = this._asNode.parentNode
+    const parent = this.as.node.parentNode
     if (!parent) {
       throw new Error("Parent node is null. " + this._debugInfo())
     }
@@ -423,7 +434,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   prev(): XMLBuilderNode {
-    const node = this._asNode.previousSibling
+    const node = this.as.node.previousSibling
     if (!node) {
       throw new Error("Previous sibling node is null. " + this._debugInfo())
     }
@@ -432,7 +443,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   next(): XMLBuilderNode {
-    const node = this._asNode.nextSibling
+    const node = this.as.node.nextSibling
     if (!node) {
       throw new Error("Next sibling node is null. " + this._debugInfo())
     }
@@ -441,7 +452,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   first(): XMLBuilderNode {
-    const node = this._asNode.firstChild
+    const node = this.as.node.firstChild
     if (!node) {
       throw new Error("First child node is null. " + this._debugInfo())
     }
@@ -450,7 +461,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   last(): XMLBuilderNode {
-    const node = this._asNode.lastChild
+    const node = this.as.node.lastChild
     if (!node) {
       throw new Error("Last child node is null. " + this._debugInfo())
     }
@@ -495,16 +506,16 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   private _serialize(writerOptions: WriterOptions): XMLSerializedValue {
     if (writerOptions.format === "text") {
       const writer = new StringWriterImpl(this._options)
-      return writer.serialize(this._asNode, writerOptions)
+      return writer.serialize(this.as.node, writerOptions)
     } else if (writerOptions.format === "map") {
       const writer = new MapWriterImpl(this._options)
-      return writer.serialize(this._asNode, writerOptions)
+      return writer.serialize(this.as.node, writerOptions)
     } else if (writerOptions.format === "object") {
       const writer = new ObjectWriterImpl(this._options)
-      return writer.serialize(this._asNode, writerOptions)
+      return writer.serialize(this.as.node, writerOptions)
     } else if (writerOptions.format === "json") {
       const writer = new JSONWriterImpl(this._options)
-      return writer.serialize(this._asNode, writerOptions)
+      return writer.serialize(this.as.node, writerOptions)
     } else {
       return ''
     }
@@ -526,7 +537,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     if (namespace === null || namespace === undefined) {
       const qName = XMLBuilderNodeImpl._algo.namespace.extractQName(name)
       if (this._options.inheritNS) {
-        const parent = this._asNode.parentNode
+        const parent = this.as.node.parentNode
         if (parent) {
           namespace = parent.lookupNamespaceURI(qName[0])
         }
@@ -548,7 +559,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       }
     }
 
-    const node = this._asNode
+    const node = this.as.node
 
     // character validation
     this._validate.name(name, this._debugInfo())
@@ -597,9 +608,9 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * Returns the document owning this node.
    */
   protected get _doc(): dom.Interfaces.Document {
-    const node = this._asNode
-    if (node.nodeType === dom.Interfaces.NodeType.Document) {
-      return <dom.Interfaces.Document>node
+    const node = this.as.node
+    if (util.Guard.isDocumentNode(node)) {
+      return node
     }
     const doc = node.ownerDocument
     if (!doc) {
@@ -609,49 +620,9 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /**
-   * Cast to `any` to call methods without a TypeScript interface definition.
-   */
-  protected get _asAny(): any {
-    return <any>this
-  }
-
-  /**
-   * Returns the underlying DOM node.
-   */
-  protected get _asNode(): dom.Interfaces.Node {
-    try {
-      return util.Cast.asNode(this)
-    } catch (e) {
-      throw new Error("This function can only be applied to a DOM node." + this._debugInfo())
-    }
-  }
-
-  /**
-   * Returns the underlying element node.
-   */
-  protected get _asElement(): dom.Interfaces.Element {
-    if (util.Guard.isElementNode(this)) {
-      return this
-    } else {
-      throw new Error("This function can only be applied to an element node." + this._debugInfo())
-    }
-  }
-
-  /**
-   * Returns the underlying document node.
-   */
-  protected get _asDocument(): dom.Interfaces.Document {
-    if (util.Guard.isDocumentNode(this)) {
-      return this
-    } else {
-      throw new Error("This function can only be applied to a document node." + this._debugInfo())
-    }
-  }
-
-  /**
    * Converts a DOM node to an `XMLBuilder`.
    */
-  protected static _FromNode(node: dom.Interfaces.Node): XMLBuilderNode {
+  static _FromNode(node: dom.Interfaces.Node): XMLBuilderNode {
     return node as unknown as XMLBuilderNode
   }
 
@@ -661,8 +632,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * @param name - node name
    */
   protected _debugInfo(name?: string): string {
-    const node = this._asNode
-    const parentNode = this._asNode.parentNode
+    const node = this.as.node
+    const parentNode = this.as.node.parentNode
 
     name = name || node.nodeName
     const parentName = parentNode ? parentNode.nodeName : ''
@@ -682,20 +653,20 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * Gets or sets builder options.
    */
   protected get _options(): XMLBuilderOptions {
-    return (<any><unknown>this.doc())._builderOptions
+    return this.doc().as.any._builderOptions
   }
   protected set _options(value: XMLBuilderOptions) {
-    (<any><unknown>this.doc())._builderOptions = value
+    this.doc().as.any._builderOptions = value
   }
 
   /**
    * Gets or sets validator functions.
    */
   protected get _validate(): Validator {
-    return (<any><unknown>this.doc())._validator
+    return this.doc().as.any._validator
   }
   protected set _validate(value: Validator) {
-    (<any><unknown>this.doc())._validator = value
+    this.doc().as.any._validator = value
   }
 
 }

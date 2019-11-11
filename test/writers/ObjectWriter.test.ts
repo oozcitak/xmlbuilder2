@@ -27,7 +27,7 @@ describe('ObjectWriter', () => {
     }
 
     const result = $$.xml({ version: "1.0", encoding: "UTF-8", standalone: true })
-      .create('root').ele(obj).end({ format: "object" })
+      .document().ele('root').ele(obj).end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -59,7 +59,7 @@ describe('ObjectWriter', () => {
   })
 
   test('duplicate tag names', () => {
-    const result = $$.xml().create('people')
+    const result = $$.xml().document().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "object" })
@@ -77,7 +77,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content', () => {
-    const result = $$.xml().create('people')
+    const result = $$.xml().document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -95,7 +95,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content and duplicate tags', () => {
-    const result = $$.xml().create('people')
+    const result = $$.xml().document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
@@ -117,7 +117,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content and interspersed duplicate tags - cannot preserve node order', () => {
-    const result = $$.xml().create('people')
+    const result = $$.xml().document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -140,7 +140,7 @@ describe('ObjectWriter', () => {
 
   test('doctype', () => {
     const result = $$.xml({ docType: { pubID: "pub", sysID: "sys" } })
-      .create('root').end({ format: "object" })
+      .document().ele('root').end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
       { root: { } }
@@ -148,7 +148,7 @@ describe('ObjectWriter', () => {
   })
 
   test('namespaces', () => {
-    const result = $$.xml().create('root', { xmlns: "myns" })
+    const result = $$.xml().document().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
@@ -166,7 +166,7 @@ describe('ObjectWriter', () => {
   })
 
   test('unknown node', () => {
-    const ele = $$.xml().create('root').ele('alien')
+    const ele = $$.xml().document().ele('root').ele('alien')
     Object.defineProperty(ele, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end({ format: "object" })).toThrow()
   })
