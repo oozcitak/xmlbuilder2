@@ -14,7 +14,6 @@ import { XMLBuilderNodeImpl } from "./XMLBuilderNodeImpl"
 export class XMLBuilderImpl implements XMLBuilder {
 
   private _options: XMLBuilderOptions
-  private _docType?: DTDOptions
   private _validate: Validator
 
   /** 
@@ -28,8 +27,6 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     this._validate = new ValidatorImpl(options.version || "1.0",
       options.validate || {})
-
-    this._docType = options.docType
 
     this._options = applyDefaults(options, DefaultBuilderOptions)
 
@@ -111,11 +108,6 @@ export class XMLBuilderImpl implements XMLBuilder {
       builder.ele(contents)
     }
 
-    // DocType node
-    if (this._docType !== undefined) {
-      builder.dtd(this._docType)
-    }
-    
     return builder
   }
 

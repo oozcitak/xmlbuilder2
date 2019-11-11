@@ -25,7 +25,7 @@ describe('toObject() with map', () => {
   })
 
   test('document type', () => {
-    const dtd = $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).document().ele('root').doc().first()
+    const dtd = $$.xml().document().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
     expect(() => dtd.toObject()).toThrow()
   })
 
@@ -98,7 +98,7 @@ describe('toObject() with object', () => {
   })
 
   test('document type', () => {
-    const dtd = $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).document().ele('root').doc().first()
+    const dtd = $$.xml().document().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
     expect(() => dtd.toObject({ format: "object" })).toThrow()
   })
 

@@ -16,10 +16,6 @@ export interface XMLBuilderCreateOptions {
    * Standalone document declaration: `true` or `false`
    */
   standalone?: boolean
-    /**
-    * DocType node identifiers
-    */
-   docType?: DTDOptions  
   /**
    * Whether child nodes inherit their parent namespace
    */

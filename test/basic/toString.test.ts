@@ -8,7 +8,7 @@ describe('toString()', () => {
   })
 
   test('document type', () => {
-    const doc = $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).document().ele('root').doc()
+    const doc = $$.xml().document().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc()
     expect(doc.toString()).toBe('<?xml version="1.0"?><!DOCTYPE root PUBLIC "pub" "sys"><root/>')
   })
 

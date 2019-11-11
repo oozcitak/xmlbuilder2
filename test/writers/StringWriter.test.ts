@@ -93,8 +93,8 @@ describe('StringWriter', () => {
   })
 
   test('doctype with both public and system identifier', () => {
-    expect($$.xml({ docType: { pubID: "pub", sysID: "sys" } })
-      .document().ele('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
+    expect($$.xml()
+      .document().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub" "sys">
       <root/>
@@ -102,8 +102,8 @@ describe('StringWriter', () => {
   })
 
   test('doctype with public identifier', () => {
-    expect($$.xml({ docType: { pubID: "pub", } })
-      .document().ele('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
+    expect($$.xml()
+      .document().dtd({ pubID: "pub" }).ele('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub">
       <root/>
@@ -111,8 +111,8 @@ describe('StringWriter', () => {
   })
 
   test('doctype with system identifier', () => {
-    expect($$.xml({ docType: { sysID: "sys" } })
-      .document().ele('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
+    expect($$.xml()
+      .document().dtd({ sysID: "sys" }).ele('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root SYSTEM "sys">
       <root/>
@@ -120,8 +120,8 @@ describe('StringWriter', () => {
   })
 
   test('doctype without identifiers', () => {
-    expect($$.xml({ docType: { } })
-      .document().ele('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
+    expect($$.xml()
+      .document().dtd().ele('root').doc().toString({ format: "text", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root>
       <root/>

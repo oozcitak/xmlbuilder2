@@ -35,7 +35,7 @@ describe('dtd()', () => {
   })
 
   test('replace doctype', () => {
-    const root = $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).document().ele('root')
+    const root = $$.xml().document().ele('root').dtd({ pubID: "pub", sysID: "sys" })
     expect($$.printTree(root.doc())).toBe($$.t`
       !DOCTYPE root PUBLIC pub sys
       root
@@ -49,7 +49,7 @@ describe('dtd()', () => {
   })
 
   test('update when element node changes', () => {
-    const doc = $$.xml({ docType: { pubID: "pub", sysID: "sys" } }).document()
+    const doc = $$.xml().document().dtd({ pubID: "pub", sysID: "sys" })
     doc.ele('newroot')
     expect($$.printTree(doc)).toBe($$.t`
       !DOCTYPE newroot PUBLIC pub sys

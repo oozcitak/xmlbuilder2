@@ -3,8 +3,9 @@ import $$ from '../TestHelpers'
 describe('end()', () => {
 
   test('simple document', () => {
-    const xml = $$.xml({ docType: { pubID: "pub", sysID: "sys" } })
+    const xml = $$.xml()
       .document()
+      .dtd({ pubID: "pub", sysID: "sys" })
       .ele('root')
       .com('comment')
       .ins('target', 'content')
