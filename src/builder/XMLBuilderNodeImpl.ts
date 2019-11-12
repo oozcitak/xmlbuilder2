@@ -72,6 +72,10 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     if (isFunction(name)) {
       // evaluate if function
       lastChild = this.ele(name.apply(this))
+    } else if (isArray(name)) {
+      for (const item of forEachArray(name)) {
+        lastChild = this.ele(item)
+      }
     } else if (isMap(name) || isObject(name)) {
       // expand if object
       for (let [key, val] of forEachObject(name)) {
