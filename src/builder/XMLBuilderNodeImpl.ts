@@ -384,17 +384,17 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       throw new Error("Owner document is null. " + this._debugInfo())
     }
 
-    const importedNode = (<XMLBuilderNodeImpl>node).as.node
+    const importedNode = node.as.node
 
-    if (importedNode.nodeType === dom.Interfaces.NodeType.Document) {
+    if (util.Guard.isDocumentNode(importedNode)) {
       // import document node
-      const elementNode = (<dom.Interfaces.Document>importedNode).documentElement
+      const elementNode = importedNode.documentElement
       if (elementNode === null) {
         throw new Error("Imported document has no document node. " + this._debugInfo())
       }
       const clone = hostDoc.importNode(elementNode, true)
       hostNode.appendChild(clone)
-    } else if (importedNode.nodeType === dom.Interfaces.NodeType.DocumentFragment) {
+    } else if (util.Guard.isDocumentFragmentNode(importedNode)) {
       // import child nodes
       for (const childNode of importedNode.childNodes) {
         const clone = hostDoc.importNode(childNode, true)

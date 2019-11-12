@@ -1,10 +1,9 @@
 import {
-  XMLBuilderOptions, XMLBuilder, ExpandObject,
-  AttributesObject, XMLBuilderNode, Validator,
-  DTDOptions, DefaultBuilderOptions, XMLBuilderCreateOptions
+  XMLBuilderOptions, XMLBuilder, ExpandObject, XMLBuilderNode, Validator,
+  DefaultBuilderOptions, XMLBuilderCreateOptions
 } from "./interfaces"
 import { dom, parser, implementation } from "@oozcitak/dom"
-import { applyDefaults, isObject, isString, isMap } from "@oozcitak/util"
+import { applyDefaults, isString } from "@oozcitak/util"
 import { ValidatorImpl } from "../validator"
 import { XMLBuilderNodeImpl } from "./XMLBuilderNodeImpl"
 
@@ -103,6 +102,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         builder.ele(obj)
       }
     } else {
+      // JS object
       builder = XMLBuilderNodeImpl._FromNode(this._createEmptyDocument())
       this._setOptions(builder)
       builder.ele(contents)
