@@ -25,6 +25,9 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   private _castAsNode: CastAsNode | undefined
   private _isRawNode: boolean = false
 
+  private _builderOptions?: XMLBuilderOptions
+  private _validator?: Validator
+
   /** @inheritdoc */
   get as(): CastAsNode {
     if (this._castAsNode === undefined) {
@@ -657,20 +660,32 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * Gets or sets builder options.
    */
   protected get _options(): XMLBuilderOptions {
-    return this.doc().as.any._builderOptions
+    const doc = this.doc() as XMLBuilderNodeImpl
+    /* istanbul ignore next */
+    if (doc._builderOptions === undefined) {
+      throw new Error("Builder options is not set.")
+    }
+    return doc._builderOptions
   }
   protected set _options(value: XMLBuilderOptions) {
-    this.doc().as.any._builderOptions = value
+    const doc = this.doc() as XMLBuilderNodeImpl
+    doc._builderOptions = value
   }
 
   /**
    * Gets or sets validator functions.
    */
   protected get _validate(): Validator {
-    return this.doc().as.any._validator
+    const doc = this.doc() as XMLBuilderNodeImpl
+    /* istanbul ignore next */
+    if (doc._validator === undefined) {
+      throw new Error("Validator is not set.")
+    }
+    return doc._validator
   }
   protected set _validate(value: Validator) {
-    this.doc().as.any._validator = value
+    const doc = this.doc() as XMLBuilderNodeImpl
+    doc._validator = value
   }
 
 }

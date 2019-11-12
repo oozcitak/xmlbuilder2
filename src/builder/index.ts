@@ -2,7 +2,6 @@ import { dom } from '@oozcitak/dom'
 import { applyMixin } from '@oozcitak/util'
 import { XMLBuilderImpl } from './XMLBuilderImpl'
 import { XMLBuilderNodeImpl } from './XMLBuilderNodeImpl'
-import { XMLBuilderDocumentImpl } from './XMLBuilderDocumentImpl'
 
 // Apply XMLBuilder mixin
 applyMixin(dom.Node, XMLBuilderNodeImpl, "remove")
@@ -16,7 +15,7 @@ applyMixin(dom.ProcessingInstruction, XMLBuilderNodeImpl, "remove")
 
 applyMixin(dom.DocumentType, XMLBuilderNodeImpl, "remove")
 applyMixin(dom.DocumentFragment, XMLBuilderNodeImpl, "remove")
-applyMixin(dom.Document, XMLBuilderDocumentImpl, "remove")
-applyMixin(dom.XMLDocument, XMLBuilderDocumentImpl, "remove")
+applyMixin(dom.Document, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.XMLDocument, XMLBuilderNodeImpl, "remove")
 
-export { XMLBuilderImpl, XMLBuilderNodeImpl, XMLBuilderDocumentImpl }
+export { XMLBuilderImpl, XMLBuilderNodeImpl }

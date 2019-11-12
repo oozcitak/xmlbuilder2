@@ -3,7 +3,7 @@ import {
   DefaultBuilderOptions, XMLBuilderCreateOptions
 } from "./interfaces"
 import { dom, parser, implementation } from "@oozcitak/dom"
-import { applyDefaults, isString } from "@oozcitak/util"
+import { applyDefaults, isObject } from "@oozcitak/util"
 import { ValidatorImpl } from "../validator"
 import { XMLBuilderNodeImpl } from "./XMLBuilderNodeImpl"
 
@@ -41,44 +41,45 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   fragment(contents?: string | ExpandObject): XMLBuilderNode {
+    let builder: XMLBuilderNode
+
     if (contents === undefined) {
+      // empty fragment
       const doc = this._createEmptyDocument()
       this._setOptions(doc)
-      return XMLBuilderNodeImpl._FromNode(doc.createDocumentFragment())
-    } else if (isString(contents)) {
-      if (/^\s*</.test(contents)) {
-        // XML nodes
-        contents = "<TEMP_ROOT>" + contents + "</TEMP_ROOT>"
-        const domParser = new parser.DOMParser()
-        const doc = domParser.parseFromString(contents, parser.MimeType.XML)
-        this._setOptions(doc)
-        /* istanbul ignore next */
-        if (doc.documentElement === null) {
-          throw new Error("Document element is null.")
-        }
-        const frag = doc.createDocumentFragment()
-        for (const child of doc.documentElement.childNodes) {
-          const newChild = doc.importNode(child, true)
-          frag.appendChild(newChild)
-        }
-        return XMLBuilderNodeImpl._FromNode(frag)
-      } else {
-        // JSON
-        const doc = this._createEmptyDocument()
-        this._setOptions(doc)
-        const frag = XMLBuilderNodeImpl._FromNode(doc.createDocumentFragment())
-        const obj = JSON.parse(contents) as ExpandObject
-        frag.ele(obj)
-        return frag
-      }
-    } else {
+      builder = XMLBuilderNodeImpl._FromNode(doc.createDocumentFragment())
+    } else if (isObject(contents)) {
       // JS object
       const doc = this._createEmptyDocument()
       this._setOptions(doc)
-      const frag = XMLBuilderNodeImpl._FromNode(doc.createDocumentFragment())
-      frag.ele(contents)
-      return frag
+      builder = XMLBuilderNodeImpl._FromNode(doc.createDocumentFragment())
+      builder.ele(contents)
+    } else if (/^\s*</.test(contents)) {
+      // XML document
+      contents = "<TEMP_ROOT>" + contents + "</TEMP_ROOT>"
+      const domParser = new parser.DOMParser()
+      const doc = domParser.parseFromString(contents, parser.MimeType.XML)
+      this._setOptions(doc)
+      /* istanbul ignore next */
+      if (doc.documentElement === null) {
+        throw new Error("Document element is null.")
+      }
+      const frag = doc.createDocumentFragment()
+      for (const child of doc.documentElement.childNodes) {
+        const newChild = doc.importNode(child, true)
+        frag.appendChild(newChild)
+      }
+      builder = XMLBuilderNodeImpl._FromNode(frag)
+    } else {
+      // JSON
+      const doc = this._createEmptyDocument()
+      this._setOptions(doc)
+      builder = XMLBuilderNodeImpl._FromNode(doc.createDocumentFragment())
+      const obj = JSON.parse(contents) as ExpandObject
+      builder.ele(obj)
     }
+
+    return builder
   }
 
   /** @inheritdoc */
@@ -86,26 +87,25 @@ export class XMLBuilderImpl implements XMLBuilder {
     let builder: XMLBuilderNode
 
     if (contents === undefined) {
+      // empty document
       builder = XMLBuilderNodeImpl._FromNode(this._createEmptyDocument())
       this._setOptions(builder)
-    } else if (isString(contents)) {
-      if (/^\s*</.test(contents)) {
-        // XML document
-        const domParser = new parser.DOMParser()
-        builder = XMLBuilderNodeImpl._FromNode(domParser.parseFromString(contents, parser.MimeType.XML))
-        this._setOptions(builder)
-      } else {
-        // JSON
-        builder = XMLBuilderNodeImpl._FromNode(this._createEmptyDocument())
-        this._setOptions(builder)
-        const obj = JSON.parse(contents) as ExpandObject
-        builder.ele(obj)
-      }
-    } else {
+    } else if (isObject(contents)) {
       // JS object
       builder = XMLBuilderNodeImpl._FromNode(this._createEmptyDocument())
       this._setOptions(builder)
       builder.ele(contents)
+    } else if (/^\s*</.test(contents)) {
+      // XML document
+      const domParser = new parser.DOMParser()
+      builder = XMLBuilderNodeImpl._FromNode(domParser.parseFromString(contents, parser.MimeType.XML))
+      this._setOptions(builder)
+    } else {
+      // JSON
+      builder = XMLBuilderNodeImpl._FromNode(this._createEmptyDocument())
+      this._setOptions(builder)
+      const obj = JSON.parse(contents) as ExpandObject
+      builder.ele(obj)
     }
 
     return builder
