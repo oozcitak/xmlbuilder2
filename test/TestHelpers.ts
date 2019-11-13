@@ -1,6 +1,6 @@
 import dedent from "dedent"
 import { serializer } from "@oozcitak/dom"
-import { isObject, isArray, isMap } from "@oozcitak/util"
+import { isObject, isArray, isMap, forEachObject, objectLength } from "@oozcitak/util"
 import { XMLBuilder } from "../src"
 import { XMLBuilderCreateOptions } from "../src/builder/interfaces"
 
@@ -45,17 +45,7 @@ export default class TestHelpers {
     let r = ''
     const leaf = TestHelpers.isLeafNode(map)
 
-    if (isMap(map)) {
-      r += '{'
-      const len = map.size
-      let i = 0
-      for (const [key, val] of map) {
-        r += (leaf ? ' ' : '\n' + TestHelpers.indent(level + 1)) + key + ': ' + TestHelpers.printMap(val, level + 1)
-        if (i < len - 1) { r += ',' }
-        i++
-      }
-      r += (leaf ? ' ' : '\n' + TestHelpers.indent(level)) + '}'
-    } else if (isArray(map)) {
+    if (isArray(map)) {
       r += '['
       const len = map.length
       let i = 0      
@@ -65,11 +55,11 @@ export default class TestHelpers {
         i++
       }
       r += (leaf ? ' ' : '\n' + TestHelpers.indent(level)) + ']'
-    } else if (isObject(map)) {
+    } else if (isMap(map) || isObject(map)) {
       r += '{'
-      const len = Object.keys(map).length
+      const len = objectLength(map)
       let i = 0
-      for (const [key, val] of Object.entries(map)) {
+      for (const [key, val] of forEachObject(map)) {
         r += (leaf ? ' ' : '\n' + TestHelpers.indent(level + 1)) + key + ': ' + TestHelpers.printMap(val, level + 1)
         if (i < len - 1) { r += ',' }
         i++

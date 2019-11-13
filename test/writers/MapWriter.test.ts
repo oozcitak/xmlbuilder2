@@ -139,8 +139,8 @@ describe('MapWriter', () => {
   })
 
   test('doctype', () => {
-    const result = $$.xml({ docType: { pubID: "pub", sysID: "sys" } })
-      .document().ele('root').end({ format: "map" })
+    const result = $$.xml().document()
+      .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
       { root: { } }

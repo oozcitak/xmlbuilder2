@@ -168,8 +168,8 @@ describe('JSONWriter', () => {
   })
 
   test('doctype', () => {
-    const result = $$.xml({ docType: { pubID: "pub", sysID: "sys" } })
-      .document().ele('root').end({ format: "json" })
+    const result = $$.xml().document()
+      .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "json" })
 
     expect(result).toBe('{"root":{}}')
   })
