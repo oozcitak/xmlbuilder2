@@ -13,11 +13,7 @@ export class CastAsNodeImpl implements CastAsNode {
    * @param builder - an XML builder node
    */
   constructor (builder: XMLBuilderNode) {
-    if (util.Guard.isNode(builder)) {
-      this._node = builder
-    } else {
-      throw new Error("This function can only be applied to a DOM node.")
-    }
+    this._node = util.Cast.asNode(builder)
   }
 
   /** @inheritdoc */

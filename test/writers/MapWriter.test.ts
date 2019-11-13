@@ -26,8 +26,8 @@ describe('MapWriter', () => {
       }
     }
 
-    const result = $$.xml({ version: "1.0", encoding: "UTF-8", standalone: true })
-      .document().ele('root').ele(obj).end({ format: "map" })
+    const result = $$.document({ version: "1.0", encoding: "UTF-8", standalone: true })
+      .ele('root').ele(obj).end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -59,7 +59,7 @@ describe('MapWriter', () => {
   })
 
   test('duplicate tag names', () => {
-    const result = $$.xml().document().ele('people')
+    const result = $$.document().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "map" })
@@ -77,7 +77,7 @@ describe('MapWriter', () => {
   })
 
   test('mixed content', () => {
-    const result = $$.xml().document().ele('people')
+    const result = $$.document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -95,7 +95,7 @@ describe('MapWriter', () => {
   })
 
   test('mixed content and duplicate tags', () => {
-    const result = $$.xml().document().ele('people')
+    const result = $$.document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
@@ -117,7 +117,7 @@ describe('MapWriter', () => {
   })
 
   test('mixed content and interspersed duplicate tags - cannot preserve node order', () => {
-    const result = $$.xml().document().ele('people')
+    const result = $$.document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -139,7 +139,7 @@ describe('MapWriter', () => {
   })
 
   test('doctype', () => {
-    const result = $$.xml().document()
+    const result = $$.document()
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -148,7 +148,7 @@ describe('MapWriter', () => {
   })
 
   test('namespaces', () => {
-    const result = $$.xml().document().ele('root', { xmlns: "myns" })
+    const result = $$.document().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
@@ -166,7 +166,7 @@ describe('MapWriter', () => {
   })
 
   test('unknown node', () => {
-    const ele = $$.xml().document().ele('root').ele('alien')
+    const ele = $$.document().ele('root').ele('alien')
     Object.defineProperty(ele, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end({ format: "map" })).toThrow()
   })

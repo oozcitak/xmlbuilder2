@@ -61,7 +61,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     } else if (isString(p1) && isObject(p2)) {
       // ele(name: string, attributes: AttributesObject)
       [namespace, name, attributes] = [undefined, p1, p2]
-    } else if (isString(p1)) {
+    } else {
       // ele(name: string)
       [namespace, name, attributes] = [undefined, p1, undefined]
     }
@@ -160,13 +160,13 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           lastChild = this.ele(key)
         }
       }
-    } else if (isString(name)) {
+    } else {
       // element node
       lastChild = this._node(namespace, name, attributes)
     }
 
     if (lastChild === null) {
-      throw new Error("Could not create any elements with: " + (name || '').toString() + ". " + this._debugInfo())
+      throw new Error("Could not create any elements with: " + name.toString() + ". " + this._debugInfo())
     }
 
     return lastChild
@@ -386,10 +386,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   /** @inheritdoc */
   import(node: XMLBuilderNode): XMLBuilderNode {
     const hostNode = this.as.node
-    const hostDoc = hostNode.ownerDocument
-    if (hostDoc === null) {
-      throw new Error("Owner document is null. " + this._debugInfo())
-    }
+    const hostDoc = this._doc
 
     const importedNode = node.as.node
 
@@ -397,7 +394,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       // import document node
       const elementNode = importedNode.documentElement
       if (elementNode === null) {
-        throw new Error("Imported document has no document node. " + this._debugInfo())
+        throw new Error("Imported document has no document element node. " + this._debugInfo())
       }
       const clone = hostDoc.importNode(elementNode, true)
       hostNode.appendChild(clone)
@@ -645,15 +642,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * Returns the document owning this node.
    */
   protected get _doc(): dom.Interfaces.Document {
-    const node = this.as.node
-    if (util.Guard.isDocumentNode(node)) {
-      return node
-    }
-    const doc = node.ownerDocument
-    if (!doc) {
-      throw new Error("Document is null. " + this._debugInfo())
-    }
-    return doc
+    return this.as.node._nodeDocument
   }
 
   /**

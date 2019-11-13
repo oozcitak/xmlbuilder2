@@ -26,8 +26,8 @@ describe('JSONWriter', () => {
       }
     }
 
-    const result = $$.xml({ version: "1.0", encoding: "UTF-8", standalone: true })
-      .document().ele('root').ele(obj).end({ format: "json", prettyPrint: true })
+    const result = $$.document({ version: "1.0", encoding: "UTF-8", standalone: true })
+      .ele('root').ele(obj).end({ format: "json", prettyPrint: true })
 
     expect(result).toBe($$.t`
       {
@@ -67,7 +67,7 @@ describe('JSONWriter', () => {
       }
     }
 
-    expect($$.xml().document().ele('root').ele(obj).root().
+    expect($$.document().ele('root').ele(obj).root().
       toString({ format: "json", prettyPrint: true, offset: 2 })).toBe(
       '    {\n' +
       '      "root": {\n' +
@@ -90,7 +90,7 @@ describe('JSONWriter', () => {
       }
     }
 
-    expect($$.xml().document().ele('root').ele(obj).root().
+    expect($$.document().ele('root').ele(obj).root().
       toString({ format: "json", prettyPrint: true, offset: -4 })).toBe(
       '{\n' +
       '"root": {\n' +
@@ -105,7 +105,7 @@ describe('JSONWriter', () => {
   })
 
   test('duplicate tag names', () => {
-    const result = $$.xml().document().ele('people')
+    const result = $$.document().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "json" })
@@ -114,7 +114,7 @@ describe('JSONWriter', () => {
   })
 
   test('mixed content', () => {
-    const result = $$.xml().document().ele('people')
+    const result = $$.document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -124,7 +124,7 @@ describe('JSONWriter', () => {
   })
 
   test('mixed content and duplicate tags', () => {
-    const result = $$.xml().document().ele('people')
+    const result = $$.document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
@@ -146,7 +146,7 @@ describe('JSONWriter', () => {
   })
 
   test('mixed content and interspersed duplicate tags - cannot preserve node order', () => {
-    const result = $$.xml().document().ele('people')
+    const result = $$.document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -168,14 +168,14 @@ describe('JSONWriter', () => {
   })
 
   test('doctype', () => {
-    const result = $$.xml().document()
+    const result = $$.document()
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "json" })
 
     expect(result).toBe('{"root":{}}')
   })
 
   test('namespaces', () => {
-    const result = $$.xml().document().ele('root', { xmlns: "myns" })
+    const result = $$.document().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .set({ inheritNS: false }).ele('bar').up()
       .doc()
@@ -193,7 +193,7 @@ describe('JSONWriter', () => {
   })
 
   test('unknown node', () => {
-    const ele = $$.xml().document().ele('root').ele('alien')
+    const ele = $$.document().ele('root').ele('alien')
     Object.defineProperty(ele, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end({ format: "json" })).toThrow()
   })

@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('fragment()', () => {
 
   test('empty', () => {
-    const frag = $$.xml().fragment()
+    const frag = $$.fragment()
     const node1 = frag.ele('node1')
     const node2 = frag.ele('node2')
     node1.ele('node1-1').att("att1-1", "val1-1")
@@ -31,7 +31,7 @@ describe('fragment()', () => {
         "node2-2": { "@att2-2": "val2-2" }
       }
     }
-    const frag = $$.xml().fragment(obj)
+    const frag = $$.fragment(obj)
     expect($$.printTree(frag)).toBe($$.t`
       node1
         node1-1 att1-1="val1-1"
@@ -53,7 +53,7 @@ describe('fragment()', () => {
         "node2-2": { "@att2-2": "val2-2" }
       }
     }
-    const frag = $$.xml().fragment(JSON.stringify(obj))
+    const frag = $$.fragment(JSON.stringify(obj))
     expect($$.printTree(frag)).toBe($$.t`
       node1
         node1-1 att1-1="val1-1"
@@ -75,7 +75,7 @@ describe('fragment()', () => {
         <node2-2 att2-2="val2-2"/>
       </node2>
       `
-    const frag = $$.xml().fragment(str)
+    const frag = $$.fragment(str)
     expect($$.printTree(frag)).toBe($$.t`
       node1
         node1-1 att1-1="val1-1"

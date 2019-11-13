@@ -1,13 +1,12 @@
 import dedent from "dedent"
 import { serializer } from "@oozcitak/dom"
 import { isObject, isArray, isMap, forEachObject, objectLength } from "@oozcitak/util"
-import { XMLBuilder } from "../src"
-import { XMLBuilderCreateOptions } from "../src/builder/interfaces"
+import { document, fragment } from "../src"
 
 export default class TestHelpers {
-  static xml(options?: XMLBuilderCreateOptions): XMLBuilder {
-    return new XMLBuilder(options) 
-  }
+  static document = document
+  static fragment = fragment
+  
   static serialize(node: any): string {
     const s = new serializer.XMLSerializer()
     return s.serializeToString(node)

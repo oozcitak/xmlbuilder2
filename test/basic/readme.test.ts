@@ -30,7 +30,7 @@ describe('examples in README', () => {
       }
     }
 
-    const root = $$.xml().document(obj)
+    const root = $$.document(obj)
     expect(root.end( { prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <topgun>
