@@ -1,6 +1,6 @@
 import $$ from '../TestHelpers'
 
-describe('create()', () => {
+describe('document()', () => {
 
   test('Empty document', () => {
     const doc = $$.xml().document()
