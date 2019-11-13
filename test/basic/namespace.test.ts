@@ -79,4 +79,30 @@ describe('namespaces', () => {
     expect(script.getAttributeNode("xlink:href").namespaceURI).toBe(xlinkNs)
   })
 
+  test('add attribute with namespace', () => {
+    const ns1 = 'http://example.com/ns1'
+    const doc = $$.document().ele('root').att(ns1, 'att', 'val').doc() as any
+
+    expect($$.serialize(doc)).toBe('<root xmlns:ns1="http://example.com/ns1" ns1:att="val"/>')
+
+    expect(doc.documentElement.attributes.item(0).namespaceURI).toBe(ns1)
+  })
+
+  test('remove attribute with namespace', () => {
+    const ns1 = 'http://example.com/ns1'
+    const doc = $$.document().ele('root').att(ns1, 'att', 'val').removeAtt(ns1, 'att')
+
+    expect($$.serialize(doc)).toBe('<root/>')
+  })
+
+  test('remove multiple attributes with namespace', () => {
+    const ns1 = 'http://example.com/ns1'
+    const doc = $$.document().ele('root')
+      .att(ns1, 'att1', 'val')
+      .att(ns1, 'att2', 'val')
+      .removeAtt(ns1, ['att1', 'att2'])
+
+    expect($$.serialize(doc)).toBe('<root/>')
+  })
+
 })

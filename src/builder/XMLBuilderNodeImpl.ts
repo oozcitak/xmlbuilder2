@@ -186,9 +186,6 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     if (isMap(p1) || isObject(p1)) {
       // att(obj: AttributesObject)
-      if (p2 !== undefined) {
-        throw new Error("Unexpected argument (expecting a single object argument). " + this._debugInfo())
-      }
       // expand if object
       for (const [attName, attValue] of forEachObject(p1)) {
         this.att(attName, attValue)
