@@ -476,6 +476,36 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
+  *traverseChildren(): IterableIterator<XMLBuilderNode> {
+    for (const child of this.as.node.childNodes) {
+      yield XMLBuilderNodeImpl._FromNode(child)
+    }
+  }
+
+  /** @inheritdoc */
+  *traverseAttributes(): IterableIterator<XMLBuilderNode> {
+    if (util.Guard.isElementNode(this)) {
+      for (const att of this.as.element.attributes) {
+        yield XMLBuilderNodeImpl._FromNode(att)
+      }  
+    }
+  }
+
+  /** @inheritdoc */
+  *traverseDescendants(): IterableIterator<XMLBuilderNode> {
+    for (const node of XMLBuilderNodeImpl._algo.tree.getDescendantNodes(this.as.node, false, false)) {
+      yield XMLBuilderNodeImpl._FromNode(node)
+    }
+  }
+
+  /** @inheritdoc */
+  *traverseAncestors(): IterableIterator<XMLBuilderNode> {
+    for (const node of XMLBuilderNodeImpl._algo.tree.getAncestorNodes(this.as.node, false)) {
+      yield XMLBuilderNodeImpl._FromNode(node)
+    }
+  }
+
+  /** @inheritdoc */
   toString(writerOptions?: WriterOptions): string {
     writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {

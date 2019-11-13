@@ -757,6 +757,44 @@ export interface XMLBuilderNode {
   last(): XMLBuilderNode
 
   /**
+   * Traverses through the child nodes of an element node.
+   */
+  traverseChildren(): IterableIterator<XMLBuilderNode>
+
+  /**
+   * Traverses through the attributes of an element node.
+   */
+  traverseAttributes(): IterableIterator<XMLBuilderNode>
+
+  /**
+   * Traverses through descendant nodes of an element node in tree order.
+   * For example, for the following tree:
+   * ```
+   *      a (document node)
+   *     / \
+   *    b   c
+   *   / \
+   *  d   e
+   * ```
+   * `a.traverseDescendants()` visits `b, d, e, c`
+   */
+  traverseDescendants(): IterableIterator<XMLBuilderNode>
+
+  /**
+   * Traverses through ancestor nodes of an element node in reverse tree order.
+   * For example, for the following tree:
+   * ```
+   *      a (document node)
+   *     / \
+   *    b   c
+   *   / \
+   *  d   e
+   * ```
+   * `e.traverseAncestors()` visits `b, a`
+   */
+  traverseAncestors(): IterableIterator<XMLBuilderNode>
+
+  /**
    * Converts the node into its string representation.
    * 
    * @param options - serialization options

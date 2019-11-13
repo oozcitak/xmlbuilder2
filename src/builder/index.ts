@@ -6,6 +6,7 @@ import { XMLBuilderNodeImpl } from './XMLBuilderNodeImpl'
 // Apply XMLBuilder mixin
 applyMixin(dom.Node, XMLBuilderNodeImpl, "remove")
 applyMixin(dom.Element, XMLBuilderNodeImpl, "remove")
+applyMixin(dom.Attr, XMLBuilderNodeImpl, "remove")
 
 applyMixin(dom.CharacterData, XMLBuilderNodeImpl, "remove")
 applyMixin(dom.CDATASection, XMLBuilderNodeImpl, "remove")
