@@ -21,7 +21,7 @@ npm install xmlbuilder2
 ``` js
 import { document } from 'xmlbuilder2';
 
-const root = $$.document()
+const root = document()
   .ele('topgun')
     .ele('pilots')
       .ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky').up()
