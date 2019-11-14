@@ -1,8 +1,9 @@
 import {
-  WriterOptions, XMLSerializedValue, XMLBuilderOptions
+  WriterOptions, XMLSerializedValue, XMLBuilderOptions, XMLBuilderNode
 } from "../builder/interfaces"
 import { dom, serializer } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
+import { isRawNode } from "../builder"
 
 /**
  * Serializes XML nodes into maps and arrays.
@@ -185,9 +186,7 @@ export class MapWriterImpl {
    * string to provide uniqueness.
    */
   private _getNodeKey(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>): [string, boolean] {
-    const isRaw = (preNode.node as any)._isRawNode
-
-    if (isRaw) {
+    if (isRawNode(preNode.node)) {
       return [this._builderOptions.convert.raw, true]
     }
 

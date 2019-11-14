@@ -22,9 +22,9 @@ import { CastAsNodeImpl } from "./CastAsNode"
 export class XMLBuilderNodeImpl implements XMLBuilderNode {
   private static _algo = new algorithm.DOMAlgorithm()
 
-  private _castAsNode: CastAsNode | undefined
-  private _isRawNode: boolean = false
+  _isRawNode: boolean = false
 
+  private _castAsNode: CastAsNode | undefined
   private _builderOptions?: XMLBuilderOptions
   private _validator?: Validator
 

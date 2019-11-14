@@ -2,6 +2,7 @@ import { WriterOptions, XMLBuilderOptions } from "../builder/interfaces"
 import { dom, serializer } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
 import { Char } from "../validator"
+import { isRawNode } from "../builder"
 
 /**
  * Represents string writer options.
@@ -87,9 +88,7 @@ export class StringWriterImpl {
    */
   private _serializeNode(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
     options: StringWriterOptions, refs: StringWriterRefs): string {
-    const isRaw = (preNode.node as any)._isRawNode
-
-    if (isRaw) {
+    if (isRawNode(preNode.node)) {
       return this._serializeRaw(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.Text>>preNode, options, refs)
     }
 

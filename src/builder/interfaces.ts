@@ -513,6 +513,8 @@ export interface XMLBuilder {
  * chainable document builder methods.
  */
 export interface XMLBuilderNode {
+  
+  _isRawNode: boolean
 
   /**
    * Returns the underlying DOM node.
