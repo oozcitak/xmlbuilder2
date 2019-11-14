@@ -70,10 +70,7 @@ const obj = {
       ]
     },
     hangar: {
-      aircraft: [
-        { '#': 'F-14 Tomcat' },
-        { '#': 'MiG-28' }
-      ]
+      aircraft: ['F-14 Tomcat', 'MiG-28']
     }
   }
 }

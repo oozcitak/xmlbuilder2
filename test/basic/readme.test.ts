@@ -42,10 +42,7 @@ describe('examples in README', () => {
           ]
         },
         hangar: {
-          aircraft: [
-            { '#': 'F-14 Tomcat' },
-            { '#': 'MiG-28' }
-          ]
+          aircraft: [ 'F-14 Tomcat', 'MiG-28']
         }
       }
     }

@@ -367,11 +367,11 @@ export interface WriterOptions {
    */
   format?: "text" | "map" | "object" | "json"
   /**
-   * Suppresses the XML declaration from the output.
+   * Suppresses the XML declaration from the output. Defaults to `false`.
    */
   headless?: boolean
   /**
-   * Pretty-prints the XML tree.
+   * Pretty-prints the XML tree. Defaults to `false`.
    */
   prettyPrint?: boolean
   /**
@@ -402,7 +402,7 @@ export interface WriterOptions {
    * Otherwise, empty element nodes will be self-closed, e.g.
    * ```xml
    * <node/>
-   * ````
+   * ```
    */
   allowEmptyTags?: boolean
   /**
@@ -431,7 +431,7 @@ export interface WriterOptions {
    */
   spaceBeforeSlash?: boolean
   /**
-   * Prevents existing html entities from being re-encoded.
+   * Prevents existing html entities from being re-encoded. Defaults to `false`.
    */
   noDoubleEncoding?: boolean
 }
