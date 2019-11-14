@@ -5,32 +5,34 @@ import { dom } from "@oozcitak/dom"
  */
 export interface XMLBuilderCreateOptions {
   /**
-   * A version number string, e.g. `"1.0"`
+   * A version number string, e.g. `"1.0"`. Defaults to `"1.0"`.
    */
   version?: "1.0" | "1.1"
   /**
-   * Encoding declaration, e.g. `"UTF-8"`
+   * Encoding declaration, e.g. `"UTF-8"`. No default.
    */
   encoding?: string
   /**
-   * Standalone document declaration: `true` or `false`
+   * Standalone document declaration: `true` or `false`. No default.
    */
   standalone?: boolean
   /**
-   * Whether child nodes inherit their parent namespace
+   * Whether child nodes inherit their parent namespace. Defaults to `true`.
    */
   inheritNS?: boolean
   /**
-   * Whether nodes with `null` values will be kept or ignored
+   * Whether nodes with `null` values will be kept or ignored. Defaults to 
+   * `false`.
    */
   keepNullNodes?: boolean
   /**
-   * Whether attributes with `null` values will be kept or ignored
+   * Whether attributes with `null` values will be kept or ignored. Defaults to 
+   * `false`.
    */
   keepNullAttributes?: boolean
   /** 
    * Whether converter strings will be ignored when converting JS 
-   * objects to nodes
+   * objects to nodes. Defaults to `false`.
    */
   ignoreConverters?: boolean
   /** 
