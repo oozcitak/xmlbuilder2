@@ -30,7 +30,7 @@ const root = document()
     .up()
     .ele('hangar')
       .ele('aircraft').txt('F-14 Tomcat').up()
-      .ele('aircraft').txt('MiG-28')
+      .ele('aircraft').txt('MiG-28').up()
     .up()
   .up()
 
