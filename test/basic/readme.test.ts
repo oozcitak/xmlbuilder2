@@ -2,6 +2,35 @@ import $$ from '../TestHelpers'
 
 describe('examples in README', () => {
 
+  test('with functions', () => {
+    const root = $$.document().ele('topgun')
+      .ele('pilots')
+        .ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky').up()
+        .ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell').up()
+        .ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw').up()
+      .up()
+      .ele('hangar')
+        .ele('aircraft').txt('F-14 Tomcat').up()
+        .ele('aircraft').txt('MiG-28')
+      .up()
+    .up()
+
+    expect(root.end( { prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <topgun>
+        <pilots>
+          <pilot callsign="Iceman" rank="Lieutenant">Tom Kazansky</pilot>
+          <pilot callsign="Maverick" rank="Lieutenant">Pete Mitchell</pilot>
+          <pilot callsign="Goose" rank="Lieutenant (j.g.)">Nick Bradshaw</pilot>
+        </pilots>
+        <hangar>
+          <aircraft>F-14 Tomcat</aircraft>
+          <aircraft>MiG-28</aircraft>
+        </hangar>
+      </topgun>
+    `)
+  })
+
   test('from JS object', () => {
     const obj = {
       topgun: {
@@ -12,19 +41,10 @@ describe('examples in README', () => {
             { '@callsign': 'Goose', '@rank': 'Lieutenant (j.g.)', '#': 'Nick Bradshaw' }
           ]
         },
-        script: {
-          monologue: {
-            '#1': 'Talk to me Goose!',
-            cut: 'dog tag shot',
-            '#2': 'Talk to me...'
-          }
-        },
         hangar: {
-          '#': [
-            { aircraft: 'F-14 Tomcat' },
-            { '!': 'Fictional; MiGs use odd numbers for fighters.' },
-            { '$': '<a href="https://topgun.fandom.com/wiki/MiG-28"/>' },
-            { aircraft: 'MiG-28' }
+          aircraft: [
+            { '#': 'F-14 Tomcat' },
+            { '#': 'MiG-28' }
           ]
         }
       }
@@ -39,20 +59,78 @@ describe('examples in README', () => {
           <pilot callsign="Maverick" rank="Lieutenant">Pete Mitchell</pilot>
           <pilot callsign="Goose" rank="Lieutenant (j.g.)">Nick Bradshaw</pilot>
         </pilots>
-        <script>
-          <monologue>
-            Talk to me Goose!
-            <cut>dog tag shot</cut>
-            Talk to me...
-          </monologue>
-        </script>
         <hangar>
           <aircraft>F-14 Tomcat</aircraft>
-          <!--Fictional; MiGs use odd numbers for fighters.-->
-          <![CDATA[<a href="https://topgun.fandom.com/wiki/MiG-28"/>]]>
           <aircraft>MiG-28</aircraft>
         </hangar>
       </topgun>
+    `)
+  })
+
+  test('processing', () => {
+    const root = $$.document().ele('squares')
+    root.com('f(x) = x^2')
+    for(let i = 1; i <= 5; i++)
+    {
+      const item = root.ele('data')
+      item.att('x', i.toString())
+      item.att('y', (i * i).toString())
+    }
+
+    expect(root.end( { prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <squares>
+        <!--f(x) = x^2-->
+        <data x="1" y="1"/>
+        <data x="2" y="4"/>
+        <data x="3" y="9"/>
+        <data x="4" y="16"/>
+        <data x="5" y="25"/>
+      </squares>
+    `)
+  })
+
+  test('mixed content', () => {
+    const obj = {
+      script: {
+        '#1': 'Talk to me Goose!',
+        cut: 'dog tag shot',
+        '#2': 'Talk to me...'
+      }
+    }
+
+    const root = $$.document(obj)
+    expect(root.end( { prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <script>
+        Talk to me Goose!
+        <cut>dog tag shot</cut>
+        Talk to me...
+      </script>
+    `)
+  })
+
+  test('mixed content with duplicate keys', () => {
+    const obj = {
+      hangar: {
+        '#': [
+          { aircraft: 'F-14 Tomcat' },
+          { '!': 'Fictional; MiGs use odd numbers for fighters.' },
+          { '$': '<a href="https://topgun.fandom.com/wiki/MiG-28"/>' },
+          { aircraft: 'MiG-28' }
+        ]
+      }
+    }
+
+    const root = $$.document(obj)
+    expect(root.end( { prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <hangar>
+        <aircraft>F-14 Tomcat</aircraft>
+        <!--Fictional; MiGs use odd numbers for fighters.-->
+        <![CDATA[<a href="https://topgun.fandom.com/wiki/MiG-28"/>]]>
+        <aircraft>MiG-28</aircraft>
+      </hangar>
     `)
   })
 
