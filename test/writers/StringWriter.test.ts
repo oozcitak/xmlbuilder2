@@ -392,6 +392,14 @@ describe('StringWriter', () => {
         text2
       </root>
       `)
+
+    const doc4 = $$.document().ele('root')
+      .txt('')
+      .doc()
+
+    expect(doc4.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root/>
+      `)
   })
 
   test('Various types of text nodes with indentTextOnlyNodes', () => {

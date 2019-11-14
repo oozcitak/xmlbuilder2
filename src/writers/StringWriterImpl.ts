@@ -1,5 +1,5 @@
 import { WriterOptions, XMLBuilderOptions } from "../builder/interfaces"
-import { dom, serializer } from "@oozcitak/dom"
+import { dom, serializer, util } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
 import { Char } from "../validator"
 import { isRawNode } from "../builder"
@@ -229,11 +229,11 @@ export class StringWriterImpl {
     let emptyNode: boolean = true
 
     for (const childNode of preNode.children) {
-      if (childNode.node.nodeType !== dom.Interfaces.NodeType.Text) {
+      if (!util.Guard.isTextNode(childNode.node)) {
         textOnlyNode = false
         emptyNode = false
         break
-      } else if((<dom.Interfaces.Text>childNode.node).data !== '') {
+      } else if(childNode.node.data !== '') {
         emptyNode = false
       }
     }
@@ -362,14 +362,10 @@ export class StringWriterImpl {
     options: StringWriterOptions, refs: StringWriterRefs): string {
     if (!options.prettyPrint || refs.suppressPrettyCount > 0) {
       return ''
-    } else if (options.prettyPrint) {
+    } else {
       const indentLevel = options.offset + preNode.level + 1
-      if (indentLevel > 0) {
-        return new Array(indentLevel).join(options.indent)
-      }
+      return indentLevel > 0 ? new Array(indentLevel).join(options.indent) : ''
     }
-
-    return ''
   }
 
   /**

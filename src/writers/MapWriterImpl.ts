@@ -94,6 +94,7 @@ export class MapWriterImpl {
   private _serializeElement(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
     options: XMLBuilderOptions): XMLSerializedValue {
 
+    /* istanbul ignore next */
     if (preNode.name === undefined) {
       throw new Error("Pre-serialized node name is null.")
     }

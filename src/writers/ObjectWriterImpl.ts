@@ -93,11 +93,13 @@ export class ObjectWriterImpl {
    */
   private _serializeElement(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
     options: XMLBuilderOptions): XMLSerializedValue {
-
-    const markup: { [key:string]: any } = { }
+ 
+    /* istanbul ignore next */
     if (preNode.name === undefined) {
       throw new Error("Pre-serialized node name is undefined.")
     }
+
+    const markup: { [key:string]: any } = { }
     markup[preNode.name] = this._serializeChildNodes(preNode, options)
     return markup
   }
