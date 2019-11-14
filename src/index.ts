@@ -1,7 +1,7 @@
 import * as Interfaces from './builder/interfaces'
 import { XMLBuilderCreateOptions, ExpandObject, XMLBuilderNode } from './builder/interfaces'
 import { XMLBuilderImpl } from './builder'
-import { isObject } from '@oozcitak/util'
+import { isObject, isPlainObject } from '@oozcitak/util'
 
 export { Interfaces }
 
@@ -44,7 +44,7 @@ export function fragment(options?: XMLBuilderCreateOptions | string | ExpandObje
 }
 
 function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {
-  if (!isObject(obj)) return false
+  if (!isPlainObject(obj)) return false
   
   const keys = new Set(["version", "encoding", "standalone", "inheritNS", 
     "keepNullNodes", "keepNullAttributes", "ignoreConverters",

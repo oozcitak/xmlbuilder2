@@ -1,7 +1,7 @@
 import {
   WriterOptions, XMLSerializedValue, XMLBuilderOptions, XMLBuilderNode
 } from "../builder/interfaces"
-import { dom, serializer } from "@oozcitak/dom"
+import { dom, serializer, util } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
 import { isRawNode } from "../builder"
 
@@ -131,9 +131,9 @@ export class MapWriterImpl {
       keyIndices.set(key, 0)
     }
 
-    if (items.length === 1 && items[0][2].node.nodeType === dom.Interfaces.NodeType.Text) {
+    if (items.length === 1 && preNode.attributes.length === 0 && util.Guard.isTextNode(items[0][2].node)) {
       // an element node with a single text node
-      return (<dom.Interfaces.Text>(items[0][2].node)).data
+      return items[0][2].node.data
     } else {
       const markup = new Map<string, XMLSerializedValue>()
       for (const attr of preNode.attributes) {
