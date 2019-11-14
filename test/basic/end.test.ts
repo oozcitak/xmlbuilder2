@@ -29,4 +29,9 @@ describe('end()', () => {
       )
   })
 
+  test('invalid writer format', () => {
+    const xml = $$.document() as any
+    expect(() => xml.end({ format: "invalid" })).toThrow()
+  })
+
 })

@@ -514,7 +514,7 @@ export interface XMLBuilder {
  */
 export interface XMLBuilderNode {
   
-  _isRawNode: boolean
+  _isRawNode?: boolean
 
   /**
    * Returns the underlying DOM node.
@@ -578,8 +578,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  att(namespace: string, name: string,
-    value: string | (() => string)): XMLBuilderNode
+  att(namespace: string, name: string, value: string): XMLBuilderNode
 
   /**
    * Creates or updates an element attribute.
@@ -589,7 +588,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  att(name: string, value: string | (() => string)): XMLBuilderNode
+  att(name: string, value: string): XMLBuilderNode
 
   /**
    * Creates or updates an element attribute.

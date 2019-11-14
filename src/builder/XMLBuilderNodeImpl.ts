@@ -22,7 +22,7 @@ import { CastAsNodeImpl } from "./CastAsNode"
 export class XMLBuilderNodeImpl implements XMLBuilderNode {
   private static _algo = new algorithm.DOMAlgorithm()
 
-  _isRawNode: boolean = false
+  _isRawNode: boolean | undefined
 
   private _castAsNode: CastAsNode | undefined
   private _builderOptions?: XMLBuilderOptions
@@ -181,8 +181,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  att(p1: AttributesObject | string, p2?: string | (() => string),
-    p3?: string | (() => string)): XMLBuilderNode {
+  att(p1: AttributesObject | string, p2?: string, p3?: string): XMLBuilderNode {
 
     if (isMap(p1) || isObject(p1)) {
       // att(obj: AttributesObject)
@@ -195,19 +194,11 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     // get primitive values
     p1 = getValue(p1)
-    if (p2 !== undefined) {
+    if (p2 !== undefined && p2 !== null) {
       p2 = getValue(p2)
     }
-    if (p3 !== undefined) {
+    if (p3 !== undefined && p3 !== null) {
       p3 = getValue(p3)
-    }
-
-    // apply functions
-    if (isFunction(p2)) {
-      p2 = p2.apply(this)
-    }
-    if (isFunction(p3)) {
-      p3 = p3.apply(this)
     }
 
     let namespace: string | null | undefined
@@ -268,7 +259,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       p2 = getValue(p2)
     }
 
-    if (isArray(p1) && p2 === undefined) {
+    if (isArray(p1)) {
       // removeAtt(names: string[])
       for (const attName of forEachArray(p1)) {
         this.removeAtt(attName)
@@ -278,14 +269,12 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       for (const attName of forEachArray(p2)) {
         this.removeAtt(p1, attName)
       }
-    } else if (isString(p1) && p2 === undefined) {
-      // removeAtt(name: string)
-      this.as.element.removeAttribute(p1)
     } else if (isString(p1) && isString(p2)) {
       // removeAtt(namespace: string, name: string)
       this.as.element.removeAttributeNS(p1, p2)
     } else {
-      throw new TypeError("Invalid arguments. " + this._debugInfo())
+      // removeAtt(name: string)
+      this.as.element.removeAttribute(p1)
     }
 
     return this
@@ -548,7 +537,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       const writer = new JSONWriterImpl(this._options)
       return writer.serialize(this.as.node, writerOptions)
     } else {
-      return ''
+      throw new Error("Invalid writer format: " + writerOptions.format + ". " + this._debugInfo())
     }
   }
 
@@ -661,11 +650,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     name = name || node.nodeName
     const parentName = parentNode ? parentNode.nodeName : ''
 
-    if (!name && !parentName) {
-      return ""
-    } else if (!name) {
-      return "parent: <" + parentName + ">"
-    } else if (!parentName) {
+    if (!parentName) {
       return "node: <" + name + ">"
     } else {
       return "node: <" + name + ">, parent: <" + parentName + ">"

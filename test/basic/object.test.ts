@@ -194,6 +194,22 @@ describe('object', () => {
     `)
   })
 
+  test('namespace prefix', () => {
+    const obj = { 
+      "ns1:root": {
+        "@xmlns:ns1": "myns",
+        node: "val",
+      }
+    }
+    const doc = $$.document().ele(obj).doc()
+
+    expect($$.printTree(doc)).toBe($$.t`
+      ns1:root (ns:myns) xmlns:ns1="myns" (ns:http://www.w3.org/2000/xmlns/)
+        node
+          # val
+    `)
+  })
+
   test('error if no nodes created', () => {
     expect(() => $$.document().ele({ })).toThrow()
   })

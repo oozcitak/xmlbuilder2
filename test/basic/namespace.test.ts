@@ -7,10 +7,10 @@ describe('namespaces', () => {
 
   test('default namespace', () => {
     const ns1 = 'http://example.com/ns1'
-    const doc = $$.document({ inheritNS: false }).ele(ns1, 'root')
+    const doc = $$.document({ inheritNS: false }).ele(ns1, 'root').att('att', 'val')
       .ele('foo').ele('bar').txt('foobar').doc() as any
 
-    expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1"><foo xmlns=""><bar>foobar</bar></foo></root>')
+    expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1" att="val"><foo xmlns=""><bar>foobar</bar></foo></root>')
 
     expect(doc.documentElement.namespaceURI).toBe(ns1)
     expect(doc.getElementsByTagName("foo")[0].namespaceURI).toBeNull()
