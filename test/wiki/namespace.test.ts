@@ -10,6 +10,14 @@ describe('namespaces examples in the wiki', () => {
     expect(doc.end({ headless: true })).toBe('<root xmlns="http://example.com/ns1"><foo>bar</foo></root>')
   })
 
+  test('reset default namespace', () => {
+    const ns1 = 'http://example.com/ns1'
+    const doc = $$.document().ele(ns1, 'root')
+      .ele('', 'foo').txt('bar').doc()
+
+    expect(doc.end({ headless: true })).toBe('<root xmlns="http://example.com/ns1"><foo xmlns="">bar</foo></root>')
+  })
+
   test('namespace declaration attribute', () => {
     const ns1 = 'http://example.com/ns1'
     const xsi = 'http://www.w3.org/2001/XMLSchema-instance'

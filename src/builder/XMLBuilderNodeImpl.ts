@@ -235,7 +235,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
         namespace = infraNamespace.XMLNS
       } else if (attQName[0] !== null) {
         namespace = ele.lookupNamespaceURI(attQName[0])
-      } else if (this._options.inheritNS) {
+      } else {
         namespace = ele.lookupNamespaceURI(attQName[0])
       }
     }
@@ -556,11 +556,9 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     // inherit namespace from parent
     if (namespace === null || namespace === undefined) {
       const qName = XMLBuilderNodeImpl._algo.namespace.extractQName(name)
-      if (this._options.inheritNS) {
-        const parent = this.as.node.parentNode
-        if (parent) {
-          namespace = parent.lookupNamespaceURI(qName[0])
-        }
+      const parent = this.as.node.parentNode
+      if (parent) {
+        namespace = parent.lookupNamespaceURI(qName[0])
       }
 
       // override namespace if there is a namespace declaration

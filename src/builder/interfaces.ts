@@ -17,10 +17,6 @@ export interface XMLBuilderCreateOptions {
    */
   standalone?: boolean
   /**
-   * Whether child nodes inherit their parent namespace. Defaults to `true`.
-   */
-  inheritNS?: boolean
-  /**
    * Whether nodes with `null` values will be kept or ignored. Defaults to 
    * `false`.
    */
@@ -61,10 +57,6 @@ export interface XMLBuilderOptions {
    * Standalone document declaration: `true` or `false`
    */
   standalone: boolean | undefined
-  /**
-   * Whether child nodes inherit their parent namespace
-   */
-  inheritNS: boolean
   /**
    * Whether nodes with `null` values will be kept or ignored
    */
@@ -235,7 +227,6 @@ export interface ConvertOptions {
  */
 export const DefaultBuilderOptions: Partial<XMLBuilderOptions> = {
   version: "1.0",
-  inheritNS: true,
   keepNullNodes: false,
   keepNullAttributes: false,
   ignoreConverters: false,

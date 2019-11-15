@@ -131,12 +131,12 @@ describe('StringWriter', () => {
   test('namespaces', () => {
     const doc = $$.document().ele('ns', 'root')
       .ele('foo').up()
-      .set({ inheritNS: false }).ele('bar').up()
+      .ele('bar').up()
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <root xmlns="ns">
         <foo/>
-        <bar xmlns=""/>
+        <bar/>
       </root>
       `)
   })
@@ -144,12 +144,12 @@ describe('StringWriter', () => {
   test('XML namespace', () => {
     const doc = $$.document().ele('http://www.w3.org/XML/1998/namespace', 'root')
       .ele('foo').up()
-      .set({ inheritNS: false }).ele('bar').up()
+      .ele('bar').up()
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <xml:root>
         <xml:foo/>
-        <bar/>
+        <xml:bar/>
       </xml:root>
       `)
   })
@@ -157,7 +157,7 @@ describe('StringWriter', () => {
   test('duplicate namespaces', () => {
     const doc = $$.document().ele('d:root', { "xmlns:d": "ns1" })
       .ele('e:foo', { "xmlns:e": "ns1" }).up()
-      .set({ inheritNS: false }).ele('bar').up()
+      .ele('bar').up()
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <d:root xmlns:d="ns1">
@@ -209,7 +209,6 @@ describe('StringWriter', () => {
 
   test('same prefix declared in an ancestor element', () => {
     const doc = $$.document().ele('root', { "xmlns:p": "uri1" })
-      .set({ inheritNS: false })
       .ele('child')
       .att('uri2', 'p:foobar', 'value')
       .doc()
@@ -222,7 +221,6 @@ describe('StringWriter', () => {
 
   test('drop element prefix if the namespace is same as inherited default namespace', () => {
     const doc = $$.document().ele('uri', 'root')
-      .set({ inheritNS: false })
       .ele('p:child', { "xmlns:p": "uri" })
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
@@ -234,7 +232,6 @@ describe('StringWriter', () => {
 
   test('find an appropriate prefix', () => {
     const doc = $$.document().ele('root', { "xmlns:p1": "u1" })
-      .set({ inheritNS: false })
       .ele('child', { "xmlns:p2": "u1" })
       .ele('u1', 'child2')
       .doc()

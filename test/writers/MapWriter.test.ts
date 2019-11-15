@@ -150,7 +150,7 @@ describe('MapWriter', () => {
   test('namespaces', () => {
     const result = $$.document().ele('root', { xmlns: "myns" })
       .ele('foo').up()
-      .set({ inheritNS: false }).ele('bar').up()
+      .ele('bar').up()
       .doc()
       .end({ format: "map" })
 
@@ -159,7 +159,7 @@ describe('MapWriter', () => {
         root: {
           @xmlns: myns,
           foo: { },
-          bar: { @xmlns:  }
+          bar: { }
         }
       }
       `)

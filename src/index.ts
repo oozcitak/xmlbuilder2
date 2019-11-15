@@ -46,7 +46,7 @@ export function fragment(options?: XMLBuilderCreateOptions | string | ExpandObje
 function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {
   if (!isPlainObject(obj)) return false
   
-  const keys = new Set(["version", "encoding", "standalone", "inheritNS", 
+  const keys = new Set(["version", "encoding", "standalone",  
     "keepNullNodes", "keepNullAttributes", "ignoreConverters",
     "convert", "validate"])
   for (const key in obj) {
