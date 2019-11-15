@@ -5,6 +5,7 @@ describe('document()', () => {
   test('Empty document', () => {
     const doc = $$.document()
     expect($$.printTree(doc)).toBe('')
+    expect(doc.end()).toBe('<?xml version="1.0"?>')
   })
 
   test('Document with root element', () => {
@@ -13,6 +14,7 @@ describe('document()', () => {
       root att="val"
         # text
       `)
+    expect(ele.end()).toBe('<?xml version="1.0"?><root att="val">text</root>')
   })
 
 })
