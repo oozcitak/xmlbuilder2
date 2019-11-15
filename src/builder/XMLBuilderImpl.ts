@@ -24,8 +24,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     options = options || {}
 
-    this._validate = new ValidatorImpl(options.version || "1.0",
-      options.validate || {})
+    this._validate = new ValidatorImpl(options.version || "1.0")
 
     this._options = applyDefaults(options, DefaultBuilderOptions)
 

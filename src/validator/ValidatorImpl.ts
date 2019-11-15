@@ -1,5 +1,5 @@
 import { Char } from "."
-import { Validator, ValidateOptions } from "../builder/interfaces"
+import { Validator } from "../builder/interfaces"
 
 /**
  * Validates character data in XML nodes.
@@ -13,21 +13,8 @@ export class ValidatorImpl implements Validator {
    * 
    * @options - builder options
    */
-  constructor(version: "1.0" | "1.1", options: ValidateOptions) {
+  constructor(version: "1.0" | "1.1") {
     this._xmlVersion = version
-
-    // override base implementation with user supplied functions
-    if (options.pubID) this.pubID = options.pubID
-    if (options.sysID) this.sysID = options.sysID
-    if (options.name) this.name = options.name
-    if (options.text) this.text = options.text
-    if (options.cdata) this.cdata = options.cdata
-    if (options.comment) this.comment = options.comment
-    if (options.raw) this.raw = options.raw
-    if (options.attValue) this.attValue = options.attValue
-    if (options.insTarget) this.insTarget = options.insTarget
-    if (options.insValue) this.insValue = options.insValue
-    if (options.namespace) this.namespace = options.namespace
   }
 
   /** @inheritdoc */

@@ -35,10 +35,6 @@ export interface XMLBuilderCreateOptions {
    * Defines string keys used while converting JS objects to nodes.
    */
   convert?: Partial<ConvertOptions>
-  /**
-   * Contains functions that validate character data in XML nodes.
-   */
-  validate?: ValidateOptions
 }
 
 /**
@@ -74,10 +70,6 @@ export interface XMLBuilderOptions {
    * Defines string keys used while converting JS objects to nodes.
    */
   convert: ConvertOptions
-  /**
-   * Contains functions that validate character data in XML nodes.
-   */
-  validate: ValidateOptions
 }
 
 /**
@@ -244,11 +236,6 @@ export const DefaultBuilderOptions: Partial<XMLBuilderOptions> = {
  * Defines a function that validates character data in XML nodes. 
  */
 type ValidatorFunction = (val: string, debugInfo?: string) => string
-
-/**
- * Contains functions that validate character data in XML nodes.
- */
-export type ValidateOptions = Partial<Validator>
 
 /**
  * Validates character data in XML nodes.
