@@ -54,6 +54,7 @@ will result in:
   </hangar>
 </topgun>
 ```
+___
 
 The same XML document can be created by converting a JS object into XML nodes:
 
@@ -79,6 +80,47 @@ const doc = document(obj);
 const xml = doc.end({ prettyPrint: true });
 console.log(xml);
 ```
+___
+
+`xmlbuilder2` can also parse and serialize XML documents from different formats:
+```js
+import { document } from 'xmlbuilder2';
+
+const xmlStr = '<root att="val"><foo/><bar>foobar</bar></foo></root>';
+const doc = document(xmlStr);
+
+// append a "baz" element to the root node of the document
+doc.root().ele("baz");
+
+const xml = doc.end({ prettyPrint: true });
+console.log(xml);
+```
+which would output:
+```xml
+<?xml version="1.0"?>
+<root att="val">
+  <foo/>
+    <bar>foobar</bar>
+  </foo>
+  <baz/>
+</root>
+```
+or you could return a JS object by changing the `format` argument to `"object"`:
+```js
+const obj = doc.end({ format: "object" });
+```
+```js
+{
+  root: {
+    "@att": "val",
+    "foo": {
+      "bar": "foobar"
+    }
+    "baz": {}
+  }
+}
+```
+___
 
 If you need to do some processing:
 
