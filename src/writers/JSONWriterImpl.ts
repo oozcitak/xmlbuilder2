@@ -1,5 +1,5 @@
 import {
-  WriterOptions, XMLBuilderOptions, XMLSerializedValue
+  JSONWriterOptions, XMLBuilderOptions, XMLSerializedValue, MapWriterOptions
 } from "../builder/interfaces"
 import { dom } from "@oozcitak/dom"
 import { MapWriterImpl } from "./MapWriterImpl"
@@ -9,15 +9,9 @@ import {
 } from "@oozcitak/util"
 
 /**
- * Represents JSON writer options.
+ * Represents JSON writer options with all properties required.
  */
-interface JSONWriterOptions {
-  prettyPrint: boolean
-  indent: string
-  newline: string
-  offset: number
-  noDoubleEncoding: boolean
-}
+type RequiredJSONWriterOptions = Required<JSONWriterOptions>
 
 /**
  * Serializes XML nodes into a JSON string.
@@ -41,9 +35,9 @@ export class JSONWriterImpl {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: dom.Interfaces.Node, writerOptions?: WriterOptions): string {
+  serialize(node: dom.Interfaces.Node, writerOptions?: JSONWriterOptions): string {
     // provide default options
-    const options: JSONWriterOptions = applyDefaults(writerOptions, {
+    const options: RequiredJSONWriterOptions = applyDefaults(writerOptions, {
       prettyPrint: false,
       indent: '  ',
       newline: '\n',
@@ -52,7 +46,10 @@ export class JSONWriterImpl {
     })
 
     const mapWriter = new MapWriterImpl(this._builderOptions)
-    const obj = mapWriter.serialize(node, writerOptions)
+    const mapWriterOptions: MapWriterOptions = applyDefaults(writerOptions, {
+      format: "map"
+    }, true)
+    const obj = mapWriter.serialize(node, mapWriterOptions)
 
     return this._beginLine(options, 0) + this._serializeObject(obj, options)
   }
@@ -64,7 +61,7 @@ export class JSONWriterImpl {
    * @param options - serialization options
    */
   private _serializeObject(obj: XMLSerializedValue,
-    options: JSONWriterOptions, level: number = 0): string {
+    options: RequiredJSONWriterOptions, level: number = 0): string {
 
     let markup = ''
     const isLeaf = this._isLeafNode(obj)
@@ -118,7 +115,7 @@ export class JSONWriterImpl {
    * @param options - serialization options
    * @param level - current depth of the XML tree
    */
-  private _beginLine(options: JSONWriterOptions, level: number): string {
+  private _beginLine(options: RequiredJSONWriterOptions, level: number): string {
     if (!options.prettyPrint) {
       return ''
     } else {
@@ -138,7 +135,7 @@ export class JSONWriterImpl {
    * @param options - serialization options
    * @param level - current depth of the XML tree
    */
-  private _endLine(options: JSONWriterOptions, level: number): string {
+  private _endLine(options: RequiredJSONWriterOptions, level: number): string {
     if (!options.prettyPrint) {
       return ''
     } else {

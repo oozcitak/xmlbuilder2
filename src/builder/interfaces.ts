@@ -311,7 +311,7 @@ export interface Validator {
 /**
  * Defines the options passed to the writer.
  */
-export interface WriterOptions {
+type BaseWriterOptions  = {
   /**
    * Output format. Defaults to `"text"`.
    * - `"text"` - Serializes the document as a string in XML format.
@@ -323,6 +323,40 @@ export interface WriterOptions {
    * - `"json"` - Serializes the document as a JSON string.
    */
   format?: "text" | "map" | "object" | "json"
+}
+
+/**
+ * Defines the options passed to the map writer.
+ */
+export type MapWriterOptions = BaseWriterOptions & {
+  /**
+   * Output format.
+   * - `"map"` - Serializes the document as an object using `Map`s and 
+   */
+  format?: "map"
+}
+
+/**
+ * Defines the options passed to the object writer.
+ */
+export type ObjectWriterOptions = BaseWriterOptions & {
+  /**
+   * Output format.
+   * - `"object"` - Serializes the document as an object using `Object`s and
+   * `Array`s.
+   */
+  format?: "object"
+}
+
+/**
+ * Defines the options passed to the object writer.
+ */
+export type StringWriterOptions = BaseWriterOptions & {
+  /**
+   * Output format.
+   * - `"text"` - Serializes the document as a string in XML format.
+   */
+  format?: "text"
   /**
    * Suppresses the XML declaration from the output. Defaults to `false`.
    */
@@ -392,6 +426,42 @@ export interface WriterOptions {
    */
   noDoubleEncoding?: boolean
 }
+
+/**
+ * Defines the options passed to the JSON writer.
+ */
+export type JSONWriterOptions = BaseWriterOptions & {
+  /**
+   * Output format.
+   * - `"json"` - Serializes the document as a JSON string.
+   */
+  format?: "json"  
+  /**
+   * Pretty-prints the XML tree. Defaults to `false`.
+   */
+  prettyPrint?: boolean
+  /**
+   * Determines the indentation string for pretty printing. Defaults to two
+   * space characters.
+   */
+  indent?: string
+  /**
+   * Determines the newline string for pretty printing. Defaults to `"\n"`.
+   */
+  newline?: string
+  /**
+   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * `0`.
+   */
+  offset?: number
+  /**
+   * Prevents existing html entities from being re-encoded. Defaults to `false`.
+   */
+  noDoubleEncoding?: boolean
+}
+
+export type WriterOptions = StringWriterOptions | ObjectWriterOptions | 
+  JSONWriterOptions | MapWriterOptions
 
 /**
  * Defines a recursive type that can represent objects, arrays and maps of
@@ -745,14 +815,14 @@ export interface XMLBuilderNode {
    * 
    * @param options - serialization options
    */
-  toString(writerOptions?: WriterOptions): string
+  toString(writerOptions?: JSONWriterOptions | StringWriterOptions): string
 
   /**
    * Converts the node into its object representation.
    * 
    * @param options - serialization options
    */
-  toObject(writerOptions?: WriterOptions): XMLSerializedValue
+  toObject(writerOptions?: MapWriterOptions | ObjectWriterOptions): XMLSerializedValue
 
   /**
    * Converts the entire XML document into its string or object representation.

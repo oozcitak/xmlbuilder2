@@ -1,5 +1,5 @@
 import {
-  WriterOptions, XMLSerializedValue, XMLBuilderOptions, XMLBuilderNode
+  XMLSerializedValue, MapWriterOptions, XMLBuilderOptions
 } from "../builder/interfaces"
 import { dom, serializer, util } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
@@ -26,8 +26,8 @@ export class MapWriterImpl {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: dom.Interfaces.Node, writerOptions?: WriterOptions): XMLSerializedValue {
-    const options: XMLBuilderOptions = applyDefaults(writerOptions, {
+  serialize(node: dom.Interfaces.Node, writerOptions?: MapWriterOptions): XMLSerializedValue {
+    const options: MapWriterOptions = applyDefaults(writerOptions, {
       format: "map"
     })
 
@@ -61,7 +61,7 @@ export class MapWriterImpl {
    * @param options - serialization options
    */
   protected _serializeNode(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
-    options: XMLBuilderOptions): XMLSerializedValue {
+    options: MapWriterOptions): XMLSerializedValue {
     switch (preNode.node.nodeType) {
       case dom.Interfaces.NodeType.Element:
         return this._serializeElement(preNode, options)
@@ -91,7 +91,7 @@ export class MapWriterImpl {
    * @param options - serialization options
    */
   private _serializeElement(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
-    options: XMLBuilderOptions): XMLSerializedValue {
+    options: MapWriterOptions): XMLSerializedValue {
 
     /* istanbul ignore next */
     if (preNode.name === undefined) {
@@ -110,7 +110,7 @@ export class MapWriterImpl {
    * @param options - serialization options
    */
   private _serializeChildNodes(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
-    options: XMLBuilderOptions): XMLSerializedValue {
+    options: MapWriterOptions): XMLSerializedValue {
     const items = new Array<[string, boolean, serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>]>()
     const keyCount = new Map<string, number>()
     const keyIndices = new Map<string, number>()

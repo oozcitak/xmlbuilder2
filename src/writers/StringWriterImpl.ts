@@ -1,23 +1,7 @@
-import { WriterOptions, XMLBuilderOptions } from "../builder/interfaces"
+import { StringWriterOptions, XMLBuilderOptions } from "../builder/interfaces"
 import { dom, serializer, util } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
 import { Char } from "../validator"
-
-/**
- * Represents string writer options.
- */
-interface StringWriterOptions {
-  headless: boolean
-  prettyPrint: boolean
-  indent: string
-  newline: string
-  offset: number
-  width: number
-  allowEmptyTags: boolean
-  indentTextOnlyNodes: boolean
-  spaceBeforeSlash: boolean
-  noDoubleEncoding: boolean
-}
 
 /**
  * Represents reference parameters passed to string writer functions.
@@ -28,6 +12,11 @@ interface StringWriterRefs {
    */
   suppressPrettyCount: number
 }
+
+/**
+ * Equal to `StringWriterOptions` but with all properties required.
+ */
+type RequiredStringWriterOptions = Required<StringWriterOptions>
 
 /**
  * Serializes XML nodes into strings.
@@ -51,9 +40,9 @@ export class StringWriterImpl {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: dom.Interfaces.Node, writerOptions?: WriterOptions): string {
+  serialize(node: dom.Interfaces.Node, writerOptions?: StringWriterOptions): string {
     // provide default options
-    const options: StringWriterOptions = applyDefaults(writerOptions, {
+    const options: RequiredStringWriterOptions = applyDefaults(writerOptions, {
       headless: false,
       prettyPrint: false,
       indent: '  ',
@@ -86,7 +75,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeNode(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     switch (preNode.node.nodeType) {
       case dom.Interfaces.NodeType.Element:
         return this._serializeElement(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.Element>>preNode, options, refs)
@@ -117,7 +106,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeChildNodes(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
     for (const child of preNode.children) {
       markup += this._serializeNode(child, options, refs)
@@ -133,7 +122,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeAttributes(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
     for (const preAttr of preNode.attributes) {
       markup += ` ${this._serializeAttribute(preAttr, options, refs)}`
@@ -149,7 +138,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeDocument(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.XMLDocument>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
 
     if (!options.headless) {
@@ -177,7 +166,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeDocumentType(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.DocumentType>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     let markup = this._beginLine(preNode, options, refs)
 
     if (preNode.node.publicId && preNode.node.systemId) {
@@ -202,7 +191,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeDocumentFragment(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.DocumentFragment>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return this._serializeChildNodes(preNode, options, refs)
   }
 
@@ -214,7 +203,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeElement(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Element>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     // opening tag
     let markup = this._beginLine(preNode, options, refs) + '<' + preNode.name
     // serialize attributes
@@ -277,7 +266,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeText(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Text>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return this._beginLine(preNode, options, refs) +
       Char.escapeText(preNode.node.data) +
       this._endLine(preNode, options, refs)
@@ -291,7 +280,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeCdata(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.CDATASection>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return `${this._beginLine(preNode, options, refs)}<![CDATA[${preNode.node.data}]]>${this._endLine(preNode, options, refs)}`
   }
 
@@ -303,7 +292,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeComment(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Comment>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return `${this._beginLine(preNode, options, refs)}<!--${preNode.node.data}-->${this._endLine(preNode, options, refs)}`
   }
 
@@ -315,7 +304,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeProcessingInstruction(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.ProcessingInstruction>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return `${this._beginLine(preNode, options, refs)}<?${preNode.node.target} ${preNode.node.data}?>${this._endLine(preNode, options, refs)}`
   }
 
@@ -327,7 +316,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _serializeAttribute(preAttr: serializer.Interfaces.PreSerializedAttr,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return `${preAttr.name}="${Char.escapeAttrValue(preAttr.value)}"`
   }
 
@@ -340,7 +329,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _beginLine(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     if (!options.prettyPrint || refs.suppressPrettyCount > 0) {
       return ''
     } else {
@@ -358,7 +347,7 @@ export class StringWriterImpl {
    * @param refs - reference parameters
    */
   private _endLine(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
+    options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     if (!options.prettyPrint || refs.suppressPrettyCount > 0) {
       return ''
     } else {
