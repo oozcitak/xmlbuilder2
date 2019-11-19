@@ -20,7 +20,3 @@ applyMixin(dom.Document, XMLBuilderNodeImpl, "remove")
 applyMixin(dom.XMLDocument, XMLBuilderNodeImpl, "remove")
 
 export { XMLBuilderImpl, XMLBuilderNodeImpl }
-
-export function isRawNode(node: any): boolean {
-  return XMLBuilderNodeImpl._FromNode(node)._isRawNode === true
-}

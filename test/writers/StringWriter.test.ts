@@ -11,7 +11,6 @@ describe('StringWriter', () => {
         '?': 'pi val',
         '!': 'Good guy',
         '$': 'well formed!',
-        '&': 'raw<>&',
         address: {
           city: "Istanbul",
           street: "End of long and winding road"
@@ -36,7 +35,6 @@ describe('StringWriter', () => {
           <?pi val?>
           <!--Good guy-->
           <![CDATA[well formed!]]>
-          raw<>&
           <address>
             <city>Istanbul</city>
             <street>End of long and winding road</street>

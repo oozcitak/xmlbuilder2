@@ -32,7 +32,6 @@ export class XMLBuilderImpl implements XMLBuilder {
       this._options.convert.ins.length === 0 ||
       this._options.convert.text.length === 0 ||
       this._options.convert.cdata.length === 0 ||
-      this._options.convert.raw.length === 0 ||
       this._options.convert.comment.length === 0) {
       throw new Error("JS object converter strings cannot be zero length.")
     }

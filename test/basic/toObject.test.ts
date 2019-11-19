@@ -59,11 +59,6 @@ describe('toObject() with map', () => {
     expect($$.printMap(node.toObject())).toBe('{ ?: target content }')
   })
 
-  test('raw', () => {
-    const node = $$.document().ele('root').raw('content<>').first()
-    expect($$.printMap(node.toObject())).toBe('{ &: content<> }')
-  })
-
   test('attribute', () => {
     const root = $$.document().ele('root').att("att", "val")
     expect($$.printMap(root.toObject())).toBe($$.t`

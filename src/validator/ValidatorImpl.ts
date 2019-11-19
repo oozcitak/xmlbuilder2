@@ -69,11 +69,6 @@ export class ValidatorImpl implements Validator {
   }
 
   /** @inheritdoc */
-  raw(val: string, debugInfo?: string | undefined): string {
-    return '' + val
-  }
-
-  /** @inheritdoc */
   attValue(val: string, debugInfo?: string | undefined): string {
     val = '' + val
     Char.assertChar(val, this._xmlVersion, debugInfo)

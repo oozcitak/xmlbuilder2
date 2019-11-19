@@ -11,7 +11,6 @@ describe('JSONWriter', () => {
         '?': 'pi mypi',
         '!': 'Good guy',
         '$': 'well formed!',
-        '&': 'raw<>&',
         address: {
           city: "Istanbul",
           street: "End of long and winding road"
@@ -39,7 +38,6 @@ describe('JSONWriter', () => {
             "?": "pi mypi",
             "!": "Good guy",
             "$": "well formed!",
-            "&": "raw<>&",
             "address": {
               "city": "Istanbul",
               "street": "End of long and winding road"

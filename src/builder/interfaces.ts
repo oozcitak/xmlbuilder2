@@ -198,20 +198,6 @@ export interface ConvertOptions {
    * ````
    */
   comment: string
-  /** 
-   * When prepended to a JS object key, converts its value to a raw text node.
-   * Defaults to `"&"`. Character validation does not apply to raw text nodes.
-   * For example:
-   * ```js
-   * obj = { node: { '&': '<&>' } }
-   * ```
-   * becomes:
-   * ```xml
-   * <node><&></node>
-   * ```
-   * _Note:_ Using raw nodes can potentially result in invalid XML documents.
-   */
-  raw: string
 }
 
 /**
@@ -227,8 +213,7 @@ export const DefaultBuilderOptions: Partial<XMLBuilderOptions> = {
     ins: "?",
     text: "#",
     cdata: "$",
-    comment: "!",
-    raw: "&"
+    comment: "!"
   }
 }
 
@@ -289,14 +274,6 @@ export interface Validator {
    * @param debugInfo - optional debug information
    */
   comment: ValidatorFunction
-
-  /**
-   * Validates raw text node contents.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  raw: ValidatorFunction
 
   /**
    * Validates attribute values.
@@ -494,8 +471,6 @@ export interface XMLBuilder {
  */
 export interface XMLBuilderNode {
   
-  _isRawNode?: boolean
-
   /**
    * Returns the underlying DOM node.
    */
@@ -634,16 +609,6 @@ export interface XMLBuilderNode {
    * @returns current element node
    */
   com(content: string): XMLBuilderNode
-
-  /**
-   * Creates a new raw text node and appends it to the list of child nodes.
-   * No character validation is applied to raw text nodes.
-   * 
-   * @param content - node content
-   * 
-   * @returns current element node
-   */
-  raw(content: string): XMLBuilderNode
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.

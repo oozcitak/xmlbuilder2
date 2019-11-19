@@ -11,7 +11,6 @@ describe('object', () => {
         '?': 'pi mypi',
         '!': 'Good guy',
         '$': 'well formed!',
-        '&': '<>&',
         address: {
           '?': 'pi',
           city: "Istanbul",
@@ -39,7 +38,6 @@ describe('object', () => {
           ? pi mypi
           ! Good guy
           $ well formed!
-          # <>&
           address
             ? pi
             city

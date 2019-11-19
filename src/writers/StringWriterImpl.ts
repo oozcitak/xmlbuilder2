@@ -2,7 +2,6 @@ import { WriterOptions, XMLBuilderOptions } from "../builder/interfaces"
 import { dom, serializer, util } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
 import { Char } from "../validator"
-import { isRawNode } from "../builder"
 
 /**
  * Represents string writer options.
@@ -88,10 +87,6 @@ export class StringWriterImpl {
    */
   private _serializeNode(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
     options: StringWriterOptions, refs: StringWriterRefs): string {
-    if (isRawNode(preNode.node)) {
-      return this._serializeRaw(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.Text>>preNode, options, refs)
-    }
-
     switch (preNode.node.nodeType) {
       case dom.Interfaces.NodeType.Element:
         return this._serializeElement(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.Element>>preNode, options, refs)
@@ -285,20 +280,6 @@ export class StringWriterImpl {
     options: StringWriterOptions, refs: StringWriterRefs): string {
     return this._beginLine(preNode, options, refs) +
       Char.escapeText(preNode.node.data) +
-      this._endLine(preNode, options, refs)
-  }
-
-  /**
-   * Produces an XML serialization of a raw text node.
-   * 
-   * @param preNode - current node
-   * @param options - serialization options
-   * @param refs - reference parameters
-   */
-  private _serializeRaw(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Text>,
-    options: StringWriterOptions, refs: StringWriterRefs): string {
-    return this._beginLine(preNode, options, refs) +
-      preNode.node.data +
       this._endLine(preNode, options, refs)
   }
 

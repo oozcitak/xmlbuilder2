@@ -22,8 +22,6 @@ import { CastAsNodeImpl } from "./CastAsNode"
 export class XMLBuilderNodeImpl implements XMLBuilderNode {
   private static _algo = new algorithm.DOMAlgorithm()
 
-  _isRawNode: boolean | undefined
-
   private _castAsNode: CastAsNode | undefined
   private _builderOptions?: XMLBuilderOptions
   private _validator?: Validator
@@ -108,9 +106,6 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.comment) === 0) {
           // comment node
           lastChild = this.com(val)
-        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.raw) === 0) {
-          // raw text node
-          lastChild = this.raw(val)
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.ins) === 0) {
           // processing instruction
           const insIndex = val.indexOf(' ')
@@ -297,19 +292,6 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.comment(content, this._debugInfo())
 
     const child = this._doc.createComment(content)
-    this.as.element.appendChild(child)
-
-    return this
-  }
-
-  /** @inheritdoc */
-  raw(content: string): XMLBuilderNode {
-    // character validation
-    content = this._validate.raw(content, this._debugInfo())
-
-    const child = this._doc.createTextNode(content)
-    const builder = XMLBuilderNodeImpl._FromNode(child) as XMLBuilderNodeImpl
-    builder._isRawNode = true
     this.as.element.appendChild(child)
 
     return this
