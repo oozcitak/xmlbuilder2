@@ -1,7 +1,7 @@
 import * as Interfaces from './builder/interfaces'
 import { XMLBuilderCreateOptions, ExpandObject, XMLBuilderNode } from './builder/interfaces'
 import { XMLBuilderImpl } from './builder'
-import { isObject, isPlainObject } from '@oozcitak/util'
+import { isPlainObject } from '@oozcitak/util'
 
 export { Interfaces }
 
