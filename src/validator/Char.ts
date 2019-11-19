@@ -19,8 +19,9 @@ export class Char {
    * `<`  | `&lt;`
    * `>`  | `&gt;`
    */
-  static escapeText(str: string): string {
-    return str.replace(/&/g, '&amp;')
+  static escapeText(str: string, noDoubleEncoding: boolean): string {
+    const ampRegex = noDoubleEncoding ? /(?!&\S+;)&/g : /&/g
+    return str.replace(ampRegex, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
   }
@@ -39,8 +40,9 @@ export class Char {
    * `>`  | `&gt;`
    * `"`  | `&quot;`
    */
-  static escapeAttrValue(str: string): string {
-    return str.replace(/&/g, '&amp;')
+  static escapeAttrValue(str: string, noDoubleEncoding: boolean): string {
+    const ampRegex = noDoubleEncoding ? /(?!&\S+;)&/g : /&/g
+    return str.replace(ampRegex, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')

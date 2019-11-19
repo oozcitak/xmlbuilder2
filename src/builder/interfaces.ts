@@ -454,10 +454,6 @@ export type JSONWriterOptions = BaseWriterOptions & {
    * `0`.
    */
   offset?: number
-  /**
-   * Prevents existing html entities from being re-encoded. Defaults to `false`.
-   */
-  noDoubleEncoding?: boolean
 }
 
 export type WriterOptions = StringWriterOptions | ObjectWriterOptions | 

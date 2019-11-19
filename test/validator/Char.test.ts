@@ -5,12 +5,25 @@ describe('Char', () => {
 
   test('escapeText', () => {
     const str = 'abc&def<ghi>jkl'
-    expect(Char.escapeText(str)).toBe('abc&amp;def&lt;ghi&gt;jkl')
+    expect(Char.escapeText(str, false)).toBe('abc&amp;def&lt;ghi&gt;jkl')
+    'HTML entities for umlaut are &uuml; and &#252;.'
+  })
+
+  test('escapeText with noDoubleEncoding', () => {
+    const str = 'HTML entities for umlaut are &uuml; and &#252;.'
+    expect(Char.escapeText(str, false)).toBe('HTML entities for umlaut are &amp;uuml; and &amp;#252;.')
+    expect(Char.escapeText(str, true)).toBe('HTML entities for umlaut are &uuml; and &#252;.')
   })
 
   test('escapeAttrValue', () => {
     const str = 'abc&def<ghi>jkl"in quotes"'
-    expect(Char.escapeAttrValue(str)).toBe('abc&amp;def&lt;ghi&gt;jkl&quot;in quotes&quot;')
+    expect(Char.escapeAttrValue(str, false)).toBe('abc&amp;def&lt;ghi&gt;jkl&quot;in quotes&quot;')
+  })
+
+  test('escapeAttrValue with noDoubleEncoding', () => {
+    const str = 'attribute value with &num; and &#35;'
+    expect(Char.escapeAttrValue(str, false)).toBe('attribute value with &amp;num; and &amp;#35;')
+    expect(Char.escapeAttrValue(str, true)).toBe('attribute value with &num; and &#35;')
   })
 
   test('assertChar 1.0', () => {

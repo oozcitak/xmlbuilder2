@@ -268,7 +268,7 @@ export class StringWriterImpl {
   private _serializeText(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Text>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return this._beginLine(preNode, options, refs) +
-      Char.escapeText(preNode.node.data) +
+      Char.escapeText(preNode.node.data, options.noDoubleEncoding) +
       this._endLine(preNode, options, refs)
   }
 
@@ -317,7 +317,7 @@ export class StringWriterImpl {
    */
   private _serializeAttribute(preAttr: serializer.Interfaces.PreSerializedAttr,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
-    return `${preAttr.name}="${Char.escapeAttrValue(preAttr.value)}"`
+    return `${preAttr.name}="${Char.escapeAttrValue(preAttr.value, options.noDoubleEncoding)}"`
   }
 
   /**
