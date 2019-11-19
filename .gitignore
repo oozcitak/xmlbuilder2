@@ -1,6 +1,7 @@
 lib/
 node_modules/
 coverage/
+docs/
 .vs/
 .vscode/
 .nyc_output/

@@ -69,9 +69,9 @@ describe('examples in README', () => {
     root.com('f(x) = x^2')
     for(let i = 1; i <= 5; i++)
     {
-      const item = root.ele('data')
-      item.att('x', i.toString())
-      item.att('y', (i * i).toString())
+      const item = root.ele('data') as any
+      item.att('x', i)
+      item.att('y', i * i)
     }
 
     expect(root.end( { prettyPrint: true })).toBe($$.t`
@@ -84,50 +84,6 @@ describe('examples in README', () => {
         <data x="4" y="16"/>
         <data x="5" y="25"/>
       </squares>
-    `)
-  })
-
-  test('mixed content', () => {
-    const obj = {
-      script: {
-        '#1': 'Talk to me Goose!',
-        cut: 'dog tag shot',
-        '#2': 'Talk to me...'
-      }
-    }
-
-    const root = $$.document(obj)
-    expect(root.end( { prettyPrint: true })).toBe($$.t`
-      <?xml version="1.0"?>
-      <script>
-        Talk to me Goose!
-        <cut>dog tag shot</cut>
-        Talk to me...
-      </script>
-    `)
-  })
-
-  test('mixed content with duplicate keys', () => {
-    const obj = {
-      hangar: {
-        '#': [
-          { aircraft: 'F-14 Tomcat' },
-          { '!': 'Fictional; MiGs use odd numbers for fighters.' },
-          { '$': '<a href="https://topgun.fandom.com/wiki/MiG-28"/>' },
-          { aircraft: 'MiG-28' }
-        ]
-      }
-    }
-
-    const root = $$.document(obj)
-    expect(root.end( { prettyPrint: true })).toBe($$.t`
-      <?xml version="1.0"?>
-      <hangar>
-        <aircraft>F-14 Tomcat</aircraft>
-        <!--Fictional; MiGs use odd numbers for fighters.-->
-        <![CDATA[<a href="https://topgun.fandom.com/wiki/MiG-28"/>]]>
-        <aircraft>MiG-28</aircraft>
-      </hangar>
     `)
   })
 

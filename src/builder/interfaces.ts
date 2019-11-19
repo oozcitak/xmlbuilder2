@@ -580,7 +580,7 @@ export interface XMLBuilderNode {
   att(obj: AttributesObject): XMLBuilderNode
 
   /**
-   * Removes an attribute or a list of attributes.
+   * Removes an attribute
    * 
    * @param name - attribute name
    * 
@@ -589,7 +589,7 @@ export interface XMLBuilderNode {
   removeAtt(name: string): XMLBuilderNode
 
   /**
-   * Removes an attribute or a list of attributes.
+   * Removes a list of attributes.
    * 
    * @param names - an array with attribute names
    * 
@@ -598,7 +598,7 @@ export interface XMLBuilderNode {
   removeAtt(names: string[]): XMLBuilderNode
 
   /**
-   * Removes an attribute or a list of attributes.
+   * Removes an attribute
    * 
    * @param namespace - namespace of the attribute to remove
    * @param name - attribute name
@@ -608,7 +608,7 @@ export interface XMLBuilderNode {
   removeAtt(namespace: string, name: string): XMLBuilderNode
 
   /**
-   * Removes an attribute or a list of attributes.
+   * Removes a list of attributes.
    * 
    * @param namespace - namespace of the attributes to remove
    * @param names - an array with attribute names
