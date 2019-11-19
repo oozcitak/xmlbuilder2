@@ -42,6 +42,29 @@ describe('fragment()', () => {
     `)
   })
 
+  test('JS object with array', () => {
+    const obj = [
+      { node1: "val1" },
+      { node2: "val2" }
+    ]
+    const frag = $$.fragment(obj)
+    expect($$.printTree(frag)).toBe($$.t`
+      node1
+        # val1
+      node2
+        # val2
+    `)
+    const root = $$.document().ele("root")
+    root.import(frag)
+    expect($$.printTree(root)).toBe($$.t`
+      root
+        node1
+          # val1
+        node2
+          # val2
+    `)
+  })
+
   test('JSON string', () => {
     const obj = { 
       node1: {
