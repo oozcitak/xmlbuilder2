@@ -456,6 +456,9 @@ export type JSONWriterOptions = BaseWriterOptions & {
   offset?: number
 }
 
+/**
+ * Defines the options passed to the writer.
+ */
 export type WriterOptions = StringWriterOptions | ObjectWriterOptions | 
   JSONWriterOptions | MapWriterOptions
 

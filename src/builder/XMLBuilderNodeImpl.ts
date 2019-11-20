@@ -281,7 +281,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.text(content, this._debugInfo())
 
     const child = this._doc.createTextNode(content)
-    this.as.element.appendChild(child)
+    this.as.node.appendChild(child)
 
     return this
   }
@@ -292,7 +292,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.comment(content, this._debugInfo())
 
     const child = this._doc.createComment(content)
-    this.as.element.appendChild(child)
+    this.as.node.appendChild(child)
 
     return this
   }
@@ -303,7 +303,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.cdata(content, this._debugInfo())
 
     const child = this._doc.createCDATASection(content)
-    this.as.element.appendChild(child)
+    this.as.node.appendChild(child)
 
     return this
   }
@@ -315,7 +315,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     content = this._validate.insValue(content, this._debugInfo())
 
     const child = this._doc.createProcessingInstruction(target, content)
-    this.as.element.appendChild(child)
+    this.as.node.appendChild(child)
 
     return this
   }

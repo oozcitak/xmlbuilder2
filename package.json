@@ -26,7 +26,7 @@
   ],
   "dependencies": {
     "@oozcitak/util": "1.0.3",
-    "@oozcitak/dom": "0.0.11",
+    "@oozcitak/dom": "0.0.12",
     "@oozcitak/infra": "1.0.4"
   },
   "devDependencies": {
@@ -37,7 +37,8 @@
     "glob": "*",
     "@types/node": "*",
     "@types/jest": "*",
-    "@types/dedent": "*"
+    "@types/dedent": "*",
+    "xpath": "*"
   },
   "jest": {
     "transform": {

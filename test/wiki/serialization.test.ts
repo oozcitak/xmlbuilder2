@@ -37,7 +37,7 @@ describe('serialization examples in wiki', () => {
       }
     }
 
-    expect(doc.end({ format: "object", prettyPrint: true })).toEqual(obj)
+    expect(doc.end({ format: "object" })).toEqual(obj)
   })
 
   test('XML string', () => {
@@ -111,7 +111,7 @@ describe('serialization examples in wiki', () => {
     const obj = new Map<string, any>()
     obj.set("topgun", topgun)
 
-    expect(doc.end({ format: "map", prettyPrint: true })).toEqual(obj)
+    expect(doc.end({ format: "map" })).toEqual(obj)
   })
 
 })
