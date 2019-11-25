@@ -86,7 +86,7 @@ ___
 ```js
 const { document } = require('xmlbuilder2');
 
-const xmlStr = '<root att="val"><foo/><bar>foobar</bar></foo></root>';
+const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>';
 const doc = document(xmlStr);
 
 // append a "baz" element to the root node of the document
@@ -99,7 +99,7 @@ which would output:
 ```xml
 <?xml version="1.0"?>
 <root att="val">
-  <foo/>
+  <foo>
     <bar>foobar</bar>
   </foo>
   <baz/>
@@ -108,15 +108,16 @@ which would output:
 or you could return a JS object by changing the `format` argument to `"object"`:
 ```js
 const obj = doc.end({ format: "object" });
+console.log(obj);
 ```
 ```js
 {
   root: {
-    "@att": "val",
-    "foo": {
-      "bar": "foobar"
-    }
-    "baz": {}
+    '@att': 'val',
+    foo: {
+      bar: 'foobar'
+    },
+    baz: {}
   }
 }
 ```

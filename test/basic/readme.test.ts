@@ -64,6 +64,40 @@ describe('examples in README', () => {
     `)
   })
 
+  test('parsing', () => {
+    const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>'
+    const doc = $$.document(xmlStr)
+    doc.root().ele("baz")
+
+    expect(doc.end( { prettyPrint: true })).toBe($$.t`
+      <?xml version="1.0"?>
+      <root att="val">
+        <foo>
+          <bar>foobar</bar>
+        </foo>
+        <baz/>
+      </root>
+    `)
+  })
+
+  test('serializing', () => {
+    const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>'
+    const doc = $$.document(xmlStr)
+    doc.root().ele("baz")
+
+    expect(doc.end( { format: "object" })).toEqual(
+      {
+        "root": {
+          "@att": "val",
+          "foo": {
+            "bar": "foobar"
+          },
+          "baz": {}
+        }
+      }
+    )
+  })
+
   test('processing', () => {
     const root = $$.document().ele('squares')
     root.com('f(x) = x^2')
