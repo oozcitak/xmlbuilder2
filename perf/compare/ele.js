@@ -1,7 +1,6 @@
-const jsdom = require("jsdom");
+const { JSDOM } = require("jsdom");
 const { document } = require("../../lib");
 
-const { JSDOM } = jsdom;
 const impl = new JSDOM().window.document.implementation
 perf('xmlbuilder2 vs jsdom: ele', 10000, () => {
   const root = document().ele('root');

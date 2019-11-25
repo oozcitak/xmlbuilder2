@@ -1,1 +1,12 @@
-{}
+{
+  "0.0.4": {
+    "xmlbuilder2 vs jsdom: ele": [
+      "0.0490",
+      "0.0679"
+    ],
+    "xmlbuilder2 vs jsdom: parser": [
+      "0.0362",
+      "0.0583"
+    ]
+  }
+}
