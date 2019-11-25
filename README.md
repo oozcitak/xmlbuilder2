@@ -19,7 +19,7 @@ npm install xmlbuilder2
 ### Usage:
 
 ``` js
-import { document } from 'xmlbuilder2';
+const { document } = require('xmlbuilder2');
 
 const root = document()
   .ele('topgun')
@@ -59,7 +59,7 @@ ___
 The same XML document can be created by converting a JS object into XML nodes:
 
 ``` js
-import { document } from 'xmlbuilder2';
+const { document } = require('xmlbuilder2');
 
 const obj = {
   topgun: {
@@ -84,7 +84,7 @@ ___
 
 `xmlbuilder2` can also parse and serialize XML documents from different formats:
 ```js
-import { document } from 'xmlbuilder2';
+const { document } = require('xmlbuilder2');
 
 const xmlStr = '<root att="val"><foo/><bar>foobar</bar></foo></root>';
 const doc = document(xmlStr);
@@ -125,7 +125,7 @@ ___
 If you need to do some processing:
 
 ``` js
-import { document } from 'xmlbuilder2';
+const { document } = require('xmlbuilder2');
 
 const root = document().ele('squares');
 root.com('f(x) = x^2');
