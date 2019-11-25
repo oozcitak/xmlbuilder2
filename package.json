@@ -38,7 +38,10 @@
     "@types/node": "*",
     "@types/jest": "*",
     "@types/dedent": "*",
-    "xpath": "*"
+    "xpath": "*",
+    "git-state": "*",
+    "xmlbuilder": "*",
+    "jsdom": "*"
   },
   "jest": {
     "transform": {
@@ -52,6 +55,7 @@
   },
   "scripts": {
     "compile": "rm -rf ./lib && tsc --version && tsc",
-    "test": "npm run compile && jest --coverage"
+    "test": "npm run compile && jest --coverage",
+    "perf": "node ./perf/index.js"
   }
 }
