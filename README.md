@@ -32,7 +32,7 @@ const root = document()
       .ele('aircraft').txt('F-14 Tomcat').up()
       .ele('aircraft').txt('MiG-28').up()
     .up()
-  .up()
+  .up();
 
 // convert the XML tree to string
 const xml = root.end({ prettyPrint: true });
