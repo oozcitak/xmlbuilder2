@@ -1,10 +1,10 @@
-import { algorithm } from "@oozcitak/dom"
+import { DOMAlgorithm } from "@oozcitak/dom/lib/algorithm"
 
 /**
  * Contains character processing utility functions.
  */
 export class Char {
-  private static _xmlSpec = new algorithm.DOMAlgorithm().xml
+  private static _xmlSpec = new DOMAlgorithm().xml
 
   /**
    * Escapes special characters to be used in a text node.

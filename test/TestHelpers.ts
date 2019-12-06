@@ -1,5 +1,5 @@
 import dedent from "dedent"
-import { serializer } from "@oozcitak/dom"
+import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { isObject, isArray, isMap, forEachObject, objectLength } from "@oozcitak/util"
 import { document, fragment } from "../src"
 
@@ -8,7 +8,7 @@ export default class TestHelpers {
   static fragment = fragment
   
   static serialize(node: any): string {
-    const s = new serializer.XMLSerializer()
+    const s = new XMLSerializer()
     return s.serializeToString(node)
   }
 

@@ -17,10 +17,10 @@ global.perf = function(description, count, func, funcBase) {
   if (!perfObj[version]) {
     perfObj[version] = {};
   }
-  if (baseTime === this.undefined)
+  if (baseTime === undefined)
     perfObj[version][description] = [averageTime.toFixed(4)];
   else
-  perfObj[version][description] = [averageTime.toFixed(4), baseTime.toFixed(4)];
+    perfObj[version][description] = [averageTime.toFixed(4), baseTime.toFixed(4)];
 };
 
 const runPerfCase = function(count, func) {

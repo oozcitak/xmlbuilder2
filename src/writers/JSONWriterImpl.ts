@@ -1,12 +1,12 @@
 import {
   JSONWriterOptions, XMLBuilderOptions, XMLSerializedValue, MapWriterOptions
 } from "../builder/interfaces"
-import { dom } from "@oozcitak/dom"
 import { MapWriterImpl } from "./MapWriterImpl"
 import {
   applyDefaults, isArray, isObject, isMap, objectLength, forEachObject,
   forEachArray
 } from "@oozcitak/util"
+import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 
 /**
  * Represents JSON writer options with all properties required.
@@ -35,7 +35,7 @@ export class JSONWriterImpl {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: dom.Interfaces.Node, writerOptions?: JSONWriterOptions): string {
+  serialize(node: Node, writerOptions?: JSONWriterOptions): string {
     // provide default options
     const options: RequiredJSONWriterOptions = applyDefaults(writerOptions, {
       prettyPrint: false,

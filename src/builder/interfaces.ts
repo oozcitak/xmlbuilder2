@@ -1,4 +1,7 @@
-import { dom } from "@oozcitak/dom"
+import { 
+  Node, Document, DocumentType, DocumentFragment, Attr, Text, CDATASection, 
+  Comment, ProcessingInstruction, Element 
+} from "@oozcitak/dom/lib/dom/interfaces"
 
 /**
  * Defines the options used while creating an XML document.
@@ -843,51 +846,51 @@ export interface CastAsNode {
   /**
    * Returns the underlying DOM node.
    */  
-  readonly node: dom.Interfaces.Node
+  readonly node: Node
 
   /**
    * Returns the underlying DOM document node.
    */
-  readonly document: dom.Interfaces.Document
+  readonly document: Document
 
   /**
    * Returns the underlying DOM document type node.
    */
-  readonly documentType: dom.Interfaces.DocumentType
+  readonly documentType: DocumentType
 
   /**
    * Returns the underlying DOM document fragment node.
    */
-  readonly documentFragment: dom.Interfaces.DocumentFragment
+  readonly documentFragment: DocumentFragment
 
   /**
    * Returns the underlying DOM attr node.
    */
-  readonly attr: dom.Interfaces.Attr
+  readonly attr: Attr
 
   /**
    * Returns the underlying DOM text node.
    */
-  readonly text: dom.Interfaces.Text
+  readonly text: Text
 
   /**
    * Returns the underlying DOM cdata section node.
    */
-  readonly cdataSection: dom.Interfaces.CDATASection
+  readonly cdataSection: CDATASection
 
   /**
    * Returns the underlying DOM comment node.
    */
-  readonly comment: dom.Interfaces.Comment
+  readonly comment: Comment
 
   /**
    * Returns the underlying DOM processing instruction node.
    */
-  readonly processingInstruction: dom.Interfaces.ProcessingInstruction
+  readonly processingInstruction: ProcessingInstruction
 
   /**
    * Returns the underlying DOM element node.
    */
-  readonly element: dom.Interfaces.Element
+  readonly element: Element
 
 }

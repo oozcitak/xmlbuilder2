@@ -4,7 +4,6 @@ import {
   DefaultBuilderOptions,
   CastAsNode
 } from "./interfaces"
-import { dom, algorithm, util } from "@oozcitak/dom"
 import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty, 
   getValue, forEachObject, forEachArray
@@ -14,13 +13,16 @@ import {
   StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
 } from "../writers"
 import { CastAsNodeImpl } from "./CastAsNode"
+import { Guard } from "@oozcitak/dom/lib/util"
+import { Document, Node } from "@oozcitak/dom/lib/dom/interfaces"
+import { DOMAlgorithm } from "@oozcitak/dom/lib/algorithm"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
  * chainable document builder methods.
  */
 export class XMLBuilderNodeImpl implements XMLBuilderNode {
-  private static _algo = new algorithm.DOMAlgorithm()
+  private static _algo = new DOMAlgorithm()
 
   private _castAsNode: CastAsNode | undefined
   private _builderOptions?: XMLBuilderOptions
@@ -358,7 +360,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     const importedNode = node.as.node
 
-    if (util.Guard.isDocumentNode(importedNode)) {
+    if (Guard.isDocumentNode(importedNode)) {
       // import document node
       const elementNode = importedNode.documentElement
       if (elementNode === null) {
@@ -366,7 +368,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       }
       const clone = hostDoc.importNode(elementNode, true)
       hostNode.appendChild(clone)
-    } else if (util.Guard.isDocumentFragmentNode(importedNode)) {
+    } else if (Guard.isDocumentFragmentNode(importedNode)) {
       // import child nodes
       for (const childNode of importedNode.childNodes) {
         const clone = hostDoc.importNode(childNode, true)
@@ -449,7 +451,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   *traverseAttributes(): IterableIterator<XMLBuilderNode> {
-    if (util.Guard.isElementNode(this)) {
+    if (Guard.isElementNode(this)) {
       for (const att of this.as.element.attributes) {
         yield XMLBuilderNodeImpl._FromNode(att)
       }  
@@ -607,14 +609,14 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   /**
    * Returns the document owning this node.
    */
-  protected get _doc(): dom.Interfaces.Document {
+  protected get _doc(): Document {
     return this.as.node._nodeDocument
   }
 
   /**
    * Converts a DOM node to an `XMLBuilder`.
    */
-  static _FromNode(node: dom.Interfaces.Node): XMLBuilderNode {
+  static _FromNode(node: Node): XMLBuilderNode {
     return node as unknown as XMLBuilderNode
   }
 

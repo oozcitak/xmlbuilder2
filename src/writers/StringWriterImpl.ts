@@ -1,7 +1,14 @@
 import { StringWriterOptions, XMLBuilderOptions } from "../builder/interfaces"
-import { dom, serializer, util } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
+import { 
+  Node, Element, XMLDocument, Comment, Text, DocumentFragment, DocumentType, 
+  ProcessingInstruction, CDATASection 
+} from "@oozcitak/dom/lib/dom/interfaces"
+import { Guard } from "@oozcitak/dom/lib/util"
+import { PreSerializer } from "@oozcitak/dom/lib/serializer/PreSerializer"
 import { Char } from "../validator"
+import { PreSerializedNode, PreSerializedAttr } from "@oozcitak/dom/lib/serializer/interfaces"
+import { NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 
 /**
  * Represents reference parameters passed to string writer functions.
@@ -40,7 +47,7 @@ export class StringWriterImpl {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: dom.Interfaces.Node, writerOptions?: StringWriterOptions): string {
+  serialize(node: Node, writerOptions?: StringWriterOptions): string {
     // provide default options
     const options: RequiredStringWriterOptions = applyDefaults(writerOptions, {
       headless: false,
@@ -55,7 +62,7 @@ export class StringWriterImpl {
       noDoubleEncoding: false
     })
 
-    const pre = new serializer.PreSerializer(this._builderOptions.version)
+    const pre = new PreSerializer(this._builderOptions.version)
     let markup =  this._serializeNode(pre.serialize(node, false), options,
       { suppressPrettyCount: 0 })
 
@@ -74,25 +81,25 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeNode(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
+  private _serializeNode(preNode: PreSerializedNode<Node>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     switch (preNode.node.nodeType) {
-      case dom.Interfaces.NodeType.Element:
-        return this._serializeElement(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.Element>>preNode, options, refs)
-      case dom.Interfaces.NodeType.Document:
-        return this._serializeDocument(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.XMLDocument>>preNode, options, refs)
-      case dom.Interfaces.NodeType.Comment:
-        return this._serializeComment(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.Comment>>preNode, options, refs)
-      case dom.Interfaces.NodeType.Text:
-        return this._serializeText(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.Text>>preNode, options, refs)
-      case dom.Interfaces.NodeType.DocumentFragment:
-        return this._serializeDocumentFragment(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.DocumentFragment>>preNode, options, refs)
-      case dom.Interfaces.NodeType.DocumentType:
-        return this._serializeDocumentType(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.DocumentType>>preNode, options, refs)
-      case dom.Interfaces.NodeType.ProcessingInstruction:
-        return this._serializeProcessingInstruction(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.ProcessingInstruction>>preNode, options, refs)
-      case dom.Interfaces.NodeType.CData:
-        return this._serializeCdata(<serializer.Interfaces.PreSerializedNode<dom.Interfaces.CDATASection>>preNode, options, refs)
+      case NodeType.Element:
+        return this._serializeElement(<PreSerializedNode<Element>>preNode, options, refs)
+      case NodeType.Document:
+        return this._serializeDocument(<PreSerializedNode<XMLDocument>>preNode, options, refs)
+      case NodeType.Comment:
+        return this._serializeComment(<PreSerializedNode<Comment>>preNode, options, refs)
+      case NodeType.Text:
+        return this._serializeText(<PreSerializedNode<Text>>preNode, options, refs)
+      case NodeType.DocumentFragment:
+        return this._serializeDocumentFragment(<PreSerializedNode<DocumentFragment>>preNode, options, refs)
+      case NodeType.DocumentType:
+        return this._serializeDocumentType(<PreSerializedNode<DocumentType>>preNode, options, refs)
+      case NodeType.ProcessingInstruction:
+        return this._serializeProcessingInstruction(<PreSerializedNode<ProcessingInstruction>>preNode, options, refs)
+      case NodeType.CData:
+        return this._serializeCdata(<PreSerializedNode<CDATASection>>preNode, options, refs)
       default:
         throw new Error("Invalid node type.")
     }
@@ -105,7 +112,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeChildNodes(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
+  private _serializeChildNodes(preNode: PreSerializedNode<Node>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
     for (const child of preNode.children) {
@@ -121,7 +128,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeAttributes(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
+  private _serializeAttributes(preNode: PreSerializedNode<Node>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
     for (const preAttr of preNode.attributes) {
@@ -137,7 +144,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeDocument(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.XMLDocument>,
+  private _serializeDocument(preNode: PreSerializedNode<XMLDocument>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     let markup = ''
 
@@ -165,7 +172,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeDocumentType(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.DocumentType>,
+  private _serializeDocumentType(preNode: PreSerializedNode<DocumentType>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     let markup = this._beginLine(preNode, options, refs)
 
@@ -190,7 +197,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeDocumentFragment(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.DocumentFragment>,
+  private _serializeDocumentFragment(preNode: PreSerializedNode<DocumentFragment>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return this._serializeChildNodes(preNode, options, refs)
   }
@@ -202,7 +209,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeElement(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Element>,
+  private _serializeElement(preNode: PreSerializedNode<Element>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     // opening tag
     let markup = this._beginLine(preNode, options, refs) + '<' + preNode.name
@@ -213,7 +220,7 @@ export class StringWriterImpl {
     let emptyNode: boolean = true
 
     for (const childNode of preNode.children) {
-      if (!util.Guard.isTextNode(childNode.node)) {
+      if (!Guard.isTextNode(childNode.node)) {
         textOnlyNode = false
         emptyNode = false
         break
@@ -265,7 +272,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeText(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Text>,
+  private _serializeText(preNode: PreSerializedNode<Text>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return this._beginLine(preNode, options, refs) +
       Char.escapeText(preNode.node.data, options.noDoubleEncoding) +
@@ -279,7 +286,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeCdata(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.CDATASection>,
+  private _serializeCdata(preNode: PreSerializedNode<CDATASection>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return `${this._beginLine(preNode, options, refs)}<![CDATA[${preNode.node.data}]]>${this._endLine(preNode, options, refs)}`
   }
@@ -291,7 +298,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeComment(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Comment>,
+  private _serializeComment(preNode: PreSerializedNode<Comment>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return `${this._beginLine(preNode, options, refs)}<!--${preNode.node.data}-->${this._endLine(preNode, options, refs)}`
   }
@@ -303,7 +310,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeProcessingInstruction(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.ProcessingInstruction>,
+  private _serializeProcessingInstruction(preNode: PreSerializedNode<ProcessingInstruction>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return `${this._beginLine(preNode, options, refs)}<?${preNode.node.target} ${preNode.node.data}?>${this._endLine(preNode, options, refs)}`
   }
@@ -315,7 +322,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _serializeAttribute(preAttr: serializer.Interfaces.PreSerializedAttr,
+  private _serializeAttribute(preAttr: PreSerializedAttr,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     return `${preAttr.name}="${Char.escapeAttrValue(preAttr.value, options.noDoubleEncoding)}"`
   }
@@ -328,7 +335,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _beginLine(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
+  private _beginLine(preNode: PreSerializedNode<Node>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     if (!options.prettyPrint || refs.suppressPrettyCount > 0) {
       return ''
@@ -346,7 +353,7 @@ export class StringWriterImpl {
    * @param options - serialization options
    * @param refs - reference parameters
    */
-  private _endLine(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
+  private _endLine(preNode: PreSerializedNode<Node>,
     options: RequiredStringWriterOptions, refs: StringWriterRefs): string {
     if (!options.prettyPrint || refs.suppressPrettyCount > 0) {
       return ''

@@ -1,7 +1,9 @@
-const { JSDOM } = require("jsdom");
 const { fragment } = require("../../lib");
+const { JSDOM } = require("jsdom");
+const { DOMParser } = require("xmldom");
 
-const xmlStr = `<root>
+const xmlStr = `
+<root>
   <node1>
     <node1-1/>
     <node1-2/>
@@ -17,4 +19,11 @@ perf('xmlbuilder2 vs jsdom: parser', 10000, () => {
   fragment(xmlStr);
 }, () => {
   JSDOM.fragment(xmlStr)
+});
+
+const xmlDomParser = new DOMParser();
+perf('xmlbuilder2 vs xmldom: parser', 10000, () => {
+  fragment(xmlStr);
+}, () => {
+  xmlDomParser.parseFromString(xmlStr);
 });

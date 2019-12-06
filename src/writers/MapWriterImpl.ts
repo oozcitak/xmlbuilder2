@@ -1,8 +1,14 @@
 import {
   XMLSerializedValue, MapWriterOptions, XMLBuilderOptions
 } from "../builder/interfaces"
-import { dom, serializer, util } from "@oozcitak/dom"
 import { applyDefaults } from "@oozcitak/util"
+import { 
+  Node, NodeType, CharacterData, ProcessingInstruction, Comment, Text, 
+  CDATASection, Element 
+} from "@oozcitak/dom/lib/dom/interfaces"
+import { PreSerializer } from "@oozcitak/dom/lib/serializer/PreSerializer"
+import { PreSerializedNode } from "@oozcitak/dom/lib/serializer/interfaces"
+import { Guard } from "@oozcitak/dom/lib/util"
 
 /**
  * Serializes XML nodes into maps and arrays.
@@ -26,26 +32,26 @@ export class MapWriterImpl {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: dom.Interfaces.Node, writerOptions?: MapWriterOptions): XMLSerializedValue {
+  serialize(node: Node, writerOptions?: MapWriterOptions): XMLSerializedValue {
     const options: MapWriterOptions = applyDefaults(writerOptions, {
       format: "map"
     })
 
-    const pre = new serializer.PreSerializer(this._builderOptions.version)
+    const pre = new PreSerializer(this._builderOptions.version)
     const preNode = pre.serialize(node, false)
 
     switch (preNode.node.nodeType) {
-      case dom.Interfaces.NodeType.Element:
-      case dom.Interfaces.NodeType.Document:
-      case dom.Interfaces.NodeType.DocumentFragment:
+      case NodeType.Element:
+      case NodeType.Document:
+      case NodeType.DocumentFragment:
         return this._serializeNode(preNode, options)
-      case dom.Interfaces.NodeType.Comment:
-      case dom.Interfaces.NodeType.Text:
-      case dom.Interfaces.NodeType.CData:
+      case NodeType.Comment:
+      case NodeType.Text:
+      case NodeType.CData:
         return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0],
-        (<dom.Interfaces.CharacterData>node).data]])
-      case dom.Interfaces.NodeType.ProcessingInstruction:
-        const pi = <dom.Interfaces.ProcessingInstruction>node
+        (<CharacterData>node).data]])
+      case NodeType.ProcessingInstruction:
+        const pi = <ProcessingInstruction>node
         return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0],
         `${pi.target} ${pi.data}`]])
       /* istanbul ignore next */
@@ -60,24 +66,24 @@ export class MapWriterImpl {
    * @param preNode - current node
    * @param options - serialization options
    */
-  protected _serializeNode(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
+  protected _serializeNode(preNode: PreSerializedNode<Node>,
     options: MapWriterOptions): XMLSerializedValue {
     switch (preNode.node.nodeType) {
-      case dom.Interfaces.NodeType.Element:
+      case NodeType.Element:
         return this._serializeElement(preNode, options)
-      case dom.Interfaces.NodeType.Document:
+      case NodeType.Document:
         return this._serializeChildNodes(preNode, options)
-      case dom.Interfaces.NodeType.Comment:
-        return (<dom.Comment>preNode.node).data
-      case dom.Interfaces.NodeType.Text:
-        return (<dom.Text>preNode.node).data
-      case dom.Interfaces.NodeType.DocumentFragment:
+      case NodeType.Comment:
+        return (<Comment>preNode.node).data
+      case NodeType.Text:
+        return (<Text>preNode.node).data
+      case NodeType.DocumentFragment:
         return this._serializeChildNodes(preNode, options)
-      case dom.Interfaces.NodeType.ProcessingInstruction:
-        const pi = <dom.ProcessingInstruction>preNode.node
+      case NodeType.ProcessingInstruction:
+        const pi = <ProcessingInstruction>preNode.node
         return `${pi.target} ${pi.data}`
-      case dom.Interfaces.NodeType.CData:
-        return (<dom.CDATASection>preNode.node).data
+      case NodeType.CData:
+        return (<CDATASection>preNode.node).data
       /* istanbul ignore next */
       default:
         throw new Error("Invalid node type.")
@@ -90,7 +96,7 @@ export class MapWriterImpl {
    * @param preNode - current node
    * @param options - serialization options
    */
-  private _serializeElement(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
+  private _serializeElement(preNode: PreSerializedNode<Node>,
     options: MapWriterOptions): XMLSerializedValue {
 
     /* istanbul ignore next */
@@ -109,15 +115,15 @@ export class MapWriterImpl {
    * @param preNode - current node
    * @param options - serialization options
    */
-  private _serializeChildNodes(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>,
+  private _serializeChildNodes(preNode: PreSerializedNode<Node>,
     options: MapWriterOptions): XMLSerializedValue {
-    const items = new Array<[string, boolean, serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>]>()
+    const items = new Array<[string, boolean, PreSerializedNode<Node>]>()
     const keyCount = new Map<string, number>()
     const keyIndices = new Map<string, number>()
     let hasDuplicateKeys = false
 
     for (const childPreNode of preNode.children) {
-      if (childPreNode.node.nodeType === dom.Interfaces.NodeType.DocumentType) continue
+      if (childPreNode.node.nodeType === NodeType.DocumentType) continue
 
       const [key, canIncrement] = this._getNodeKey(childPreNode)
       items.push([key, canIncrement, childPreNode])
@@ -130,7 +136,7 @@ export class MapWriterImpl {
       keyIndices.set(key, 0)
     }
 
-    if (items.length === 1 && preNode.attributes.length === 0 && util.Guard.isTextNode(items[0][2].node)) {
+    if (items.length === 1 && preNode.attributes.length === 0 && Guard.isTextNode(items[0][2].node)) {
       // an element node with a single text node
       return items[0][2].node.data
     } else {
@@ -141,7 +147,7 @@ export class MapWriterImpl {
       }
       for (const [key, canIncrement, node] of items) {
         // serialize child nodes or node contents
-        const nodeResult = node.node.nodeType === dom.Interfaces.NodeType.Element ?
+        const nodeResult = node.node.nodeType === NodeType.Element ?
           this._serializeChildNodes(node, options) :
           this._serializeNode(node, options)
 
@@ -185,17 +191,17 @@ export class MapWriterImpl {
    * is a boolean determining whether the key can be prefixed with a random 
    * string to provide uniqueness.
    */
-  private _getNodeKey(preNode: serializer.Interfaces.PreSerializedNode<dom.Interfaces.Node>): [string, boolean] {
+  private _getNodeKey(preNode: PreSerializedNode<Node>): [string, boolean] {
     switch (preNode.node.nodeType) {
-      case dom.Interfaces.NodeType.Element:
-        return [(<dom.Interfaces.Element>preNode.node).tagName, false]
-      case dom.Interfaces.NodeType.Comment:
+      case NodeType.Element:
+        return [(<Element>preNode.node).tagName, false]
+      case NodeType.Comment:
         return [this._builderOptions.convert.comment, true]
-      case dom.Interfaces.NodeType.Text:
+      case NodeType.Text:
         return [this._builderOptions.convert.text, true]
-      case dom.Interfaces.NodeType.ProcessingInstruction:
+      case NodeType.ProcessingInstruction:
         return [this._builderOptions.convert.ins, true]
-      case dom.Interfaces.NodeType.CData:
+      case NodeType.CData:
         return [this._builderOptions.convert.cdata, true]
       /* istanbul ignore next */
       default:

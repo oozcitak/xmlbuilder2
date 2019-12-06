@@ -1,63 +1,63 @@
 import $$ from '../TestHelpers'
-import { dom } from '@oozcitak/dom'
+import { NodeType } from '@oozcitak/dom/lib/dom/interfaces'
 
 describe('cast', () => {
 
   test('any', () => {
     const node = $$.document().ele('root').ele('node')
-    expect(node.as.any.nodeType).toBe(dom.Interfaces.NodeType.Element)
+    expect(node.as.any.nodeType).toBe(NodeType.Element)
   })
 
   test('node', () => {
     const node = $$.document().ele('root').ele('node')
-    expect(node.as.node.nodeType).toBe(dom.Interfaces.NodeType.Element)
+    expect(node.as.node.nodeType).toBe(NodeType.Element)
   })
 
   test('document', () => {
     const node = $$.document()
-    expect(node.as.document.nodeType).toBe(dom.Interfaces.NodeType.Document)
+    expect(node.as.document.nodeType).toBe(NodeType.Document)
   })
 
   test('documentType', () => {
     const node = $$.document().dtd().first()
-    expect(node.as.documentType.nodeType).toBe(dom.Interfaces.NodeType.DocumentType)
+    expect(node.as.documentType.nodeType).toBe(NodeType.DocumentType)
   })
 
   test('documentFragment', () => {
     const node = $$.fragment()
-    expect(node.as.documentFragment.nodeType).toBe(dom.Interfaces.NodeType.DocumentFragment)
+    expect(node.as.documentFragment.nodeType).toBe(NodeType.DocumentFragment)
   })
 
   test('attr', () => {
     const node = $$.document().ele('root').att('node', 'val')
     for (const att of node.traverseAttributes()) {
-      expect(att.as.attr.nodeType).toBe(dom.Interfaces.NodeType.Attribute)
+      expect(att.as.attr.nodeType).toBe(NodeType.Attribute)
     }
   })
 
   test('text', () => {
     const node = $$.document().ele('root').txt('node').first()
-    expect(node.as.text.nodeType).toBe(dom.Interfaces.NodeType.Text)
+    expect(node.as.text.nodeType).toBe(NodeType.Text)
   })
 
   test('cdataSection', () => {
     const node = $$.document().ele('root').dat('node').first()
-    expect(node.as.cdataSection.nodeType).toBe(dom.Interfaces.NodeType.CData)
+    expect(node.as.cdataSection.nodeType).toBe(NodeType.CData)
   })
 
   test('comment', () => {
     const node = $$.document().ele('root').com('node').first()
-    expect(node.as.comment.nodeType).toBe(dom.Interfaces.NodeType.Comment)
+    expect(node.as.comment.nodeType).toBe(NodeType.Comment)
   })
 
   test('processingInstruction', () => {
     const node = $$.document().ele('root').ins('node', 'val').first()
-    expect(node.as.processingInstruction.nodeType).toBe(dom.Interfaces.NodeType.ProcessingInstruction)
+    expect(node.as.processingInstruction.nodeType).toBe(NodeType.ProcessingInstruction)
   })
 
   test('element', () => {
     const node = $$.document().ele('root').ele('node')
-    expect(node.as.element.nodeType).toBe(dom.Interfaces.NodeType.Element)
+    expect(node.as.element.nodeType).toBe(NodeType.Element)
   })
 
   test('guards', () => {
