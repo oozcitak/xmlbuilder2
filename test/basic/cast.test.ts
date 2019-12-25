@@ -30,9 +30,9 @@ describe('cast', () => {
 
   test('attr', () => {
     const node = $$.document().ele('root').att('node', 'val')
-    for (const att of node.traverseAttributes()) {
+    node.forEachAttribute(att =>
       expect(att.as.attr.nodeType).toBe(NodeType.Attribute)
-    }
+    )
   })
 
   test('text', () => {

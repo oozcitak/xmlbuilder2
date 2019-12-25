@@ -16,7 +16,7 @@ import { CastAsNodeImpl } from "./CastAsNode"
 import { Guard } from "@oozcitak/dom/lib/util"
 import { Document, Node } from "@oozcitak/dom/lib/dom/interfaces"
 import {
-  namespace_extractQName, tree_getDescendantNodes, tree_getAncestorNodes
+  namespace_extractQName, tree_getDescendantNodes, tree_getAncestorNodes, tree_getFirstDescendantNode, tree_getNextDescendantNode, tree_getFirstAncestorNode, tree_getNextAncestorNode
 } from "@oozcitak/dom/lib/algorithm"
 
 /**
@@ -443,32 +443,34 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  *traverseChildren(): IterableIterator<XMLBuilderNode> {
-    for (const child of this.as.node.childNodes) {
-      yield XMLBuilderNodeImpl._FromNode(child)
+  forEachChild(callback: (node: XMLBuilderNode) => void): void {
+    this.as.node.childNodes.forEach(
+      node => callback(XMLBuilderNodeImpl._FromNode(node))
+    )
+  }
+
+  /** @inheritdoc */
+  forEachAttribute(callback: (node: XMLBuilderNode) => void): void {
+    this.as.element.attributes._attributeList.forEach(
+      node => callback(XMLBuilderNodeImpl._FromNode(node))
+    )
+  }
+
+  /** @inheritdoc */
+  forEachDescendant(callback: (node: XMLBuilderNode) => void): void {
+    let node = tree_getFirstDescendantNode(this.as.node, false, false)
+    while (node !== null) {
+      callback(XMLBuilderNodeImpl._FromNode(node))
+      node = tree_getNextDescendantNode(this.as.node, node, false, false)
     }
   }
 
   /** @inheritdoc */
-  *traverseAttributes(): IterableIterator<XMLBuilderNode> {
-    if (Guard.isElementNode(this)) {
-      for (const att of this.as.element.attributes) {
-        yield XMLBuilderNodeImpl._FromNode(att)
-      }  
-    }
-  }
-
-  /** @inheritdoc */
-  *traverseDescendants(): IterableIterator<XMLBuilderNode> {
-    for (const node of tree_getDescendantNodes(this.as.node, false, false)) {
-      yield XMLBuilderNodeImpl._FromNode(node)
-    }
-  }
-
-  /** @inheritdoc */
-  *traverseAncestors(): IterableIterator<XMLBuilderNode> {
-    for (const node of tree_getAncestorNodes(this.as.node, false)) {
-      yield XMLBuilderNodeImpl._FromNode(node)
+  forEachAncestor(callback: (node: XMLBuilderNode) => void): void {
+    let node = tree_getFirstAncestorNode(this.as.node, false)
+    while (node !== null) {
+      callback(XMLBuilderNodeImpl._FromNode(node))
+      node = tree_getNextAncestorNode(this.as.node, node, false)
     }
   }
 
