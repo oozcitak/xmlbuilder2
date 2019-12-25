@@ -15,15 +15,15 @@ import {
 import { CastAsNodeImpl } from "./CastAsNode"
 import { Guard } from "@oozcitak/dom/lib/util"
 import { Document, Node } from "@oozcitak/dom/lib/dom/interfaces"
-import { DOMAlgorithm } from "@oozcitak/dom/lib/algorithm"
+import {
+  namespace_extractQName, tree_getDescendantNodes, tree_getAncestorNodes
+} from "@oozcitak/dom/lib/algorithm"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
  * chainable document builder methods.
  */
 export class XMLBuilderNodeImpl implements XMLBuilderNode {
-  private static _algo = new DOMAlgorithm()
-
   private _castAsNode: CastAsNode | undefined
   private _builderOptions?: XMLBuilderOptions
   private _validator?: Validator
@@ -132,10 +132,10 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           }
         } else if (isObject(val) || isMap(val)) {
           // check for a namespace declaration attribute
-          const qName = XMLBuilderNodeImpl._algo.namespace.extractQName(key)
+          const qName = namespace_extractQName(key)
           for (const [attName, attValue] of forEachObject(val)) {
             if (attName[0] === this._options.convert.att) {
-              const attQName = XMLBuilderNodeImpl._algo.namespace.extractQName(attName.slice(1))
+              const attQName = namespace_extractQName(attName.slice(1))
               if ((attQName[0] === null && attQName[1] === "xmlns") ||
                 (attQName[0] === "xmlns" && attQName[1] === qName[0])) {
                 namespace = attValue
@@ -227,7 +227,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     // check if this is a namespace declaration attribute
     if (namespace === undefined) {
-      const attQName = XMLBuilderNodeImpl._algo.namespace.extractQName(name)
+      const attQName = namespace_extractQName(name)
       if (attQName[0] === "xmlns") {
         namespace = infraNamespace.XMLNS
       } else if (attQName[0] !== null) {
@@ -460,14 +460,14 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   *traverseDescendants(): IterableIterator<XMLBuilderNode> {
-    for (const node of XMLBuilderNodeImpl._algo.tree.getDescendantNodes(this.as.node, false, false)) {
+    for (const node of tree_getDescendantNodes(this.as.node, false, false)) {
       yield XMLBuilderNodeImpl._FromNode(node)
     }
   }
 
   /** @inheritdoc */
   *traverseAncestors(): IterableIterator<XMLBuilderNode> {
-    for (const node of XMLBuilderNodeImpl._algo.tree.getAncestorNodes(this.as.node, false)) {
+    for (const node of tree_getAncestorNodes(this.as.node, false)) {
       yield XMLBuilderNodeImpl._FromNode(node)
     }
   }
@@ -539,7 +539,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     // inherit namespace from parent
     if (namespace === null || namespace === undefined) {
-      const qName = XMLBuilderNodeImpl._algo.namespace.extractQName(name)
+      const qName = namespace_extractQName(name)
       const parent = this.as.node.parentNode
       if (parent) {
         namespace = parent.lookupNamespaceURI(qName[0])
@@ -552,7 +552,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           if (attName === "xmlns") {
             namespace = attValue
           } else {
-            const attQName = XMLBuilderNodeImpl._algo.namespace.extractQName(attName)
+            const attQName = namespace_extractQName(attName)
             if (attQName[0] === "xmlns" && attQName[1] === qName[0]) {
               namespace = attValue
             }

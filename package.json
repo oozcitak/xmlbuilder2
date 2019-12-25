@@ -25,8 +25,8 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@oozcitak/util": "1.0.3",
-    "@oozcitak/dom": "1.0.0",
+    "@oozcitak/util": "2.1.0",
+    "@oozcitak/dom": "1.1.1",
     "@oozcitak/infra": "1.0.4"
   },
   "devDependencies": {

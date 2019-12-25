@@ -1,11 +1,11 @@
-import { DOMAlgorithm } from "@oozcitak/dom/lib/algorithm"
+import { 
+  xml_isLegalChar, xml_isName, xml_isPubidChar
+} from "@oozcitak/dom/lib/algorithm"
 
 /**
  * Contains character processing utility functions.
  */
 export class Char {
-  private static _xmlSpec = new DOMAlgorithm().xml
-
   /**
    * Escapes special characters to be used in a text node.
    * 
@@ -56,7 +56,7 @@ export class Char {
    * @param debugInfo - additional debug info to add to the exception message
    */
   static assertChar(str: string, version: "1.0" | "1.1", debugInfo?: string): void {
-    if (!Char._xmlSpec.isLegalChar(str, version)) {
+    if (!xml_isLegalChar(str, version)) {
       throw new Error(`Invalid character in string: ${str}. ${debugInfo || ""}`)
     }
   }
@@ -70,7 +70,7 @@ export class Char {
    */  
   static assertName(str: string, version: "1.0" | "1.1", debugInfo?: string): void {
     Char.assertChar(str, version, debugInfo)
-    if (!Char._xmlSpec.isName(str)) {
+    if (!xml_isName(str)) {
       throw new Error(`Invalid character in XML name: ${str}. ${debugInfo || ""}`)
     }
   }
@@ -83,7 +83,7 @@ export class Char {
    * @param debugInfo - additional debug info to add to the exception message
    */
   static assertPubId(str: string, version: "1.0" | "1.1", debugInfo?: string): void {
-    if (!Char._xmlSpec.isPubidChar(str)) {
+    if (!xml_isPubidChar(str)) {
       throw new Error(`Invalid character in public identifier string: ${str}. ${debugInfo || ""}`)
     }
   }

@@ -2,7 +2,8 @@ import {
   XMLBuilderOptions, XMLBuilder, ExpandObject, XMLBuilderNode, Validator,
   DefaultBuilderOptions, XMLBuilderCreateOptions
 } from "./interfaces"
-import { DOM, DOMParser } from "@oozcitak/dom"
+import { dom, DOMParser, DOMImplementation } from "@oozcitak/dom"
+import { DOM } from "@oozcitak/dom/lib/dom"
 import { applyDefaults, isObject } from "@oozcitak/util"
 import { ValidatorImpl } from "../validator"
 import { XMLBuilderNodeImpl } from "./XMLBuilderNodeImpl"
@@ -24,7 +25,8 @@ export class XMLBuilderImpl implements XMLBuilder {
    */
   constructor(options?: XMLBuilderCreateOptions) {
 
-    this._dom = new DOM(false)
+    dom.setFeatures(false)
+    this._dom = dom
 
     options = options || {}
 
@@ -117,7 +119,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * Creates an XML document without any child nodes.
    */
   private _createEmptyDocument(): XMLDocument {
-    const impl = this._dom.implementation
+    const impl = new DOMImplementation()
     const doc = impl.createDocument(null, 'root')
     /* istanbul ignore else */
     if (doc.documentElement) {
