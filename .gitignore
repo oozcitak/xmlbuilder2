@@ -3,6 +3,5 @@ node_modules/
 coverage/
 docs/
 .vs/
-.vscode/
 .nyc_output/
 package-lock.json
