@@ -20,6 +20,7 @@ import {
   tree_getNextDescendantNode, tree_getFirstAncestorNode, 
   tree_getNextAncestorNode
 } from "@oozcitak/dom/lib/algorithm"
+import { DOMParser } from "@oozcitak/dom"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -54,7 +55,31 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     let name: string | ExpandObject | undefined
     let attributes: AttributesObject | undefined
 
-    if (isObject(p1)) {
+    let lastChild: XMLBuilderNode | null = null
+  
+    if (isString(p1) && /^\s*</.test(p1)) {
+      // parse XML string
+      const contents = "<TEMP_ROOT>" + p1 + "</TEMP_ROOT>"
+      const domParser = new DOMParser()
+      const doc = domParser.parseFromString(contents, "text/xml")
+      /* istanbul ignore next */
+      if (doc.documentElement === null) {
+        throw new Error("Document element is null.")
+      }
+      for (const child of doc.documentElement.childNodes) {
+        const newChild = doc.importNode(child, true)
+        lastChild = XMLBuilderNodeImpl._FromNode(newChild)
+        this.as.node.appendChild(newChild)
+      }
+      if (lastChild === null) {
+        throw new Error("Could not create any elements with: " + p1.toString() + ". " + this._debugInfo())
+      }
+      return lastChild
+    } else if (isString(p1) && /^\s*[\{\[]/.test(p1)) {
+      // parse JSON string
+      const obj = JSON.parse(p1) as ExpandObject
+      return this.ele(obj)
+    } else if (isObject(p1)) {
       // ele(obj: ExpandObject)
       [namespace, name, attributes] = [undefined, p1, undefined]
     } else if (isString(p1) && isString(p2)) {
@@ -71,8 +96,6 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     if (attributes) {
       attributes = getValue(attributes)
     }
-
-    let lastChild: XMLBuilderNode | null = null
 
     if (isFunction(name)) {
       // evaluate if function
