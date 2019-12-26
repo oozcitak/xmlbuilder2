@@ -1,12 +1,16 @@
 {
   "0.0.4": {
-    "xmlbuilder2 vs jsdom: ele": [
-      "0.0500",
-      "0.0675"
-    ],
-    "xmlbuilder2 vs jsdom: parser": [
-      "0.0836",
-      "0.1205"
-    ]
+    "small document with ele()": {
+      "xmlbuilder": 105036.01869227322,
+      "xmlbuilder2": 29589.357194960437
+    },
+    "convert small JS object": {
+      "xmlbuilder": 10873.348702378165,
+      "xmlbuilder2": 2896.0831872039516
+    },
+    "serialize small document to XML string": {
+      "xmlbuilder": 35807.029867781945,
+      "xmlbuilder2": 12242.528279814775
+    }
   }
 }

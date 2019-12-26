@@ -30,19 +30,21 @@
     "@oozcitak/infra": "1.0.4"
   },
   "devDependencies": {
+    "@types/node": "*",
+    "@types/jest": "*",
+    "@types/dedent": "*",
+    "@types/benchmark": "*",
+    "@types/chalk": "*",
     "typescript": "*",
     "jest": "*",
     "ts-jest": "*",
     "dedent": "*",
     "glob": "*",
-    "@types/node": "*",
-    "@types/jest": "*",
-    "@types/dedent": "*",
     "xpath": "*",
-    "git-state": "*",
     "xmlbuilder": "*",
-    "jsdom": "*",
-    "xmldom": "*"
+    "ts-node": "*",
+    "benchmark": "*",
+    "chalk": "*"
   },
   "jest": {
     "transform": {
@@ -57,6 +59,7 @@
   "scripts": {
     "compile": "rm -rf ./lib && tsc --version && tsc",
     "test": "npm run compile && jest --coverage",
-    "perf": "node ./perf/index.js"
+    "perf": "npm run compile && ts-node ./perf/perf.ts",
+    "publish-public": "npm run test && npm publish"
   }
 }
