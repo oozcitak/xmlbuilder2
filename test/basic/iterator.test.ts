@@ -47,4 +47,13 @@ describe('iterators', () => {
     expect(str).toBe('ba#document')
   })
 
+  test('this inside callback', () => {
+    const root = $$.document().ele('root')
+      .ele('node1').up()
+      .ele('node2').up()
+      .ele('node3').up()
+    
+    root.forEachChild(function(this: number) { expect(this).toBe(42) }, 42)
+  })
+
 })
