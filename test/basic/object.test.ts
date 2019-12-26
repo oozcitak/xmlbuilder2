@@ -113,7 +113,6 @@ describe('object', () => {
   test('from function', () => {
     const doc = $$.document().ele('root').ele(() => {
       const arr = []
-      const i = 0
       for (let i = 1; i < 5; i++) {
         arr.push({ "#": "ele" + i.toString() })
       }
@@ -130,6 +129,46 @@ describe('object', () => {
           # ele3
         node
           # ele4
+    `)
+  })
+
+  test('multiple cdata nodes', () => {
+    const doc = $$.document().ele('root').ele({
+      '$': [ 'data1', 'data2' ]
+    }).doc()
+
+    expect($$.printTree(doc)).toBe($$.t`
+      root
+        $ data1
+        $ data2
+    `)
+  })
+
+  test('multiple comment nodes', () => {
+    const doc = $$.document().ele('root').ele({
+      '!': [ 'comment1', 'comment2' ]
+    }).doc()
+
+    expect($$.printTree(doc)).toBe($$.t`
+      root
+        ! comment1
+        ! comment2
+    `)
+  })
+
+  test('multiple processing instruction nodes', () => {
+    const doc = $$.document().ele('root').ele({
+      '?1': [ 'target0', 'target1 value1', 'target2 value2' ],
+      '?2': { target3: 'value3', target4: 'value4' }
+    }).doc()
+
+    expect($$.printTree(doc)).toBe($$.t`
+      root
+        ? target0
+        ? target1 value1
+        ? target2 value2
+        ? target3 value3
+        ? target4 value4
     `)
   })
 

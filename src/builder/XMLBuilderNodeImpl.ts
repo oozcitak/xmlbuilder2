@@ -129,16 +129,41 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.cdata) === 0) {
           // cdata node
-          lastChild = this.dat(val)
+          if (isArray(val)) {
+            for (const item of forEachArray(val)) {
+              lastChild = this.dat(item)
+            }
+          } else {
+            lastChild = this.dat(val)
+          }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.comment) === 0) {
           // comment node
-          lastChild = this.com(val)
+          if (isArray(val)) {
+            for (const item of forEachArray(val)) {
+              lastChild = this.com(item)
+            }
+          } else {
+            lastChild = this.com(val)
+          }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.ins) === 0) {
           // processing instruction
-          const insIndex = val.indexOf(' ')
-          const insTarget = (insIndex === -1 ? val : val.substr(0, insIndex))
-          const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
-          lastChild = this.ins(insTarget, insValue)
+          if (isArray(val)) {
+            for (const item of forEachArray(val)) {
+              const insIndex = item.indexOf(' ')
+              const insTarget = (insIndex === -1 ? item : item.substr(0, insIndex))
+              const insValue = (insIndex === -1 ? '' : item.substr(insIndex + 1))
+              lastChild = this.ins(insTarget, insValue)
+            }
+          } else if (isMap(val) || isObject(val)) {
+            for (const [insTarget, insValue] of forEachObject(val)) {
+              lastChild = this.ins(insTarget, insValue)
+            }
+          } else {
+            const insIndex = val.indexOf(' ')
+            const insTarget = (insIndex === -1 ? val : val.substr(0, insIndex))
+            const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
+            lastChild = this.ins(insTarget, insValue)
+          }
         } else if (isArray(val) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
