@@ -16,7 +16,9 @@ import { CastAsNodeImpl } from "./CastAsNode"
 import { Guard } from "@oozcitak/dom/lib/util"
 import { Document, Node } from "@oozcitak/dom/lib/dom/interfaces"
 import {
-  namespace_extractQName, tree_getDescendantNodes, tree_getAncestorNodes, tree_getFirstDescendantNode, tree_getNextDescendantNode, tree_getFirstAncestorNode, tree_getNextAncestorNode
+  namespace_extractQName, tree_getFirstDescendantNode, 
+  tree_getNextDescendantNode, tree_getFirstAncestorNode, 
+  tree_getNextAncestorNode
 } from "@oozcitak/dom/lib/algorithm"
 
 /**
