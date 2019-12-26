@@ -779,14 +779,14 @@ export interface XMLBuilderNode {
    * 
    * @param callback - a callback function to apply to each node
    */
-  forEachChild(callback: (node: XMLBuilderNode) => void): void
+  forEachChild(callback: (node: XMLBuilderNode) => void): XMLBuilderNode
 
   /**
    * Traverses through the attributes of an element node.
    * 
    * @param callback - a callback function to apply to each attribute
    */
-  forEachAttribute(callback: (node: XMLBuilderNode) => void): void
+  forEachAttribute(callback: (node: XMLBuilderNode) => void): XMLBuilderNode
 
   /**
    * Traverses through descendant nodes of an element node in tree order.
@@ -803,7 +803,7 @@ export interface XMLBuilderNode {
    * ```
    * `a.traverseDescendants()` visits `b, d, e, c`
    */
-  forEachDescendant(callback: (node: XMLBuilderNode) => void): void
+  forEachDescendant(callback: (node: XMLBuilderNode) => void): XMLBuilderNode
 
   /**
    * Traverses through ancestor nodes of an element node in reverse tree order.
@@ -820,7 +820,7 @@ export interface XMLBuilderNode {
    * ```
    * `e.traverseAncestors()` visits `b, a`
    */
-  forEachAncestor(callback: (node: XMLBuilderNode) => void): void
+  forEachAncestor(callback: (node: XMLBuilderNode) => void): XMLBuilderNode
 
   /**
    * Converts the node into its string representation.

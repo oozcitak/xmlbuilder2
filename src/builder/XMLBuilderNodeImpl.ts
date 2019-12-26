@@ -445,35 +445,39 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  forEachChild(callback: (node: XMLBuilderNode) => void): void {
+  forEachChild(callback: (node: XMLBuilderNode) => void): XMLBuilderNode {
     this.as.node.childNodes.forEach(
       node => callback(XMLBuilderNodeImpl._FromNode(node))
     )
+    return this
   }
 
   /** @inheritdoc */
-  forEachAttribute(callback: (node: XMLBuilderNode) => void): void {
+  forEachAttribute(callback: (node: XMLBuilderNode) => void): XMLBuilderNode {
     this.as.element.attributes._attributeList.forEach(
       node => callback(XMLBuilderNodeImpl._FromNode(node))
     )
+    return this
   }
 
   /** @inheritdoc */
-  forEachDescendant(callback: (node: XMLBuilderNode) => void): void {
+  forEachDescendant(callback: (node: XMLBuilderNode) => void): XMLBuilderNode {
     let node = tree_getFirstDescendantNode(this.as.node, false, false)
     while (node !== null) {
       callback(XMLBuilderNodeImpl._FromNode(node))
       node = tree_getNextDescendantNode(this.as.node, node, false, false)
     }
+    return this
   }
 
   /** @inheritdoc */
-  forEachAncestor(callback: (node: XMLBuilderNode) => void): void {
+  forEachAncestor(callback: (node: XMLBuilderNode) => void): XMLBuilderNode {
     let node = tree_getFirstAncestorNode(this.as.node, false)
     while (node !== null) {
       callback(XMLBuilderNodeImpl._FromNode(node))
       node = tree_getNextAncestorNode(this.as.node, node, false)
     }
+    return this
   }
 
   /** @inheritdoc */
