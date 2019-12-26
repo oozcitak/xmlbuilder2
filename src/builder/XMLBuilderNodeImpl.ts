@@ -1,9 +1,7 @@
 import {
   XMLBuilderOptions, XMLBuilderNode, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, Validator, DTDOptions,
-  DefaultBuilderOptions,
-  CastAsNode,
-  PIObject
+  DefaultBuilderOptions, CastAsNode, PIObject
 } from "./interfaces"
 import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty, 
