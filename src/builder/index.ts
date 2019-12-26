@@ -23,4 +23,4 @@ applyMixin(DocumentFragment, XMLBuilderNodeImpl, "remove")
 applyMixin(Document, XMLBuilderNodeImpl, "remove")
 applyMixin(XMLDocument, XMLBuilderNodeImpl, "remove")
 
-export { XMLBuilderImpl, XMLBuilderNodeImpl }
+export { XMLBuilderImpl }

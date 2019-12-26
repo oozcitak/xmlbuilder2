@@ -1,9 +1,6 @@
-import * as Interfaces from './builder/interfaces'
 import { XMLBuilderCreateOptions, ExpandObject, XMLBuilderNode } from './builder/interfaces'
 import { XMLBuilderImpl } from './builder'
 import { isPlainObject } from '@oozcitak/util'
-
-export { Interfaces }
 
 /**
  * Creates an XML document.
