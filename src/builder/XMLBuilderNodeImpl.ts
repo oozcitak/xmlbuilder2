@@ -2,7 +2,8 @@ import {
   XMLBuilderOptions, XMLBuilderNode, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, Validator, DTDOptions,
   DefaultBuilderOptions,
-  CastAsNode
+  CastAsNode,
+  PIObject
 } from "./interfaces"
 import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty, 
@@ -147,22 +148,13 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.ins) === 0) {
           // processing instruction
-          if (isArray(val)) {
-            for (const item of forEachArray(val)) {
-              const insIndex = item.indexOf(' ')
-              const insTarget = (insIndex === -1 ? item : item.substr(0, insIndex))
-              const insValue = (insIndex === -1 ? '' : item.substr(insIndex + 1))
-              lastChild = this.ins(insTarget, insValue)
-            }
-          } else if (isMap(val) || isObject(val)) {
-            for (const [insTarget, insValue] of forEachObject(val)) {
-              lastChild = this.ins(insTarget, insValue)
-            }
-          } else {
+          if (isString(val)) {
             const insIndex = val.indexOf(' ')
             const insTarget = (insIndex === -1 ? val : val.substr(0, insIndex))
             const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
             lastChild = this.ins(insTarget, insValue)
+          } else {
+            lastChild = this.ins(val)
           }
         } else if (isArray(val) && isEmpty(val)) {
           // skip empty arrays
@@ -361,13 +353,27 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  ins(target: string, content: string = ''): XMLBuilderNode {
-    // character validation
-    target = this._validate.insTarget(target, this._debugInfo())
-    content = this._validate.insValue(content, this._debugInfo())
+  ins(target: string | PIObject, content: string = ''): XMLBuilderNode {
 
-    const child = this._doc.createProcessingInstruction(target, content)
-    this.as.node.appendChild(child)
+    if (isArray(target)) {
+      for (const item of forEachArray(target)) {
+        const insIndex = item.indexOf(' ')
+        const insTarget = (insIndex === -1 ? item : item.substr(0, insIndex))
+        const insValue = (insIndex === -1 ? '' : item.substr(insIndex + 1))
+        this.ins(insTarget, insValue)
+      }
+    } else if (isMap(target) || isObject(target)) {
+      for (const [insTarget, insValue] of forEachObject(target)) {
+        this.ins(insTarget, insValue)
+      }
+    } else {
+      // character validation
+      target = this._validate.insTarget(target, this._debugInfo())
+      content = this._validate.insValue(content, this._debugInfo())
+
+      const child = this._doc.createProcessingInstruction(target, content)
+      this.as.node.appendChild(child)
+    }
 
     return this
   }

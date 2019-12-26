@@ -497,6 +497,17 @@ export type AttributesObject = Map<string, any> | {
 }
 
 /**
+ * Represents the type of a variable that is a JS object defining
+ * processing instructions.
+ */
+export type PIObject = Map<string, string> | string[] | {
+  /**
+   * Processing instruction target/data pairs
+   */
+  [key: string]: string
+}
+
+/**
  * Serves as an entry point to builder functions.
  */
 export interface XMLBuilder {
@@ -701,6 +712,17 @@ export interface XMLBuilderNode {
    * @returns current element node
    */
   ins(target: string, content?: string): XMLBuilderNode
+
+  /**
+   * Creates new processing instruction nodes by expanding the given object and
+   * appends them to the list of child nodes.
+   * 
+   * @param contents - a JS object containing processing instruction targets 
+   * and values or an array of strings
+   * 
+   * @returns current element node
+   */
+  ins(target: PIObject): XMLBuilderNode
 
   /**
    * Updates XML declaration.
