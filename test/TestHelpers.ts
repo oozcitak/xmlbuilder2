@@ -1,11 +1,12 @@
 import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { isObject, isArray, isMap, forEachObject, objectLength } from "@oozcitak/util"
-import { document, fragment } from "../src"
+import { document, fragment, convert } from "../src"
 
 export default class TestHelpers {
   static document = document
   static fragment = fragment
+  static convert = convert
   
   static serialize(node: any): string {
     const s = new XMLSerializer()
