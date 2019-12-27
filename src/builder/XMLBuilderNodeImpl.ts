@@ -546,7 +546,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   toObject(writerOptions?: WriterOptions): XMLSerializedValue {
     writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
-      writerOptions.format = "map"
+      writerOptions.format = "object"
     }
 
     return this._serialize(writerOptions)

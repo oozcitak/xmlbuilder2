@@ -319,8 +319,7 @@ type BaseWriterOptions  = {
    * Output format. Defaults to `"text"`.
    * - `"text"` - Serializes the document as a string in XML format.
    * - `"map"` - Serializes the document as an object using `Map`s and 
-   * `Array`s. Note that this is the preferred format since a `Map` preserves
-   * insertion order of nodes as opposed to `Object`.
+   * `Array`s.
    * - `"object"` - Serializes the document as an object using `Object`s and
    * `Array`s.
    * - `"json"` - Serializes the document as a JSON string.
@@ -332,10 +331,7 @@ type BaseWriterOptions  = {
  * Defines the options passed to the map writer.
  */
 export type MapWriterOptions = BaseWriterOptions & {
-  /**
-   * Output format.
-   * - `"map"` - Serializes the document as an object using `Map`s and 
-   */
+  /** @inheritdoc */
   format?: "map"
 }
 
@@ -343,11 +339,7 @@ export type MapWriterOptions = BaseWriterOptions & {
  * Defines the options passed to the object writer.
  */
 export type ObjectWriterOptions = BaseWriterOptions & {
-  /**
-   * Output format.
-   * - `"object"` - Serializes the document as an object using `Object`s and
-   * `Array`s.
-   */
+  /** @inheritdoc */
   format?: "object"
 }
 
@@ -355,10 +347,7 @@ export type ObjectWriterOptions = BaseWriterOptions & {
  * Defines the options passed to the object writer.
  */
 export type StringWriterOptions = BaseWriterOptions & {
-  /**
-   * Output format.
-   * - `"text"` - Serializes the document as a string in XML format.
-   */
+  /** @inheritdoc */
   format?: "text"
   /**
    * Suppresses the XML declaration from the output. Defaults to `false`.
@@ -434,10 +423,7 @@ export type StringWriterOptions = BaseWriterOptions & {
  * Defines the options passed to the JSON writer.
  */
 export type JSONWriterOptions = BaseWriterOptions & {
-  /**
-   * Output format.
-   * - `"json"` - Serializes the document as a JSON string.
-   */
+  /** @inheritdoc */
   format?: "json"  
   /**
    * Pretty-prints the XML tree. Defaults to `false`.
