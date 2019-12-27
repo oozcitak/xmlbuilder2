@@ -536,7 +536,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   toString(writerOptions?: WriterOptions): string {
     writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
-      writerOptions.format = "text"
+      writerOptions.format = "xml"
     }
 
     return <string>this._serialize(writerOptions)
@@ -556,7 +556,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   end(writerOptions?: WriterOptions): XMLSerializedValue {
     writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
-      writerOptions.format = "text"
+      writerOptions.format = "xml"
     }
 
     return (<XMLBuilderNodeImpl>this.doc())._serialize(writerOptions)
@@ -568,7 +568,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * @param options - serialization options
    */
   private _serialize(writerOptions: WriterOptions): XMLSerializedValue {
-    if (writerOptions.format === "text") {
+    if (writerOptions.format === "xml") {
       const writer = new StringWriterImpl(this._options)
       return writer.serialize(this.as.node, writerOptions)
     } else if (writerOptions.format === "map") {

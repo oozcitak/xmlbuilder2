@@ -316,15 +316,15 @@ export interface Validator {
  */
 type BaseWriterOptions  = {
   /**
-   * Output format. Defaults to `"text"`.
-   * - `"text"` - Serializes the document as a string in XML format.
+   * Output format. Defaults to `"xml"`.
+   * - `"xml"` - Serializes the document as a string in XML format.
    * - `"map"` - Serializes the document as an object using `Map`s and 
    * `Array`s.
    * - `"object"` - Serializes the document as an object using `Object`s and
    * `Array`s.
    * - `"json"` - Serializes the document as a JSON string.
    */
-  format?: "text" | "map" | "object" | "json"
+  format?: "xml" | "map" | "object" | "json"
 }
 
 /**
@@ -348,7 +348,7 @@ export type ObjectWriterOptions = BaseWriterOptions & {
  */
 export type StringWriterOptions = BaseWriterOptions & {
   /** @inheritdoc */
-  format?: "text"
+  format?: "xml"
   /**
    * Suppresses the XML declaration from the output. Defaults to `false`.
    */

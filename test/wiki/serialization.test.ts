@@ -56,7 +56,7 @@ describe('serialization examples in wiki', () => {
     </topgun>
     `
 
-    expect(doc.end({ format: "text", prettyPrint: true })).toBe(serializedXML)
+    expect(doc.end({ format: "xml", prettyPrint: true })).toBe(serializedXML)
   })
 
   test('JSON', () => {
