@@ -2,8 +2,8 @@ import {
   XMLBuilderOptions, XMLBuilder, ExpandObject, XMLBuilderNode, Validator,
   DefaultBuilderOptions, XMLBuilderCreateOptions
 } from "./interfaces"
-import { dom, DOMParser, DOMImplementation } from "@oozcitak/dom"
-import { DOM } from "@oozcitak/dom/lib/dom"
+import { DOMParser, DOMImplementation } from "@oozcitak/dom"
+import { dom } from "@oozcitak/dom/lib/dom"
 import { applyDefaults, isObject } from "@oozcitak/util"
 import { ValidatorImpl } from "../validator"
 import { XMLBuilderNodeImpl } from "./XMLBuilderNodeImpl"
@@ -16,19 +16,15 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   private _options: XMLBuilderOptions
   private _validate: Validator
-  private _dom: DOM
 
   /** 
    * Initializes a new instance of  `XMLBuilderImpl`
    * 
    * @param options - builder options
    */
-  constructor(options?: XMLBuilderCreateOptions) {
+  constructor(options: XMLBuilderCreateOptions = {}) {
 
     dom.setFeatures(false)
-    this._dom = dom
-
-    options = options || {}
 
     this._validate = new ValidatorImpl(options.version || "1.0")
 
