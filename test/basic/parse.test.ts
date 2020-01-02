@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('parse()', () => {
 
   test('XML string', () => {
-    const doc = $$.document('<?xml version="1.0?"><root att="val">text</root>')
+    const doc = $$.document('<?xml version="1.0"?><root att="val">text</root>')
 
     expect($$.printTree(doc)).toBe($$.t`
       root att="val"
