@@ -26,5 +26,19 @@
       "xmlbuilder": 35429.753741068474,
       "xmlbuilder2": 12790.221674039012
     }
+  },
+  "0.0.6": {
+    "small document with ele()": {
+      "xmlbuilder": 103795.08943366387,
+      "xmlbuilder2": 38826.00975485016
+    },
+    "convert small JS object": {
+      "xmlbuilder": 11338.562436294264,
+      "xmlbuilder2": 4174.88331328124
+    },
+    "serialize small document to XML string": {
+      "xmlbuilder": 35653.897786872585,
+      "xmlbuilder2": 13074.662573542017
+    }
   }
 }
