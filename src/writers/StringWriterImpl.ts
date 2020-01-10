@@ -74,12 +74,11 @@ export class StringWriterImpl {
       openTagBegin: this._openTagBegin.bind(this),
       openTagEnd: this._openTagEnd.bind(this),
       closeTag: this._closeTag.bind(this),
-      namespace: this._attribute.bind(this),
       attribute: this._attribute.bind(this),
       comment: this._comment.bind(this),
       text: this._text.bind(this),
       instruction: this._instruction.bind(this),
-      cdata: this._cdata.bind(this),
+      cdata: this._cdata.bind(this)
     })
 
     // XML declaration
