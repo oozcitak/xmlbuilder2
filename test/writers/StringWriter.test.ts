@@ -127,7 +127,7 @@ describe('StringWriter', () => {
   })
 
   test('namespaces', () => {
-    const doc = $$.document().ele('ns', 'root')
+    const doc = $$.document().ele('root', { xmlns: "ns" })
       .ele('foo').up()
       .ele('bar').up()
       .doc()

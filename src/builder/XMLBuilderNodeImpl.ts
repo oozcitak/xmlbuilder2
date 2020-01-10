@@ -260,6 +260,11 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       return this
     }
 
+    // xmlns defaults to XMLNS namespace
+    if ((namespace === null || namespace === undefined) && name === "xmlns") {
+      namespace = infraNamespace.XMLNS
+    }
+
     const ele = this.as.element
     // character validation
     name = this._validate.name(name, this._debugInfo())
