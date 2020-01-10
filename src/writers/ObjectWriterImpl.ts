@@ -1,14 +1,57 @@
 import {
   XMLSerializedValue, ObjectWriterOptions, XMLBuilderOptions
 } from "../builder/interfaces"
-import { applyDefaults } from "@oozcitak/util"
-import { 
-  Node, NodeType, CharacterData, ProcessingInstruction, Comment, Text, 
-  CDATASection, Element 
+import { applyDefaults, isArray, isString, isObject } from "@oozcitak/util"
+import {
+  Node, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { PreSerializer } from "@oozcitak/dom/lib/serializer/PreSerializer"
-import { PreSerializedNode } from "@oozcitak/dom/lib/serializer/interfaces"
-import { Guard } from "@oozcitak/dom/lib/util"
+
+class IntermediateContentNode {
+  parent: IntermediateElementNode
+  contentNode = true
+
+  name: string
+  contents: string
+
+  constructor(parent: IntermediateElementNode, name: string, contents: string) {
+    this.parent = parent
+    this.name = name
+    this.contents = contents
+  }
+}
+
+class IntermediateElementNode {
+  parent?: IntermediateElementNode
+  contentNode = false
+
+  name: string
+  contents: (IntermediateContentNode | IntermediateElementNode)[] = []
+
+  constructor(parent: IntermediateElementNode | undefined, name: string) {
+    this.parent = parent
+    this.name = name
+  }
+
+  appendContentNode(name: string, contents: string): void {
+    this.contents.push(new IntermediateContentNode(this, name, contents))
+  }
+
+  appendElementNode(name: string): IntermediateElementNode {
+    const newItem = new IntermediateElementNode(this, name)
+    this.contents.push(newItem)
+    return newItem
+  }
+}
+
+function isContentNode(x: any): x is IntermediateContentNode { return x.contentNode }
+function isElementNode(x: any): x is IntermediateElementNode { return !x.contentNode }
+
+type IntermediateValue = {
+  parent?: IntermediateValue,
+  name: string,
+  items: (string | IntermediateValue)[]
+}
 
 /**
  * Serializes XML nodes into objects and arrays.
@@ -16,6 +59,7 @@ import { Guard } from "@oozcitak/dom/lib/util"
 export class ObjectWriterImpl {
 
   private _builderOptions: XMLBuilderOptions
+  private _pre!: PreSerializer
 
   /**
    * Initializes a new instance of `ObjectWriterImpl`.
@@ -37,172 +81,77 @@ export class ObjectWriterImpl {
       format: "object"
     })
 
-    const pre = new PreSerializer(this._builderOptions.version)
-    const preNode = pre.serialize(node, false)
+    let intObj: IntermediateValue = { name: "#document", items: [] }
+    this._pre = new PreSerializer(this._builderOptions.version, {
+      beginElement: (name) => {
+        const childObj = this._addElement(intObj, name)
+        intObj = childObj
+      },
+      endElement: () => {
+        if (intObj.parent) intObj = intObj.parent
+      },
+      attribute: (name, value) => {
+        this._addValue(intObj, this._getAttrKey() + name, value)
+      },
+      comment: (data) => {
+        this._addValue(intObj, this._getNodeKey(NodeType.Comment), data)
+      },
+      text: (data) => {
+        this._addValue(intObj, this._getNodeKey(NodeType.Text), data)
+      },
+      instruction: (target, data) => {
+        this._addValue(intObj, this._getNodeKey(NodeType.ProcessingInstruction), target + " " + data)
+      },
+      cdata: (data) => {
+        this._addValue(intObj, this._getNodeKey(NodeType.CData), data)
+      }
+    })
 
-    switch (preNode.node.nodeType) {
-      case NodeType.Element:
-      case NodeType.Document:
-      case NodeType.DocumentFragment:
-        return this._serializeNode(preNode, options)
-      case NodeType.Comment:
-      case NodeType.Text:
-      case NodeType.CData:
-        return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0], 
-          (<CharacterData>node).data]])
-      case NodeType.ProcessingInstruction:
-        const pi = <ProcessingInstruction>node
-        return new Map<string, XMLSerializedValue>([[this._getNodeKey(preNode)[0], 
-          `${pi.target} ${pi.data}`]])          
-      /* istanbul ignore next */
-      default:
-        throw new Error("Invalid node type.")
-    }
+    this._pre.serialize(node, false)
+    return { }
   }
 
-  /**
-   * Produces an XML serialization of the given node.
-   * 
-   * @param preNode - current node
-   * @param options - serialization options
-   */
-  protected _serializeNode(preNode: PreSerializedNode<Node>,
-    options: ObjectWriterOptions): XMLSerializedValue {
-    switch (preNode.node.nodeType) {
-      case NodeType.Element:
-        return this._serializeElement(preNode, options)
-      case NodeType.Document:
-        return this._serializeChildNodes(preNode, options)
-      case NodeType.Comment:
-        return (<Comment>preNode.node).data
-      case NodeType.Text:
-        return (<Text>preNode.node).data
-      case NodeType.DocumentFragment:
-        return this._serializeChildNodes(preNode, options)
-      case NodeType.ProcessingInstruction:
-        const pi = <ProcessingInstruction>preNode.node
-        return `${pi.target} ${pi.data}`
-      case NodeType.CData:
-        return (<CDATASection>preNode.node).data
-      /* istanbul ignore next */
-      default:
-        throw new Error("Invalid node type.")
-    }
+  private _addElement(obj: IntermediateValue, name: string): IntermediateValue {
+    const childObj: IntermediateValue = { parent: obj, name: name, items: [] }
+    obj.items.push(childObj)
+    return childObj
   }
 
-  /**
-   * Produces an XML serialization of an element node.
-   * 
-   * @param preNode - current node
-   * @param options - serialization options
-   */
-  private _serializeElement(preNode: PreSerializedNode<Node>,
-    options: ObjectWriterOptions): XMLSerializedValue {
- 
-    /* istanbul ignore next */
-    if (preNode.name === undefined) {
-      throw new Error("Pre-serialized node name is undefined.")
-    }
-
-    const markup: { [key:string]: any } = { }
-    markup[preNode.name] = this._serializeChildNodes(preNode, options)
-    return markup
-  }
-
-  /**
-   * Produces an XML serialization of the given node's children.
-   * 
-   * @param preNode - current node
-   * @param options - serialization options
-   */
-  private _serializeChildNodes(preNode: PreSerializedNode<Node>,
-    options: ObjectWriterOptions): XMLSerializedValue {
-    const items = new Array<[string, boolean, PreSerializedNode<Node>]>()
-    const keyCount = new Map<string, number>()
-    const keyIndices = new Map<string, number>()
-    let hasDuplicateKeys = false
-
-    for (const childPreNode of preNode.children) {
-      if (childPreNode.node.nodeType === NodeType.DocumentType) continue
-
-      const [key, canIncrement] = this._getNodeKey(childPreNode)
-      items.push([key, canIncrement, childPreNode])
-      let count = keyCount.get(key)
-      count = (count || 0) + 1
-      if (!hasDuplicateKeys && !canIncrement && count > 1) [
-        hasDuplicateKeys = true
-      ]
-      keyCount.set(key, count)
-      keyIndices.set(key, 0)
-    }
-
-    if (items.length === 1 && preNode.attributes.length === 0 && Guard.isTextNode(items[0][2].node)) {
-      // an element node with a single text node
-      return items[0][2].node.data
+  private _addValue(obj: IntermediateValue, key: string, value: string): void {
+    if (obj.items.length === 0) {
+      obj.items.push({ parent: obj, name: key, items: [value] })
     } else {
-      const markup: { [key:string]: any } = { }
-      for (const attr of preNode.attributes) {
-        const key = this._getAttrKey(attr.name)
-        markup[key] = attr.value
+      const lastItem = obj.items[obj.items.length - 1]
+      if (isObject(lastItem) && lastItem.name === key) {
+        lastItem.items.push(value)
+      } else {
+        obj.items.push({ parent: obj, name: key, items: [value] })
       }
-      for (const [key, canIncrement, node] of items) {
-        // serialize child nodes or node contents
-        const nodeResult = node.node.nodeType === NodeType.Element ?
-          this._serializeChildNodes(node, options) :
-          this._serializeNode(node, options)
-
-        if (canIncrement && <number>keyCount.get(key) > 1) {
-          // generate a unique key
-          let index = (keyIndices.get(key) || 0) + 1
-          const uniqueKey = key + index.toString()
-          keyIndices.set(key, index)
-
-          markup[uniqueKey] = nodeResult
-        } else if (<number>keyCount.get(key) > 1) {
-          // cannot generate a unique key, create an array to hold nodes with
-          // duplicate keys
-          const nodeList = <Array<XMLSerializedValue>>(markup[key] || [])
-          nodeList.push(nodeResult)
-          markup[key] = nodeList
-        } else {
-          // object already has a unique key
-          markup[key] = nodeResult
-        }
-      }
-      return markup
     }
   }
 
   /**
-   * Returns an object key for the given attribute or namespace declaration.
-   * 
-   * @param name - attribute name
+   * Returns an object key for and attribute or namespace declaration.
    */
-  private _getAttrKey(name: string): string {
-    return this._builderOptions.convert.att + name
+  private _getAttrKey(): string {
+    return this._builderOptions.convert.att
   }
 
   /**
-   * Returns an object key for the given node.
+   * Returns an object key for the given node type.
    * 
-   * @param preNode - node to get a key for
-   * 
-   * @returns a two-tuple whose first value is the node key and second value
-   * is a boolean determining whether the key can be prefixed with a random 
-   * string to provide uniqueness.
+   * @param nodeType - node type to get a key for
    */
-  private _getNodeKey(preNode: PreSerializedNode<Node>): [string, boolean] {
-    switch (preNode.node.nodeType) {
-      case NodeType.Element:
-        return [(<Element>preNode.node).tagName, false]
+  private _getNodeKey(nodeType: NodeType): string {
+    switch (nodeType) {
       case NodeType.Comment:
-        return [this._builderOptions.convert.comment, true]
+        return this._builderOptions.convert.comment
       case NodeType.Text:
-        return [this._builderOptions.convert.text, true]
+        return this._builderOptions.convert.text
       case NodeType.ProcessingInstruction:
-        return [this._builderOptions.convert.ins, true]
+        return this._builderOptions.convert.ins
       case NodeType.CData:
-        return [this._builderOptions.convert.cdata, true]
+        return this._builderOptions.convert.cdata
       /* istanbul ignore next */
       default:
         throw new Error("Invalid node type.")

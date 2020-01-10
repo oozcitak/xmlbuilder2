@@ -84,9 +84,9 @@ describe('ObjectWriter', () => {
     expect($$.printMap(result)).toBe($$.t`
       {
         people: {
-          #1: hello,
+          #: hello,
           person: { @name: xxx },
-          #2: world
+          #1: world
         }
       }
       `)
