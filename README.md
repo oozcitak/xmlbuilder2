@@ -133,7 +133,7 @@ root.com('f(x) = x^2');
 for(let i = 1; i <= 5; i++)
 {
   const item = root.ele('data');
-  item.att('x', i;
+  item.att('x', i);
   item.att('y', i * i);
 }
 
