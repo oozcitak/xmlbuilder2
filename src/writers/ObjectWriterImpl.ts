@@ -1,57 +1,11 @@
 import {
   XMLSerializedValue, ObjectWriterOptions, XMLBuilderOptions
 } from "../builder/interfaces"
-import { applyDefaults, isArray, isString, isObject } from "@oozcitak/util"
+import { applyDefaults, isArray } from "@oozcitak/util"
 import {
   Node, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { PreSerializer } from "@oozcitak/dom/lib/serializer/PreSerializer"
-
-class IntermediateContentNode {
-  parent: IntermediateElementNode
-  contentNode = true
-
-  name: string
-  contents: string
-
-  constructor(parent: IntermediateElementNode, name: string, contents: string) {
-    this.parent = parent
-    this.name = name
-    this.contents = contents
-  }
-}
-
-class IntermediateElementNode {
-  parent?: IntermediateElementNode
-  contentNode = false
-
-  name: string
-  contents: (IntermediateContentNode | IntermediateElementNode)[] = []
-
-  constructor(parent: IntermediateElementNode | undefined, name: string) {
-    this.parent = parent
-    this.name = name
-  }
-
-  appendContentNode(name: string, contents: string): void {
-    this.contents.push(new IntermediateContentNode(this, name, contents))
-  }
-
-  appendElementNode(name: string): IntermediateElementNode {
-    const newItem = new IntermediateElementNode(this, name)
-    this.contents.push(newItem)
-    return newItem
-  }
-}
-
-function isContentNode(x: any): x is IntermediateContentNode { return x.contentNode }
-function isElementNode(x: any): x is IntermediateElementNode { return !x.contentNode }
-
-type IntermediateValue = {
-  parent?: IntermediateValue,
-  name: string,
-  items: (string | IntermediateValue)[]
-}
 
 type AttrNode = { "@": { [key: string]: string } }
 type TextNode = { "#": string | string[] }
