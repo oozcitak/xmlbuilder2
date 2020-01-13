@@ -84,9 +84,9 @@ describe('ObjectWriter', () => {
     expect($$.printMap(result)).toBe($$.t`
       {
         people: {
-          #: hello,
+          #1: hello,
           person: { @name: xxx },
-          #1: world
+          #2: world
         }
       }
       `)
@@ -103,18 +103,18 @@ describe('ObjectWriter', () => {
     expect($$.printMap(result)).toBe($$.t`
       {
         people: {
-          #1: hello,
-          person: [
-            { @name: xxx },
-            { @name: yyy }
-          ],
-          #2: world
+          #: [
+            { #: hello },
+            { person: { @name: xxx } },
+            { person: { @name: yyy } },
+            { #: world }
+          ]
         }
       }
       `)
   })
 
-  test('mixed content and interspersed duplicate tags - cannot preserve node order', () => {
+  test('mixed content and interspersed duplicate tags', () => {
     const result = $$.document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -125,12 +125,12 @@ describe('ObjectWriter', () => {
     expect($$.printMap(result)).toBe($$.t`
       {
         people: {
-          #1: hello,
-          person: [
-            { @name: xxx },
-            { @name: yyy }
-          ],
-          #2: world
+          #: [
+            { #: hello },
+            { person: { @name: xxx } },
+            { #: world },
+            { person: { @name: yyy } }
+          ]
         }
       }
       `)
