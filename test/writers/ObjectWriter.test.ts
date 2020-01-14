@@ -56,6 +56,86 @@ describe('ObjectWriter', () => {
       `)
   })
 
+  test('consecutive text nodes', () => {
+    const result = $$.document().ele('root')
+      .txt("text1")
+      .txt("text2")
+      .ele("node").txt("text3").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          #: [
+            text1,
+            text2
+          ],
+          node: text3
+        }
+      }
+      `)
+  })
+
+  test('consecutive comment nodes', () => {
+    const result = $$.document().ele('root')
+      .com("text1")
+      .com("text2")
+      .ele("node").com("text3").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          !: [
+            text1,
+            text2
+          ],
+          node: { !: text3 }
+        }
+      }
+      `)
+  })
+
+  test('consecutive cdata nodes', () => {
+    const result = $$.document().ele('root')
+      .dat("text1")
+      .dat("text2")
+      .ele("node").dat("text3").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          $: [
+            text1,
+            text2
+          ],
+          node: { $: text3 }
+        }
+      }
+      `)
+  })
+
+  test('consecutive instruction nodes', () => {
+    const result = $$.document().ele('root')
+      .ins("target1", "text1")
+      .ins("target2", "text2")
+      .ele("node").ins("target3", "text3").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          ?: [
+            target1 text1,
+            target2 text2
+          ],
+          node: { ?: target3 text3 }
+        }
+      }
+      `)
+  })
+
   test('duplicate tag names', () => {
     const result = $$.document().ele('people')
       .ele('person', { name: "xxx" }).up()
@@ -94,20 +174,24 @@ describe('ObjectWriter', () => {
 
   test('mixed content and duplicate tags', () => {
     const result = $$.document().ele('people')
-      .txt('hello')
+      .txt('text1')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
-      .txt('world')
+      .txt('text2')
+      .txt('text3')
       .end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
       {
         people: {
-          #: [
-            { #: hello },
-            { person: { @name: xxx } },
-            { person: { @name: yyy } },
-            { #: world }
+          #1: text1,
+          person: [
+            { @name: xxx },
+            { @name: yyy }
+          ],
+          #2: [
+            text2,
+            text3
           ]
         }
       }

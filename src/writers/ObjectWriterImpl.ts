@@ -1,7 +1,7 @@
 import {
   XMLSerializedValue, ObjectWriterOptions, XMLBuilderOptions
 } from "../builder/interfaces"
-import { applyDefaults, isArray } from "@oozcitak/util"
+import { applyDefaults, isArray, isString } from "@oozcitak/util"
 import {
   Node, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
@@ -14,7 +14,7 @@ type InstructionNode = { "?": string | string[] }
 type CDATANode = { "$": string | string[] }
 type NodeList = (ElementNode | AttrNode | TextNode | CommentNode |
   InstructionNode | CDATANode)[]
-type ElementNode = { [key: string]: NodeList }
+type ElementNode = { [key: string]: NodeList | NodeList[] }
 
 /**
  * Serializes XML nodes into objects and arrays.
@@ -50,9 +50,7 @@ export class ObjectWriterImpl {
 
     this._pre = new PreSerializer(this._builderOptions.version, {
       beginElement: (name) => {
-        const childItems: NodeList = []
-        const childObj: ElementNode = { [name]: childItems }
-        currentList.push(childObj)
+        const childItems = this._addElement(currentList, name)
         currentIndex++
         if (listRegister.length > currentIndex) {
           listRegister[currentIndex] = childItems
@@ -173,38 +171,9 @@ export class ObjectWriterImpl {
       }
     }
 
-    if (textCount === 1 && items.length === 1) {
+    if (textCount === 1 && items.length === 1 && isString((items[0] as TextNode)["#"])) {
       // special case of an element node with a single text node
       return (items[0] as TextNode)["#"]
-    } else if (!hasDataNodes && uniqueNameCount === 1 && elementCount > 1) {
-      // list of element nodes only which have the same name
-      // return an array with list notation
-      const obj: XMLSerializedValue = {}
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i]
-        const key = Object.keys(item)[0]
-        switch (key) {
-          case "@":
-            const attrs = (item as AttrNode)["@"]
-            const attrKeys = Object.keys(attrs)
-            if (attrKeys.length === 1) {
-              obj[this._getAttrKey() + attrKeys[0]] = attrs[attrKeys[0]]
-            } else {
-              obj[this._getAttrKey()] = (item as AttrNode)["@"]
-            }
-            break
-          default:
-            // element node
-            let childNodes: XMLSerializedValue[] = obj[key] as XMLSerializedValue[]
-            if (childNodes === undefined) {
-              childNodes = []
-              obj[key] = childNodes
-            }
-            childNodes.push(this._process((item as ElementNode)[key]))
-            break
-        }
-      }
-      return obj
     } else if (hasNonUniqueNames) {
       // list contains element nodes with non-unique names
       // return an array with mixed content notation
@@ -241,7 +210,19 @@ export class ObjectWriterImpl {
             break
           default:
             // element node
-            result.push({ [key]: this._process((item as ElementNode)[key]) })
+            const ele = item as ElementNode
+            if (ele[key].length !== 0 && isArray(ele[key][0])) {
+              // group of element nodes
+              const eleGroup: XMLSerializedValue = []
+              const listOfLists = ele[key] as NodeList[]
+              for (let i = 0; i < listOfLists.length; i++) {
+                eleGroup.push(this._process(listOfLists[i]))
+              }
+              result.push({ [key]: eleGroup })
+            } else {
+              // single element node
+              result.push({ [key]: this._process(ele[key] as NodeList) })
+            }
             break
         }
       }
@@ -285,7 +266,19 @@ export class ObjectWriterImpl {
             break
           default:
             // element node
-            obj[key] = this._process((item as ElementNode)[key])
+            const ele = item as ElementNode
+            if (ele[key].length !== 0 && isArray(ele[key][0])) {
+              // group of element nodes
+              const eleGroup: XMLSerializedValue = []
+              const listOfLists = ele[key] as NodeList[]
+              for (let i = 0; i < listOfLists.length; i++) {
+                eleGroup.push(this._process(listOfLists[i]))
+              }
+              obj[key] = eleGroup
+            } else {
+              // single element node
+              obj[key] = this._process(ele[key] as NodeList)
+            }
             break
         }
       }
@@ -315,7 +308,7 @@ export class ObjectWriterImpl {
         if (isArray(lastItem["#"])) {
           lastItem["#"].push(value)
         } else {
-          lastItem["#"] = value
+          lastItem["#"] = [lastItem["#"], value]
         }
       } else {
         items.push({ "#": value })
@@ -332,7 +325,7 @@ export class ObjectWriterImpl {
         if (isArray(lastItem["!"])) {
           lastItem["!"].push(value)
         } else {
-          lastItem["!"] = value
+          lastItem["!"] = [lastItem["!"], value]
         }
       } else {
         items.push({ "!": value })
@@ -349,7 +342,7 @@ export class ObjectWriterImpl {
         if (isArray(lastItem["?"])) {
           lastItem["?"].push(value)
         } else {
-          lastItem["?"] = value
+          lastItem["?"] = [lastItem["?"], value]
         }
       } else {
         items.push({ "?": value })
@@ -366,7 +359,7 @@ export class ObjectWriterImpl {
         if (isArray(lastItem["$"])) {
           lastItem["$"].push(value)
         } else {
-          lastItem["$"] = value
+          lastItem["$"] = [lastItem["$"], value]
         }
       } else {
         items.push({ "$": value })
@@ -374,21 +367,48 @@ export class ObjectWriterImpl {
     }
   }
 
+  private _addElement(items: NodeList, name: string): NodeList {
+    const childItems: NodeList = []
+    if (items.length === 0) {
+      items.push({ [name]: childItems })
+    } else {
+      const lastItem = items[items.length - 1]
+      if (this._isElementNode(lastItem, name)) {
+        if (lastItem[name].length !== 0 && isArray(lastItem[name][0])) {
+          const listOfLists = lastItem[name] as NodeList[]
+          listOfLists.push(childItems)
+        } else {
+          lastItem[name] = [lastItem[name] as NodeList, childItems]
+        }
+      } else {
+        items.push({ [name]: childItems })
+      }
+    }
+    return childItems
+  }
+
   private _isAttrNode(x: any): x is AttrNode {
-    return x["@"] !== undefined
+    return "@" in x
   }
 
   private _isTextNode(x: any): x is TextNode {
-    return x["#"] !== undefined
+    return "#" in x
   }
+
   private _isCommentNode(x: any): x is CommentNode {
-    return x["!"] !== undefined
+    return "!" in x
   }
+
   private _isInstructionNode(x: any): x is InstructionNode {
-    return x["?"] !== undefined
+    return "?" in x
   }
+
   private _isCDATANode(x: any): x is CDATANode {
-    return x["$"] !== undefined
+    return "$" in x
+  }
+
+  private _isElementNode(x: any, name: string): x is ElementNode {
+    return name in x
   }
 
   /**
