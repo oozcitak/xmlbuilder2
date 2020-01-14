@@ -56,11 +56,34 @@ describe('ObjectWriter', () => {
       `)
   })
 
+  test('consecutive attributes', () => {
+    const result = $$.document().ele('root')
+      .att("att1", "val1")
+      .att("att2", "val2")
+      .att("att3", "val3")
+      .ele("node").att("att", "val").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          @: {
+            att1: val1,
+            att2: val2,
+            att3: val3
+          },
+          node: { @att: val }
+        }
+      }
+      `)
+  })
+
   test('consecutive text nodes', () => {
     const result = $$.document().ele('root')
       .txt("text1")
       .txt("text2")
-      .ele("node").txt("text3").up()
+      .txt("text3")
+      .ele("node").txt("text").up()
       .end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -68,9 +91,10 @@ describe('ObjectWriter', () => {
         root: {
           #: [
             text1,
-            text2
+            text2,
+            text3
           ],
-          node: text3
+          node: text
         }
       }
       `)
@@ -80,7 +104,8 @@ describe('ObjectWriter', () => {
     const result = $$.document().ele('root')
       .com("text1")
       .com("text2")
-      .ele("node").com("text3").up()
+      .com("text3")
+      .ele("node").com("text").up()
       .end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -88,9 +113,10 @@ describe('ObjectWriter', () => {
         root: {
           !: [
             text1,
-            text2
+            text2,
+            text3
           ],
-          node: { !: text3 }
+          node: { !: text }
         }
       }
       `)
@@ -100,7 +126,8 @@ describe('ObjectWriter', () => {
     const result = $$.document().ele('root')
       .dat("text1")
       .dat("text2")
-      .ele("node").dat("text3").up()
+      .dat("text3")
+      .ele("node").dat("text").up()
       .end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -108,9 +135,10 @@ describe('ObjectWriter', () => {
         root: {
           $: [
             text1,
-            text2
+            text2,
+            text3
           ],
-          node: { $: text3 }
+          node: { $: text }
         }
       }
       `)
@@ -120,7 +148,8 @@ describe('ObjectWriter', () => {
     const result = $$.document().ele('root')
       .ins("target1", "text1")
       .ins("target2", "text2")
-      .ele("node").ins("target3", "text3").up()
+      .ins("target3", "text3")
+      .ele("node").ins("target", "text").up()
       .end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -128,9 +157,10 @@ describe('ObjectWriter', () => {
         root: {
           ?: [
             target1 text1,
-            target2 text2
+            target2 text2,
+            target3 text3
           ],
-          node: { ?: target3 text3 }
+          node: { ?: target text }
         }
       }
       `)
@@ -177,6 +207,7 @@ describe('ObjectWriter', () => {
       .txt('text1')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
+      .ele('person', { name: "zzz" }).up()
       .txt('text2')
       .txt('text3')
       .end({ format: "object" })
@@ -187,7 +218,8 @@ describe('ObjectWriter', () => {
           #1: text1,
           person: [
             { @name: xxx },
-            { @name: yyy }
+            { @name: yyy },
+            { @name: zzz }
           ],
           #2: [
             text2,
@@ -204,6 +236,8 @@ describe('ObjectWriter', () => {
       .ele('person', { name: "xxx" }).up()
       .txt('world')
       .ele('person', { name: "yyy" }).up()
+      .ele('person', { name: "zzz" }).up()
+      .ele('person', { name: "aaa" }).up()
       .end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -213,8 +247,258 @@ describe('ObjectWriter', () => {
             { #: hello },
             { person: { @name: xxx } },
             { #: world },
-            { person: { @name: yyy } }
+            {
+              person: [
+                { @name: yyy },
+                { @name: zzz },
+                { @name: aaa }
+              ]
+            }
           ]
+        }
+      }
+      `)
+  })
+
+  test('mixed content - attributes', () => {
+    const result = $$.document().ele('root')
+      .att("att", "val")
+      .ele("node").att("att", "val").up()
+      .txt("text")
+      .ele("node").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          #: [
+            { @att: val },
+            { node: { @att: val } },
+            { #: text },
+            { node: { } }
+          ]
+        }
+      }
+      `)
+  })
+
+  test('mixed content - consecutive attributes', () => {
+    const result = $$.document().ele('root')
+      .att("att1", "val1")
+      .att("att2", "val2")
+      .att("att3", "val3")
+      .ele("node").att("att", "val").up()
+      .txt("text")
+      .ele("node").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          #: [
+            {
+              @: {
+                att1: val1,
+                att2: val2,
+                att3: val3
+              }
+            },
+            { node: { @att: val } },
+            { #: text },
+            { node: { } }
+          ]
+        }
+      }
+      `)
+  })
+
+  test('mixed content - consecutive text nodes', () => {
+    const result = $$.document().ele('root')
+      .txt("text1")
+      .txt("text2")
+      .txt("text3")
+      .ele("node").txt("text").up()
+      .txt("text")
+      .ele("node").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          #: [
+            {
+              #: [
+                text1,
+                text2,
+                text3
+              ]
+            },
+            { node: text },
+            { #: text },
+            { node: { } }
+          ]
+        }
+      }
+      `)
+  })
+
+  test('mixed content - consecutive comment nodes', () => {
+    const result = $$.document().ele('root')
+      .com("text1")
+      .com("text2")
+      .com("text3")
+      .ele("node").com("text").up()
+      .txt("text")
+      .ele("node").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          #: [
+            {
+              !: [
+                text1,
+                text2,
+                text3
+              ]
+            },
+            { node: { !: text } },
+            { #: text },
+            { node: { } }
+          ]
+        }
+      }
+      `)
+  })
+
+  test('mixed content - consecutive cdata nodes', () => {
+    const result = $$.document().ele('root')
+      .dat("text1")
+      .dat("text2")
+      .dat("text3")
+      .ele("node").dat("text").up()
+      .txt("text")
+      .ele("node").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          #: [
+            {
+              $: [
+                text1,
+                text2,
+                text3
+              ]
+            },
+            { node: { $: text } },
+            { #: text },
+            { node: { } }
+          ]
+        }
+      }
+      `)
+  })
+
+  test('mixed content - consecutive instruction nodes', () => {
+    const result = $$.document().ele('root')
+      .ins("target1", "text1")
+      .ins("target2", "text2")
+      .ins("target3", "text3")
+      .ele("node").ins("target", "text").up()
+      .txt("text")
+      .ele("node").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          #: [
+            {
+              ?: [
+                target1 text1,
+                target2 text2,
+                target3 text3
+              ]
+            },
+            { node: { ?: target text } },
+            { #: text },
+            { node: { } }
+          ]
+        }
+      }
+      `)
+  })
+
+  test('mixed content - text suffix', () => {
+    const result = $$.document().ele('people')
+      .txt('text1')
+      .ele('person').up()
+      .txt('text2')
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        people: {
+          #1: text1,
+          person: { },
+          #2: text2
+        }
+      }
+      `)
+  })
+
+  test('mixed content - comment suffix', () => {
+    const result = $$.document().ele('people')
+      .com('text1')
+      .ele('person').up()
+      .com('text2')
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        people: {
+          !1: text1,
+          person: { },
+          !2: text2
+        }
+      }
+      `)
+  })
+
+  test('mixed content - cdata suffix', () => {
+    const result = $$.document().ele('people')
+      .dat('text1')
+      .ele('person').up()
+      .dat('text2')
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        people: {
+          $1: text1,
+          person: { },
+          $2: text2
+        }
+      }
+      `)
+  })
+
+  test('mixed content - processing instruction suffix', () => {
+    const result = $$.document().ele('people')
+      .ins('target1', 'text1')
+      .ele('person').up()
+      .ins('target2', 'text2')
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        people: {
+          ?1: target1 text1,
+          person: { },
+          ?2: target2 text2
         }
       }
       `)

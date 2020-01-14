@@ -143,7 +143,7 @@ describe('JSONWriter', () => {
       `)
   })
 
-  test('mixed content and interspersed duplicate tags - cannot preserve node order', () => {
+  test('mixed content and interspersed duplicate tags', () => {
     const result = $$.document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -151,15 +151,15 @@ describe('JSONWriter', () => {
       .ele('person', { name: "yyy" }).up()
       .end({ format: "json", prettyPrint: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    expect(result).toBe($$.t`
       {
         "people": {
-          "#1": "hello",
-          "person": [
-            { "@name": "xxx" },
-            { "@name": "yyy" }
-          ],
-          "#2": "world"
+          "#": [
+            { "#": "hello" },
+            { "person": { "@name": "xxx" } },
+            { "#": "world" },
+            { "person": { "@name": "yyy" } }
+          ]
         }
       }
       `)

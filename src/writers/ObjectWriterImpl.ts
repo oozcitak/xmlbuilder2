@@ -2,9 +2,7 @@ import {
   XMLSerializedValue, ObjectWriterOptions, XMLBuilderOptions
 } from "../builder/interfaces"
 import { applyDefaults, isArray, isString } from "@oozcitak/util"
-import {
-  Node, NodeType
-} from "@oozcitak/dom/lib/dom/interfaces"
+import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { PreSerializer } from "@oozcitak/dom/lib/serializer/PreSerializer"
 
 type AttrNode = { "@": { [key: string]: string } }
@@ -22,7 +20,6 @@ type ElementNode = { [key: string]: NodeList | NodeList[] }
 export class ObjectWriterImpl {
 
   private _builderOptions: XMLBuilderOptions
-  private _pre!: PreSerializer
 
   /**
    * Initializes a new instance of `ObjectWriterImpl`.
@@ -48,7 +45,7 @@ export class ObjectWriterImpl {
     let currentIndex = 0
     let listRegister: NodeList[] = [currentList]
 
-    this._pre = new PreSerializer(this._builderOptions.version, {
+    const pre = new PreSerializer(this._builderOptions.version, {
       beginElement: (name) => {
         const childItems = this._addElement(currentList, name)
         currentIndex++
@@ -98,7 +95,8 @@ export class ObjectWriterImpl {
      *   ]
      * ]
      */
-    this._pre.serialize(node, false)
+    pre.serialize(node, false)
+    
     /**
      * Second pass, process node lists. Above example becomes:
      * {
@@ -280,7 +278,8 @@ export class ObjectWriterImpl {
       items.push({ "@": { [name]: value } })
     } else {
       const lastItem = items[items.length - 1]
-      if (this._isAttrNode(lastItem)) {
+        /* istanbul ignore else */
+        if (this._isAttrNode(lastItem)) {
         lastItem["@"][name] = value
       } else {
         items.push({ "@": { [name]: value } })

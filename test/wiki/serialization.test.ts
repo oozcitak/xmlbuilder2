@@ -23,9 +23,9 @@ describe('serialization examples in wiki', () => {
       topgun: {
         pilots: {
           pilot: [
-            { '@callsign': 'Iceman', '@rank': 'Lieutenant', '#': 'Tom Kazansky' },
-            { '@callsign': 'Maverick', '@rank': 'Lieutenant', '#': 'Pete Mitchell' },
-            { '@callsign': 'Goose', '@rank': 'Lieutenant (j.g.)', '#': 'Nick Bradshaw' }
+            { '@': { 'callsign': 'Iceman', 'rank': 'Lieutenant'}, '#': 'Tom Kazansky' },
+            { '@': { 'callsign': 'Maverick', 'rank': 'Lieutenant'}, '#': 'Pete Mitchell' },
+            { '@': { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)'}, '#': 'Nick Bradshaw' }
           ]
         },
         hangar: {
@@ -65,18 +65,24 @@ describe('serialization examples in wiki', () => {
         "pilots": {
           "pilot": [
             {
-              "@callsign": "Iceman",
-              "@rank": "Lieutenant",
+              "@": {
+                "callsign": "Iceman",
+                "rank": "Lieutenant"
+              },
               "#": "Tom Kazansky"
             },
             {
-              "@callsign": "Maverick",
-              "@rank": "Lieutenant",
+              "@": {
+                "callsign": "Maverick",
+                "rank": "Lieutenant"
+              },
               "#": "Pete Mitchell"
             },
             {
-              "@callsign": "Goose",
-              "@rank": "Lieutenant (j.g.)",
+              "@": {
+                "callsign": "Goose",
+                "rank": "Lieutenant (j.g.)"
+              },
               "#": "Nick Bradshaw"
             }
           ]
@@ -96,9 +102,9 @@ describe('serialization examples in wiki', () => {
   test('Map', () => {
     const pilots = new Map<string, any>()
     pilots.set("pilot", [
-      new Map([['@callsign', 'Iceman'], ['@rank', 'Lieutenant'], ['#', 'Tom Kazansky']]),
-      new Map([['@callsign', 'Maverick'], ['@rank', 'Lieutenant'], ['#', 'Pete Mitchell']]),
-      new Map([['@callsign', 'Goose'], ['@rank', 'Lieutenant (j.g.)'], ['#', 'Nick Bradshaw']])
+      new Map<string, any>([['@', new Map([['callsign', 'Iceman'], ['rank', 'Lieutenant']])], ['#', 'Tom Kazansky']]),
+      new Map<string, any>([['@', new Map([['callsign', 'Maverick'], ['rank', 'Lieutenant']])], ['#', 'Pete Mitchell']]),
+      new Map<string, any>([['@', new Map([['callsign', 'Goose'], ['rank', 'Lieutenant (j.g.)']])], ['#', 'Nick Bradshaw']])
     ])
 
     const hangar = new Map<string, any>()

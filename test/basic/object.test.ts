@@ -225,7 +225,7 @@ describe('object', () => {
     const doc = $$.document().ele(obj).doc()
 
     expect($$.printTree(doc)).toBe($$.t`
-      root (ns:myns) xmlns="myns"
+      root (ns:myns) xmlns="myns" (ns:http://www.w3.org/2000/xmlns/)
         node (ns:myns)
           # val
     `)

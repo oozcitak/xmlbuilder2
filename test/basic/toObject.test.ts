@@ -8,12 +8,14 @@ describe('toObject() with map', () => {
       .ele('node2').root()
     const obj = root.toObject({ format: "map" })
     expect($$.printMap(obj)).toBe($$.t`
-      {
-        root: {
-          @att: val,
-          @att2: val2,
-          node1: { },
-          node2: { }
+      M{
+        root: M{
+          @: M{
+            att: val,
+            att2: val2
+          },
+          node1: M{ },
+          node2: M{ }
         }
       }
     `)
@@ -21,48 +23,48 @@ describe('toObject() with map', () => {
 
   test('document', () => {
     const obj = $$.document().ele('root').doc().toObject({ format: "map" })
-    expect($$.printMap(obj)).toBe('{ root: { } }')
+    expect($$.printMap(obj)).toBe('M{ root: M{ } }')
   })
 
   test('document type', () => {
     const dtd = $$.document().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
-    expect(() => dtd.toObject({ format: "map" })).toThrow()
+    expect(dtd.toObject({ format: "map" })).toEqual(new Map())
   })
 
   test('document fragment', () => {
     const frag = $$.fragment().ele('foo').ele('bar').up().up()
-    expect($$.printMap(frag.toObject({ format: "map" }))).toBe('{ foo: { bar: { } } }')
+    expect($$.printMap(frag.toObject({ format: "map" }))).toBe('M{ foo: M{ bar: M{ } } }')
   })
 
   test('element', () => {
     const root = $$.document().ele('root')
-    expect($$.printMap(root.toObject({ format: "map" }))).toBe('{ root: { } }')
+    expect($$.printMap(root.toObject({ format: "map" }))).toBe('M{ root: M{ } }')
   })
 
   test('text', () => {
     const node = $$.document().ele('root').txt('content').first()
-    expect($$.printMap(node.toObject({ format: "map" }))).toBe('{ #: content }')
+    expect($$.printMap(node.toObject({ format: "map" }))).toBe('content')
   })
 
   test('cdata', () => {
     const node = $$.document().ele('root').dat('content').first()
-    expect($$.printMap(node.toObject({ format: "map" }))).toBe('{ $: content }')
+    expect($$.printMap(node.toObject({ format: "map" }))).toBe('M{ $: content }')
   })
 
   test('comment', () => {
     const node = $$.document().ele('root').com('content').first()
-    expect($$.printMap(node.toObject({ format: "map" }))).toBe('{ !: content }')
+    expect($$.printMap(node.toObject({ format: "map" }))).toBe('M{ !: content }')
   })
 
   test('processing instruction', () => {
     const node = $$.document().ele('root').ins('target', 'content').first()
-    expect($$.printMap(node.toObject({ format: "map" }))).toBe('{ ?: target content }')
+    expect($$.printMap(node.toObject({ format: "map" }))).toBe('M{ ?: target content }')
   })
 
   test('attribute', () => {
     const root = $$.document().ele('root').att("att", "val")
     expect($$.printMap(root.toObject({ format: "map" }))).toBe($$.t`
-      { root: { @att: val } }
+      M{ root: M{ @att: val } }
     `)
   })
 
@@ -83,8 +85,10 @@ describe('toObject() with object', () => {
     expect($$.printMap(obj)).toBe($$.t`
       {
         root: {
-          @att: val,
-          @att2: val2,
+          @: {
+            att: val,
+            att2: val2
+          },
           node1: { },
           node2: { }
         }
@@ -99,7 +103,7 @@ describe('toObject() with object', () => {
 
   test('document type', () => {
     const dtd = $$.document().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
-    expect(() => dtd.toObject({ format: "object" })).toThrow()
+    expect(dtd.toObject({ format: "object" })).toEqual({})
   })
 
   test('document fragment', () => {
@@ -114,7 +118,7 @@ describe('toObject() with object', () => {
 
   test('text', () => {
     const node = $$.document().ele('root').txt('content').first()
-    expect($$.printMap(node.toObject({ format: "object" }))).toBe('{ #: content }')
+    expect($$.printMap(node.toObject({ format: "object" }))).toBe('content')
   })
 
   test('cdata', () => {

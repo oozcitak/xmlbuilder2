@@ -29,20 +29,20 @@ describe('MapWriter', () => {
       .ele('root').ele(obj).end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
-      {
-        root: {
+      M{
+        root: M{
           ele: simple element,
-          person: {
+          person: M{
             @age: 35,
             name: John,
             ?: pi mypi,
             !: Good guy,
             $: well formed!,
-            address: {
+            address: M{
               city: Istanbul,
               street: End of long and winding road
             },
-            contact: {
+            contact: M{
               phone: [
                 555-1234,
                 555-1235
@@ -63,11 +63,11 @@ describe('MapWriter', () => {
       .end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
-      {
-        people: {
+      M{
+        people: M{
           person: [
-            { @name: xxx },
-            { @name: yyy }
+            M{ @name: xxx },
+            M{ @name: yyy }
           ]
         }
       }
@@ -82,10 +82,10 @@ describe('MapWriter', () => {
       .end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
-      {
-        people: {
+      M{
+        people: M{
           #1: hello,
-          person: { @name: xxx },
+          person: M{ @name: xxx },
           #2: world
         }
       }
@@ -101,12 +101,12 @@ describe('MapWriter', () => {
       .end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
-      {
-        people: {
+      M{
+        people: M{
           #1: hello,
           person: [
-            { @name: xxx },
-            { @name: yyy }
+            M{ @name: xxx },
+            M{ @name: yyy }
           ],
           #2: world
         }
@@ -114,7 +114,7 @@ describe('MapWriter', () => {
       `)
   })
 
-  test('mixed content and interspersed duplicate tags - cannot preserve node order', () => {
+  test('mixed content and interspersed duplicate tags', () => {
     const result = $$.document().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -123,14 +123,14 @@ describe('MapWriter', () => {
       .end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
-      {
-        people: {
-          #1: hello,
-          person: [
-            { @name: xxx },
-            { @name: yyy }
-          ],
-          #2: world
+      M{
+        people: M{
+          #: [
+            M{ #: hello },
+            M{ person: M{ @name: xxx } },
+            M{ #: world },
+            M{ person: M{ @name: yyy } }
+          ]
         }
       }
       `)
@@ -141,7 +141,7 @@ describe('MapWriter', () => {
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
-      { root: { } }
+      M{ root: M{ } }
       `)
   })
 
@@ -153,11 +153,11 @@ describe('MapWriter', () => {
       .end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
-      {
-        root: {
+      M{
+        root: M{
           @xmlns: myns,
-          foo: { },
-          bar: { }
+          foo: M{ },
+          bar: M{ }
         }
       }
       `)
