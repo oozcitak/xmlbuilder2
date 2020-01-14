@@ -128,45 +128,34 @@ export class ObjectWriterImpl {
     // determine if there are non-unique element names
     const namesSeen: { [key: string]: boolean } = {}
     let hasNonUniqueNames = false
-    let uniqueNameCount = 0
-    let attrCount = 0
     let textCount = 0
     let commentCount = 0
     let instructionCount = 0
     let cdataCount = 0
-    let elementCount = 0
-    let hasDataNodes = false
     for (let i = 0; i < items.length; i++) {
       const item = items[i]
       const key = Object.keys(item)[0]
       switch (key) {
         case "@":
-          attrCount++
           continue
         case "#":
           textCount++
-          hasDataNodes = true
           break
         case "!":
           commentCount++
-          hasDataNodes = true
           break
         case "?":
           instructionCount++
-          hasDataNodes = true
           break
         case "$":
           cdataCount++
-          hasDataNodes = true
           break
         default:
           if (namesSeen[key]) {
             hasNonUniqueNames = true
           } else {
             namesSeen[key] = true
-            uniqueNameCount++
           }
-          elementCount++
           break
       }
     }
