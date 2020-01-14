@@ -56,7 +56,7 @@ export default class TestHelpers {
       }
       r += (leaf ? ' ' : '\n' + TestHelpers.indent(level)) + ']'
     } else if (isMap(map) || isObject(map)) {
-      r += '{'
+      r += isMap(map) ? 'M{' : '{'
       const len = objectLength(map)
       let i = 0
       for (const [key, val] of forEachObject(map)) {
