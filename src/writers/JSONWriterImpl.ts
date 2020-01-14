@@ -1,7 +1,7 @@
 import {
-  JSONWriterOptions, XMLBuilderOptions, XMLSerializedValue, MapWriterOptions
+  JSONWriterOptions, XMLBuilderOptions, XMLSerializedValue, ObjectWriterOptions
 } from "../builder/interfaces"
-import { MapWriterImpl } from "./MapWriterImpl"
+import { ObjectWriterImpl } from "./ObjectWriterImpl"
 import {
   applyDefaults, isArray, isObject, isMap, objectLength, forEachObject,
   forEachArray
@@ -45,13 +45,15 @@ export class JSONWriterImpl {
       noDoubleEncoding: false
     })
 
-    const mapWriter = new MapWriterImpl(this._builderOptions)
-    const mapWriterOptions: MapWriterOptions = applyDefaults(writerOptions, {
-      format: "map"
-    }, true)
-    const obj = mapWriter.serialize(node, mapWriterOptions)
+    // convert to object
+    const objectWriterOptions: ObjectWriterOptions = applyDefaults(options, {
+      format: "object"
+    })
+    const objectWriter = new ObjectWriterImpl(this._builderOptions)
+    const val = objectWriter.serialize(node, objectWriterOptions)
 
-    return this._beginLine(options, 0) + this._serializeObject(obj, options)
+    // recursively convert object into JSON string
+    return this._beginLine(options, 0) + this._convertObject(val, options)
   }
 
   /**
@@ -59,8 +61,9 @@ export class JSONWriterImpl {
    * 
    * @param obj - object to serialize
    * @param options - serialization options
+   * @param level - depth of the XML tree
    */
-  private _serializeObject(obj: XMLSerializedValue,
+  private _convertObject(obj: XMLSerializedValue,
     options: RequiredJSONWriterOptions, level: number = 0): string {
 
     let markup = ''
@@ -73,7 +76,7 @@ export class JSONWriterImpl {
       for (const val of obj) {
         markup += this._endLine(options, level + 1) + 
           this._beginLine(options, level + 1) +
-          this._serializeObject(val, options, level + 1)
+          this._convertObject(val, options, level + 1)
         if (i < len - 1) { markup += ',' }
         i++
       }
@@ -91,7 +94,7 @@ export class JSONWriterImpl {
         }
         markup += '"' + key + '":'
         if (options.prettyPrint) { markup += ' ' }
-        markup += this._serializeObject(val, options, level + 1)
+        markup += this._convertObject(val, options, level + 1)
         if (i < len - 1) { markup += ',' }
         i++
       }
@@ -164,7 +167,7 @@ export class JSONWriterImpl {
       for (const val of forEachArray(obj)) {
         count += this._descendantCount(val, count)
       }
-    } else if (isMap(obj) || isObject(obj)) {
+    } else if (isObject(obj)) {
       for (const [, val] of forEachObject(obj)) {
         count += this._descendantCount(val, count)
       }
