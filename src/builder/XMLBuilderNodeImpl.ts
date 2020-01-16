@@ -4,19 +4,18 @@ import {
   DefaultBuilderOptions, CastAsNode, PIObject
 } from "./interfaces"
 import {
-  applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty, 
+  applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
   getValue, forEachObject, forEachArray
 } from "@oozcitak/util"
 import { namespace as infraNamespace } from "@oozcitak/infra"
-import { 
+import {
   StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
 } from "../writers"
 import { CastAsNodeImpl } from "./CastAsNode"
 import { Document, Node } from "@oozcitak/dom/lib/dom/interfaces"
 import {
-  namespace_extractQName
-} from "@oozcitak/dom/lib/algorithm"
-import { createParser, isDocumentNode, isDocumentFragmentNode } from "./dom"
+  createParser, isDocumentNode, isDocumentFragmentNode, extractQName
+} from "./dom"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -52,7 +51,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     let attributes: AttributesObject | undefined
 
     let lastChild: XMLBuilderNode | null = null
-  
+
     if (isString(p1) && /^\s*</.test(p1)) {
       // parse XML string
       const contents = "<TEMP_ROOT>" + p1 + "</TEMP_ROOT>"
@@ -169,10 +168,10 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           }
         } else if (isObject(val) || isMap(val)) {
           // check for a namespace declaration attribute
-          const qName = namespace_extractQName(key)
+          const qName = extractQName(key)
           for (const [attName, attValue] of forEachObject(val)) {
             if (attName[0] === this._options.convert.att) {
-              const attQName = namespace_extractQName(attName.slice(1))
+              const attQName = extractQName(attName.slice(1))
               if ((attQName[0] === null && attQName[1] === "xmlns") ||
                 (attQName[0] === "xmlns" && attQName[1] === qName[0])) {
                 namespace = attValue
@@ -269,7 +268,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     // check if this is a namespace declaration attribute
     if (namespace === undefined) {
-      const attQName = namespace_extractQName(name)
+      const attQName = extractQName(name)
       if (attQName[0] === "xmlns") {
         namespace = infraNamespace.XMLNS
       } else if (attQName[0] !== null) {
@@ -581,7 +580,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     // inherit namespace from parent
     if (namespace === null || namespace === undefined) {
-      const qName = namespace_extractQName(name)
+      const qName = extractQName(name)
       const parent = this.as.node.parentNode
       if (parent) {
         namespace = parent.lookupNamespaceURI(qName[0])
@@ -594,7 +593,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
           if (attName === "xmlns") {
             namespace = attValue
           } else {
-            const attQName = namespace_extractQName(attName)
+            const attQName = extractQName(attName)
             if (attQName[0] === "xmlns" && attQName[1] === qName[0]) {
               namespace = attValue
             }

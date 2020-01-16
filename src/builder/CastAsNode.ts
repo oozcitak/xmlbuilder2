@@ -1,9 +1,13 @@
-import { 
-  Node, Document, DocumentType, DocumentFragment, Attr, Text, CDATASection, 
-  Comment, ProcessingInstruction, Element 
+import {
+  Node, Document, DocumentType, DocumentFragment, Attr, Text, CDATASection,
+  Comment, ProcessingInstruction, Element
 } from "@oozcitak/dom/lib/dom/interfaces"
-import { Cast, Guard } from "@oozcitak/dom/lib/util"
 import { XMLBuilderNode, CastAsNode } from "./interfaces"
+import {
+  isDocumentNode, isDocumentFragmentNode, isDocumentTypeNode, isElementNode,
+  isAttrNode, isTextNode, isCDATASectionNode, isCommentNode,
+  isProcessingInstructionNode
+} from "./dom"
 
 /**
  * Returns underlying DOM nodes.
@@ -16,8 +20,8 @@ export class CastAsNodeImpl implements CastAsNode {
    * 
    * @param builder - an XML builder node
    */
-  constructor (builder: XMLBuilderNode) {
-    this._node = Cast.asNode(builder)
+  constructor(builder: XMLBuilderNode) {
+    this._node = builder as unknown as Node
   }
 
   /** @inheritdoc */
@@ -32,7 +36,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get document(): Document {
-    if (Guard.isDocumentNode(this._node)) {
+    if (isDocumentNode(this._node)) {
       return this._node
     } else {
       throw new Error("This function can only be applied to a DOM document node.")
@@ -41,7 +45,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get documentType(): DocumentType {
-    if (Guard.isDocumentTypeNode(this._node)) {
+    if (isDocumentTypeNode(this._node)) {
       return this._node
     } else {
       throw new Error("This function can only be applied to a DOM document type node.")
@@ -50,7 +54,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get documentFragment(): DocumentFragment {
-    if (Guard.isDocumentFragmentNode(this._node)) {
+    if (isDocumentFragmentNode(this._node)) {
       return this._node
     } else {
       throw new Error("This function can only be applied to a DOM document fragment node.")
@@ -59,7 +63,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get attr(): Attr {
-    if (Guard.isAttrNode(this._node)) {
+    if (isAttrNode(this._node)) {
       return this._node
     } else {
       throw new Error("This function can only be applied to a DOM attr node.")
@@ -68,7 +72,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get text(): Text {
-    if (Guard.isTextNode(this._node)) {
+    if (isTextNode(this._node)) {
       return this._node
     } else {
       throw new Error("This function can only be applied to a DOM text node.")
@@ -77,7 +81,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get cdataSection(): CDATASection {
-    if (Guard.isCDATASectionNode(this._node)) {
+    if (isCDATASectionNode(this._node)) {
       return this._node
     } else {
       throw new Error("This function can only be applied to a DOM cdata section node.")
@@ -86,7 +90,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get comment(): Comment {
-    if (Guard.isCommentNode(this._node)) {
+    if (isCommentNode(this._node)) {
       return this._node
     } else {
       throw new Error("This function can only be applied to a DOM comment node.")
@@ -95,7 +99,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get processingInstruction(): ProcessingInstruction {
-    if (Guard.isProcessingInstructionNode(this._node)) {
+    if (isProcessingInstructionNode(this._node)) {
       return this._node
     } else {
       throw new Error("This function can only be applied to a DOM processing instruction node.")
@@ -104,7 +108,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get element(): Element {
-    if (Guard.isElementNode(this._node)) {
+    if (isElementNode(this._node)) {
       return this._node
     } else {
       throw new Error("This function can only be applied to a DOM element node.")
