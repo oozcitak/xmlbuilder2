@@ -12,14 +12,13 @@ import {
   StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
 } from "../writers"
 import { CastAsNodeImpl } from "./CastAsNode"
-import { Guard } from "@oozcitak/dom/lib/util"
 import { Document, Node } from "@oozcitak/dom/lib/dom/interfaces"
 import {
   namespace_extractQName, tree_getFirstDescendantNode, 
   tree_getNextDescendantNode, tree_getFirstAncestorNode, 
   tree_getNextAncestorNode
 } from "@oozcitak/dom/lib/algorithm"
-import { DOMParser } from "@oozcitak/dom"
+import { createParser, isDocumentNode, isDocumentFragmentNode } from "./dom"
 
 /**
  * Represents a mixin that extends XML nodes to implement easy to use and
@@ -59,7 +58,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     if (isString(p1) && /^\s*</.test(p1)) {
       // parse XML string
       const contents = "<TEMP_ROOT>" + p1 + "</TEMP_ROOT>"
-      const domParser = new DOMParser()
+      const domParser = createParser()
       const doc = domParser.parseFromString(contents, "text/xml")
       /* istanbul ignore next */
       if (doc.documentElement === null) {
@@ -419,7 +418,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     const importedNode = node.as.node
 
-    if (Guard.isDocumentNode(importedNode)) {
+    if (isDocumentNode(importedNode)) {
       // import document node
       const elementNode = importedNode.documentElement
       if (elementNode === null) {
@@ -427,7 +426,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       }
       const clone = hostDoc.importNode(elementNode, true)
       hostNode.appendChild(clone)
-    } else if (Guard.isDocumentFragmentNode(importedNode)) {
+    } else if (isDocumentFragmentNode(importedNode)) {
       // import child nodes
       for (const childNode of importedNode.childNodes) {
         const clone = hostDoc.importNode(childNode, true)

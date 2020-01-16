@@ -2,12 +2,10 @@ import {
   XMLBuilderOptions, XMLBuilder, ExpandObject, XMLBuilderNode, Validator,
   DefaultBuilderOptions, XMLBuilderCreateOptions
 } from "./interfaces"
-import { DOMParser, DOMImplementation } from "@oozcitak/dom"
-import { dom } from "@oozcitak/dom/lib/dom"
 import { applyDefaults, isObject } from "@oozcitak/util"
 import { ValidatorImpl } from "../validator"
 import { XMLBuilderNodeImpl } from "./XMLBuilderNodeImpl"
-import { XMLDocument } from "@oozcitak/dom/lib/dom/interfaces"
+import { createDocument, createParser } from "./dom"
 
 /**
  * Serves as an entry point to builder functions.
@@ -23,8 +21,6 @@ export class XMLBuilderImpl implements XMLBuilder {
    * @param options - builder options
    */
   constructor(options: XMLBuilderCreateOptions = {}) {
-
-    dom.setFeatures(false)
 
     this._validate = new ValidatorImpl(options.version || "1.0")
 
@@ -45,19 +41,19 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     if (contents === undefined) {
       // empty fragment
-      const doc = this._createEmptyDocument()
+      const doc = createDocument()
       this._setOptions(doc)
       builder = XMLBuilderNodeImpl._FromNode(doc.createDocumentFragment())
     } else if (isObject(contents)) {
       // JS object
-      const doc = this._createEmptyDocument()
+      const doc = createDocument()
       this._setOptions(doc)
       builder = XMLBuilderNodeImpl._FromNode(doc.createDocumentFragment())
       builder.ele(contents)
     } else if (/^\s*</.test(contents)) {
       // XML document
       contents = "<TEMP_ROOT>" + contents + "</TEMP_ROOT>"
-      const domParser = new DOMParser()
+      const domParser = createParser()
       const doc = domParser.parseFromString(contents, "text/xml")
       this._setOptions(doc)
       /* istanbul ignore next */
@@ -72,7 +68,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       builder = XMLBuilderNodeImpl._FromNode(frag)
     } else {
       // JSON
-      const doc = this._createEmptyDocument()
+      const doc = createDocument()
       this._setOptions(doc)
       builder = XMLBuilderNodeImpl._FromNode(doc.createDocumentFragment())
       const obj = JSON.parse(contents) as ExpandObject
@@ -88,40 +84,27 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     if (contents === undefined) {
       // empty document
-      builder = XMLBuilderNodeImpl._FromNode(this._createEmptyDocument())
+      builder = XMLBuilderNodeImpl._FromNode(createDocument())
       this._setOptions(builder)
     } else if (isObject(contents)) {
       // JS object
-      builder = XMLBuilderNodeImpl._FromNode(this._createEmptyDocument())
+      builder = XMLBuilderNodeImpl._FromNode(createDocument())
       this._setOptions(builder)
       builder.ele(contents)
     } else if (/^\s*</.test(contents)) {
       // XML document
-      const domParser = new DOMParser()
+      const domParser = createParser()
       builder = XMLBuilderNodeImpl._FromNode(domParser.parseFromString(contents, "text/xml"))
       this._setOptions(builder)
     } else {
       // JSON
-      builder = XMLBuilderNodeImpl._FromNode(this._createEmptyDocument())
+      builder = XMLBuilderNodeImpl._FromNode(createDocument())
       this._setOptions(builder)
       const obj = JSON.parse(contents) as ExpandObject
       builder.ele(obj)
     }
 
     return builder
-  }
-
-  /**
-   * Creates an XML document without any child nodes.
-   */
-  private _createEmptyDocument(): XMLDocument {
-    const impl = new DOMImplementation()
-    const doc = impl.createDocument(null, 'root')
-    /* istanbul ignore else */
-    if (doc.documentElement) {
-      doc.removeChild(doc.documentElement)
-    }
-    return doc
   }
 
   /**
