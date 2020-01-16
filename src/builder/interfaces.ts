@@ -799,42 +799,6 @@ export interface XMLBuilderNode {
   forEachAttribute(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode
 
   /**
-   * Traverses through descendant nodes of an element node in tree order.
-   * 
-   * @param callback - a callback function to apply to each node
-   * @param thisArg - value to use as this when executing callback
-   * 
-   * For example, for the following tree:
-   * ```
-   *      a (document node)
-   *     / \
-   *    b   c
-   *   / \
-   *  d   e
-   * ```
-   * `a.traverseDescendants()` visits `b, d, e, c`
-   */
-  forEachDescendant(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode
-
-  /**
-   * Traverses through ancestor nodes of an element node in reverse tree order.
-   * 
-   * @param callback - a callback function to apply to each node
-   * @param thisArg - value to use as this when executing callback
-   * 
-   * For example, for the following tree:
-   * ```
-   *      a (document node)
-   *     / \
-   *    b   c
-   *   / \
-   *  d   e
-   * ```
-   * `e.traverseAncestors()` visits `b, a`
-   */
-  forEachAncestor(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode
-
-  /**
    * Converts the node into its string representation.
    * 
    * @param options - serialization options

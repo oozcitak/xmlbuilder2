@@ -28,25 +28,6 @@ describe('iterators', () => {
     expect(() => node.forEachAttribute(att => str += att.as.node.nodeName)).toThrow()
   })
 
-  test('forEachDescendant()', () => {
-    const nodeA = $$.document().ele('a')
-    nodeA.ele('b').ele('d').up().ele('e').up().up()
-      .ele('c').up()
-    let str = ''
-    nodeA.forEachDescendant(child => str += child.as.node.nodeName)
-    expect(str).toBe('bdec')
-  })
-
-  test('forEachAncestor()', () => {
-    const nodeA = $$.document().ele('a')
-    nodeA.ele('b').ele('d').up().ele('e').up().up()
-      .ele('c').up()
-    const nodeD = nodeA.first().first()
-    let str = ''
-    nodeD.forEachAncestor(child => str += child.as.node.nodeName)
-    expect(str).toBe('ba#document')
-  })
-
   test('this inside callback', () => {
     const root = $$.document().ele('root')
       .ele('node1').up()

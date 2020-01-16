@@ -14,9 +14,7 @@ import {
 import { CastAsNodeImpl } from "./CastAsNode"
 import { Document, Node } from "@oozcitak/dom/lib/dom/interfaces"
 import {
-  namespace_extractQName, tree_getFirstDescendantNode, 
-  tree_getNextDescendantNode, tree_getFirstAncestorNode, 
-  tree_getNextAncestorNode
+  namespace_extractQName
 } from "@oozcitak/dom/lib/algorithm"
 import { createParser, isDocumentNode, isDocumentFragmentNode } from "./dom"
 
@@ -513,26 +511,6 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     this.as.element.attributes._attributeList.forEach(
       node => callback.call(thisArg, (XMLBuilderNodeImpl._FromNode(node)))
     )
-    return this
-  }
-
-  /** @inheritdoc */
-  forEachDescendant(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode {
-    let node = tree_getFirstDescendantNode(this.as.node, false, false)
-    while (node !== null) {
-      callback.call(thisArg, (XMLBuilderNodeImpl._FromNode(node)))
-      node = tree_getNextDescendantNode(this.as.node, node, false, false)
-    }
-    return this
-  }
-
-  /** @inheritdoc */
-  forEachAncestor(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode {
-    let node = tree_getFirstAncestorNode(this.as.node, false)
-    while (node !== null) {
-      callback.call(thisArg, (XMLBuilderNodeImpl._FromNode(node)))
-      node = tree_getNextAncestorNode(this.as.node, node, false)
-    }
     return this
   }
 
