@@ -1,7 +1,7 @@
 import {
   XMLBuilderOptions, XMLBuilderNode, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, Validator, DTDOptions,
-  DefaultBuilderOptions, CastAsNode, PIObject
+  DefaultBuilderOptions, CastAsNode, PIObject, DocumentWithSettings
 } from "./interfaces"
 import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
@@ -18,18 +18,26 @@ import {
 } from "./dom"
 
 /**
- * Represents a mixin that extends XML nodes to implement easy to use and
+ * Represents a wrapper that extends XML nodes to implement easy to use and
  * chainable document builder methods.
  */
 export class XMLBuilderNodeImpl implements XMLBuilderNode {
-  private _castAsNode: CastAsNode | undefined
-  private _builderOptions?: XMLBuilderOptions
-  private _validator?: Validator
+  private _domNode: Node
+  private _castAsNode?: CastAsNode
+
+  /**
+   * Initializes a new instance of `XMLBuilderNodeImpl`.
+   * 
+   * @param domNode - the DOM node to wrap
+   */
+  constructor (domNode: Node) {
+    this._domNode = domNode
+  }
 
   /** @inheritdoc */
   get as(): CastAsNode {
     if (this._castAsNode === undefined) {
-      this._castAsNode = new CastAsNodeImpl(this)
+      this._castAsNode = new CastAsNodeImpl(this._domNode)
     }
     return this._castAsNode
   }
@@ -63,8 +71,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       }
       for (const child of doc.documentElement.childNodes) {
         const newChild = doc.importNode(child, true)
-        lastChild = XMLBuilderNodeImpl._FromNode(newChild)
-        this.as.node.appendChild(newChild)
+        lastChild = new XMLBuilderNodeImpl(newChild)
+        this._domNode.appendChild(newChild)
       }
       if (lastChild === null) {
         throw new Error("Could not create any elements with: " + p1.toString() + ". " + this._debugInfo())
@@ -209,7 +217,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   /** @inheritdoc */
   remove(): XMLBuilderNode {
     const parent = this.up()
-    this.as.any._remove()
+    parent.as.node.removeChild(this.as.node)
     return parent
   }
 
@@ -410,7 +418,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   import(node: XMLBuilderNode): XMLBuilderNode {
-    const hostNode = this.as.node
+    const hostNode = this._domNode
     const hostDoc = this._doc
 
     const importedNode = node.as.node
@@ -440,7 +448,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   doc(): XMLBuilderNode {
-    return XMLBuilderNodeImpl._FromNode(this._doc)
+    return new XMLBuilderNodeImpl(this._doc)
   }
 
   /** @inheritdoc */
@@ -449,58 +457,58 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     if (!ele) {
       throw new Error("Document root element is null. " + this._debugInfo())
     }
-    return XMLBuilderNodeImpl._FromNode(ele)
+    return new XMLBuilderNodeImpl(ele)
   }
 
   /** @inheritdoc */
   up(): XMLBuilderNode {
-    const parent = this.as.node.parentNode
+    const parent = this._domNode.parentNode
     if (!parent) {
       throw new Error("Parent node is null. " + this._debugInfo())
     }
-    return XMLBuilderNodeImpl._FromNode(parent)
+    return new XMLBuilderNodeImpl(parent)
   }
 
   /** @inheritdoc */
   prev(): XMLBuilderNode {
-    const node = this.as.node.previousSibling
+    const node = this._domNode.previousSibling
     if (!node) {
       throw new Error("Previous sibling node is null. " + this._debugInfo())
     }
-    return XMLBuilderNodeImpl._FromNode(node)
+    return new XMLBuilderNodeImpl(node)
   }
 
   /** @inheritdoc */
   next(): XMLBuilderNode {
-    const node = this.as.node.nextSibling
+    const node = this._domNode.nextSibling
     if (!node) {
       throw new Error("Next sibling node is null. " + this._debugInfo())
     }
-    return XMLBuilderNodeImpl._FromNode(node)
+    return new XMLBuilderNodeImpl(node)
   }
 
   /** @inheritdoc */
   first(): XMLBuilderNode {
-    const node = this.as.node.firstChild
+    const node = this._domNode.firstChild
     if (!node) {
       throw new Error("First child node is null. " + this._debugInfo())
     }
-    return XMLBuilderNodeImpl._FromNode(node)
+    return new XMLBuilderNodeImpl(node)
   }
 
   /** @inheritdoc */
   last(): XMLBuilderNode {
-    const node = this.as.node.lastChild
+    const node = this._domNode.lastChild
     if (!node) {
       throw new Error("Last child node is null. " + this._debugInfo())
     }
-    return XMLBuilderNodeImpl._FromNode(node)
+    return new XMLBuilderNodeImpl(node)
   }
 
   /** @inheritdoc */
   forEachChild(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode {
-    this.as.node.childNodes.forEach(
-      node => callback.call(thisArg, (XMLBuilderNodeImpl._FromNode(node)))
+    this._domNode.childNodes.forEach(
+      node => callback.call(thisArg, (new XMLBuilderNodeImpl(node)))
     )
     return this
   }
@@ -508,7 +516,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   /** @inheritdoc */
   forEachAttribute(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode {
     this.as.element.attributes._attributeList.forEach(
-      node => callback.call(thisArg, (XMLBuilderNodeImpl._FromNode(node)))
+      node => callback.call(thisArg, (new XMLBuilderNodeImpl(node)))
     )
     return this
   }
@@ -540,7 +548,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       writerOptions.format = "xml"
     }
 
-    return (<XMLBuilderNodeImpl>this.doc())._serialize(writerOptions)
+    return (this.doc() as XMLBuilderNodeImpl)._serialize(writerOptions)
   }
 
   /**
@@ -613,7 +621,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     )
 
     node.appendChild(child)
-    const builder = XMLBuilderNodeImpl._FromNode(child)
+    const builder = new XMLBuilderNodeImpl(child)
 
     // update doctype node if the new node is the document element node
     const oldDocType = this._doc.doctype
@@ -643,22 +651,21 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * @returns the new dummy element node
    */
   private _dummy(): XMLBuilderNode {
-    const child = this._doc.createElement('dummy_node')
-    return XMLBuilderNodeImpl._FromNode(child)
+    return new XMLBuilderNodeImpl(this._doc.createElement('dummy_node'))
   }
 
   /**
    * Returns the document owning this node.
    */
   protected get _doc(): Document {
-    return this.as.node._nodeDocument
-  }
-
-  /**
-   * Converts a DOM node to an `XMLBuilder`.
-   */
-  static _FromNode(node: Node): XMLBuilderNode {
-    return node as unknown as XMLBuilderNode
+    const node = this.as.node
+    if (isDocumentNode(node)) {
+      return node
+    } else {
+      const docNode = node.ownerDocument
+      if (!docNode) throw new Error("Owner document is null")
+      return docNode
+    }
   }
 
   /**
@@ -684,32 +691,32 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * Gets or sets builder options.
    */
   protected get _options(): XMLBuilderOptions {
-    const doc = this.doc() as XMLBuilderNodeImpl
+    const doc = this._doc as unknown as DocumentWithSettings
     /* istanbul ignore next */
-    if (doc._builderOptions === undefined) {
+    if (doc._xmlBuilderOptions === undefined) {
       throw new Error("Builder options is not set.")
     }
-    return doc._builderOptions
+    return doc._xmlBuilderOptions
   }
   protected set _options(value: XMLBuilderOptions) {
-    const doc = this.doc() as XMLBuilderNodeImpl
-    doc._builderOptions = value
+    const doc = this._doc as unknown as DocumentWithSettings
+    doc._xmlBuilderOptions = value
   }
 
   /**
    * Gets or sets validator functions.
    */
   protected get _validate(): Validator {
-    const doc = this.doc() as XMLBuilderNodeImpl
+    const doc = this._doc as unknown as DocumentWithSettings
     /* istanbul ignore next */
-    if (doc._validator === undefined) {
+    if (doc._xmlBuilderValidator === undefined) {
       throw new Error("Validator is not set.")
     }
-    return doc._validator
+    return doc._xmlBuilderValidator
   }
   protected set _validate(value: Validator) {
-    const doc = this.doc() as XMLBuilderNodeImpl
-    doc._validator = value
+    const doc = this._doc as unknown as DocumentWithSettings
+    doc._xmlBuilderValidator = value
   }
 
 }

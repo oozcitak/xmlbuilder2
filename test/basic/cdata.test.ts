@@ -8,7 +8,7 @@ describe('dat()', () => {
     node1.dat('node1 cdata').ele('node1-2')
     const node2 = root.ele('node2')
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node1
           $ node1 cdata

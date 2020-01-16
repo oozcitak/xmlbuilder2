@@ -1,14 +1,16 @@
 import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
+import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { isObject, isArray, isMap, forEachObject, objectLength } from "@oozcitak/util"
-import { document, fragment, convert } from "../src"
+import { builder, document, fragment, convert } from "../src"
 
 export default class TestHelpers {
+  static builder = builder
   static document = document
   static fragment = fragment
   static convert = convert
   
-  static serialize(node: any): string {
+  static serialize(node: Node): string {
     const s = new XMLSerializer()
     return s.serializeToString(node)
   }
@@ -79,7 +81,7 @@ export default class TestHelpers {
   /**
    * Returns a string representation of the XML tree rooted at `node`.
    * 
-   * @param node - the root node of the tree
+   * @param node - a DOM node
    * @param level - indentation level
    */
   static printTree(node: any, level?: number | undefined): string {

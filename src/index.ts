@@ -1,9 +1,76 @@
 import { 
   XMLBuilderCreateOptions, ExpandObject, XMLBuilderNode, WriterOptions, 
-  XMLSerializedValue 
+  XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions, DocumentWithSettings
 } from './builder/interfaces'
-import { XMLBuilderImpl } from './builder'
-import { isPlainObject } from '@oozcitak/util'
+import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
+import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
+import { XMLBuilderNodeImpl } from './builder'
+import { isNode, createDocument, createParser } from './builder/dom'
+import { ValidatorImpl } from './validator'
+import { isArray } from 'util'
+
+/**
+ * Wraps a DOM node for use with XML builder with default options.
+ * 
+ * @param node - DOM node
+ * 
+ * @returns an XML builder
+ */
+export function builder(node: Node): XMLBuilderNode
+
+/**
+ * Wraps an array of DOM nodes for use with XML builder with default options.
+ * 
+ * @param nodes - an array of DOM nodes
+ * 
+ * @returns an array of XML builders
+ */
+export function builder(nodes: Node[]): XMLBuilderNode[]
+
+/**
+ * Wraps a DOM node for use with XML builder with the given options.
+ * 
+ * @param options - builder options
+ * @param node - DOM node
+ * 
+ * @returns an XML builder
+ */
+export function builder(options: XMLBuilderCreateOptions, node: Node): XMLBuilderNode
+  
+/**
+ * Wraps an array of DOM nodes for use with XML builder with the given options.
+ * 
+ * @param options - builder options
+ * @param nodes - an array of DOM nodes
+ * 
+ * @returns an array of XML builders
+ */
+export function builder(options: XMLBuilderCreateOptions, nodes: Node[]): XMLBuilderNode[]
+
+/** @inheritdoc */
+export function builder(p1: XMLBuilderCreateOptions | Node | Node[], 
+  p2?: Node | Node[]): XMLBuilderNode | XMLBuilderNode[] {
+
+  const options = getOptions(isXMLBuilderCreateOptions(p1) ? p1 : DefaultBuilderOptions)
+  const nodes = isNode(p1) || isArray(p1) ? p1 : p2
+  if (nodes === undefined) {
+    throw new Error("Invalid arguments.")
+  }
+
+  if (isArray(nodes)) {
+    const builders: XMLBuilderNode[] = []
+    for (let i = 0; i < nodes.length; i++) {
+      const builder = new XMLBuilderNodeImpl(nodes[i])
+      builder.set(options)
+      builders.push(builder)
+    }
+    return builders
+  } else {
+    const builder = new XMLBuilderNodeImpl(nodes)
+    builder.set(options)
+    return builder
+  }
+}
 
 /**
  * Creates an XML document without any child nodes.
@@ -47,11 +114,40 @@ export function document(options: XMLBuilderCreateOptions,
 export function document(p1?: XMLBuilderCreateOptions | string | ExpandObject, 
   p2?: string | ExpandObject): XMLBuilderNode {
 
-  if (p1 === undefined || isXMLBuilderCreateOptions(p1)) {
-    return new XMLBuilderImpl(p1).document(p2)
+  const options = getOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
+    p1 : DefaultBuilderOptions)
+  const contents: string | ExpandObject | undefined = 
+    isXMLBuilderCreateOptions(p1) ? p2 : p1
+
+  let builder: XMLBuilderNode
+
+  if (contents === undefined) {
+    // empty document
+    const doc = createDocument()
+    builder = new XMLBuilderNodeImpl(doc)
+    setOptions(doc, options)
+  } else if (isObject(contents)) {
+    // JS object
+    const doc = createDocument()
+    builder = new XMLBuilderNodeImpl(doc)
+    setOptions(doc, options)
+    builder.ele(contents)
+  } else if (/^\s*</.test(contents)) {
+    // XML document
+    const domParser = createParser()
+    const doc = domParser.parseFromString(contents, "text/xml")
+    builder = new XMLBuilderNodeImpl(doc)
+    setOptions(doc, options)
   } else {
-    return new XMLBuilderImpl().document(p1)
+    // JSON
+    const doc = createDocument()
+    builder = new XMLBuilderNodeImpl(doc)
+    setOptions(doc, options)
+    const obj = JSON.parse(contents) as ExpandObject
+    builder.ele(obj)
   }
+
+  return builder
 }
 
 /**
@@ -96,11 +192,49 @@ export function fragment(options: XMLBuilderCreateOptions,
 export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   p2?: string | ExpandObject): XMLBuilderNode {
 
-  if (p1 === undefined || isXMLBuilderCreateOptions(p1)) {
-    return new XMLBuilderImpl(p1).fragment(p2)
+  const options = getOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
+    p1 : DefaultBuilderOptions)
+  const contents: string | ExpandObject | undefined = 
+    isXMLBuilderCreateOptions(p1) ? p2 : p1
+
+  let builder: XMLBuilderNode
+
+  if (contents === undefined) {
+    // empty fragment
+    const doc = createDocument()
+    setOptions(doc, options)
+    builder = new XMLBuilderNodeImpl(doc.createDocumentFragment())
+  } else if (isObject(contents)) {
+    // JS object
+    const doc = createDocument()
+    setOptions(doc, options)
+    builder = new XMLBuilderNodeImpl(doc.createDocumentFragment())
+    builder.ele(contents)
+  } else if (/^\s*</.test(contents)) {
+    // XML document
+    const domParser = createParser()
+    const doc = domParser.parseFromString("<TEMP_ROOT>" + contents + "</TEMP_ROOT>", "text/xml")
+    setOptions(doc, options)
+    /* istanbul ignore next */
+    if (doc.documentElement === null) {
+      throw new Error("Document element is null.")
+    }
+    const frag = doc.createDocumentFragment()
+    for (const child of doc.documentElement.childNodes) {
+      const newChild = doc.importNode(child, true)
+      frag.appendChild(newChild)
+    }
+    builder = new XMLBuilderNodeImpl(frag)
   } else {
-    return new XMLBuilderImpl().fragment(p1)
+    // JSON
+    const doc = createDocument()
+    setOptions(doc, options)
+    builder = new XMLBuilderNodeImpl(doc.createDocumentFragment())
+    const obj = JSON.parse(contents) as ExpandObject
+    builder.ele(obj)
   }
+
+  return builder
 }
 
 /**
@@ -158,7 +292,7 @@ export function convert(builderOptions: XMLBuilderCreateOptions,
 export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject, 
   p2?: string | ExpandObject | WriterOptions, p3?: WriterOptions): XMLSerializedValue {
 
-  let builderOptions: XMLBuilderCreateOptions | undefined
+  let builderOptions: XMLBuilderCreateOptions
   let contents: string | ExpandObject
   let convertOptions: WriterOptions | undefined
   if (isXMLBuilderCreateOptions(p1) && p2 !== undefined) {
@@ -166,11 +300,12 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
     contents = p2
     convertOptions = p3
   } else {
+    builderOptions = DefaultBuilderOptions
     contents = p1
     convertOptions = p2 as WriterOptions | undefined
   }
 
-  return new XMLBuilderImpl(builderOptions).document(contents).end(convertOptions)
+  return document(builderOptions, contents).end(convertOptions)
 }
 
 function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {
@@ -185,4 +320,27 @@ function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {
     }
   }
   return true
+}
+
+function getOptions(createOptions?: XMLBuilderCreateOptions) {
+  const options: XMLBuilderOptions = applyDefaults(
+    createOptions === undefined ? {} : createOptions,
+    DefaultBuilderOptions)
+
+  if (options.convert.att.length === 0 ||
+    options.convert.ins.length === 0 ||
+    options.convert.text.length === 0 ||
+    options.convert.cdata.length === 0 ||
+    options.convert.comment.length === 0) {
+    throw new Error("JS object converter strings cannot be zero length.")
+  }
+
+  return options
+}
+
+function setOptions(doc: Document, options: XMLBuilderOptions): void {
+  const validate = new ValidatorImpl(options.version || "1.0")
+  const docWithSettings = doc as unknown as DocumentWithSettings
+  docWithSettings._xmlBuilderValidator = validate
+  docWithSettings._xmlBuilderOptions = options
 }

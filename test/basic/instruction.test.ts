@@ -9,7 +9,7 @@ describe('ins()', () => {
     const node2 = root.ele('node2')
     node2.ins('target2')
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node1
           ? target1 content

@@ -192,7 +192,7 @@ describe('JSONWriter', () => {
 
   test('unknown node', () => {
     const ele = $$.document().ele('root').ele('alien')
-    Object.defineProperty(ele, "nodeType", { value: 1001, writable: false })
+    Object.defineProperty(ele.as.node, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end({ format: "json" })).toThrow()
   })
   

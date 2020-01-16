@@ -4,6 +4,14 @@ import {
 } from "@oozcitak/dom/lib/dom/interfaces"
 
 /**
+ * Represents a document with XML builder settins applied.
+ */
+export interface DocumentWithSettings {
+  _xmlBuilderValidator: Validator
+  _xmlBuilderOptions: XMLBuilderOptions
+}
+
+/**
  * Defines the options used while creating an XML document.
  */
 export interface XMLBuilderCreateOptions {

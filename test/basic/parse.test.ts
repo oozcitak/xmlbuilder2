@@ -5,7 +5,7 @@ describe('parse()', () => {
   test('XML string', () => {
     const doc = $$.document('<?xml version="1.0"?><root att="val">text</root>')
 
-    expect($$.printTree(doc)).toBe($$.t`
+    expect($$.printTree(doc.as.node)).toBe($$.t`
       root att="val"
         # text
       `)
@@ -14,7 +14,7 @@ describe('parse()', () => {
   test('JS object', () => {
     const doc = $$.document({ root: { "@att": "val", "#": "text" }})
 
-    expect($$.printTree(doc)).toBe($$.t`
+    expect($$.printTree(doc.as.node)).toBe($$.t`
       root att="val"
         # text
       `)
@@ -23,7 +23,7 @@ describe('parse()', () => {
   test('JSON string', () => {
     const doc = $$.document(JSON.stringify({ root: { "@att": "val", "#": "text" }}))
 
-    expect($$.printTree(doc)).toBe($$.t`
+    expect($$.printTree(doc.as.node)).toBe($$.t`
       root att="val"
         # text
       `)

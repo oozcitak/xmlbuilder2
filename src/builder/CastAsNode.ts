@@ -2,7 +2,7 @@ import {
   Node, Document, DocumentType, DocumentFragment, Attr, Text, CDATASection,
   Comment, ProcessingInstruction, Element
 } from "@oozcitak/dom/lib/dom/interfaces"
-import { XMLBuilderNode, CastAsNode } from "./interfaces"
+import { CastAsNode } from "./interfaces"
 import {
   isDocumentNode, isDocumentFragmentNode, isDocumentTypeNode, isElementNode,
   isAttrNode, isTextNode, isCDATASectionNode, isCommentNode,
@@ -18,10 +18,10 @@ export class CastAsNodeImpl implements CastAsNode {
   /**
    * Initializes a new `CastAsNode`.
    * 
-   * @param builder - an XML builder node
+   * @param node - a DOM node
    */
-  constructor(builder: XMLBuilderNode) {
-    this._node = builder as unknown as Node
+  constructor(node: Node) {
+    this._node = node
   }
 
   /** @inheritdoc */

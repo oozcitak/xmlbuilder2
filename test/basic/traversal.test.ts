@@ -7,7 +7,7 @@ describe('traversal', () => {
       .ele('node1').up()
       .ele('node2').up()
 
-    expect(root.first().root()).toBe(root)
+    expect(root.first().root()).toEqual(root)
     const emptyDoc = $$.document()
     expect(() => emptyDoc.root()).toThrow()
   })
@@ -17,7 +17,7 @@ describe('traversal', () => {
       .ele('node1').up()
       .ele('node2').up()
 
-    expect(root.first().up()).toBe(root)
+    expect(root.first().up()).toEqual(root)
     expect(() => root.first().up().up().up()).toThrow()
   })
 

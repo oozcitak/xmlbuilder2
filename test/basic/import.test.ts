@@ -15,7 +15,7 @@ describe('import()', () => {
     root.import(pilot2.doc())
     root.import(pilot3.doc())
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       roster
         ! fighter pilots
         pilot callsign="Maverick" rank="Lieutenant"
@@ -47,7 +47,7 @@ describe('import()', () => {
     
     root.import(pilots)
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       roster
         ! fighter pilots
         pilot callsign="Maverick" rank="Lieutenant"
@@ -71,7 +71,7 @@ describe('import()', () => {
     root.import(pilot2)
     root.import(pilot3)
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       roster
         ! fighter pilots
         pilot callsign="Maverick" rank="Lieutenant"

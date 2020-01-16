@@ -9,7 +9,7 @@ describe('Simple XPath', () => {
 
     expect(nodes[0].localName).toBe("title")
     expect(nodes[0].firstChild.data,).toBe("Harry Potter")
-    expect(nodes[0].toString()).toBe("<title>Harry Potter</title>")
+    expect($$.builder(nodes[0]).toString()).toBe("<title>Harry Potter</title>")
   })
   
   test('select 2', () => {
@@ -29,7 +29,7 @@ describe('Simple XPath', () => {
   
       expect(nodes[0].localName).toBe('title')
       expect(nodes[0].firstChild.data).toBe('Harry Potter')
-      expect(nodes[0].toString()).toBe('<title>Harry Potter</title>')
+      expect($$.builder(nodes[0]).toString()).toBe('<title>Harry Potter</title>')
       
       expect(nodes2.length).toBe(7)
       
@@ -39,24 +39,24 @@ describe('Simple XPath', () => {
 
   test('Select single node', () => {
     const doc = $$.document().ele('book').ele('title').txt('Harry Potter').doc()
-    const nodes = select('//title[1]', doc as any) as any
+    const nodes = select('//title[1]', doc.as.any) as any
     expect(nodes[0].localName).toBe('title')
   })
 
   test('Select text node', () => {
     const doc = $$.document().ele('book').ele('title').txt('Harry').up().ele('title').txt('Potter').doc()
-    expect(select('local-name(/book)', doc as any) as any).toBe('book')
-    expect(select('//title/text()', doc as any).toString()).toBe('Harry,Potter')
+    expect(select('local-name(/book)', doc.as.any) as any).toBe('book')
+    expect($$.builder(select('//title/text()', doc.as.any) as any).toString()).toBe('Harry,Potter')
   })
 
   test('Select number value', () => {
     const doc = $$.document().ele('book').ele('title').txt('Harry').up().ele('title').txt('Potter').doc()
-    expect(select('count(//title)', doc as any)).toBe(2)
+    expect(select('count(//title)', doc.as.any)).toBe(2)
   })
 
   test('Select attribute', () => {
     const doc = $$.document().ele('author').att('name', 'J. K. Rowling').doc()
-    const author = select1('/author/@name', doc as any) as any
+    const author = select1('/author/@name', doc.as.any) as any
     expect(author.value).toBe('J. K. Rowling')
   })
 
@@ -66,7 +66,7 @@ describe('Simple XPath', () => {
       .ele('character', { name: "McGonnagal", sex: "F", age: "65" }).up()
       .doc()
 
-    const characters = select('/*/character[@sex = "M"][@age > 40]/@name', doc as any) as any
+    const characters = select('/*/character[@sex = "M"][@age > 40]/@name', doc.as.any) as any
 
     expect(characters.length).toBe(1)
     expect(characters[0].textContent).toBe('Snape')

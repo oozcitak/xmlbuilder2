@@ -8,7 +8,7 @@ describe('att()', () => {
     node1.att('att1', 'val1').att('att2', 'val2').ele('node1-2')
     const node2 = root.ele('node2')
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node1 att1="val1" att2="val2"
           node1-2
@@ -22,7 +22,7 @@ describe('att()', () => {
     node1.att({ 'att1': 'val1', 'att2': 'val2'}).ele('node1-2')
     const node2 = root.ele('node2')
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node1 att1="val1" att2="val2"
           node1-2
@@ -36,7 +36,7 @@ describe('att()', () => {
     node1.att('att1', 'val1').att('att1', 'val2').ele('node1-2')
     const node2 = root.ele('node2')
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node1 att1="val2"
           node1-2
@@ -56,7 +56,7 @@ describe('att()', () => {
     node1.removeAtt('att2')
     node1.removeAtt(['att1', 'att2', 'att4'])
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node1 att3="val3"
           node1-2
@@ -68,7 +68,7 @@ describe('att()', () => {
     const root = $$.document().ele('root')
     root.ele('node').ele({ '@att1': 'val1', '@att2': 'val2' })
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node att1="val1" att2="val2"
       `)
@@ -78,7 +78,7 @@ describe('att()', () => {
     const root = $$.document().ele('root')
     root.ele('node').ele({ '@': { 'att1': 'val1', 'att2': 'val2' } })
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node att1="val1" att2="val2"
       `)
@@ -90,7 +90,7 @@ describe('att()', () => {
     node1.ele({ '@att1': null, '@att2': 'val2' }).ele('node1-2')
     const node2 = root.ele('node2')
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node1 att2="val2"
           node1-2
@@ -104,7 +104,7 @@ describe('att()', () => {
     node1.ele({ '@att1': null, '@att2': 'val2' }).ele('node1-2')
     const node2 = root.ele('node2')
 
-    expect($$.printTree(root.doc())).toBe($$.t`
+    expect($$.printTree(root.doc().as.node)).toBe($$.t`
       root
         node1 att1="" att2="val2"
           node1-2

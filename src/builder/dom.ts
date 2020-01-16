@@ -1,6 +1,6 @@
 import { 
   XMLDocument, Document, DocumentType, Element, Attr, Text, CDATASection, 
-  Comment, ProcessingInstruction 
+  Comment, ProcessingInstruction, Node 
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { DOMParser, DOMImplementation } from "@oozcitak/dom"
 import { dom, DocumentFragment } from "@oozcitak/dom/lib/dom"
@@ -26,6 +26,15 @@ export function createDocument(): XMLDocument {
  */
 export function createParser(): DOMParser {
   return new DOMParser
+}
+
+/**
+ * Determines if the given object is a `Node`.
+ *
+ * @param x - the object to check
+ */
+export function isNode(x: any): x is Node {
+  return Guard.isNode(x)
 }
 
 /**

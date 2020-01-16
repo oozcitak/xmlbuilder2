@@ -8,7 +8,7 @@ describe('namespaces', () => {
   test('inherit parent namespace', () => {
     const ns1 = 'http://example.com/ns1'
     const doc = $$.document().ele(ns1, 'root')
-      .ele('foo').ele('bar').txt('foobar').doc() as any
+      .ele('foo').ele('bar').txt('foobar').doc().as.node as any
 
     expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1"><foo><bar>foobar</bar></foo></root>')
 
@@ -25,7 +25,7 @@ describe('namespaces', () => {
     const doc = $$.document().ele(ns1, 'root', {
       "xmlns:xsi": xsi,
       "xsi:schemaLocation": "http://example.com/n1 schema.xsd" })
-      .ele('foo').ele('bar').txt('foobar').doc() as any
+      .ele('foo').ele('bar').txt('foobar').doc().as.node as any
 
     expect($$.serialize(doc)).toBe(
       '<root xmlns="http://example.com/ns1"' +
@@ -51,7 +51,7 @@ describe('namespaces', () => {
     const doc = $$.document().ele(svgNs, 'svg', { 
       "xmlns:xlink": xlinkNs })
       .ele('script', { type: "text/ecmascript", "xlink:href": "foo.js" })
-      .doc() as any
+      .doc().as.document as any
 
     expect($$.serialize(doc)).toBe(
       '<svg xmlns="http://www.w3.org/2000/svg"' +
@@ -69,7 +69,7 @@ describe('namespaces', () => {
 
   test('add attribute with namespace', () => {
     const ns1 = 'http://example.com/ns1'
-    const doc = $$.document().ele('root').att(ns1, 'att', 'val').doc() as any
+    const doc = $$.document().ele('root').att(ns1, 'att', 'val').doc().as.node as any
 
     expect($$.serialize(doc)).toBe('<root xmlns:ns1="http://example.com/ns1" ns1:att="val"/>')
 
@@ -80,7 +80,7 @@ describe('namespaces', () => {
     const ns1 = 'http://example.com/ns1'
     const doc = $$.document().ele('root').att(ns1, 'att', 'val').removeAtt(ns1, 'att')
 
-    expect($$.serialize(doc)).toBe('<root/>')
+    expect($$.serialize(doc.as.node)).toBe('<root/>')
   })
 
   test('remove multiple attributes with namespace', () => {
@@ -90,7 +90,7 @@ describe('namespaces', () => {
       .att(ns1, 'att2', 'val')
       .removeAtt(ns1, ['att1', 'att2'])
 
-    expect($$.serialize(doc)).toBe('<root/>')
+    expect($$.serialize(doc.as.node)).toBe('<root/>')
   })
 
 })
