@@ -36,7 +36,7 @@ export class StringWriterImpl {
   private _options!: RequiredStringWriterOptions
   private _refs!: StringWriterRefs
   private _pre!: PreSerializer
-  private _indentation: string[] = []
+  private _indentation: { [key: number]: string} = {}
 
   /**
    * Initializes a new instance of `StringWriterImpl`.
@@ -233,8 +233,7 @@ export class StringWriterImpl {
     if (!this._options.prettyPrint || this._refs.suppressPretty) {
       return
     } else {
-      const indentLevel = this._options.offset + this._pre.level + 1
-      this._refs.markup += this._indent(indentLevel)
+      this._refs.markup += this._indent(this._options.offset + this._pre.level)
     }
   }
 
@@ -258,7 +257,7 @@ export class StringWriterImpl {
   private _indent(level: number): string {
     if (level <= 0) {
       return ""
-    } else if (this._indentation.length > level) {
+    } else if (this._indentation[level] !== undefined) {
       return this._indentation[level]
     } else {
       const str = this._options.indent.repeat(level)
