@@ -1,12 +1,16 @@
 import {
-  Node, Element, NodeType, Document, Comment, Text, DocumentFragment,
+  Node, Element, Document, Comment, Text, DocumentFragment,
   DocumentType, ProcessingInstruction, CDATASection
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { LocalNameSet } from "./LocalNameSet"
 import { NamespacePrefixMap } from "./NamespacePrefixMap"
 import { InvalidStateError } from "@oozcitak/dom/lib/dom/DOMException"
 import { namespace as infraNamespace } from "@oozcitak/infra"
-import { isName, isLegalChar, isPubidChar } from "../../builder/dom"
+import { 
+  isName, isLegalChar, isPubidChar, isElementNode, isDocumentNode, 
+  isCommentNode, isTextNode, isDocumentFragmentNode, isDocumentTypeNode, 
+  isProcessingInstructionNode, isCDATASectionNode 
+} from "../../builder/dom"
 
 /**
  * Pre-serializes XML nodes.
@@ -125,37 +129,24 @@ export class PreSerializer {
 
     this.currentNode = node
 
-    switch (node.nodeType) {
-      case NodeType.Element:
-        this._serializeElement(<Element>node, namespace, prefixMap, prefixIndex,
-          requireWellFormed)
-        break
-      case NodeType.Document:
-        this._serializeDocument(<Document>node, namespace, prefixMap,
-          prefixIndex, requireWellFormed)
-        break
-      case NodeType.Comment:
-        this._serializeComment(<Comment>node, requireWellFormed)
-        break
-      case NodeType.Text:
-        this._serializeText(<Text>node, requireWellFormed)
-        break
-      case NodeType.DocumentFragment:
-        this._serializeDocumentFragment(<DocumentFragment>node, namespace,
-          prefixMap, prefixIndex, requireWellFormed)
-        break
-      case NodeType.DocumentType:
-        this._serializeDocumentType(<DocumentType>node, requireWellFormed)
-        break
-      case NodeType.ProcessingInstruction:
-        this._serializeProcessingInstruction(<ProcessingInstruction>node,
-          requireWellFormed)
-        break
-      case NodeType.CData:
-        this._serializeCData(<CDATASection>node, requireWellFormed)
-        break
-      default:
-        throw new Error(`Unknown node type: ${node.nodeType}`)
+    if (isElementNode(node)) {
+      this._serializeElement(node, namespace, prefixMap, prefixIndex, requireWellFormed)
+    } else if (isDocumentNode(node)) {
+      this._serializeDocument(node, namespace, prefixMap, prefixIndex, requireWellFormed)
+    } else if (isCommentNode(node)) {
+      this._serializeComment(node, requireWellFormed)
+    } else if (isTextNode(node)) {
+      this._serializeText(node, requireWellFormed)
+    } else if (isDocumentFragmentNode(node)) {
+      this._serializeDocumentFragment(node, namespace, prefixMap, prefixIndex, requireWellFormed)
+    } else if (isDocumentTypeNode(node)) {
+      this._serializeDocumentType(node, requireWellFormed)
+    } else if (isProcessingInstructionNode(node)) {
+      this._serializeProcessingInstruction(node, requireWellFormed)
+    } else if (isCDATASectionNode(node)) {
+      this._serializeCData(node, requireWellFormed)
+    } else {
+      throw new Error(`Unknown node type: ${node.nodeType}`)
     }
   }
 

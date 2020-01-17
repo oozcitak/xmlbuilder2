@@ -1,10 +1,9 @@
 import { 
   XMLDocument, Document, DocumentType, Element, Attr, Text, CDATASection, 
-  Comment, ProcessingInstruction, Node 
+  Comment, ProcessingInstruction, DocumentFragment, Node, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { DOMParser, DOMImplementation } from "@oozcitak/dom"
-import { dom, DocumentFragment } from "@oozcitak/dom/lib/dom"
-import { Guard } from "@oozcitak/dom/lib/util"
+import { dom } from "@oozcitak/dom/lib/dom"
 
 dom.setFeatures(false)
 
@@ -34,7 +33,7 @@ export function createParser(): DOMParser {
  * @param x - the object to check
  */
 export function isNode(x: any): x is Node {
-  return Guard.isNode(x)
+  return (!!x && x.nodeType !== undefined)
 }
 
 /**
@@ -43,7 +42,7 @@ export function isNode(x: any): x is Node {
  * @param x - the object to check
  */
 export function isDocumentNode(x: any): x is Document {
-  return Guard.isDocumentNode(x)
+  return (!!x && x.nodeType === NodeType.Document)
 }
 
 /**
@@ -52,7 +51,7 @@ export function isDocumentNode(x: any): x is Document {
  * @param x - the object to check
  */
 export function isDocumentTypeNode(x: any): x is DocumentType {
-  return Guard.isDocumentTypeNode(x)
+  return (!!x && x.nodeType === NodeType.DocumentType)
 }
 
 /**
@@ -61,7 +60,7 @@ export function isDocumentTypeNode(x: any): x is DocumentType {
  * @param x - the object to check
  */
 export function isDocumentFragmentNode(x: any): x is DocumentFragment {
-  return Guard.isDocumentFragmentNode(x)
+  return (!!x && x.nodeType === NodeType.DocumentFragment)
 }
 
 /**
@@ -70,7 +69,7 @@ export function isDocumentFragmentNode(x: any): x is DocumentFragment {
  * @param x - the object to check
  */
 export function isElementNode(x: any): x is Element {
-  return Guard.isElementNode(x)
+  return (!!x && x.nodeType === NodeType.Element)
 }
 
 /**
@@ -79,7 +78,7 @@ export function isElementNode(x: any): x is Element {
  * @param x - the object to check
  */
 export function isAttrNode(x: any): x is Attr {
-  return Guard.isAttrNode(x)
+  return (!!x && x.nodeType === NodeType.Attribute)
 }
 
 /**
@@ -88,7 +87,7 @@ export function isAttrNode(x: any): x is Attr {
  * @param x - the object to check
  */
 export function isTextNode(x: any): x is Text {
-  return Guard.isTextNode(x)
+  return (!!x && x.nodeType === NodeType.Text)
 }
 
 /**
@@ -97,7 +96,7 @@ export function isTextNode(x: any): x is Text {
  * @param x - the object to check
  */
 export function isCDATASectionNode(x: any): x is CDATASection {
-  return Guard.isCDATASectionNode(x)
+  return (!!x && x.nodeType === NodeType.CData)
 }
 
 /**
@@ -106,7 +105,7 @@ export function isCDATASectionNode(x: any): x is CDATASection {
  * @param x - the object to check
  */
 export function isCommentNode(x: any): x is Comment {
-  return Guard.isCommentNode(x)
+  return (!!x && x.nodeType === NodeType.Comment)
 }
 
 /**
@@ -115,7 +114,7 @@ export function isCommentNode(x: any): x is Comment {
  * @param x - the object to check
  */
 export function isProcessingInstructionNode(x: any): x is ProcessingInstruction {
-  return Guard.isProcessingInstructionNode(x)
+  return (!!x && x.nodeType === NodeType.ProcessingInstruction)
 }
 
 /**

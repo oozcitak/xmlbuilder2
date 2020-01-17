@@ -516,7 +516,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       writerOptions.format = "xml"
     }
 
-    return <string>this._serialize(writerOptions)
+    return this._serialize(writerOptions) as string
   }
 
   /** @inheritdoc */
