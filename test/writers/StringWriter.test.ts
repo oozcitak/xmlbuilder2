@@ -478,7 +478,13 @@ describe('StringWriter', () => {
 
   test('wellFormed checks - invalid element node', () => {
     const ele = $$.document().ele('root')
-    Object.defineProperty(ele.as.element, "localName", { value: "x:y"})
+    Object.defineProperty(ele.as.element, "localName", { value: "x:y", configurable: true })
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.as.element, "localName", { value: "\uD87E\uDC04😊", configurable: true})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.as.element, "localName", { value: "abc\0", configurable: true})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.as.element, "localName", { value: "\0abc", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
     Object.defineProperty(ele.as.element, "prefix", { value: "xmlns"})
     expect(() => ele.end({ wellFormed: true })).toThrow()
@@ -490,7 +496,7 @@ describe('StringWriter', () => {
     expect(() => doc.end({ wellFormed: true })).toThrow()
   })
 
-  test('wellFormed checks - invalid element node', () => {
+  test('wellFormed checks - invalid comment node', () => {
     const ele1 = $$.document().ele('root').com('--')
     expect(() => ele1.end({ wellFormed: true })).toThrow()
     const ele2 = $$.document().ele('root').com('text-')
@@ -498,12 +504,12 @@ describe('StringWriter', () => {
   })
 
   test('wellFormed checks - invalid text node', () => {
-    const ele = $$.document().ele('root').txt('\0')
+    const ele = $$.document().ele('root').txt('abc😊\0')
     expect(() => ele.end({ wellFormed: true })).toThrow()
   })
 
   test('wellFormed checks - invalid document type node', () => {
-    const ele1 = $$.document().ele('root').dtd({ pubID: '\0' })
+    const ele1 = $$.document().ele('root').dtd({ pubID: 'abc😊\0' })
     expect(() => ele1.end({ wellFormed: true })).toThrow()
     const ele2 = $$.document().ele('root').dtd({ sysID: '\0' })
     expect(() => ele2.end({ wellFormed: true })).toThrow()
