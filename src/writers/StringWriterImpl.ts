@@ -1,8 +1,8 @@
 import { StringWriterOptions, XMLBuilderOptions } from "../builder/interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { Guard } from "@oozcitak/dom/lib/util"
 import { PreSerializer } from "./base/PreSerializer"
+import { isTextNode } from "../builder/dom"
 
 /**
  * Represents reference parameters passed to string writer functions.
@@ -146,7 +146,7 @@ export class StringWriterImpl {
       let textOnlyNode = true
       let emptyNode = true
       for (const childNode of this._pre.currentNode.childNodes) {
-        if (!Guard.isTextNode(childNode)) {
+        if (!isTextNode(childNode)) {
           textOnlyNode = false
           emptyNode = false
           break
