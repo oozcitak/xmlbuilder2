@@ -26,7 +26,7 @@ export class CastAsNodeImpl implements CastAsNode {
 
   /** @inheritdoc */
   get any(): any {
-    return this._node as any
+    return this._node
   }
 
   /** @inheritdoc */

@@ -301,7 +301,7 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
   } else {
     builderOptions = DefaultBuilderOptions
     contents = p1
-    convertOptions = p2 as WriterOptions | undefined
+    convertOptions = p2 as WriterOptions || undefined
   }
 
   return document(builderOptions, contents).end(convertOptions)

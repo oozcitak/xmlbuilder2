@@ -679,7 +679,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * Gets or sets builder options.
    */
   protected get _options(): XMLBuilderOptions {
-    const doc = this._doc as unknown as DocumentWithSettings
+    const doc = this._doc as DocumentWithSettings
     /* istanbul ignore next */
     if (doc._xmlBuilderOptions === undefined) {
       throw new Error("Builder options is not set.")
@@ -687,7 +687,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     return doc._xmlBuilderOptions
   }
   protected set _options(value: XMLBuilderOptions) {
-    const doc = this._doc as unknown as DocumentWithSettings
+    const doc = this._doc as DocumentWithSettings
     doc._xmlBuilderOptions = value
   }
 
