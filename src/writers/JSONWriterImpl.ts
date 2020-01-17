@@ -38,6 +38,7 @@ export class JSONWriterImpl {
   serialize(node: Node, writerOptions?: JSONWriterOptions): string {
     // provide default options
     const options: RequiredJSONWriterOptions = applyDefaults(writerOptions, {
+      wellFormed: false,
       prettyPrint: false,
       indent: '  ',
       newline: '\n',

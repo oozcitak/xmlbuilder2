@@ -2,6 +2,11 @@ import $$ from '../TestHelpers'
 
 describe('convert()', () => {
 
+  test('From XML string to XML string with default options', () => {
+    const xml = $$.convert('<root att="val">text</root>')
+    expect(xml).toBe(`<?xml version="1.0"?><root att="val">text</root>`)
+  })
+
   test('From XML string to XML string', () => {
     const xml = $$.convert('<root att="val">text</root>', { format: "xml" })
     expect(xml).toBe(`<?xml version="1.0"?><root att="val">text</root>`)

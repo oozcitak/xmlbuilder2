@@ -38,12 +38,14 @@ export class MapWriterImpl {
    */
   serialize(node: Node, writerOptions?: MapWriterOptions): XMLSerializedValue {
     const options: MapWriterOptions = applyDefaults(writerOptions, {
-      format: "map"
+      format: "map",
+      wellFormed: false
     })
 
     // convert to object
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(options, {
-      format: "object"
+      format: "object",
+      wellFormed: false
     })
     const objectWriter = new ObjectWriterImpl(this._builderOptions)
     const val = objectWriter.serialize(node, objectWriterOptions)

@@ -55,6 +55,7 @@ export class StringWriterImpl {
   serialize(node: Node, writerOptions?: StringWriterOptions): string {
     // provide default options
     this._options = applyDefaults(writerOptions, {
+      wellFormed: false,
       headless: false,
       prettyPrint: false,
       indent: "  ",
@@ -95,7 +96,7 @@ export class StringWriterImpl {
       this._endLine()
     }
 
-    this._pre.serialize(node, false)
+    this._pre.serialize(node, this._options.wellFormed)
 
     // remove trailing newline
     if (this._options.prettyPrint && 

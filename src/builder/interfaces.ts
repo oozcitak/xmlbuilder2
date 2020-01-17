@@ -241,6 +241,12 @@ type BaseWriterOptions  = {
    * - `"json"` - Serializes the document as a JSON string.
    */
   format?: "xml" | "map" | "object" | "json"
+  /**
+   * Ensures that the document adheres to the syntax rules specified by the
+   * XML specification. If this flag is set and the document is not well-formed
+   * errors will be thrown. Defaults to `false`.
+   */
+  wellFormed?: boolean
 }
 
 /**

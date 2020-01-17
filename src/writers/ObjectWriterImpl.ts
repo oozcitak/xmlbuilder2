@@ -37,8 +37,9 @@ export class ObjectWriterImpl {
    * @param writerOptions - serialization options
    */
   serialize(node: Node, writerOptions?: ObjectWriterOptions): XMLSerializedValue {
-    const options: ObjectWriterOptions = applyDefaults(writerOptions, {
-      format: "object"
+    const options: Required<ObjectWriterOptions> = applyDefaults(writerOptions, {
+      format: "object",
+      wellFormed: false
     })
 
     let currentList: NodeList = []
@@ -95,7 +96,7 @@ export class ObjectWriterImpl {
      *   ]
      * ]
      */
-    pre.serialize(node, false)
+    pre.serialize(node, options.wellFormed)
     
     /**
      * Second pass, process node lists. Above example becomes:

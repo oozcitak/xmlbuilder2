@@ -287,6 +287,28 @@ describe('StringWriter', () => {
       `)
   })
 
+  test('attributes in same namespace', () => {
+    const doc = $$.document().ele('root')
+      .ele('child').att('uri', 'attr', 'value').up()
+      .ele('child').att('uri', 'attr', 'value')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <root>
+        <child xmlns:ns1="uri" ns1:attr="value"/>
+        <child xmlns:ns2="uri" ns2:attr="value"/>
+      </root>
+      `)
+  })
+
+  test('attributes in same namespace in a single element', () => {
+    const doc = $$.document().ele('root')
+      .att('uri', 'attr1', 'value1').att('uri', 'attr2', 'value2')
+      .doc()
+    expect(doc.end({ wellFormed: true, prettyPrint: true, headless: true })).toBe($$.t`
+      <root xmlns:ns1="uri" ns1:attr1="value1" ns1:attr2="value2"/>
+      `)
+  })
+
   test('allowEmptyTags', () => {
     expect($$.document().ele('root').end({ allowEmptyTags: true, prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
@@ -439,6 +461,109 @@ describe('StringWriter', () => {
     const ele = $$.document().ele('root').ele('alien')
     Object.defineProperty(ele.as.node, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end()).toThrow()
+  })
+
+  test('escape text data', () => {
+    const ele = $$.document().ele('root').txt('&<>')
+    expect(ele.toString()).toBe('<root>&amp;&lt;&gt;</root>')
+  })
+
+  test('escape attribute value', () => {
+    const ele1 = $$.document().ele('root').att('att', '"&<>')
+    expect(ele1.toString()).toBe('<root att="&quot;&amp;&lt;&gt;"/>')
+    const ele2 = $$.document().ele('root').att('att', 'val')
+    Object.defineProperty(ele2.as.element.attributes.item(0), "value", { value: null})
+    expect(ele2.toString()).toBe('<root att=""/>')
+  })
+
+  test('wellFormed checks - invalid element node', () => {
+    const ele = $$.document().ele('root')
+    Object.defineProperty(ele.as.element, "localName", { value: "x:y"})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.as.element, "prefix", { value: "xmlns"})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+  })
+
+  test('wellFormed checks - invalid document node', () => {
+    const doc = $$.document()
+    Object.defineProperty(doc.as.document, "documentElement", { value: null})
+    expect(() => doc.end({ wellFormed: true })).toThrow()
+  })
+
+  test('wellFormed checks - invalid element node', () => {
+    const ele1 = $$.document().ele('root').com('--')
+    expect(() => ele1.end({ wellFormed: true })).toThrow()
+    const ele2 = $$.document().ele('root').com('text-')
+    expect(() => ele2.end({ wellFormed: true })).toThrow()
+  })
+
+  test('wellFormed checks - invalid text node', () => {
+    const ele = $$.document().ele('root').txt('\0')
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+  })
+
+  test('wellFormed checks - invalid document type node', () => {
+    const ele1 = $$.document().ele('root').dtd({ pubID: '\0' })
+    expect(() => ele1.end({ wellFormed: true })).toThrow()
+    const ele2 = $$.document().ele('root').dtd({ sysID: '\0' })
+    expect(() => ele2.end({ wellFormed: true })).toThrow()
+    const ele3 = $$.document().ele('root').dtd({ sysID: '\'quote mismatch"' })
+    expect(() => ele3.end({ wellFormed: true })).toThrow()
+  })
+
+  test('wellFormed checks - invalid processing instruction node', () => {
+    const ele1 = $$.document().ele('root').ins(':')
+    expect(() => ele1.end({ wellFormed: true })).toThrow()
+    const ele2 = $$.document().ele('root').ins('xml')
+    expect(() => ele2.end({ wellFormed: true })).toThrow()
+    const ele3 = $$.document().ele('root').ins('name', '\0')
+    expect(() => ele3.end({ wellFormed: true })).toThrow()
+    const ele4 = $$.document().ele('root').ins('name', 'data')
+    Object.defineProperty(ele4.as.element.firstChild, "data", { value: "?>"})
+    expect(() => ele4.end({ wellFormed: true })).toThrow()
+  })
+
+  test('wellFormed checks - invalid cdata node', () => {
+    const ele = $$.document().ele('root').dat('data')
+    Object.defineProperty(ele.as.element.firstChild, "data", { value: "]]>"})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+  })
+
+  test('wellFormed checks - invalid attribute', () => {
+    // duplicate name
+    const ele1 = $$.document().ele('root').att('att', 'val').att('att2', 'val')
+    Object.defineProperty(ele1.as.element.attributes.item(1), "localName", { value: "att"})
+    expect(() => ele1.end({ wellFormed: true })).toThrow()
+    // XMLNS namespace
+    const ele2 = $$.document().ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:att', 'http://www.w3.org/2000/xmlns/')
+    expect(() => ele2.end({ wellFormed: true })).toThrow()
+    // undeclared namespace
+    const ele3 = $$.document().ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:att', '')
+    expect(() => ele3.end({ wellFormed: true })).toThrow()
+    // invalid name
+    const ele4 = $$.document().ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:att', '')
+    Object.defineProperty(ele4.as.element.attributes.item(0), "localName", { value: ":"})
+    expect(() => ele4.end({ wellFormed: true })).toThrow()
+    const ele5 = $$.document().ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:att', '')
+    Object.defineProperty(ele5.as.element.attributes.item(0), "localName", { value: "\0"})
+    expect(() => ele5.end({ wellFormed: true })).toThrow()
+    const ele6 = $$.document().ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns', 'value')
+    Object.defineProperty(ele6.as.element.attributes.item(0), "namespaceURI", { value: null})
+    expect(() => ele6.end({ wellFormed: true })).toThrow()
+    // invalid value
+    const ele7 = $$.document().ele('root').att('att', '\0')
+    expect(() => ele7.end({ wellFormed: true })).toThrow()
+  })
+
+  test('void HTML element', () => {
+    const doc = $$.document().ele('root')
+      .ele('http://www.w3.org/1999/xhtml', 'hr')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <root>
+        <hr xmlns="http://www.w3.org/1999/xhtml" />
+      </root>
+      `)
   })
 
 })
