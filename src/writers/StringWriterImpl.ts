@@ -36,6 +36,7 @@ export class StringWriterImpl {
   private _options!: RequiredStringWriterOptions
   private _refs!: StringWriterRefs
   private _pre!: PreSerializer
+  private _indentation: string[] = []
 
   /**
    * Initializes a new instance of `StringWriterImpl`.
@@ -233,7 +234,7 @@ export class StringWriterImpl {
       return
     } else {
       const indentLevel = this._options.offset + this._pre.level + 1
-      this._refs.markup += indentLevel > 0 ? new Array(indentLevel).join(this._options.indent) : ''
+      this._refs.markup += this._indent(indentLevel)
     }
   }
 
@@ -246,6 +247,23 @@ export class StringWriterImpl {
       return
     } else {
       this._refs.markup += this._options.newline
+    }
+  }
+
+  /**
+   * Produces an indentation string.
+   * 
+   * @param level - depth of the tree
+   */
+  private _indent(level: number): string {
+    if (level <= 0) {
+      return ""
+    } else if (this._indentation.length > level) {
+      return this._indentation[level]
+    } else {
+      const str = this._options.indent.repeat(level)
+      this._indentation[level] = str
+      return str
     }
   }
 

@@ -41,18 +41,18 @@
       "xmlbuilder2": 13074.662573542017
     }
   },
-  "0.0.7*": {
+  "0.0.7": {
     "small document with ele()": {
-      "xmlbuilder": 97709.1808944878,
-      "xmlbuilder2": 80017.77148027018
+      "xmlbuilder": 106850.62214469152,
+      "xmlbuilder2": 77692.7741526518
     },
     "convert small JS object": {
-      "xmlbuilder": 10016.786868903991,
-      "xmlbuilder2": 7052.9478097719475
+      "xmlbuilder": 11097.539448645606,
+      "xmlbuilder2": 6895.351882136946
     },
     "serialize small document to XML string": {
-      "xmlbuilder": 35474.13392087851,
-      "xmlbuilder2": 12295.46053851602
+      "xmlbuilder": 35422.35398484366,
+      "xmlbuilder2": 14408.373136611226
     }
   }
 }
