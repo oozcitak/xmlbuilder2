@@ -6,7 +6,6 @@ import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
 import { XMLBuilderNodeImpl } from './builder'
 import { isNode, createDocument, createParser } from './builder/dom'
-import { ValidatorImpl } from './validator'
 import { isArray } from 'util'
 
 /**
@@ -51,7 +50,7 @@ export function builder(options: XMLBuilderCreateOptions, nodes: Node[]): XMLBui
 export function builder(p1: XMLBuilderCreateOptions | Node | Node[], 
   p2?: Node | Node[]): XMLBuilderNode | XMLBuilderNode[] {
 
-  const options = getOptions(isXMLBuilderCreateOptions(p1) ? p1 : DefaultBuilderOptions)
+  const options = formatOptions(isXMLBuilderCreateOptions(p1) ? p1 : DefaultBuilderOptions)
   const nodes = isNode(p1) || isArray(p1) ? p1 : p2
   if (nodes === undefined) {
     throw new Error("Invalid arguments.")
@@ -114,7 +113,7 @@ export function document(options: XMLBuilderCreateOptions,
 export function document(p1?: XMLBuilderCreateOptions | string | ExpandObject, 
   p2?: string | ExpandObject): XMLBuilderNode {
 
-  const options = getOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
+  const options = formatOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
     p1 : DefaultBuilderOptions)
   const contents: string | ExpandObject | undefined = 
     isXMLBuilderCreateOptions(p1) ? p2 : p1
@@ -192,7 +191,7 @@ export function fragment(options: XMLBuilderCreateOptions,
 export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   p2?: string | ExpandObject): XMLBuilderNode {
 
-  const options = getOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
+  const options = formatOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
     p1 : DefaultBuilderOptions)
   const contents: string | ExpandObject | undefined = 
     isXMLBuilderCreateOptions(p1) ? p2 : p1
@@ -322,7 +321,7 @@ function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {
   return true
 }
 
-function getOptions(createOptions?: XMLBuilderCreateOptions) {
+function formatOptions(createOptions?: XMLBuilderCreateOptions) {
   const options: XMLBuilderOptions = applyDefaults(
     createOptions === undefined ? {} : createOptions,
     DefaultBuilderOptions)
@@ -339,8 +338,6 @@ function getOptions(createOptions?: XMLBuilderCreateOptions) {
 }
 
 function setOptions(doc: Document, options: XMLBuilderOptions): void {
-  const validate = new ValidatorImpl(options.version || "1.0")
-  const docWithSettings = doc as unknown as DocumentWithSettings
-  docWithSettings._xmlBuilderValidator = validate
+  const docWithSettings = doc as DocumentWithSettings
   docWithSettings._xmlBuilderOptions = options
 }

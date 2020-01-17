@@ -4,10 +4,9 @@ import {
 } from "@oozcitak/dom/lib/dom/interfaces"
 
 /**
- * Represents a document with XML builder settins applied.
+ * Represents a document with XML builder settings applied.
  */
-export interface DocumentWithSettings {
-  _xmlBuilderValidator: Validator
+export interface DocumentWithSettings extends Document {
   _xmlBuilderOptions: XMLBuilderOptions
 }
 
@@ -229,97 +228,6 @@ export const DefaultBuilderOptions: Partial<XMLBuilderOptions> = {
 }
 
 /**
- * Defines a function that validates character data in XML nodes. 
- */
-type ValidatorFunction = (val: string, debugInfo?: string) => string
-
-/**
- * Validates character data in XML nodes.
- */
-export interface Validator {
-
-  /**
-   * Validates a public identifier.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  pubID: ValidatorFunction
-
-  /**
-   * Validates a system identifier.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  sysID: ValidatorFunction
-
-  /**
-   * Validates element and attribute names.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  name: ValidatorFunction
-
-  /**
-   * Validates text node contents.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  text: ValidatorFunction
-
-  /**
-   * Validates CDATA node contents.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  cdata: ValidatorFunction
-
-  /**
-   * Validates comment node contents.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  comment: ValidatorFunction
-
-  /**
-   * Validates attribute values.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  attValue: ValidatorFunction
-
-  /**
-   * Validates processing instruction node target.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  insTarget: ValidatorFunction
-
-  /**
-   * Validates processing instruction node value.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  insValue: ValidatorFunction
-
-  /**
-   * Validates namespace declaration.
-   * 
-   * @param val - value to validate
-   * @param debugInfo - optional debug information
-   */
-  namespace: ValidatorFunction
-}
-
-/**
  * Defines the options passed to the writer.
  */
 type BaseWriterOptions  = {
@@ -421,10 +329,6 @@ export type StringWriterOptions = BaseWriterOptions & {
    * ```
    */
   spaceBeforeSlash?: boolean
-  /**
-   * Prevents existing html entities from being re-encoded. Defaults to `false`.
-   */
-  noDoubleEncoding?: boolean
 }
 
 /**

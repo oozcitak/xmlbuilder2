@@ -6,7 +6,7 @@ import { LocalNameSet } from "./LocalNameSet"
 import { NamespacePrefixMap } from "./NamespacePrefixMap"
 import { InvalidStateError } from "@oozcitak/dom/lib/dom/DOMException"
 import { namespace as infraNamespace } from "@oozcitak/infra"
-import { xml_isName, xml_isLegalChar, xml_isPubidChar } from "@oozcitak/dom/lib/algorithm"
+import { isName, isLegalChar, isPubidChar } from "../../builder/dom"
 
 /**
  * Pre-serializes XML nodes.
@@ -181,7 +181,7 @@ export class PreSerializer {
      * serialization of this node would not be a well-formed element.
      */
     if (requireWellFormed && (node.localName.indexOf(":") !== -1 ||
-      !xml_isName(node.localName))) {
+      !isName(node.localName))) {
       throw new Error("Node local name contains invalid characters (well-formed required).")
     }
 
@@ -363,7 +363,8 @@ export class PreSerializer {
          * the require well-formed flag as input;
          * 12.5.5.6. """ (U+0022 QUOTATION MARK).
          */
-        if (this._attribute) this._attribute('xmlns:' + prefix, ns || '')
+        if (this._attribute) this._attribute('xmlns:' + prefix, 
+          this._serializeAttributeValue(ns, requireWellFormed))
 
         /**
          * 12.5.5.7. If local default namespace is not null (there exists a
@@ -420,7 +421,8 @@ export class PreSerializer {
          * and the require well-formed flag as input;
          * 12.6.5.5. """ (U+0022 QUOTATION MARK).
          */
-        if (this._attribute) this._attribute('xmlns', ns || '')
+        if (this._attribute) this._attribute('xmlns', 
+          this._serializeAttributeValue(ns, requireWellFormed))
 
         /**
          * 12.7. Otherwise, the node has a local default namespace that matches 
@@ -572,7 +574,7 @@ export class PreSerializer {
      * ends with a "-" (U+002D HYPHEN-MINUS) character, then throw an exception;
      * the serialization of this node's data would not be well-formed.
      */
-    if (requireWellFormed && (!xml_isLegalChar(node.data, this._xmlVersion) ||
+    if (requireWellFormed && (!isLegalChar(node.data, this._xmlVersion) ||
       node.data.indexOf("--") !== -1 || node.data.endsWith("-"))) {
       throw new Error("Comment data contains invalid characters (well-formed required).")
     }
@@ -598,7 +600,7 @@ export class PreSerializer {
      * production, then throw an exception; the serialization of this node's 
      * data would not be well-formed.
      */
-    if (requireWellFormed && !xml_isLegalChar(node.data, this._xmlVersion)) {
+    if (requireWellFormed && !isLegalChar(node.data, this._xmlVersion)) {
       throw new Error("Text data contains invalid characters (well-formed required).")
     }
 
@@ -609,7 +611,20 @@ export class PreSerializer {
      * 5. Replace any occurrences of ">" in markup by "&gt;".
      * 6. Return the value of markup.
      */
-    if (this._text) this._text(node.data)
+    let markup = ""
+    for (let i = 0; i < node.data.length; i++) {
+      const c = node.data[i]
+      if (c === "&")
+        markup += "&amp;"
+      else if (c === "<")
+        markup += "&lt;"
+      else if (c === ">")
+        markup += "&gt;"
+      else
+        markup += c
+    }
+
+    if (this._text) this._text(markup)
   }
 
   /**
@@ -657,7 +672,7 @@ export class PreSerializer {
      *  production, then throw an exception; the serialization of this node 
      * would not be a well-formed document type declaration.
      */
-    if (requireWellFormed && !xml_isPubidChar(node.publicId)) {
+    if (requireWellFormed && !isPubidChar(node.publicId)) {
       throw new Error("DocType public identifier does not match PubidChar construct (well-formed required).")
     }
 
@@ -669,7 +684,7 @@ export class PreSerializer {
      * of this node would not be a well-formed document type declaration.
      */
     if (requireWellFormed &&
-      (!xml_isLegalChar(node.systemId, this._xmlVersion) ||
+      (!isLegalChar(node.systemId, this._xmlVersion) ||
         (node.systemId.indexOf('"') !== -1 && node.systemId.indexOf("'") !== -1))) {
       throw new Error("DocType system identifier contains invalid characters (well-formed required).")
     }
@@ -731,7 +746,7 @@ export class PreSerializer {
      * U+003E GREATER-THAN SIGN), then throw an exception; the serialization of
      * this node's data would not be well-formed.
      */
-    if (requireWellFormed && (!xml_isLegalChar(node.data, this._xmlVersion) ||
+    if (requireWellFormed && (!isLegalChar(node.data, this._xmlVersion) ||
       node.data.indexOf("?>") !== -1)) {
       throw new Error("Processing instruction data contains invalid characters (well-formed required).")
     }
@@ -801,7 +816,8 @@ export class PreSerializer {
 
       // Optimize common case
       if (!requireWellFormed && attr.namespaceURI === null) {
-        if (this._attribute) this._attribute(attr.localName, attr.value)
+        if (this._attribute) this._attribute(attr.localName, 
+          this._serializeAttributeValue(attr.value, requireWellFormed))
         continue
       }
 
@@ -939,7 +955,8 @@ export class PreSerializer {
            * attribute namespace and the require well-formed flag as input;
            * 3.5.3.2.6. """ (U+0022 QUOTATION MARK).
           */
-          if (this._attribute) this._attribute('xmlns:' + candidatePrefix, attributeNamespace)
+          if (this._attribute) this._attribute('xmlns:' + candidatePrefix, 
+            this._serializeAttributeValue(attributeNamespace, requireWellFormed))
         }
       }
 
@@ -962,7 +979,7 @@ export class PreSerializer {
        * well-formed attribute.
        */
       if (requireWellFormed && (attr.localName.indexOf(":") !== -1 ||
-        !xml_isName(attr.localName) ||
+        !isName(attr.localName) ||
         (attr.localName === "xmlns" && attributeNamespace === null))) {
         throw new Error("Attribute local name contains invalid characters (well-formed required).")
       }
@@ -976,7 +993,8 @@ export class PreSerializer {
        * 3.9.4. """ (U+0022 QUOTATION MARK).
        */
       attrName += attr.localName
-      if (this._attribute) this._attribute(attrName, attr.value)
+      if (this._attribute) this._attribute(attrName, 
+        this._serializeAttributeValue(attr.value, requireWellFormed))
     }
 
     /**
@@ -1127,6 +1145,59 @@ export class PreSerializer {
     prefixIndex.value++
     prefixMap.set(generatedPrefix, newNamespace)
     return generatedPrefix
+  }
+
+  /**
+   * Produces an XML serialization of an attribute value.
+   * 
+   * @param value - attribute value
+   * @param requireWellFormed - whether to check conformance
+   */
+  private _serializeAttributeValue(value: string | null, requireWellFormed: boolean): string {
+    /**
+     * From: https://w3c.github.io/DOM-Parsing/#dfn-serializing-an-attribute-value
+     * 
+     * 1. If the require well-formed flag is set (its value is true), and 
+     * attribute value contains characters that are not matched by the XML Char
+     * production, then throw an exception; the serialization of this attribute
+     * value would fail to produce a well-formed element serialization.
+     */
+    if (requireWellFormed && value !== null && !isLegalChar(value, this._xmlVersion)) {
+      throw new Error("Invalid characters in attribute value.")
+    }
+
+    /**
+     * 2. If attribute value is null, then return the empty string.
+     */
+    if (value === null) return ""
+
+    /**
+     * 3. Otherwise, attribute value is a string. Return the value of attribute
+     * value, first replacing any occurrences of the following:
+     * - "&" with "&amp;"
+     * - """ with "&quot;"
+     * - "<" with "&lt;"
+     * - ">" with "&gt;"
+     * NOTE
+     * This matches behavior present in browsers, and goes above and beyond the
+     * grammar requirement in the XML specification's AttValue production by
+     * also replacing ">" characters.
+     */
+    let result = ""
+    for (let i = 0; i < value.length; i++) {
+      const c = value[i]
+      if (c === "\"")
+        result += "&quot;"
+      else if (c === "&")
+        result += "&amp;"
+      else if (c === "<")
+        result += "&lt;"
+      else if (c === ">")
+        result += "&gt;"
+      else
+        result += c
+    }
+    return result
   }
 
 }

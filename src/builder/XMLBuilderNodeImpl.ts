@@ -1,6 +1,6 @@
 import {
   XMLBuilderOptions, XMLBuilderNode, AttributesObject, ExpandObject,
-  WriterOptions, XMLSerializedValue, Validator, DTDOptions,
+  WriterOptions, XMLSerializedValue, DTDOptions,
   DefaultBuilderOptions, CastAsNode, PIObject, DocumentWithSettings
 } from "./interfaces"
 import {
@@ -248,10 +248,10 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     if (p1 !== undefined && p2 !== undefined && p3 !== undefined) {
       // att(namespace: string, name: string, value: string)
-      [namespace, name, value] = [<string>p1, p2, p3]
+      [namespace, name, value] = [p1 as string, p2, p3]
     } else if (p1 !== undefined && p2 !== undefined) {
       // ele(name: string, value: string)
-      [namespace, name, value] = [undefined, <string>p1, p2]
+      [namespace, name, value] = [undefined, p1 as string, p2]
     } else {
       throw new Error("Attribute name and value not specified. " + this._debugInfo())
     }
@@ -270,9 +270,11 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     }
 
     const ele = this.as.element
-    // character validation
-    name = this._validate.name(name, this._debugInfo())
-    value = this._validate.attValue(value, this._debugInfo())
+
+    // convert to string
+    if (namespace !== undefined && namespace !== null) namespace += ""
+    name += ""
+    value += ""
 
     // check if this is a namespace declaration attribute
     if (namespace === undefined) {
@@ -287,7 +289,6 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     }
 
     if (namespace !== null && namespace !== undefined && !ele.isDefaultNamespace(namespace)) {
-      namespace = this._validate.namespace(namespace, this._debugInfo())
       ele.setAttributeNS(namespace, name, value)
     } else {
       ele.setAttribute(name, value)
@@ -310,17 +311,17 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       for (const attName of forEachArray(p1)) {
         this.removeAtt(attName)
       }
-    } else if (isString(p1) && isArray(p2)) {
+    } else if (isArray(p2)) {
       // removeAtt(namespace: string, names: string[])
       for (const attName of forEachArray(p2)) {
-        this.removeAtt(p1, attName)
+        this.removeAtt(p1 + "", attName)
       }
-    } else if (isString(p1) && isString(p2)) {
+    } else if (p1 !== undefined && p2 !== undefined) {
       // removeAtt(namespace: string, name: string)
-      this.as.element.removeAttributeNS(p1, p2)
+      this.as.element.removeAttributeNS(p1 + "", p2 + "")
     } else {
       // removeAtt(name: string)
-      this.as.element.removeAttribute(p1)
+      this.as.element.removeAttribute(p1 + "")
     }
 
     return this
@@ -328,10 +329,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   txt(content: string): XMLBuilderNode {
-    // character validation
-    content = this._validate.text(content, this._debugInfo())
-
-    const child = this._doc.createTextNode(content)
+    const child = this._doc.createTextNode(content + "")
     this.as.node.appendChild(child)
 
     return this
@@ -339,10 +337,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   com(content: string): XMLBuilderNode {
-    // character validation
-    content = this._validate.comment(content, this._debugInfo())
-
-    const child = this._doc.createComment(content)
+    const child = this._doc.createComment(content + "")
     this.as.node.appendChild(child)
 
     return this
@@ -350,10 +345,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   dat(content: string): XMLBuilderNode {
-    // character validation
-    content = this._validate.cdata(content, this._debugInfo())
-
-    const child = this._doc.createCDATASection(content)
+    const child = this._doc.createCDATASection(content + "")
     this.as.node.appendChild(child)
 
     return this
@@ -363,7 +355,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   ins(target: string | PIObject, content: string = ''): XMLBuilderNode {
 
     if (isArray(target)) {
-      for (const item of forEachArray(target)) {
+      for (let item of forEachArray(target)) {
+        item += ""
         const insIndex = item.indexOf(' ')
         const insTarget = (insIndex === -1 ? item : item.substr(0, insIndex))
         const insValue = (insIndex === -1 ? '' : item.substr(insIndex + 1))
@@ -374,11 +367,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
         this.ins(insTarget, insValue)
       }
     } else {
-      // character validation
-      target = this._validate.insTarget(target, this._debugInfo())
-      content = this._validate.insValue(content, this._debugInfo())
-
-      const child = this._doc.createProcessingInstruction(target, content)
+      const child = this._doc.createProcessingInstruction(target + "", content + "")
       this.as.node.appendChild(child)
     }
 
@@ -396,9 +385,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   dtd(options?: DTDOptions): XMLBuilderNode {
-    // character validation
-    const pubID = this._validate.pubID((options && options.pubID) || '', this._debugInfo())
-    const sysID = this._validate.sysID((options && options.sysID) || '', this._debugInfo())
+    const pubID = ((options && options.pubID) || "") + ""
+    const sysID = ((options && options.sysID) || "") + ""
 
     // create doctype node
     const docType = this._doc.implementation.createDocumentType(
@@ -586,6 +574,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   private _node(namespace: string | null | undefined, name: string,
     attributes?: AttributesObject): XMLBuilderNode {
 
+    name += ""
+
     // inherit namespace from parent
     if (namespace === null || namespace === undefined) {
       const qName = extractQName(name)
@@ -612,11 +602,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
     const node = this.as.node
 
-    // character validation
-    this._validate.name(name, this._debugInfo())
-
     const child = (namespace !== null && namespace !== undefined ?
-      this._doc.createElementNS(namespace, name) :
+      this._doc.createElementNS(namespace + "", name) :
       this._doc.createElement(name)
     )
 
@@ -701,22 +688,6 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   protected set _options(value: XMLBuilderOptions) {
     const doc = this._doc as unknown as DocumentWithSettings
     doc._xmlBuilderOptions = value
-  }
-
-  /**
-   * Gets or sets validator functions.
-   */
-  protected get _validate(): Validator {
-    const doc = this._doc as unknown as DocumentWithSettings
-    /* istanbul ignore next */
-    if (doc._xmlBuilderValidator === undefined) {
-      throw new Error("Validator is not set.")
-    }
-    return doc._xmlBuilderValidator
-  }
-  protected set _validate(value: Validator) {
-    const doc = this._doc as unknown as DocumentWithSettings
-    doc._xmlBuilderValidator = value
   }
 
 }

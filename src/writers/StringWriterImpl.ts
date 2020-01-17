@@ -3,7 +3,6 @@ import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { Guard } from "@oozcitak/dom/lib/util"
 import { PreSerializer } from "./base/PreSerializer"
-import { Char } from "../validator"
 
 /**
  * Represents reference parameters passed to string writer functions.
@@ -185,7 +184,7 @@ export class StringWriterImpl {
    * Produces the serialization of an attribute node.
    */
   private _attribute(name: string, value: string): void {
-    this._refs.markup += " " + name + "=\"" + Char.escapeAttrValue(value, this._options.noDoubleEncoding) + "\""
+    this._refs.markup += " " + name + "=\"" + value + "\""
   }
 
   /**
@@ -193,7 +192,7 @@ export class StringWriterImpl {
    */
   private _text(data: string): void {
     this._beginLine()
-    this._refs.markup += Char.escapeText(data, this._options.noDoubleEncoding)
+    this._refs.markup += data
     this._endLine()
   }
 
