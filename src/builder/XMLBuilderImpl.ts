@@ -1,5 +1,5 @@
 import {
-  XMLBuilderOptions, XMLBuilderNode, AttributesObject, ExpandObject,
+  XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, DTDOptions,
   DefaultBuilderOptions, CastAsNode, PIObject, DocumentWithSettings
 } from "./interfaces"
@@ -21,7 +21,7 @@ import {
  * Represents a wrapper that extends XML nodes to implement easy to use and
  * chainable document builder methods.
  */
-export class XMLBuilderNodeImpl implements XMLBuilderNode {
+export class XMLBuilderImpl implements XMLBuilder {
   private _domNode: Node
   private _castAsNode?: CastAsNode
 
@@ -43,7 +43,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  set(options: Partial<XMLBuilderOptions>): XMLBuilderNode {
+  set(options: Partial<XMLBuilderOptions>): XMLBuilder {
     this._options = applyDefaults(
       applyDefaults(this._options, options, true), // apply user settings
       DefaultBuilderOptions) // provide defaults
@@ -52,13 +52,13 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
 
   /** @inheritdoc */
   ele(p1: string | ExpandObject, p2?: AttributesObject | string,
-    p3?: AttributesObject): XMLBuilderNode {
+    p3?: AttributesObject): XMLBuilder {
 
     let namespace: string | undefined
     let name: string | ExpandObject | undefined
     let attributes: AttributesObject | undefined
 
-    let lastChild: XMLBuilderNode | null = null
+    let lastChild: XMLBuilder | null = null
 
     if (isString(p1) && /^\s*</.test(p1)) {
       // parse XML string
@@ -71,7 +71,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       }
       for (const child of doc.documentElement.childNodes) {
         const newChild = doc.importNode(child, true)
-        lastChild = new XMLBuilderNodeImpl(newChild)
+        lastChild = new XMLBuilderImpl(newChild)
         this._domNode.appendChild(newChild)
       }
       if (lastChild === null) {
@@ -215,14 +215,14 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  remove(): XMLBuilderNode {
+  remove(): XMLBuilder {
     const parent = this.up()
     parent.as.node.removeChild(this.as.node)
     return parent
   }
 
   /** @inheritdoc */
-  att(p1: AttributesObject | string, p2?: string, p3?: string): XMLBuilderNode {
+  att(p1: AttributesObject | string, p2?: string, p3?: string): XMLBuilder {
 
     if (isMap(p1) || isObject(p1)) {
       // att(obj: AttributesObject)
@@ -298,7 +298,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  removeAtt(p1: string | string[], p2?: string | string[]): XMLBuilderNode {
+  removeAtt(p1: string | string[], p2?: string | string[]): XMLBuilder {
 
     // get primitive values
     p1 = getValue(p1)
@@ -328,7 +328,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  txt(content: string): XMLBuilderNode {
+  txt(content: string): XMLBuilder {
     const child = this._doc.createTextNode(content + "")
     this.as.node.appendChild(child)
 
@@ -336,7 +336,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  com(content: string): XMLBuilderNode {
+  com(content: string): XMLBuilder {
     const child = this._doc.createComment(content + "")
     this.as.node.appendChild(child)
 
@@ -344,7 +344,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  dat(content: string): XMLBuilderNode {
+  dat(content: string): XMLBuilder {
     const child = this._doc.createCDATASection(content + "")
     this.as.node.appendChild(child)
 
@@ -352,7 +352,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  ins(target: string | PIObject, content: string = ''): XMLBuilderNode {
+  ins(target: string | PIObject, content: string = ''): XMLBuilder {
 
     if (isArray(target)) {
       for (let item of forEachArray(target)) {
@@ -375,7 +375,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilderNode {
+  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilder {
     this._options.version = options.version
     this._options.encoding = options.encoding
     this._options.standalone = options.standalone
@@ -384,7 +384,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  dtd(options?: DTDOptions): XMLBuilderNode {
+  dtd(options?: DTDOptions): XMLBuilder {
     const pubID = ((options && options.pubID) || "") + ""
     const sysID = ((options && options.sysID) || "") + ""
 
@@ -405,7 +405,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  import(node: XMLBuilderNode): XMLBuilderNode {
+  import(node: XMLBuilder): XMLBuilder {
     const hostNode = this._domNode
     const hostDoc = this._doc
 
@@ -435,76 +435,76 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
   }
 
   /** @inheritdoc */
-  doc(): XMLBuilderNode {
-    return new XMLBuilderNodeImpl(this._doc)
+  doc(): XMLBuilder {
+    return new XMLBuilderImpl(this._doc)
   }
 
   /** @inheritdoc */
-  root(): XMLBuilderNode {
+  root(): XMLBuilder {
     const ele = this._doc.documentElement
     if (!ele) {
       throw new Error("Document root element is null. " + this._debugInfo())
     }
-    return new XMLBuilderNodeImpl(ele)
+    return new XMLBuilderImpl(ele)
   }
 
   /** @inheritdoc */
-  up(): XMLBuilderNode {
+  up(): XMLBuilder {
     const parent = this._domNode.parentNode
     if (!parent) {
       throw new Error("Parent node is null. " + this._debugInfo())
     }
-    return new XMLBuilderNodeImpl(parent)
+    return new XMLBuilderImpl(parent)
   }
 
   /** @inheritdoc */
-  prev(): XMLBuilderNode {
+  prev(): XMLBuilder {
     const node = this._domNode.previousSibling
     if (!node) {
       throw new Error("Previous sibling node is null. " + this._debugInfo())
     }
-    return new XMLBuilderNodeImpl(node)
+    return new XMLBuilderImpl(node)
   }
 
   /** @inheritdoc */
-  next(): XMLBuilderNode {
+  next(): XMLBuilder {
     const node = this._domNode.nextSibling
     if (!node) {
       throw new Error("Next sibling node is null. " + this._debugInfo())
     }
-    return new XMLBuilderNodeImpl(node)
+    return new XMLBuilderImpl(node)
   }
 
   /** @inheritdoc */
-  first(): XMLBuilderNode {
+  first(): XMLBuilder {
     const node = this._domNode.firstChild
     if (!node) {
       throw new Error("First child node is null. " + this._debugInfo())
     }
-    return new XMLBuilderNodeImpl(node)
+    return new XMLBuilderImpl(node)
   }
 
   /** @inheritdoc */
-  last(): XMLBuilderNode {
+  last(): XMLBuilder {
     const node = this._domNode.lastChild
     if (!node) {
       throw new Error("Last child node is null. " + this._debugInfo())
     }
-    return new XMLBuilderNodeImpl(node)
+    return new XMLBuilderImpl(node)
   }
 
   /** @inheritdoc */
-  forEachChild(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode {
+  forEachChild(callback: (node: XMLBuilder) => void, thisArg?: any): XMLBuilder {
     this._domNode.childNodes.forEach(
-      node => callback.call(thisArg, (new XMLBuilderNodeImpl(node)))
+      node => callback.call(thisArg, (new XMLBuilderImpl(node)))
     )
     return this
   }
 
   /** @inheritdoc */
-  forEachAttribute(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode {
+  forEachAttribute(callback: (node: XMLBuilder) => void, thisArg?: any): XMLBuilder {
     this.as.element.attributes._attributeList.forEach(
-      node => callback.call(thisArg, (new XMLBuilderNodeImpl(node)))
+      node => callback.call(thisArg, (new XMLBuilderImpl(node)))
     )
     return this
   }
@@ -536,7 +536,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       writerOptions.format = "xml"
     }
 
-    return (this.doc() as XMLBuilderNodeImpl)._serialize(writerOptions)
+    return (this.doc() as XMLBuilderImpl)._serialize(writerOptions)
   }
 
   /**
@@ -572,7 +572,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * @returns the new element node
    */
   private _node(namespace: string | null | undefined, name: string,
-    attributes?: AttributesObject): XMLBuilderNode {
+    attributes?: AttributesObject): XMLBuilder {
 
     name += ""
 
@@ -608,7 +608,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
     )
 
     node.appendChild(child)
-    const builder = new XMLBuilderNodeImpl(child)
+    const builder = new XMLBuilderImpl(child)
 
     // update doctype node if the new node is the document element node
     const oldDocType = this._doc.doctype
@@ -637,8 +637,8 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
    * 
    * @returns the new dummy element node
    */
-  private _dummy(): XMLBuilderNode {
-    return new XMLBuilderNodeImpl(this._doc.createElement('dummy_node'))
+  private _dummy(): XMLBuilder {
+    return new XMLBuilderImpl(this._doc.createElement('dummy_node'))
   }
 
   /**
@@ -650,6 +650,7 @@ export class XMLBuilderNodeImpl implements XMLBuilderNode {
       return node
     } else {
       const docNode = node.ownerDocument
+      /* istanbul ignore next */
       if (!docNode) throw new Error("Owner document is null")
       return docNode
     }

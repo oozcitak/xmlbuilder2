@@ -1,10 +1,10 @@
 import { 
-  XMLBuilderCreateOptions, ExpandObject, XMLBuilderNode, WriterOptions, 
+  XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions, 
   XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions, DocumentWithSettings
 } from './builder/interfaces'
 import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
-import { XMLBuilderNodeImpl } from './builder'
+import { XMLBuilderImpl } from './builder'
 import { isNode, createDocument, createParser } from './builder/dom'
 import { isArray } from 'util'
 
@@ -15,7 +15,7 @@ import { isArray } from 'util'
  * 
  * @returns an XML builder
  */
-export function builder(node: Node): XMLBuilderNode
+export function builder(node: Node): XMLBuilder
 
 /**
  * Wraps an array of DOM nodes for use with XML builder with default options.
@@ -24,7 +24,7 @@ export function builder(node: Node): XMLBuilderNode
  * 
  * @returns an array of XML builders
  */
-export function builder(nodes: Node[]): XMLBuilderNode[]
+export function builder(nodes: Node[]): XMLBuilder[]
 
 /**
  * Wraps a DOM node for use with XML builder with the given options.
@@ -34,7 +34,7 @@ export function builder(nodes: Node[]): XMLBuilderNode[]
  * 
  * @returns an XML builder
  */
-export function builder(options: XMLBuilderCreateOptions, node: Node): XMLBuilderNode
+export function builder(options: XMLBuilderCreateOptions, node: Node): XMLBuilder
   
 /**
  * Wraps an array of DOM nodes for use with XML builder with the given options.
@@ -44,11 +44,11 @@ export function builder(options: XMLBuilderCreateOptions, node: Node): XMLBuilde
  * 
  * @returns an array of XML builders
  */
-export function builder(options: XMLBuilderCreateOptions, nodes: Node[]): XMLBuilderNode[]
+export function builder(options: XMLBuilderCreateOptions, nodes: Node[]): XMLBuilder[]
 
 /** @inheritdoc */
 export function builder(p1: XMLBuilderCreateOptions | Node | Node[], 
-  p2?: Node | Node[]): XMLBuilderNode | XMLBuilderNode[] {
+  p2?: Node | Node[]): XMLBuilder | XMLBuilder[] {
 
   const options = formatOptions(isXMLBuilderCreateOptions(p1) ? p1 : DefaultBuilderOptions)
   const nodes = isNode(p1) || isArray(p1) ? p1 : p2
@@ -57,15 +57,15 @@ export function builder(p1: XMLBuilderCreateOptions | Node | Node[],
   }
 
   if (isArray(nodes)) {
-    const builders: XMLBuilderNode[] = []
+    const builders: XMLBuilder[] = []
     for (let i = 0; i < nodes.length; i++) {
-      const builder = new XMLBuilderNodeImpl(nodes[i])
+      const builder = new XMLBuilderImpl(nodes[i])
       builder.set(options)
       builders.push(builder)
     }
     return builders
   } else {
-    const builder = new XMLBuilderNodeImpl(nodes)
+    const builder = new XMLBuilderImpl(nodes)
     builder.set(options)
     return builder
   }
@@ -76,7 +76,7 @@ export function builder(p1: XMLBuilderCreateOptions | Node | Node[],
  * 
  * @returns document node
  */
-export function document(): XMLBuilderNode
+export function document(): XMLBuilder
 
 /**
  * Creates an XML document without any child nodes with the given options.
@@ -85,7 +85,7 @@ export function document(): XMLBuilderNode
  * 
  * @returns document node
  */
-export function document(options: XMLBuilderCreateOptions): XMLBuilderNode
+export function document(options: XMLBuilderCreateOptions): XMLBuilder
 
 /**
  * Creates an XML document by parsing the given `contents`.
@@ -95,7 +95,7 @@ export function document(options: XMLBuilderCreateOptions): XMLBuilderNode
  * 
  * @returns document node
  */
-export function document(contents: string | ExpandObject): XMLBuilderNode
+export function document(contents: string | ExpandObject): XMLBuilder
 
 /**
  * Creates an XML document.
@@ -107,40 +107,40 @@ export function document(contents: string | ExpandObject): XMLBuilderNode
  * @returns document node
  */
 export function document(options: XMLBuilderCreateOptions,
-  contents: string | ExpandObject): XMLBuilderNode
+  contents: string | ExpandObject): XMLBuilder
 
 /** @inheritdoc */
 export function document(p1?: XMLBuilderCreateOptions | string | ExpandObject, 
-  p2?: string | ExpandObject): XMLBuilderNode {
+  p2?: string | ExpandObject): XMLBuilder {
 
   const options = formatOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
     p1 : DefaultBuilderOptions)
   const contents: string | ExpandObject | undefined = 
     isXMLBuilderCreateOptions(p1) ? p2 : p1
 
-  let builder: XMLBuilderNode
+  let builder: XMLBuilder
 
   if (contents === undefined) {
     // empty document
     const doc = createDocument()
-    builder = new XMLBuilderNodeImpl(doc)
+    builder = new XMLBuilderImpl(doc)
     setOptions(doc, options)
   } else if (isObject(contents)) {
     // JS object
     const doc = createDocument()
-    builder = new XMLBuilderNodeImpl(doc)
+    builder = new XMLBuilderImpl(doc)
     setOptions(doc, options)
     builder.ele(contents)
   } else if (/^\s*</.test(contents)) {
     // XML document
     const domParser = createParser()
     const doc = domParser.parseFromString(contents, "text/xml")
-    builder = new XMLBuilderNodeImpl(doc)
+    builder = new XMLBuilderImpl(doc)
     setOptions(doc, options)
   } else {
     // JSON
     const doc = createDocument()
-    builder = new XMLBuilderNodeImpl(doc)
+    builder = new XMLBuilderImpl(doc)
     setOptions(doc, options)
     const obj = JSON.parse(contents) as ExpandObject
     builder.ele(obj)
@@ -154,7 +154,7 @@ export function document(p1?: XMLBuilderCreateOptions | string | ExpandObject,
  * 
  * @returns document fragment node
  */
-export function fragment(): XMLBuilderNode
+export function fragment(): XMLBuilder
 
 /**
  * Creates a new document fragment with the given options.
@@ -163,7 +163,7 @@ export function fragment(): XMLBuilderNode
  * 
  * @returns document fragment node
  */
-export function fragment(options: XMLBuilderCreateOptions): XMLBuilderNode
+export function fragment(options: XMLBuilderCreateOptions): XMLBuilder
 
 /**
  * Creates a new document fragment by parsing the given `contents`.
@@ -173,7 +173,7 @@ export function fragment(options: XMLBuilderCreateOptions): XMLBuilderNode
  * 
  * @returns document fragment node
  */
-export function fragment(contents: string | ExpandObject): XMLBuilderNode
+export function fragment(contents: string | ExpandObject): XMLBuilder
 
 /**
  * Creates a new document fragment.
@@ -185,29 +185,29 @@ export function fragment(contents: string | ExpandObject): XMLBuilderNode
  * @returns document fragment node
  */
 export function fragment(options: XMLBuilderCreateOptions,
-  contents: string | ExpandObject): XMLBuilderNode
+  contents: string | ExpandObject): XMLBuilder
 
 /** @inheritdoc */
 export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
-  p2?: string | ExpandObject): XMLBuilderNode {
+  p2?: string | ExpandObject): XMLBuilder {
 
   const options = formatOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
     p1 : DefaultBuilderOptions)
   const contents: string | ExpandObject | undefined = 
     isXMLBuilderCreateOptions(p1) ? p2 : p1
 
-  let builder: XMLBuilderNode
+  let builder: XMLBuilder
 
   if (contents === undefined) {
     // empty fragment
     const doc = createDocument()
     setOptions(doc, options)
-    builder = new XMLBuilderNodeImpl(doc.createDocumentFragment())
+    builder = new XMLBuilderImpl(doc.createDocumentFragment())
   } else if (isObject(contents)) {
     // JS object
     const doc = createDocument()
     setOptions(doc, options)
-    builder = new XMLBuilderNodeImpl(doc.createDocumentFragment())
+    builder = new XMLBuilderImpl(doc.createDocumentFragment())
     builder.ele(contents)
   } else if (/^\s*</.test(contents)) {
     // XML document
@@ -223,12 +223,12 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
       const newChild = doc.importNode(child, true)
       frag.appendChild(newChild)
     }
-    builder = new XMLBuilderNodeImpl(frag)
+    builder = new XMLBuilderImpl(frag)
   } else {
     // JSON
     const doc = createDocument()
     setOptions(doc, options)
-    builder = new XMLBuilderNodeImpl(doc.createDocumentFragment())
+    builder = new XMLBuilderImpl(doc.createDocumentFragment())
     const obj = JSON.parse(contents) as ExpandObject
     builder.ele(obj)
   }

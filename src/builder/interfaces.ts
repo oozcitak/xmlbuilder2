@@ -406,51 +406,10 @@ export type PIObject = Map<string, string> | string[] | {
 }
 
 /**
- * Serves as an entry point to builder functions.
- */
-export interface XMLBuilder {
-
-  /**
-   * Creates and returns a new document fragment.
-   * 
-   * @returns document fragment node
-   */
-  fragment(): XMLBuilderNode
-
-  /**
-   * Creates and returns a new document fragment.
-   * 
-   * @param contents - a string containing an XML fragment in either XML or JSON
-   * format or a JS object representing nodes to insert
-   * 
-   * @returns document fragment node
-   */
-  fragment(contents: string | ExpandObject): XMLBuilderNode
-
-  /**
-   * Creates an XML document.
-   * 
-   * @returns document node
-   */
-  document(): XMLBuilderNode
-
-  /**
-   * Creates an XML document by parsing the given document representation.
-   * 
-   * @param contents - a string containing an XML document in either XML or JSON
-   * format or a JS object representing nodes to insert
-   * 
-   * @returns document node
-   */
-  document(contents: string | ExpandObject): XMLBuilderNode
-
-}
-
-/**
- * Represents a mixin that extends XML nodes to implement easy to use and
+ * Represents a wrapper around XML nodes to implement easy to use and
  * chainable document builder methods.
  */
-export interface XMLBuilderNode {
+export interface XMLBuilder {
   
   /**
    * Returns the underlying DOM node.
@@ -464,7 +423,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  set(builderOptions: Partial<XMLBuilderOptions>): XMLBuilderNode
+  set(builderOptions: Partial<XMLBuilderOptions>): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -476,7 +435,7 @@ export interface XMLBuilderNode {
    * @returns the new element node
    */
   ele(namespace: string, name: string,
-    attributes?: AttributesObject): XMLBuilderNode
+    attributes?: AttributesObject): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -486,7 +445,7 @@ export interface XMLBuilderNode {
    * 
    * @returns the new element node
    */
-  ele(name: string, attributes?: AttributesObject): XMLBuilderNode
+  ele(name: string, attributes?: AttributesObject): XMLBuilder
 
   /**
    * Creates new element nodes from the given JS object and appends it to the
@@ -496,14 +455,14 @@ export interface XMLBuilderNode {
    * 
    * @returns the last top level element node created
    */
-  ele(obj: ExpandObject): XMLBuilderNode
+  ele(obj: ExpandObject): XMLBuilder
 
   /**
    * Removes this node from the XML document.
    * 
    * @returns parent element node
    */
-  remove(): XMLBuilderNode
+  remove(): XMLBuilder
 
   /**
    * Creates or updates an element attribute.
@@ -514,7 +473,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  att(namespace: string, name: string, value: string): XMLBuilderNode
+  att(namespace: string, name: string, value: string): XMLBuilder
 
   /**
    * Creates or updates an element attribute.
@@ -524,7 +483,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  att(name: string, value: string): XMLBuilderNode
+  att(name: string, value: string): XMLBuilder
 
   /**
    * Creates or updates an element attribute.
@@ -533,7 +492,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  att(obj: AttributesObject): XMLBuilderNode
+  att(obj: AttributesObject): XMLBuilder
 
   /**
    * Removes an attribute
@@ -542,7 +501,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  removeAtt(name: string): XMLBuilderNode
+  removeAtt(name: string): XMLBuilder
 
   /**
    * Removes a list of attributes.
@@ -551,7 +510,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  removeAtt(names: string[]): XMLBuilderNode
+  removeAtt(names: string[]): XMLBuilder
 
   /**
    * Removes an attribute
@@ -561,7 +520,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  removeAtt(namespace: string, name: string): XMLBuilderNode
+  removeAtt(namespace: string, name: string): XMLBuilder
 
   /**
    * Removes a list of attributes.
@@ -571,7 +530,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  removeAtt(namespace: string, names: string[]): XMLBuilderNode
+  removeAtt(namespace: string, names: string[]): XMLBuilder
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
@@ -580,7 +539,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  txt(content: string): XMLBuilderNode
+  txt(content: string): XMLBuilder
 
   /**
    * Creates a new comment node and appends it to the list of child nodes.
@@ -589,7 +548,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  com(content: string): XMLBuilderNode
+  com(content: string): XMLBuilder
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.
@@ -598,7 +557,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  dat(content: string): XMLBuilderNode
+  dat(content: string): XMLBuilder
 
   /**
    * Creates a new processing instruction node and appends it to the list of 
@@ -609,7 +568,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  ins(target: string, content?: string): XMLBuilderNode
+  ins(target: string, content?: string): XMLBuilder
 
   /**
    * Creates new processing instruction nodes by expanding the given object and
@@ -620,7 +579,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  ins(target: PIObject): XMLBuilderNode
+  ins(target: PIObject): XMLBuilder
 
   /**
    * Updates XML declaration.
@@ -629,7 +588,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilderNode
+  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilder
 
   /**
    * Creates a new DocType node and inserts it into the document. If the 
@@ -640,7 +599,7 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  dtd(options?: DTDOptions): XMLBuilderNode
+  dtd(options?: DTDOptions): XMLBuilder
 
   /**
    * Imports a node as a child node of this node. The nodes' descendants and
@@ -657,42 +616,42 @@ export interface XMLBuilderNode {
    * 
    * @returns current element node
    */
-  import(node: XMLBuilderNode): XMLBuilderNode
+  import(node: XMLBuilder): XMLBuilder
 
   /**
    * Returns the document node.
    */
-  doc(): XMLBuilderNode
+  doc(): XMLBuilder
 
   /**
    * Returns the root element node.
    */
-  root(): XMLBuilderNode
+  root(): XMLBuilder
 
   /**
    * Returns the parent node.
    */
-  up(): XMLBuilderNode
+  up(): XMLBuilder
 
   /**
    * Returns the previous sibling node.
    */
-  prev(): XMLBuilderNode
+  prev(): XMLBuilder
 
   /**
    * Returns the next sibling node.
    */
-  next(): XMLBuilderNode
+  next(): XMLBuilder
 
   /**
    * Returns the first child node.
    */
-  first(): XMLBuilderNode
+  first(): XMLBuilder
 
   /**
    * Returns the last child node.
    */
-  last(): XMLBuilderNode
+  last(): XMLBuilder
 
   /**
    * Traverses through the child nodes of an element node.
@@ -700,7 +659,7 @@ export interface XMLBuilderNode {
    * @param callback - a callback function to apply to each node
    * @param thisArg - value to use as this when executing callback
    */
-  forEachChild(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode
+  forEachChild(callback: (node: XMLBuilder) => void, thisArg?: any): XMLBuilder
 
   /**
    * Traverses through the attributes of an element node.
@@ -708,7 +667,7 @@ export interface XMLBuilderNode {
    * @param callback - a callback function to apply to each attribute
    * @param thisArg - value to use as this when executing callback
    */
-  forEachAttribute(callback: (node: XMLBuilderNode) => void, thisArg?: any): XMLBuilderNode
+  forEachAttribute(callback: (node: XMLBuilder) => void, thisArg?: any): XMLBuilder
 
   /**
    * Converts the node into its string representation.

@@ -1,1 +1,1 @@
-export { XMLBuilderNodeImpl } from "./XMLBuilderNodeImpl"
+export { XMLBuilderImpl } from "./XMLBuilderImpl"
