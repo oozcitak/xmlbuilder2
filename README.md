@@ -18,7 +18,7 @@ npm install xmlbuilder2
 
 ### Usage:
 
-`xmlbuilder2` is a wrapper around DOM nodes which adds chainable functions which maked it easier to build XML documents.
+`xmlbuilder2` is a wrapper around DOM nodes which adds chainable functions which makes it easier to create XML documents.
 For example the following XML document:
 
 ``` xml
