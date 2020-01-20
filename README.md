@@ -21,17 +21,12 @@ npm install xmlbuilder2
 ``` js
 const { document } = require('xmlbuilder2');
 
-const root = document()
-  .ele('topgun')
-    .ele('pilots')
-      .ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky').up()
-      .ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell').up()
-      .ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw').up()
+const root = document({ version: "1.0" })
+  .ele("root", { att: "val" })
+    .ele("foo")
+      .ele("bar").txt("foobar").up()
     .up()
-    .ele('hangar')
-      .ele('aircraft').txt('F-14 Tomcat').up()
-      .ele('aircraft').txt('MiG-28').up()
-    .up()
+    .ele("baz").up()
   .up();
 
 // convert the XML tree to string
@@ -42,17 +37,12 @@ will result in:
 
 ``` xml
 <?xml version="1.0"?>
-<topgun>
-  <pilots>
-    <pilot callsign="Iceman" rank="Lieutenant">Tom Kazansky</pilot>
-    <pilot callsign="Maverick" rank="Lieutenant">Pete Mitchell</pilot>
-    <pilot callsign="Goose" rank="Lieutenant (j.g.)">Nick Bradshaw</pilot>
-  </pilots>
-  <hangar>
-    <aircraft>F-14 Tomcat</aircraft>
-    <aircraft>MiG-28</aircraft>
-  </hangar>
-</topgun>
+<root att="val">
+  <foo>
+    <bar>foobar</bar>
+  </foo>
+  <baz/>
+</root>
 ```
 ___
 
@@ -62,19 +52,14 @@ The same XML document can be created by converting a JS object into XML nodes:
 const { document } = require('xmlbuilder2');
 
 const obj = {
-  topgun: {
-    pilots: {
-      pilot: [
-        { '@callsign': 'Iceman', '@rank': 'Lieutenant', '#': 'Tom Kazansky' },
-        { '@callsign': 'Maverick', '@rank': 'Lieutenant', '#': 'Pete Mitchell' },
-        { '@callsign': 'Goose', '@rank': 'Lieutenant (j.g.)', '#': 'Nick Bradshaw' }
-      ]
+  root: {
+    "@att": "val",
+    "foo": {
+      "bar": "foobar"
     },
-    hangar: {
-      aircraft: ['F-14 Tomcat', 'MiG-28']
-    }
+    "baz": {}
   }
-}
+};
 
 const doc = document(obj);
 const xml = doc.end({ prettyPrint: true });
