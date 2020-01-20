@@ -1,30 +1,25 @@
 import { 
-  XMLDocument, Document, DocumentType, Element, Attr, Text, CDATASection, 
-  Comment, ProcessingInstruction, DocumentFragment, Node, NodeType
+  Document, DocumentType, Element, Attr, Text, CDATASection, Comment,
+  ProcessingInstruction, DocumentFragment, Node, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
-import { DOMParser, DOMImplementation } from "@oozcitak/dom"
-import { dom } from "@oozcitak/dom/lib/dom"
-
-dom.setFeatures(false)
+import { DOMParser } from "@oozcitak/dom/lib/parser/interfaces"
 
 /**
  * Creates an XML document without any child nodes.
  */
-export function createDocument(): XMLDocument {
-  const impl = new DOMImplementation()
-  const doc = impl.createDocument(null, 'root')
-  /* istanbul ignore else */
-  if (doc.documentElement) {
-    doc.removeChild(doc.documentElement)
-  }
-  return doc
+export function createDocument(): Document {
+  const { createDocument } =  (typeof window === 'undefined' ?
+    require("./node") : require("./browser"))
+  return createDocument()
 }
 
 /**
  * Creates a DOM parser.
  */
-export function createParser(): DOMParser {
-  return new DOMParser
+export function createParser(version: "1.0" | "1.1"): DOMParser {
+  const { createParser } =  (typeof window === 'undefined' ?
+    require("./node") : require("./browser"))
+  return createParser(version)
 }
 
 /**

@@ -1,27 +1,27 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "declaration": true,
-        "lib": [
-            "es6"
-        ],
-        "locale": "en",
-        "strict": true,
-        "newLine": "lf",
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "outDir": "lib",
-        "types": [
-            "node",
-            "jest",
-            "dedent"
-        ]
-    },
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+  "compilerOptions": {
+      "target": "ES6",
+      "module": "CommonJS",
+      "declaration": true,
+      "lib": [
+          "ES6"
+      ],
+      "locale": "en",
+      "strict": true,
+      "newLine": "lf",
+      "sourceMap": true,
+      "esModuleInterop": true,
+      "outDir": "lib",
+      "types": [
+          "node",
+          "jest",
+          "dedent"
+      ]
+  },
+  "include": [
+      "src/**/*"
+  ],
+  "exclude": [
+      "node_modules"
+  ]
 }
