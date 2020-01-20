@@ -8,14 +8,14 @@ describe('collection', () => {
       .ele('node2').up()
       .ele('node3').up()
     let str = ''
-    root.each(child => str += child.as.node.nodeName)
+    root.each(child => str += child.node.nodeName)
     expect(str).toBe('node1node2node3')
   })
 
   test('each() - single node', () => {
     const root = $$.document().ele('root')
     let str = ''
-    root.each(child => str += child.as.node.nodeName, true, true)
+    root.each(child => str += child.node.nodeName, true, true)
     expect(str).toBe('root')
   })
 
@@ -27,7 +27,7 @@ describe('collection', () => {
       .ele('node2').up()
       .ele('node3').up()
     let str = ''
-    root.each(child => str += child.as.node.nodeName, false, true)
+    root.each(child => str += child.node.nodeName, false, true)
     expect(str).toBe('node1childnode2node3')
   })
 
@@ -41,7 +41,7 @@ describe('collection', () => {
       .ele('node2').up()
       .ele('node3').up()
     let str = ''
-    root.each(child => str += child.as.node.nodeName + ' ', true, true)
+    root.each(child => str += child.node.nodeName + ' ', true, true)
     expect(str).toBe('root node1 child grandchild node2 node3 ')
   })
 
@@ -50,7 +50,7 @@ describe('collection', () => {
       .ele('node1').up()
       .ele('node2').up()
       .ele('node3').up()
-    const arr = root.map(child => child.as.node.nodeName)
+    const arr = root.map(child => child.node.nodeName)
     expect(arr).toEqual(['node1', 'node2', 'node3'])
   })
 
@@ -61,7 +61,7 @@ describe('collection', () => {
       .up()
       .ele('node2').up()
       .ele('node3').up()
-    const arr = root.map(child => child.as.node.nodeName, true, true)
+    const arr = root.map(child => child.node.nodeName, true, true)
     expect(arr).toEqual(['root', 'node1', 'child', 'node2', 'node3'])
   })
 
@@ -70,7 +70,7 @@ describe('collection', () => {
       .ele('node1').up()
       .ele('node2').up()
       .ele('node3').up()
-    const str = root.reduce((value, child) => value + child.as.node.nodeName, '')
+    const str = root.reduce((value, child) => value + child.node.nodeName, '')
     expect(str).toBe('node1node2node3')
   })
 
@@ -81,7 +81,7 @@ describe('collection', () => {
       .up()
       .ele('node2').up()
       .ele('node3').up()
-    const str = root.reduce((value, child) => value + child.as.node.nodeName, '', true, true)
+    const str = root.reduce((value, child) => value + child.node.nodeName, '', true, true)
     expect(str).toBe('rootnode1childnode2node3')
   })
 
@@ -90,10 +90,10 @@ describe('collection', () => {
     const node1 = root.ele('node1')
     const node2 = root.ele('node2')
     const node3 = root.ele('node3')
-    const n1 = root.find(child => child.as.node.nodeName === 'node2')
+    const n1 = root.find(child => child.node.nodeName === 'node2')
     if (!n1) throw new Error('node is undefined')
-    expect(n1.as.node).toBe(node2.as.node)
-    const n2 = root.find(child => child.as.node.nodeName === 'x')
+    expect(n1.node).toBe(node2.node)
+    const n2 = root.find(child => child.node.nodeName === 'x')
     expect(n2).toBeUndefined()
   })
 
@@ -103,12 +103,12 @@ describe('collection', () => {
     const child = node1.ele('child')
     const node2 = root.ele('node2')
     const node3 = root.ele('node3')
-    const n1 = root.find(child => child.as.node.nodeName === 'child', true, true)
+    const n1 = root.find(child => child.node.nodeName === 'child', true, true)
     if (!n1) throw new Error('node is undefined')
-    expect(n1.as.node).toBe(child.as.node)
-    const n2 = root.find(child => child.as.node.nodeName === 'root', true, true)
+    expect(n1.node).toBe(child.node)
+    const n2 = root.find(child => child.node.nodeName === 'root', true, true)
     if (!n2) throw new Error('node is undefined')
-    expect(n2.as.node).toBe(root.as.node)
+    expect(n2.node).toBe(root.node)
   })
 
   test('filter()', () => {
@@ -116,8 +116,8 @@ describe('collection', () => {
     const node1 = root.ele('node1')
     const node2 = root.ele('diode2')
     const node3 = root.ele('node3')
-    const arr = root.filter(child => child.as.node.nodeName.startsWith('n'))
-    expect(arr.map(n => n.as.node)).toEqual([node1.as.node, node3.as.node])
+    const arr = root.filter(child => child.node.nodeName.startsWith('n'))
+    expect(arr.map(n => n.node)).toEqual([node1.node, node3.node])
   })
 
   test('filter() - self and recursive', () => {
@@ -126,8 +126,8 @@ describe('collection', () => {
     const child = node1.ele('child')
     const node2 = root.ele('diode2')
     const node3 = root.ele('node3')
-    const arr = root.filter(child => child.as.node.nodeName.startsWith('n'), true, true)
-    expect(arr.map(n => n.as.node)).toEqual([node1.as.node, node3.as.node])
+    const arr = root.filter(child => child.node.nodeName.startsWith('n'), true, true)
+    expect(arr.map(n => n.node)).toEqual([node1.node, node3.node])
   })
   
   test('every()', () => {
@@ -135,9 +135,9 @@ describe('collection', () => {
       .ele('node1').up()
       .ele('node2').up()
       .ele('node3').up()
-    const test1 = root.every(child => child.as.node.nodeName.startsWith('n'))
+    const test1 = root.every(child => child.node.nodeName.startsWith('n'))
     expect(test1).toBe(true)
-    const test2 = root.every(child => child.as.node.nodeName.startsWith('n'), true)
+    const test2 = root.every(child => child.node.nodeName.startsWith('n'), true)
     expect(test2).toBe(false)
   })
 
@@ -147,9 +147,9 @@ describe('collection', () => {
     const child = node1.ele('nils')
     const node2 = root.ele('node2')
     const node3 = root.ele('node3')
-    const test1 = root.every(child => child.as.node.nodeName.startsWith('n'), true, true)
+    const test1 = root.every(child => child.node.nodeName.startsWith('n'), true, true)
     expect(test1).toBe(true)
-    const test2 = root.every(child => child.as.node.nodeName.endsWith('n'), true, true)
+    const test2 = root.every(child => child.node.nodeName.endsWith('n'), true, true)
     expect(test2).toBe(false)
   })
 
@@ -158,9 +158,9 @@ describe('collection', () => {
       .ele('node1').up()
       .ele('diode2').up()
       .ele('node3').up()
-    const test1 = root.some(child => child.as.node.nodeName.startsWith('n'))
+    const test1 = root.some(child => child.node.nodeName.startsWith('n'))
     expect(test1).toBe(true)
-    const test2 = root.some(child => child.as.node.nodeName.startsWith('x'), true)
+    const test2 = root.some(child => child.node.nodeName.startsWith('x'), true)
     expect(test2).toBe(false)
   })
 
@@ -169,9 +169,9 @@ describe('collection', () => {
       .ele('node1').up()
       .ele('diode2').up()
       .ele('node3').up()
-    const test1 = root.some(child => child.as.node.nodeName.startsWith('n'), true, true)
+    const test1 = root.some(child => child.node.nodeName.startsWith('n'), true, true)
     expect(test1).toBe(true)
-    const test2 = root.some(child => child.as.node.nodeName.startsWith('x'), true, true)
+    const test2 = root.some(child => child.node.nodeName.startsWith('x'), true, true)
     expect(test2).toBe(false)
   })
   
@@ -181,7 +181,7 @@ describe('collection', () => {
     const node2 = root.ele('node2')
     const node3 = root.ele('node3')
     const arr = root.toArray()
-    expect(arr.map(n => n.as.node)).toEqual([node1.as.node, node2.as.node, node3.as.node])
+    expect(arr.map(n => n.node)).toEqual([node1.node, node2.node, node3.node])
   })
 
   test('toArray() - self and recursive', () => {
@@ -191,7 +191,7 @@ describe('collection', () => {
     const node2 = root.ele('node2')
     const node3 = root.ele('node3')
     const arr = root.toArray(true, true)
-    expect(arr.map(n => n.as.node)).toEqual([root.as.node, node1.as.node, child.as.node, node2.as.node, node3.as.node])
+    expect(arr.map(n => n.node)).toEqual([root.node, node1.node, child.node, node2.node, node3.node])
   })
 
   test('this inside callback', () => {

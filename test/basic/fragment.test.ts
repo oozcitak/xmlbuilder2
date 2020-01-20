@@ -10,7 +10,7 @@ describe('fragment()', () => {
     node1.ele('node1-2').att("att1-2", "val1-2")
     node2.ele('node2-1').att("att2-1", "val2-1")
     node2.ele('node2-2').att("att2-2", "val2-2")
-    expect($$.printTree(frag.as.node)).toBe($$.t`
+    expect($$.printTree(frag.node)).toBe($$.t`
       node1
         node1-1 att1-1="val1-1"
         node1-2 att1-2="val1-2"
@@ -32,7 +32,7 @@ describe('fragment()', () => {
       }
     }
     const frag = $$.fragment(obj)
-    expect($$.printTree(frag.as.node)).toBe($$.t`
+    expect($$.printTree(frag.node)).toBe($$.t`
       node1
         node1-1 att1-1="val1-1"
         node1-2 att1-2="val1-2"
@@ -48,7 +48,7 @@ describe('fragment()', () => {
       { node2: "val2" }
     ]
     const frag = $$.fragment(obj)
-    expect($$.printTree(frag.as.node)).toBe($$.t`
+    expect($$.printTree(frag.node)).toBe($$.t`
       node1
         # val1
       node2
@@ -56,7 +56,7 @@ describe('fragment()', () => {
     `)
     const root = $$.document().ele("root")
     root.import(frag)
-    expect($$.printTree(root.as.node)).toBe($$.t`
+    expect($$.printTree(root.node)).toBe($$.t`
       root
         node1
           # val1
@@ -77,7 +77,7 @@ describe('fragment()', () => {
       }
     }
     const frag = $$.fragment(JSON.stringify(obj))
-    expect($$.printTree(frag.as.node)).toBe($$.t`
+    expect($$.printTree(frag.node)).toBe($$.t`
       node1
         node1-1 att1-1="val1-1"
         node1-2 att1-2="val1-2"
@@ -99,7 +99,7 @@ describe('fragment()', () => {
       </node2>
       `
     const frag = $$.fragment(str)
-    expect($$.printTree(frag.as.node)).toBe($$.t`
+    expect($$.printTree(frag.node)).toBe($$.t`
       node1
         node1-1 att1-1="val1-1"
         node1-2 att1-2="val1-2"

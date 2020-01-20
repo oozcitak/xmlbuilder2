@@ -26,7 +26,7 @@ describe('traversal', () => {
       .ele('node1').up()
       .ele('node2').up()
 
-    expect(root.last().prev().as.node.nodeName).toBe('node1')
+    expect(root.last().prev().node.nodeName).toBe('node1')
     expect(() => root.first().prev()).toThrow()
   })
 
@@ -35,7 +35,7 @@ describe('traversal', () => {
       .ele('node1').up()
       .ele('node2').up()
 
-    expect(root.first().next().as.node.nodeName).toBe('node2')
+    expect(root.first().next().node.nodeName).toBe('node2')
     expect(() => root.last().next()).toThrow()
   })
 
@@ -44,7 +44,7 @@ describe('traversal', () => {
       .ele('node1').up()
       .ele('node2').up()
 
-    expect(root.first().as.node.nodeName).toBe('node1')
+    expect(root.first().node.nodeName).toBe('node1')
     expect(() => root.first().first()).toThrow()
   })
 
@@ -53,7 +53,7 @@ describe('traversal', () => {
       .ele('node1').up()
       .ele('node2').up()
 
-    expect(root.last().as.node.nodeName).toBe('node2')
+    expect(root.last().node.nodeName).toBe('node2')
     expect(() => root.last().last()).toThrow()
   })
 

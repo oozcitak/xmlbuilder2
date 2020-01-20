@@ -28,7 +28,7 @@ describe('object', () => {
 
     const doc = $$.document().ele('root').ele(obj).doc()
 
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       root
         ele
           # simple element
@@ -83,7 +83,7 @@ describe('object', () => {
 
     const doc = $$.document().ele('root').ele(obj).doc()
     
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       root
         ele
           # simple element
@@ -119,7 +119,7 @@ describe('object', () => {
       return { node: arr }
     }).doc()
 
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       root
         node
           # ele1
@@ -137,7 +137,7 @@ describe('object', () => {
       '$': [ 'data1', 'data2' ]
     }).doc()
 
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       root
         $ data1
         $ data2
@@ -149,7 +149,7 @@ describe('object', () => {
       '!': [ 'comment1', 'comment2' ]
     }).doc()
 
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       root
         ! comment1
         ! comment2
@@ -162,7 +162,7 @@ describe('object', () => {
       '?2': { target3: 'value3', target4: 'value4' }
     }).doc()
 
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       root
         ? target0
         ? target1 value1
@@ -182,7 +182,7 @@ describe('object', () => {
     }
     const doc = $$.document().ele(obj).doc()
 
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       root
         node2
     `)
@@ -202,7 +202,7 @@ describe('object', () => {
     }
     const doc = $$.document().ele(obj).doc()
 
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       root
         node1
           # val1
@@ -224,7 +224,7 @@ describe('object', () => {
     }
     const doc = $$.document().ele(obj).doc()
 
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       root (ns:myns) xmlns="myns" (ns:http://www.w3.org/2000/xmlns/)
         node (ns:myns)
           # val
@@ -240,7 +240,7 @@ describe('object', () => {
     }
     const doc = $$.document().ele(obj).doc()
 
-    expect($$.printTree(doc.as.node)).toBe($$.t`
+    expect($$.printTree(doc.node)).toBe($$.t`
       ns1:root (ns:myns) xmlns:ns1="myns" (ns:http://www.w3.org/2000/xmlns/)
         node
           # val

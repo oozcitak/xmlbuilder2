@@ -1,4 +1,5 @@
 import $$ from '../TestHelpers'
+import { Element } from "@oozcitak/dom/lib/dom/interfaces"
 
 describe('StringWriter', () => {
 
@@ -459,7 +460,7 @@ describe('StringWriter', () => {
 
   test('unknown node', () => {
     const ele = $$.document().ele('root').ele('alien')
-    Object.defineProperty(ele.as.node, "nodeType", { value: 1001, writable: false })
+    Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end()).toThrow()
   })
 
@@ -472,27 +473,27 @@ describe('StringWriter', () => {
     const ele1 = $$.document().ele('root').att('att', '"&<>')
     expect(ele1.toString()).toBe('<root att="&quot;&amp;&lt;&gt;"/>')
     const ele2 = $$.document().ele('root').att('att', 'val')
-    Object.defineProperty(ele2.as.element.attributes.item(0), "value", { value: null})
+    Object.defineProperty((ele2.node as Element).attributes.item(0), "value", { value: null})
     expect(ele2.toString()).toBe('<root att=""/>')
   })
 
   test('wellFormed checks - invalid element node', () => {
     const ele = $$.document().ele('root')
-    Object.defineProperty(ele.as.element, "localName", { value: "x:y", configurable: true })
+    Object.defineProperty(ele.node, "localName", { value: "x:y", configurable: true })
     expect(() => ele.end({ wellFormed: true })).toThrow()
-    Object.defineProperty(ele.as.element, "localName", { value: "\uD87E\uDC04😊", configurable: true})
+    Object.defineProperty(ele.node, "localName", { value: "\uD87E\uDC04😊", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
-    Object.defineProperty(ele.as.element, "localName", { value: "abc\0", configurable: true})
+    Object.defineProperty(ele.node, "localName", { value: "abc\0", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
-    Object.defineProperty(ele.as.element, "localName", { value: "\0abc", configurable: true})
+    Object.defineProperty(ele.node, "localName", { value: "\0abc", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
-    Object.defineProperty(ele.as.element, "prefix", { value: "xmlns"})
+    Object.defineProperty(ele.node, "prefix", { value: "xmlns"})
     expect(() => ele.end({ wellFormed: true })).toThrow()
   })
 
   test('wellFormed checks - invalid document node', () => {
     const doc = $$.document()
-    Object.defineProperty(doc.as.document, "documentElement", { value: null})
+    Object.defineProperty(doc.node, "documentElement", { value: null})
     expect(() => doc.end({ wellFormed: true })).toThrow()
   })
 
@@ -525,20 +526,20 @@ describe('StringWriter', () => {
     const ele3 = $$.document().ele('root').ins('name', '\0')
     expect(() => ele3.end({ wellFormed: true })).toThrow()
     const ele4 = $$.document().ele('root').ins('name', 'data')
-    Object.defineProperty(ele4.as.element.firstChild, "data", { value: "?>"})
+    Object.defineProperty(ele4.node.firstChild, "data", { value: "?>"})
     expect(() => ele4.end({ wellFormed: true })).toThrow()
   })
 
   test('wellFormed checks - invalid cdata node', () => {
     const ele = $$.document().ele('root').dat('data')
-    Object.defineProperty(ele.as.element.firstChild, "data", { value: "]]>"})
+    Object.defineProperty(ele.node.firstChild, "data", { value: "]]>"})
     expect(() => ele.end({ wellFormed: true })).toThrow()
   })
 
   test('wellFormed checks - invalid attribute', () => {
     // duplicate name
     const ele1 = $$.document().ele('root').att('att', 'val').att('att2', 'val')
-    Object.defineProperty(ele1.as.element.attributes.item(1), "localName", { value: "att"})
+    Object.defineProperty((ele1.node as Element).attributes.item(1), "localName", { value: "att"})
     expect(() => ele1.end({ wellFormed: true })).toThrow()
     // XMLNS namespace
     const ele2 = $$.document().ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:att', 'http://www.w3.org/2000/xmlns/')
@@ -548,13 +549,13 @@ describe('StringWriter', () => {
     expect(() => ele3.end({ wellFormed: true })).toThrow()
     // invalid name
     const ele4 = $$.document().ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:att', '')
-    Object.defineProperty(ele4.as.element.attributes.item(0), "localName", { value: ":"})
+    Object.defineProperty((ele4.node as Element).attributes.item(0), "localName", { value: ":"})
     expect(() => ele4.end({ wellFormed: true })).toThrow()
     const ele5 = $$.document().ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:att', '')
-    Object.defineProperty(ele5.as.element.attributes.item(0), "localName", { value: "\0"})
+    Object.defineProperty((ele5.node as Element).attributes.item(0), "localName", { value: "\0"})
     expect(() => ele5.end({ wellFormed: true })).toThrow()
     const ele6 = $$.document().ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns', 'value')
-    Object.defineProperty(ele6.as.element.attributes.item(0), "namespaceURI", { value: null})
+    Object.defineProperty((ele6.node as Element).attributes.item(0), "namespaceURI", { value: null})
     expect(() => ele6.end({ wellFormed: true })).toThrow()
     // invalid value
     const ele7 = $$.document().ele('root').att('att', '\0')

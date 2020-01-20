@@ -1,7 +1,4 @@
-import { 
-  Node, Document, DocumentType, DocumentFragment, Attr, Text, CDATASection, 
-  Comment, ProcessingInstruction, Element 
-} from "@oozcitak/dom/lib/dom/interfaces"
+import { Node, Document } from "@oozcitak/dom/lib/dom/interfaces"
 
 /**
  * Represents a document with XML builder settings applied.
@@ -420,7 +417,7 @@ export interface XMLBuilder {
   /**
    * Returns the underlying DOM node.
    */
-  readonly as: CastAsNode
+  readonly node: Node
 
   /**
    * Sets builder options.
@@ -780,65 +777,4 @@ export interface XMLBuilder {
    * @param options - serialization options
    */
   end(writerOptions?: WriterOptions): XMLSerializedValue
-}
-
-/**
- * Returns underlying DOM nodes.
- */
-export interface CastAsNode {
-  /**
-   * Casts to `any` to call methods without a TypeScript definition.
-   */  
-  readonly any: any
-
-  /**
-   * Returns the underlying DOM node.
-   */  
-  readonly node: Node
-
-  /**
-   * Returns the underlying DOM document node.
-   */
-  readonly document: Document
-
-  /**
-   * Returns the underlying DOM document type node.
-   */
-  readonly documentType: DocumentType
-
-  /**
-   * Returns the underlying DOM document fragment node.
-   */
-  readonly documentFragment: DocumentFragment
-
-  /**
-   * Returns the underlying DOM attr node.
-   */
-  readonly attr: Attr
-
-  /**
-   * Returns the underlying DOM text node.
-   */
-  readonly text: Text
-
-  /**
-   * Returns the underlying DOM cdata section node.
-   */
-  readonly cdataSection: CDATASection
-
-  /**
-   * Returns the underlying DOM comment node.
-   */
-  readonly comment: Comment
-
-  /**
-   * Returns the underlying DOM processing instruction node.
-   */
-  readonly processingInstruction: ProcessingInstruction
-
-  /**
-   * Returns the underlying DOM element node.
-   */
-  readonly element: Element
-
 }

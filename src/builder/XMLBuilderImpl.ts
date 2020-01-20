@@ -1,7 +1,7 @@
 import {
   XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, DTDOptions,
-  DefaultBuilderOptions, CastAsNode, PIObject, DocumentWithSettings
+  DefaultBuilderOptions, PIObject, DocumentWithSettings
 } from "./interfaces"
 import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
@@ -11,8 +11,7 @@ import { namespace as infraNamespace } from "@oozcitak/infra"
 import {
   StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
 } from "../writers"
-import { CastAsNodeImpl } from "./CastAsNode"
-import { Document, Node } from "@oozcitak/dom/lib/dom/interfaces"
+import { Document, Node, Element } from "@oozcitak/dom/lib/dom/interfaces"
 import {
   createParser, isDocumentNode, isDocumentFragmentNode, extractQName
 } from "./dom"
@@ -23,7 +22,6 @@ import {
  */
 export class XMLBuilderImpl implements XMLBuilder {
   private _domNode: Node
-  private _castAsNode?: CastAsNode
 
   /**
    * Initializes a new instance of `XMLBuilderNodeImpl`.
@@ -35,12 +33,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  get as(): CastAsNode {
-    if (this._castAsNode === undefined) {
-      this._castAsNode = new CastAsNodeImpl(this._domNode)
-    }
-    return this._castAsNode
-  }
+  get node(): Node { return this._domNode }
 
   /** @inheritdoc */
   set(options: Partial<XMLBuilderOptions>): XMLBuilder {
@@ -211,7 +204,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   remove(): XMLBuilder {
     const parent = this.up()
-    parent.as.node.removeChild(this.as.node)
+    parent.node.removeChild(this.node)
     return parent
   }
 
@@ -261,7 +254,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       namespace = infraNamespace.XMLNS
     }
 
-    const ele = this.as.element
+    const ele = this.node as Element
 
     // convert to string
     if (namespace !== undefined && namespace !== null) namespace += ""
@@ -306,10 +299,10 @@ export class XMLBuilderImpl implements XMLBuilder {
       forEachArray(p2, attName => this.removeAtt(p1 + "", attName), this)
     } else if (p1 !== undefined && p2 !== undefined) {
       // removeAtt(namespace: string, name: string)
-      this.as.element.removeAttributeNS(p1 + "", p2 + "")
+      (this.node as Element).removeAttributeNS(p1 + "", p2 + "")
     } else {
       // removeAtt(name: string)
-      this.as.element.removeAttribute(p1 + "")
+      (this.node as Element).removeAttribute(p1 + "")
     }
 
     return this
@@ -318,7 +311,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   txt(content: string): XMLBuilder {
     const child = this._doc.createTextNode(content + "")
-    this.as.node.appendChild(child)
+    this.node.appendChild(child)
 
     return this
   }
@@ -326,7 +319,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   com(content: string): XMLBuilder {
     const child = this._doc.createComment(content + "")
-    this.as.node.appendChild(child)
+    this.node.appendChild(child)
 
     return this
   }
@@ -334,7 +327,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   dat(content: string): XMLBuilder {
     const child = this._doc.createCDATASection(content + "")
-    this.as.node.appendChild(child)
+    this.node.appendChild(child)
 
     return this
   }
@@ -354,7 +347,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       forEachObject(target, (insTarget, insValue) => this.ins(insTarget, insValue), this)
     } else {
       const child = this._doc.createProcessingInstruction(target + "", content + "")
-      this.as.node.appendChild(child)
+      this.node.appendChild(child)
     }
 
     return this
@@ -395,7 +388,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     const hostNode = this._domNode
     const hostDoc = this._doc
 
-    const importedNode = node.as.node
+    const importedNode = node.node
 
     if (isDocumentNode(importedNode)) {
       // import document node
@@ -669,16 +662,16 @@ export class XMLBuilderImpl implements XMLBuilder {
   private _serialize(writerOptions: WriterOptions): XMLSerializedValue {
     if (writerOptions.format === "xml") {
       const writer = new StringWriterImpl(this._options)
-      return writer.serialize(this.as.node, writerOptions)
+      return writer.serialize(this.node, writerOptions)
     } else if (writerOptions.format === "map") {
       const writer = new MapWriterImpl(this._options)
-      return writer.serialize(this.as.node, writerOptions)
+      return writer.serialize(this.node, writerOptions)
     } else if (writerOptions.format === "object") {
       const writer = new ObjectWriterImpl(this._options)
-      return writer.serialize(this.as.node, writerOptions)
+      return writer.serialize(this.node, writerOptions)
     } else if (writerOptions.format === "json") {
       const writer = new JSONWriterImpl(this._options)
-      return writer.serialize(this.as.node, writerOptions)
+      return writer.serialize(this.node, writerOptions)
     } else {
       throw new Error("Invalid writer format: " + writerOptions.format + ". " + this._debugInfo())
     }
@@ -701,7 +694,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     // inherit namespace from parent
     if (namespace === null || namespace === undefined) {
       const qName = extractQName(name)
-      const parent = this.as.node.parentNode
+      const parent = this.node.parentNode
       if (parent) {
         namespace = parent.lookupNamespaceURI(qName[0])
       }
@@ -722,7 +715,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       }
     }
 
-    const node = this.as.node
+    const node = this.node
 
     const child = (namespace !== null && namespace !== undefined ?
       this._doc.createElementNS(namespace + "", name) :
@@ -767,7 +760,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * Returns the document owning this node.
    */
   protected get _doc(): Document {
-    const node = this.as.node
+    const node = this.node
     if (isDocumentNode(node)) {
       return node
     } else {
@@ -784,8 +777,8 @@ export class XMLBuilderImpl implements XMLBuilder {
    * @param name - node name
    */
   protected _debugInfo(name?: string): string {
-    const node = this.as.node
-    const parentNode = this.as.node.parentNode
+    const node = this.node
+    const parentNode = node.parentNode
 
     name = name || node.nodeName
     const parentName = parentNode ? parentNode.nodeName : ''
