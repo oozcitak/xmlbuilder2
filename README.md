@@ -54,10 +54,10 @@ const { document } = require('xmlbuilder2');
 const obj = {
   root: {
     "@att": "val",
-    "foo": {
-      "bar": "foobar"
+    foo: {
+      bar: "foobar"
     },
-    "baz": {}
+    baz: {}
   }
 };
 
