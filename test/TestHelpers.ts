@@ -1,7 +1,7 @@
 import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
-import { isObject, isArray, isMap, forEachObject, objectLength } from "@oozcitak/util"
+import { isObject, isArray, isMap, forEachObject, objectLength, forEachArray } from "@oozcitak/util"
 import { builder, document, fragment, convert } from "../src"
 
 export default class TestHelpers {
@@ -51,21 +51,21 @@ export default class TestHelpers {
       r += '['
       const len = map.length
       let i = 0      
-      for (const val of map) {
+      forEachArray(map, val => {
         r += (leaf ? ' ' : '\n' + TestHelpers.indent(level + 1)) + TestHelpers.printMap(val, level + 1)
         if (i < len - 1) { r += ',' }
         i++
-      }
+      })
       r += (leaf ? ' ' : '\n' + TestHelpers.indent(level)) + ']'
     } else if (isMap(map) || isObject(map)) {
       r += isMap(map) ? 'M{' : '{'
       const len = objectLength(map)
       let i = 0
-      for (const [key, val] of forEachObject(map)) {
+      forEachObject(map, (key, val) => {
         r += (leaf ? ' ' : '\n' + TestHelpers.indent(level + 1)) + key + ': ' + TestHelpers.printMap(val, level + 1)
         if (i < len - 1) { r += ',' }
         i++
-      }
+      })
       r += (leaf ? ' ' : '\n' + TestHelpers.indent(level)) + '}'
     } else {
       r += map

@@ -9,11 +9,6 @@ import {
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 
 /**
- * Represents JSON writer options with all properties required.
- */
-type RequiredJSONWriterOptions = Required<JSONWriterOptions>
-
-/**
  * Serializes XML nodes into a JSON string.
  */
 export class JSONWriterImpl {
@@ -37,14 +32,14 @@ export class JSONWriterImpl {
    */
   serialize(node: Node, writerOptions?: JSONWriterOptions): string {
     // provide default options
-    const options: RequiredJSONWriterOptions = applyDefaults(writerOptions, {
+    const options = applyDefaults(writerOptions, {
       wellFormed: false,
       prettyPrint: false,
       indent: '  ',
       newline: '\n',
       offset: 0,
       noDoubleEncoding: false
-    })
+    }) as Required<JSONWriterOptions>
 
     // convert to object
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(options, {
@@ -65,7 +60,7 @@ export class JSONWriterImpl {
    * @param level - depth of the XML tree
    */
   private _convertObject(obj: XMLSerializedValue,
-    options: RequiredJSONWriterOptions, level: number = 0): string {
+    options: Required<JSONWriterOptions>, level: number = 0): string {
 
     let markup = ''
     const isLeaf = this._isLeafNode(obj)
@@ -87,7 +82,7 @@ export class JSONWriterImpl {
       markup += '{'
       const len = objectLength(obj)
       let i = 0
-      for (const [key, val] of forEachObject(obj)) {
+      forEachObject(obj, (key, val) => {
         if (isLeaf && options.prettyPrint) {
           markup += ' '
         } else {
@@ -98,7 +93,7 @@ export class JSONWriterImpl {
         markup += this._convertObject(val, options, level + 1)
         if (i < len - 1) { markup += ',' }
         i++
-      }
+      }, this)
       if (isLeaf && options.prettyPrint) {
         markup += ' '
       } else {
@@ -119,7 +114,7 @@ export class JSONWriterImpl {
    * @param options - serialization options
    * @param level - current depth of the XML tree
    */
-  private _beginLine(options: RequiredJSONWriterOptions, level: number): string {
+  private _beginLine(options: Required<JSONWriterOptions>, level: number): string {
     if (!options.prettyPrint) {
       return ''
     } else {
@@ -139,7 +134,7 @@ export class JSONWriterImpl {
    * @param options - serialization options
    * @param level - current depth of the XML tree
    */
-  private _endLine(options: RequiredJSONWriterOptions, level: number): string {
+  private _endLine(options: Required<JSONWriterOptions>, level: number): string {
     if (!options.prettyPrint) {
       return ''
     } else {
@@ -162,16 +157,11 @@ export class JSONWriterImpl {
    * @param obj 
    * @param count 
    */
-  private _descendantCount(obj: any, count?: number): number {
-    count = count || 0
+  private _descendantCount(obj: any, count: number = 0): number {
     if (isArray(obj)) {
-      for (const val of forEachArray(obj)) {
-        count += this._descendantCount(val, count)
-      }
+      forEachArray(obj, val => count += this._descendantCount(val, count), this)
     } else if (isObject(obj)) {
-      for (const [, val] of forEachObject(obj)) {
-        count += this._descendantCount(val, count)
-      }
+      forEachObject(obj, (key, val) => count += this._descendantCount(val, count), this)
     } else {
       count++
     }

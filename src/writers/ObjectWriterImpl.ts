@@ -37,10 +37,10 @@ export class ObjectWriterImpl {
    * @param writerOptions - serialization options
    */
   serialize(node: Node, writerOptions?: ObjectWriterOptions): XMLSerializedValue {
-    const options: Required<ObjectWriterOptions> = applyDefaults(writerOptions, {
+    const options = applyDefaults(writerOptions, {
       format: "object",
       wellFormed: false
-    })
+    }) as Required<ObjectWriterOptions> 
 
     let currentList: NodeList = []
     let currentIndex = 0

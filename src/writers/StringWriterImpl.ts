@@ -23,17 +23,12 @@ type StringWriterRefs = {
 }
 
 /**
- * Equal to `StringWriterOptions` but with all properties required.
- */
-type RequiredStringWriterOptions = Required<StringWriterOptions>
-
-/**
  * Serializes XML nodes into strings.
  */
 export class StringWriterImpl {
 
   private _builderOptions: XMLBuilderOptions
-  private _options!: RequiredStringWriterOptions
+  private _options!: Required<StringWriterOptions>
   private _refs!: StringWriterRefs
   private _pre!: PreSerializer
   private _indentation: { [key: number]: string} = {}
@@ -67,7 +62,7 @@ export class StringWriterImpl {
       indentTextOnlyNodes: false,
       spaceBeforeSlash: false,
       noDoubleEncoding: false
-    })
+    }) as Required<StringWriterOptions>
 
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
     this._pre = new PreSerializer(this._builderOptions.version, {

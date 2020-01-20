@@ -321,10 +321,8 @@ function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {
   return true
 }
 
-function formatOptions(createOptions?: XMLBuilderCreateOptions) {
-  const options: XMLBuilderOptions = applyDefaults(
-    createOptions === undefined ? {} : createOptions,
-    DefaultBuilderOptions)
+function formatOptions(createOptions: XMLBuilderCreateOptions = {}) {
+  const options = applyDefaults(createOptions, DefaultBuilderOptions) as XMLBuilderOptions
 
   if (options.convert.att.length === 0 ||
     options.convert.ins.length === 0 ||

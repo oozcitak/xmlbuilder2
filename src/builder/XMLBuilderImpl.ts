@@ -5,7 +5,7 @@ import {
 } from "./interfaces"
 import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
-  getValue, forEachObject, forEachArray
+  getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import {
@@ -46,7 +46,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   set(options: Partial<XMLBuilderOptions>): XMLBuilder {
     this._options = applyDefaults(
       applyDefaults(this._options, options, true), // apply user settings
-      DefaultBuilderOptions) // provide defaults
+      DefaultBuilderOptions) as XMLBuilderOptions // provide defaults
     return this
   }
 
@@ -103,13 +103,11 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (isFunction(name)) {
       // evaluate if function
       lastChild = this.ele(name.apply(this))
-    } else if (isArray(name)) {
-      for (const item of forEachArray(name)) {
-        lastChild = this.ele(item)
-      }
+    } else if (isArray(name) || isSet(name)) {
+      forEachArray(name, item => lastChild = this.ele(item), this)
     } else if (isMap(name) || isObject(name)) {
       // expand if object
-      for (let [key, val] of forEachObject(name)) {
+      forEachObject(name, (key, val) => {
         if (isFunction(val)) {
           // evaluate if function
           val = val.apply(this)
@@ -124,7 +122,7 @@ export class XMLBuilderImpl implements XMLBuilder {
           }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.text) === 0) {
           // text node
-          if (isObject(val) || isMap(val)) {
+          if (isMap(val) || isObject(val)) {
             // if the key is #text expand child nodes under this node to support mixed content
             lastChild = this.ele(val)
           } else {
@@ -132,19 +130,15 @@ export class XMLBuilderImpl implements XMLBuilder {
           }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.cdata) === 0) {
           // cdata node
-          if (isArray(val)) {
-            for (const item of forEachArray(val)) {
-              lastChild = this.dat(item)
-            }
+          if (isArray(val) || isSet(val)) {
+            forEachArray(val, item => lastChild = this.dat(item), this)
           } else {
             lastChild = this.dat(val)
           }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.comment) === 0) {
           // comment node
-          if (isArray(val)) {
-            for (const item of forEachArray(val)) {
-              lastChild = this.com(item)
-            }
+          if (isArray(val) || isSet(val)) {
+            forEachArray(val, item => lastChild = this.com(item), this)
           } else {
             lastChild = this.com(val)
           }
@@ -158,26 +152,26 @@ export class XMLBuilderImpl implements XMLBuilder {
           } else {
             lastChild = this.ins(val)
           }
-        } else if (isArray(val) && isEmpty(val)) {
+        } else if ((isArray(val) || isSet(val)) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
-        } else if (isObject(val) && isEmpty(val)) {
+        } else if (( isMap(val) || isObject(val)) && isEmpty(val)) {
           // empty objects produce one node
           lastChild = this.ele(key)
         } else if (!this._options.keepNullNodes && (val === null)) {
           // skip null and undefined nodes
           lastChild = this._dummy()
-        } else if (isArray(val)) {
+        } else if (isArray(val) || isSet(val)) {
           // expand list by creating child nodes
-          for (const item of forEachArray(val)) {
+          forEachArray(val, item => {
             const childNode: { [key: string]: any } = {}
             childNode[key] = item
             lastChild = this.ele(childNode)
-          }
-        } else if (isObject(val) || isMap(val)) {
+          }, this)
+        } else if (isMap(val) || isObject(val)) {
           // check for a namespace declaration attribute
           const qName = extractQName(key)
-          for (const [attName, attValue] of forEachObject(val)) {
+          forEachObject(val, (attName, attValue) => {
             if (attName[0] === this._options.convert.att) {
               const attQName = extractQName(attName.slice(1))
               if ((attQName[0] === null && attQName[1] === "xmlns") ||
@@ -185,7 +179,7 @@ export class XMLBuilderImpl implements XMLBuilder {
                 namespace = attValue
               }
             }
-          }
+          }, this)
 
           // create a parent node
           lastChild = this._node(namespace, key)
@@ -200,7 +194,7 @@ export class XMLBuilderImpl implements XMLBuilder {
           // leaf element node
           lastChild = this.ele(key)
         }
-      }
+      }, this)
     } else {
       // element node
       lastChild = this._node(namespace, name, attributes)
@@ -227,9 +221,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (isMap(p1) || isObject(p1)) {
       // att(obj: AttributesObject)
       // expand if object
-      for (const [attName, attValue] of forEachObject(p1)) {
-        this.att(attName, attValue)
-      }
+      forEachObject(p1, (attName, attValue) => this.att(attName, attValue), this)
       return this
     }
 
@@ -306,16 +298,12 @@ export class XMLBuilderImpl implements XMLBuilder {
       p2 = getValue(p2)
     }
 
-    if (isArray(p1)) {
+    if (isArray(p1) || isSet(p1)) {
       // removeAtt(names: string[])
-      for (const attName of forEachArray(p1)) {
-        this.removeAtt(attName)
-      }
-    } else if (isArray(p2)) {
+      forEachArray(p1, attName => this.removeAtt(attName), this)
+    } else if (isArray(p2) || isSet(p2)) {
       // removeAtt(namespace: string, names: string[])
-      for (const attName of forEachArray(p2)) {
-        this.removeAtt(p1 + "", attName)
-      }
+      forEachArray(p2, attName => this.removeAtt(p1 + "", attName), this)
     } else if (p1 !== undefined && p2 !== undefined) {
       // removeAtt(namespace: string, name: string)
       this.as.element.removeAttributeNS(p1 + "", p2 + "")
@@ -354,18 +342,16 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   ins(target: string | PIObject, content: string = ''): XMLBuilder {
 
-    if (isArray(target)) {
-      for (let item of forEachArray(target)) {
+    if (isArray(target) || isSet(target)) {
+      forEachArray(target, item => {
         item += ""
         const insIndex = item.indexOf(' ')
         const insTarget = (insIndex === -1 ? item : item.substr(0, insIndex))
         const insValue = (insIndex === -1 ? '' : item.substr(insIndex + 1))
         this.ins(insTarget, insValue)
-      }
+      }, this)
     } else if (isMap(target) || isObject(target)) {
-      for (const [insTarget, insValue] of forEachObject(target)) {
-        this.ins(insTarget, insValue)
-      }
+      forEachObject(target, (insTarget, insValue) => this.ins(insTarget, insValue), this)
     } else {
       const child = this._doc.createProcessingInstruction(target + "", content + "")
       this.as.node.appendChild(child)
@@ -587,7 +573,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       // override namespace if there is a namespace declaration
       // attribute
       if (attributes !== undefined) {
-        for (let [attName, attValue] of forEachObject(attributes)) {
+        forEachObject(attributes, (attName, attValue) => {
           if (attName === "xmlns") {
             namespace = attValue
           } else {
@@ -596,7 +582,7 @@ export class XMLBuilderImpl implements XMLBuilder {
               namespace = attValue
             }
           }
-        }
+        })
       }
     }
 
