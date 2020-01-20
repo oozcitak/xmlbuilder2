@@ -28,13 +28,6 @@ describe('cast', () => {
     expect(node.as.documentFragment.nodeType).toBe(NodeType.DocumentFragment)
   })
 
-  test('attr', () => {
-    const node = $$.document().ele('root').att('node', 'val')
-    node.forEachAttribute(att =>
-      expect(att.as.attr.nodeType).toBe(NodeType.Attribute)
-    )
-  })
-
   test('text', () => {
     const node = $$.document().ele('root').txt('node').first()
     expect(node.as.text.nodeType).toBe(NodeType.Text)

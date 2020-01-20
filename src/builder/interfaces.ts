@@ -660,20 +660,105 @@ export interface XMLBuilder {
   last(): XMLBuilder
 
   /**
-   * Traverses through the child nodes of an element node.
+   * Traverses through the child nodes of a node. `callback` is called with two
+   * arguments: `(node, index)`.
    * 
-   * @param callback - a callback function to apply to each node
+   * @param callback - a callback function to apply to each child node
+   * @param self - whether to visit the current node along with child nodes
+   * @param recursive - whether to visit all descendant nodes in tree-order or
+   * only the immediate child nodes
    * @param thisArg - value to use as this when executing callback
    */
-  forEachChild(callback: (node: XMLBuilder) => void, thisArg?: any): XMLBuilder
+  each(callback: ((node: XMLBuilder, index: number) => void), 
+    self?: boolean, recursive?: boolean, thisArg?: any): XMLBuilder
 
   /**
-   * Traverses through the attributes of an element node.
+   * Produces an array of values by transforming each child node with the given
+   * callback function. `callback` is called with two arguments: `(node, index)`.
    * 
-   * @param callback - a callback function to apply to each attribute
+   * @param callback - a callback function to apply to each child node
+   * @param self - whether to visit the current node along with child nodes
+   * @param recursive - whether to visit all descendant nodes in tree-order or
+   * only the immediate child nodes
    * @param thisArg - value to use as this when executing callback
    */
-  forEachAttribute(callback: (node: XMLBuilder) => void, thisArg?: any): XMLBuilder
+  map<T>(callback: ((node: XMLBuilder, index: number) => T), 
+    self?: boolean, recursive?: boolean, thisArg?: any): T[]
+
+  /**
+   * Reduces child nodes into a single value by applying the given callback 
+   * function. `callback` is called with three arguments: `(value, node, index)`.
+   * 
+   * @param callback - a callback function to apply to each child node
+   * @param initialValue - initial value of the iteration
+   * @param self - whether to visit the current node along with child nodes
+   * @param recursive - whether to visit all descendant nodes in tree-order or
+   * only the immediate child nodes
+   * @param thisArg - value to use as this when executing callback
+   */
+  reduce<T>(callback: ((value: T, node: XMLBuilder, index: number) => T),
+    initialValue: T, self?: boolean, recursive?: boolean, thisArg?: any): T
+
+  /**
+   * Returns the first child node satisfying the given predicate. `predicate` is
+   * called with two arguments: `(node, index)`.
+   * 
+   * @param predicate - a callback function to apply to each child node
+   * @param self - whether to visit the current node along with child nodes
+   * @param recursive - whether to visit all descendant nodes in tree-order or
+   * only the immediate child nodes
+   * @param thisArg - value to use as this when executing predicate
+   */
+  find(predicate: ((node: XMLBuilder, index: number) => boolean), 
+    self?: boolean, recursive?: boolean, thisArg?: any): XMLBuilder | undefined
+
+  /**
+   * Produces an array of child nodes which pass the given predicate test.
+   * `predicate` is called with two arguments: `(node, index)`.
+   * 
+   * @param predicate - a callback function to apply to each child node
+   * @param self - whether to visit the current node along with child nodes
+   * @param recursive - whether to visit all descendant nodes in tree-order or
+   * only the immediate child nodes
+   * @param thisArg - value to use as this when executing predicate
+   */
+  filter(predicate: ((node: XMLBuilder, index: number) => boolean), 
+    self?: boolean, recursive?: boolean, thisArg?: any): XMLBuilder[]
+
+  /**
+   * Returns `true` if all child nodes pass the given predicate test.
+   * `predicate` is called with two arguments: `(node, index)`.
+   * 
+   * @param predicate - a callback function to apply to each child node
+   * @param self - whether to visit the current node along with child nodes
+   * @param recursive - whether to visit all descendant nodes in tree-order or
+   * only the immediate child nodes
+   * @param thisArg - value to use as this when executing predicate
+   */
+  every(predicate: ((node: XMLBuilder, index: number) => boolean), 
+    self?: boolean, recursive?: boolean, thisArg?: any): boolean
+
+  /**
+   * Returns `true` if any of the child nodes pass the given predicate test.
+   * `predicate` is called with two arguments: `(node, index)`.
+   * 
+   * @param predicate - a callback function to apply to each child node
+   * @param self - whether to visit the current node along with child nodes
+   * @param recursive - whether to visit all descendant nodes in tree-order or
+   * only the immediate child nodes
+   * @param thisArg - value to use as this when executing predicate
+   */
+  some(predicate: ((node: XMLBuilder, index: number) => boolean), 
+    self?: boolean, recursive?: boolean, thisArg?: any): boolean
+
+  /**
+   * Produces an array of child nodes.
+   * 
+   * @param self - whether to visit the current node along with child nodes
+   * @param recursive - whether to visit all descendant nodes in tree-order or
+   * only the immediate child nodes
+   */
+  toArray(self?: boolean, recursive?: boolean): XMLBuilder[]
 
   /**
    * Converts the node into its string representation.
