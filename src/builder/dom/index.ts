@@ -8,18 +8,24 @@ import { DOMParser } from "@oozcitak/dom/lib/parser/interfaces"
  * Creates an XML document without any child nodes.
  */
 export function createDocument(): Document {
-  const { createDocument } =  (typeof window === 'undefined' ?
+  const { getImplementation } =  (typeof window === 'undefined' ?
     require("./node") : require("./browser"))
-  return createDocument()
+  const impl = getImplementation()
+  const doc = impl.createDocument(null, 'root', null)
+  /* istanbul ignore else */
+  if (doc.documentElement) {
+    doc.removeChild(doc.documentElement)
+  }
+  return doc  
 }
 
 /**
  * Creates a DOM parser.
  */
 export function createParser(version: "1.0" | "1.1"): DOMParser {
-  const { createParser } =  (typeof window === 'undefined' ?
+  const { getParser } =  (typeof window === 'undefined' ?
     require("./node") : require("./browser"))
-  return createParser(version)
+  return getParser(version)
 }
 
 /**

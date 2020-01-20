@@ -1,21 +1,15 @@
 /// <reference lib="dom" />
 
 /**
- * Creates an XML document without any child nodes.
+ * Returns a DOM implementation.
  */
-export function createDocument(): Document {
-  const impl = window.document.implementation
-  const doc = impl.createDocument(null, 'root', null)
-  /* istanbul ignore else */
-  if (doc.documentElement) {
-    doc.removeChild(doc.documentElement)
-  }
-  return doc
+export function getImplementation(): DOMImplementation {
+  return window.document.implementation
 }
 
 /**
- * Creates a DOM parser.
+ * Returns a DOM parser.
  */
-export function createParser(version: "1.0" | "1.1"): DOMParser {
+export function getParser(version: "1.0" | "1.1"): DOMParser {
   return new DOMParser()
 }

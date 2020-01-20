@@ -1,25 +1,18 @@
-import { Document } from "@oozcitak/dom/lib/dom/interfaces"
 import { DOMParser, DOMImplementation } from "@oozcitak/dom"
 import { dom } from "@oozcitak/dom/lib/dom"
 
 dom.setFeatures(false)
 
 /**
- * Creates an XML document without any child nodes.
+ * Returns a DOM implementation.
  */
-export function createDocument(): Document {
-  const impl = new DOMImplementation()
-  const doc = impl.createDocument(null, 'root', null)
-  /* istanbul ignore else */
-  if (doc.documentElement) {
-    doc.removeChild(doc.documentElement)
-  }
-  return doc
+export function getImplementation(): DOMImplementation {
+  return new DOMImplementation()
 }
 
 /**
- * Creates a DOM parser.
+ * Returns a DOM parser.
  */
-export function createParser(version: "1.0" | "1.1"): DOMParser {
+export function getParser(version: "1.0" | "1.1"): DOMParser {
   return new DOMParser(version)
 }

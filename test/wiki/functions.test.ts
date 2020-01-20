@@ -13,8 +13,12 @@ describe('examples in the function reference wiki page', () => {
     expect(doc3.end({ headless: true }))
       .toBe('<root><foo><bar>foobar</bar></foo></root>')
     
-    const doc4 = $$.document({ version: "1.1" }, '<ሥር><ኤለመንት/></ሥር>')
-    expect(doc4.end({ headless: true })).toBe('<ሥር><ኤለመንት/></ሥር>')
+    const doc4 = $$.document({ version: "1.1" }, '<root>text\x01</root>')
+    expect(doc4.end({ headless: true })).toBe('<root>text\x01</root>')
+
+    expect(() => $$.document({ version: "1.0" }, '<root>text\x00</root>')).toThrow()
+    expect(() => $$.document({ version: "1.0" }, '<root>text\x01</root>')).toThrow()
+    expect(() => $$.document({ version: "1.1" }, '<root>text\x00</root>')).toThrow()
   })
 
   test('fragment()', () => {
@@ -28,8 +32,12 @@ describe('examples in the function reference wiki page', () => {
     expect(frag3.toString())
       .toBe('<foo1>bar</foo1><foo2>baz</foo2>')
     
-    const frag4 = $$.fragment({ version: "1.1" }, '<ሥር><ኤለመንት/></ሥር>')
-    expect(frag4.toString()).toBe('<ሥር><ኤለመንት/></ሥር>')
+    const frag4 = $$.fragment({ version: "1.1" }, '<root>text\x01</root>')
+    expect(frag4.toString()).toBe('<root>text\x01</root>')
+
+    expect(() => $$.fragment({ version: "1.0" }, '<root>text\x00</root>')).toThrow()
+    expect(() => $$.fragment({ version: "1.0" }, '<root>text\x01</root>')).toThrow()
+    expect(() => $$.fragment({ version: "1.1" }, '<root>text\x00</root>')).toThrow()
   })
 
   test('ele()', () => {

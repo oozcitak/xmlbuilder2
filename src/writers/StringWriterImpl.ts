@@ -31,7 +31,7 @@ export class StringWriterImpl {
   private _options!: Required<StringWriterOptions>
   private _refs!: StringWriterRefs
   private _pre!: PreSerializer
-  private _indentation: { [key: number]: string} = {}
+  private _indentation: { [key: number]: string } = {}
 
   /**
    * Initializes a new instance of `StringWriterImpl`.
@@ -95,11 +95,11 @@ export class StringWriterImpl {
     this._pre.serialize(node, this._options.wellFormed)
 
     // remove trailing newline
-    if (this._options.prettyPrint && 
+    if (this._options.prettyPrint &&
       this._refs.markup.slice(-this._options.newline.length) === this._options.newline) {
       this._refs.markup = this._refs.markup.slice(0, -this._options.newline.length)
     }
-      
+
     return this._refs.markup
   }
 
@@ -116,7 +116,7 @@ export class StringWriterImpl {
     } else if (systemId) {
       this._refs.markup += "<!DOCTYPE " + name + " SYSTEM \"" + systemId + "\">"
     } else {
-      this._refs.markup += "<!DOCTYPE "+ name + ">"
+      this._refs.markup += "<!DOCTYPE " + name + ">"
     }
 
     this._endLine()
@@ -145,7 +145,7 @@ export class StringWriterImpl {
           textOnlyNode = false
           emptyNode = false
           break
-        } else if(childNode.data !== '') {
+        } else if (childNode.data !== '') {
           emptyNode = false
         }
       }
@@ -156,7 +156,7 @@ export class StringWriterImpl {
     if ((voidElement || selfClosing) && this._options.allowEmptyTags) {
       this._refs.markup += "></" + name + ">"
     } else {
-      this._refs.markup += voidElement ? " />" : 
+      this._refs.markup += voidElement ? " />" :
         (selfClosing || this._refs.emptyNode) ? (this._options.spaceBeforeSlash ? " />" : "/>") : ">"
     }
     this._endLine()

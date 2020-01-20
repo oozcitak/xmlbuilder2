@@ -133,7 +133,7 @@ export function document(p1?: XMLBuilderCreateOptions | string | ExpandObject,
     builder.ele(contents)
   } else if (/^\s*</.test(contents)) {
     // XML document
-    const domParser = createParser()
+    const domParser = createParser(options.version)
     const doc = domParser.parseFromString(contents, "text/xml")
     builder = new XMLBuilderImpl(doc)
     setOptions(doc, options)
@@ -211,7 +211,7 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
     builder.ele(contents)
   } else if (/^\s*</.test(contents)) {
     // XML document
-    const domParser = createParser()
+    const domParser = createParser(options.version)
     const doc = domParser.parseFromString("<TEMP_ROOT>" + contents + "</TEMP_ROOT>", "text/xml")
     setOptions(doc, options)
     /* istanbul ignore next */

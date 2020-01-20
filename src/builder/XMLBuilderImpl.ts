@@ -63,7 +63,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (isString(p1) && /^\s*</.test(p1)) {
       // parse XML string
       const contents = "<TEMP_ROOT>" + p1 + "</TEMP_ROOT>"
-      const domParser = createParser()
+      const domParser = createParser(this._options.version)
       const doc = domParser.parseFromString(contents, "text/xml")
       /* istanbul ignore next */
       if (doc.documentElement === null) {
