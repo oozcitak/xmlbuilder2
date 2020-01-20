@@ -18,6 +18,21 @@ npm install xmlbuilder2
 
 ### Usage:
 
+`xmlbuilder2` is a wrapper around DOM nodes which adds chainable functions which maked it easier to build XML documents.
+For example the following XML document:
+
+``` xml
+<?xml version="1.0"?>
+<root att="val">
+  <foo>
+    <bar>foobar</bar>
+  </foo>
+  <baz/>
+</root>
+```
+
+can be created with the following function chain:
+
 ``` js
 const { document } = require('xmlbuilder2');
 
@@ -33,17 +48,7 @@ const root = document({ version: '1.0' })
 const xml = root.end({ prettyPrint: true });
 console.log(xml);
 ```
-will result in:
 
-``` xml
-<?xml version="1.0"?>
-<root att="val">
-  <foo>
-    <bar>foobar</bar>
-  </foo>
-  <baz/>
-</root>
-```
 ___
 
 The same XML document can be created by converting a JS object into XML nodes:
