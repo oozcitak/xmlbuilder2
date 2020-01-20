@@ -21,12 +21,12 @@ npm install xmlbuilder2
 ``` js
 const { document } = require('xmlbuilder2');
 
-const root = document({ version: "1.0" })
-  .ele("root", { att: "val" })
-    .ele("foo")
-      .ele("bar").txt("foobar").up()
+const root = document({ version: '1.0' })
+  .ele('root', { att: 'val' })
+    .ele('foo')
+      .ele('bar').txt('foobar').up()
     .up()
-    .ele("baz").up()
+    .ele('baz').up()
   .up();
 
 // convert the XML tree to string
@@ -53,9 +53,9 @@ const { document } = require('xmlbuilder2');
 
 const obj = {
   root: {
-    "@att": "val",
+    '@att': 'val',
     foo: {
-      bar: "foobar"
+      bar: 'foobar'
     },
     baz: {}
   }
@@ -74,25 +74,17 @@ const { document } = require('xmlbuilder2');
 const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>';
 const doc = document(xmlStr);
 
-// append a "baz" element to the root node of the document
-doc.root().ele("baz");
+// append a 'baz' element to the root node of the document
+doc.root().ele('baz');
 
 const xml = doc.end({ prettyPrint: true });
 console.log(xml);
 ```
-which would output:
-```xml
-<?xml version="1.0"?>
-<root att="val">
-  <foo>
-    <bar>foobar</bar>
-  </foo>
-  <baz/>
-</root>
-```
-or you could return a JS object by changing the `format` argument to `"object"`:
+which would output the same document string at the top of this page.
+
+Or you could return a JS object by changing the `format` argument to `'object'`:
 ```js
-const obj = doc.end({ format: "object" });
+const obj = doc.end({ format: 'object' });
 console.log(obj);
 ```
 ```js
