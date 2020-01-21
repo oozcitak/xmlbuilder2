@@ -178,6 +178,19 @@ describe('StringWriter', () => {
       `)
   })
 
+  test('nested default namespace declaration attributes with same namespace are ignored', () => {
+    const doc = $$.document().ele('ns', 'r')
+      .att('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns')
+      .ele('ns', 'n')
+      .att('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns')
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <r xmlns="ns">
+        <n/>
+      </r>
+      `)
+  })
+
   test('prefix of an attribute is replaced with another existing prefix mapped to the same namespace URI', () => {
     const doc = $$.document().ele('r', { "xmlns:xx": "uri" })
       .att('uri', 'p:name', 'v')

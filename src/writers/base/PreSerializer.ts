@@ -237,7 +237,9 @@ export class PreSerializer {
       }
 
       /** 11.4. Append the value of qualified name to markup. */
+      /* istanbul ignore else */
       if (this._beginElement) this._beginElement(qualifiedName)
+      /* istanbul ignore else */
       if (this._openTagBegin) this._openTagBegin(qualifiedName)
     } else {
       /** 
@@ -307,7 +309,9 @@ export class PreSerializer {
         /**
          * 12.4.3. Append the value of qualified name to markup.
          */
+        /* istanbul ignore else */
         if (this._beginElement) this._beginElement(qualifiedName)
+        /* istanbul ignore else */
         if (this._openTagBegin) this._openTagBegin(qualifiedName)
 
         /** 12.5. Otherwise, if prefix is not null, then: */
@@ -337,7 +341,9 @@ export class PreSerializer {
          */
         map.set(prefix, ns)
         qualifiedName += prefix + ':' + node.localName
+        /* istanbul ignore else */
         if (this._beginElement) this._beginElement(qualifiedName)
+        /* istanbul ignore else */
         if (this._openTagBegin) this._openTagBegin(qualifiedName)
 
         /**
@@ -354,6 +360,7 @@ export class PreSerializer {
          * the require well-formed flag as input;
          * 12.5.5.6. """ (U+0022 QUOTATION MARK).
          */
+        /* istanbul ignore else */
         if (this._attribute) this._attribute('xmlns:' + prefix, 
           this._serializeAttributeValue(ns, requireWellFormed))
 
@@ -396,7 +403,9 @@ export class PreSerializer {
         /**
          * 12.6.4. Append the value of qualified name to markup.
          */
+        /* istanbul ignore else */
         if (this._beginElement) this._beginElement(qualifiedName)
+        /* istanbul ignore else */
         if (this._openTagBegin) this._openTagBegin(qualifiedName)
 
         /**
@@ -412,6 +421,7 @@ export class PreSerializer {
          * and the require well-formed flag as input;
          * 12.6.5.5. """ (U+0022 QUOTATION MARK).
          */
+        /* istanbul ignore else */
         if (this._attribute) this._attribute('xmlns', 
           this._serializeAttributeValue(ns, requireWellFormed))
 
@@ -424,7 +434,9 @@ export class PreSerializer {
       } else {
         qualifiedName += node.localName
         inheritedNS = ns
+        /* istanbul ignore else */
         if (this._beginElement) this._beginElement(qualifiedName)
+        /* istanbul ignore else */
         if (this._openTagBegin) this._openTagBegin(qualifiedName)
       }
     }
@@ -455,14 +467,19 @@ export class PreSerializer {
     const isHTML = (ns === infraNamespace.HTML)
     if (isHTML && node.childNodes.length === 0 &&
       PreSerializer._VoidElementNames.has(node.localName)) {
+      /* istanbul ignore else */
       if (this._endElement) this._endElement(qualifiedName)
+      /* istanbul ignore else */
       if (this._openTagEnd) this._openTagEnd(qualifiedName, true, true)
       skipEndTag = true
     } else if (!isHTML && node.childNodes.length === 0) {
+      /* istanbul ignore else */
       if (this._endElement) this._endElement(qualifiedName)
+      /* istanbul ignore else */
       if (this._openTagEnd) this._openTagEnd(qualifiedName, true, false)
       skipEndTag = true
     } else {
+      /* istanbul ignore else */
       if (this._openTagEnd) this._openTagEnd(qualifiedName, false, false)
     }
 
@@ -504,7 +521,9 @@ export class PreSerializer {
      * 20.3. ">" (U+003E GREATER-THAN SIGN).
      * 21. Return the value of markup.
      */
+    /* istanbul ignore else */
     if (this._endElement) this._endElement(qualifiedName)
+    /* istanbul ignore else */
     if (this._closeTag) this._closeTag(qualifiedName)
   }
 
@@ -573,6 +592,7 @@ export class PreSerializer {
     /**
      * Otherwise, return the concatenation of "<!--", node's data, and "-->".
      */
+    /* istanbul ignore else */
     if (this._comment) this._comment(node.data)
   }
 
@@ -615,6 +635,7 @@ export class PreSerializer {
         markup += c
     }
 
+    /* istanbul ignore else */
     if (this._text) this._text(markup)
   }
 
@@ -708,6 +729,7 @@ export class PreSerializer {
      * 10. Append ">" (U+003E GREATER-THAN SIGN) to markup.
      * 11. Return the value of markup.
      */
+    /* istanbul ignore else */
     if (this._docType) this._docType(node.name, node.publicId, node.systemId)
   }
 
@@ -751,6 +773,7 @@ export class PreSerializer {
      * 3.5. "?>" (U+003F QUESTION MARK, U+003E GREATER-THAN SIGN).
      * 4. Return the value of markup.
      */
+    /* istanbul ignore else */
     if (this._instruction) this._instruction(node.target, node.data)
   }
 
@@ -766,6 +789,7 @@ export class PreSerializer {
       throw new Error("CDATA contains invalid characters (well-formed required).")
     }
 
+    /* istanbul ignore else */
     if (this._cdata) this._cdata(node.data)
   }
 
@@ -807,6 +831,7 @@ export class PreSerializer {
 
       // Optimize common case
       if (!requireWellFormed && attr.namespaceURI === null) {
+        /* istanbul ignore else */
         if (this._attribute) this._attribute(attr.localName, 
           this._serializeAttributeValue(attr.value, requireWellFormed))
         continue
@@ -946,6 +971,7 @@ export class PreSerializer {
            * attribute namespace and the require well-formed flag as input;
            * 3.5.3.2.6. """ (U+0022 QUOTATION MARK).
           */
+          /* istanbul ignore else */
           if (this._attribute) this._attribute('xmlns:' + candidatePrefix, 
             this._serializeAttributeValue(attributeNamespace, requireWellFormed))
         }
@@ -984,6 +1010,7 @@ export class PreSerializer {
        * 3.9.4. """ (U+0022 QUOTATION MARK).
        */
       attrName += attr.localName
+      /* istanbul ignore else */
       if (this._attribute) this._attribute(attrName, 
         this._serializeAttributeValue(attr.value, requireWellFormed))
     }
