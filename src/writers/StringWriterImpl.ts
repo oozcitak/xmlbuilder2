@@ -225,9 +225,7 @@ export class StringWriterImpl {
    * mode.
    */
   private _beginLine(): void {
-    if (!this._options.prettyPrint || this._refs.suppressPretty) {
-      return
-    } else {
+    if (this._options.prettyPrint && !this._refs.suppressPretty) {
       this._refs.markup += this._indent(this._options.offset + this._pre.level)
     }
   }
@@ -237,9 +235,7 @@ export class StringWriterImpl {
    * mode.
    */
   private _endLine(): void {
-    if (!this._options.prettyPrint || this._refs.suppressPretty) {
-      return
-    } else {
+    if (this._options.prettyPrint && !this._refs.suppressPretty) {
       this._refs.markup += this._options.newline
     }
   }
