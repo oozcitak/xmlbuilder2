@@ -1,4 +1,4 @@
-import { 
+import {
   Document, DocumentType, Element, Attr, Text, CDATASection, Comment,
   ProcessingInstruction, DocumentFragment, Node, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
@@ -8,7 +8,7 @@ import { DOMParser } from "@oozcitak/dom/lib/parser/interfaces"
  * Creates an XML document without any child nodes.
  */
 export function createDocument(): Document {
-  const { getImplementation } =  (typeof window === 'undefined' ?
+  const { getImplementation } = (typeof window === 'undefined' ?
     require("./node") : require("./browser"))
   const impl = getImplementation()
   const doc = impl.createDocument(null, 'root', null)
@@ -16,14 +16,14 @@ export function createDocument(): Document {
   if (doc.documentElement) {
     doc.removeChild(doc.documentElement)
   }
-  return doc  
+  return doc
 }
 
 /**
  * Creates a DOM parser.
  */
 export function createParser(version: "1.0" | "1.1"): DOMParser {
-  const { getParser } =  (typeof window === 'undefined' ?
+  const { getParser } = (typeof window === 'undefined' ?
     require("./node") : require("./browser"))
   return getParser(version)
 }
@@ -71,15 +71,6 @@ export function isDocumentFragmentNode(x: any): x is DocumentFragment {
  */
 export function isElementNode(x: any): x is Element {
   return (!!x && x.nodeType === NodeType.Element)
-}
-
-/**
- * Determines if the given object is a `Attr`.
- *
- * @param x - the object to check
- */
-export function isAttrNode(x: any): x is Attr {
-  return (!!x && x.nodeType === NodeType.Attribute)
 }
 
 /**
@@ -145,7 +136,8 @@ export function isName(name: string): boolean {
     if (c1 >= 0xD800 && c1 <= 0xDBFF && i < name.length - 1) {
       const c2 = name.charCodeAt(i + 1)
       if (c2 >= 0xDC00 && c2 <= 0xDFFF) {
-        n = (c1 - 0xD800) * 0x400 + c2 - 0xDC00 + 0x10000 
+        n = (c1 - 0xD800) * 0x400 + c2 - 0xDC00 + 0x10000
+        i++
       }
     }
 
@@ -187,14 +179,15 @@ export function isName(name: string): boolean {
  * @param chars - sequence of characters to test
  * @param xmlVersion - XML specification version
  */
-export function isLegalChar(chars: string, xmlVersion: "1.0" | "1.1" = "1.0"): boolean {
+export function isLegalChar(chars: string, xmlVersion: "1.0" | "1.1"): boolean {
   for (let i = 0; i < chars.length; i++) {
     const c1 = chars.charCodeAt(i)
     let n = c1
     if (c1 >= 0xD800 && c1 <= 0xDBFF && i < chars.length - 1) {
       const c2 = chars.charCodeAt(i + 1)
       if (c2 >= 0xDC00 && c2 <= 0xDFFF) {
-        n = (c1 - 0xD800) * 0x400 + c2 - 0xDC00 + 0x10000 
+        n = (c1 - 0xD800) * 0x400 + c2 - 0xDC00 + 0x10000
+        i++
       }
     }
 
@@ -230,24 +223,17 @@ export function isLegalChar(chars: string, xmlVersion: "1.0" | "1.1" = "1.0"): b
  */
 export function isPubidChar(chars: string): boolean {
   for (let i = 0; i < chars.length; i++) {
-    const c1 = chars.charCodeAt(i)
-    let n = c1
-    if (c1 >= 0xD800 && c1 <= 0xDBFF && i < chars.length - 1) {
-      const c2 = chars.charCodeAt(i + 1)
-      if (c2 >= 0xDC00 && c2 <= 0xDFFF) {
-        n = (c1 - 0xD800) * 0x400 + c2 - 0xDC00 + 0x10000 
-      }
-    }
+    // PubId chars are all in the ASCII range, no need to check surrogates
+    const n = chars.charCodeAt(i)
 
     // #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=?;!*#@$_%]
     if ((n >= 97 && n <= 122) || // [a-z]
       (n >= 65 && n <= 90) || // [A-Z]
-      (n >= 48 && n <= 57) || // [0-9]
-      n === 0x20 || n === 0xD || n === 0xA ||
-      n === 45 || n === 39 || n === 40 || n === 41 || n === 43 || n === 44 ||
-      n === 46 || n === 47 || n === 58 || n === 61 || n === 63 || n === 59 ||
-      n === 33 || n === 42 || n === 35 || n === 64 || n === 36 || n === 95 ||
-      n === 37) {
+      (n >= 39 && n <= 59) || // ['()*+,-./] | [0-9] | [:;]
+      n === 0x20 || n === 0xD || n === 0xA || // #x20 | #xD | #xA
+      (n >= 35 && n <= 37) || // [#$%]
+      n === 33 || // !
+      n === 61 || n === 63 || n === 64 || n === 95) { // [=?@_]
       continue
     } else {
       return false

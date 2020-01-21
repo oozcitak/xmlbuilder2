@@ -481,13 +481,17 @@ describe('StringWriter', () => {
     const ele = $$.document().ele('root')
     Object.defineProperty(ele.node, "localName", { value: "x:y", configurable: true })
     expect(() => ele.end({ wellFormed: true })).toThrow()
-    Object.defineProperty(ele.node, "localName", { value: "\uD87E\uDC04😊", configurable: true})
-    expect(() => ele.end({ wellFormed: true })).toThrow()
     Object.defineProperty(ele.node, "localName", { value: "abc\0", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
     Object.defineProperty(ele.node, "localName", { value: "\0abc", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
     Object.defineProperty(ele.node, "prefix", { value: "xmlns"})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.node, "localName", { value: "abc\uDBFF", configurable: true})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.node, "localName", { value: "abc🌃\0", configurable: true})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.node, "localName", { value: "abc\uDBFFx", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
   })
 
@@ -504,9 +508,23 @@ describe('StringWriter', () => {
     expect(() => ele2.end({ wellFormed: true })).toThrow()
   })
 
-  test('wellFormed checks - invalid text node', () => {
+  test('wellFormed checks - invalid text node - 1.0', () => {
     const ele = $$.document().ele('root').txt('abc😊\0')
     expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.first().node, "data", { value: "abc\uDBFFx", configurable: true})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+  })
+
+  test('wellFormed checks - invalid text node - 1.1', () => {
+    const ele = $$.document({ version: "1.1" }).ele('root').txt('abc')
+    Object.defineProperty(ele.first().node, "data", { value: "abc\uDBFFx", configurable: true})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.first().node, "data", { value: "abc\0", configurable: true})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.first().node, "data", { value: "abc\uE000🌃\0", configurable: true})
+    expect(() => ele.end({ wellFormed: true })).toThrow()
+    Object.defineProperty(ele.first().node, "data", { value: "abc\uE000🌃", configurable: true})
+    expect(() => ele.end({ wellFormed: true })).not.toThrow()
   })
 
   test('wellFormed checks - invalid document type node', () => {
