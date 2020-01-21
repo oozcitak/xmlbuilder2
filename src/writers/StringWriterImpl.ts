@@ -140,7 +140,8 @@ export class StringWriterImpl {
     if (this._options.prettyPrint && !selfClosing && !voidElement && !this._options.indentTextOnlyNodes) {
       let textOnlyNode = true
       let emptyNode = true
-      for (const childNode of this._pre.currentNode.childNodes) {
+      let childNode = this._pre.currentNode.firstChild
+      while (childNode) {
         if (!isTextNode(childNode)) {
           textOnlyNode = false
           emptyNode = false
@@ -148,6 +149,7 @@ export class StringWriterImpl {
         } else if (childNode.data !== '') {
           emptyNode = false
         }
+        childNode = childNode.nextSibling
       }
       this._refs.suppressPretty = textOnlyNode
       this._refs.emptyNode = emptyNode
