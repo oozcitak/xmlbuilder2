@@ -18,42 +18,36 @@ npm install xmlbuilder2
 
 ### Usage:
 
+`xmlbuilder2` is a wrapper around DOM nodes which adds chainable functions to make it easier to create and work with XML documents. For example the following XML document:
+
+``` xml
+<?xml version="1.0"?>
+<root att="val">
+  <foo>
+    <bar>foobar</bar>
+  </foo>
+  <baz/>
+</root>
+```
+
+can be created with the following function chain:
+
 ``` js
 const { document } = require('xmlbuilder2');
 
-const root = document()
-  .ele('topgun')
-    .ele('pilots')
-      .ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky').up()
-      .ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell').up()
-      .ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw').up()
+const root = document({ version: '1.0' })
+  .ele('root', { att: 'val' })
+    .ele('foo')
+      .ele('bar').txt('foobar').up()
     .up()
-    .ele('hangar')
-      .ele('aircraft').txt('F-14 Tomcat').up()
-      .ele('aircraft').txt('MiG-28').up()
-    .up()
+    .ele('baz').up()
   .up();
 
 // convert the XML tree to string
 const xml = root.end({ prettyPrint: true });
 console.log(xml);
 ```
-will result in:
 
-``` xml
-<?xml version="1.0"?>
-<topgun>
-  <pilots>
-    <pilot callsign="Iceman" rank="Lieutenant">Tom Kazansky</pilot>
-    <pilot callsign="Maverick" rank="Lieutenant">Pete Mitchell</pilot>
-    <pilot callsign="Goose" rank="Lieutenant (j.g.)">Nick Bradshaw</pilot>
-  </pilots>
-  <hangar>
-    <aircraft>F-14 Tomcat</aircraft>
-    <aircraft>MiG-28</aircraft>
-  </hangar>
-</topgun>
-```
 ___
 
 The same XML document can be created by converting a JS object into XML nodes:
@@ -62,19 +56,14 @@ The same XML document can be created by converting a JS object into XML nodes:
 const { document } = require('xmlbuilder2');
 
 const obj = {
-  topgun: {
-    pilots: {
-      pilot: [
-        { '@callsign': 'Iceman', '@rank': 'Lieutenant', '#': 'Tom Kazansky' },
-        { '@callsign': 'Maverick', '@rank': 'Lieutenant', '#': 'Pete Mitchell' },
-        { '@callsign': 'Goose', '@rank': 'Lieutenant (j.g.)', '#': 'Nick Bradshaw' }
-      ]
+  root: {
+    '@att': 'val',
+    foo: {
+      bar: 'foobar'
     },
-    hangar: {
-      aircraft: ['F-14 Tomcat', 'MiG-28']
-    }
+    baz: {}
   }
-}
+};
 
 const doc = document(obj);
 const xml = doc.end({ prettyPrint: true });
@@ -89,25 +78,17 @@ const { document } = require('xmlbuilder2');
 const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>';
 const doc = document(xmlStr);
 
-// append a "baz" element to the root node of the document
-doc.root().ele("baz");
+// append a 'baz' element to the root node of the document
+doc.root().ele('baz');
 
 const xml = doc.end({ prettyPrint: true });
 console.log(xml);
 ```
-which would output:
-```xml
-<?xml version="1.0"?>
-<root att="val">
-  <foo>
-    <bar>foobar</bar>
-  </foo>
-  <baz/>
-</root>
-```
-or you could return a JS object by changing the `format` argument to `"object"`:
+which would output the same document string at the top of this page.
+
+Or you could return a JS object by changing the `format` argument to `'object'`:
 ```js
-const obj = doc.end({ format: "object" });
+const obj = doc.end({ format: 'object' });
 console.log(obj);
 ```
 ```js
