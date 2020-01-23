@@ -4,4 +4,3 @@ coverage/
 docs/
 .vs/
 .nyc_output/
-package-lock.json
