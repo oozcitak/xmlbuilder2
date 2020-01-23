@@ -168,6 +168,15 @@ describe('ObjectWriter', () => {
 
   test('duplicate tag names', () => {
     const result = $$.document().ele('people')
+      .ele('person').up()
+      .ele('person').up()
+      .end({ format: "object" })
+
+    expect(result).toEqual( { people: { person: [ {}, {} ] } } )
+  })
+
+  test('duplicate tag names with attributes', () => {
+    const result = $$.document().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "object" })
@@ -178,6 +187,24 @@ describe('ObjectWriter', () => {
           person: [
             { @name: xxx },
             { @name: yyy }
+          ]
+        }
+      }
+      `)
+  })
+
+  test('duplicate tag names with text child nodes', () => {
+    const result = $$.document().ele('people')
+      .ele('person').txt("text").up()
+      .ele('person').txt("text").up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        people: {
+          person: [
+            text,
+            text
           ]
         }
       }
