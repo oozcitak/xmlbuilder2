@@ -26,7 +26,7 @@
   ],
   "dependencies": {
     "@oozcitak/util": "7.0.0",
-    "@oozcitak/dom": "1.10.0",
+    "@oozcitak/dom": "1.11.0",
     "@oozcitak/infra": "1.0.4"
   },
   "devDependencies": {
