@@ -13,12 +13,6 @@
                 "-i"
             ],
             "internalConsoleOptions": "openOnSessionStart"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Run ConcatTS",
-            "program": "${workspaceFolder}/scripts/concatTS.js"
         }
     ]
 }
