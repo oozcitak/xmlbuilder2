@@ -3,6 +3,15 @@ import { existsSync, closeSync, openSync, readFileSync, writeFileSync } from "fs
 import { join } from "path"
 import { execSync } from "child_process"
 
+export function benchmarkTitle(baseCase: string): void {
+  console.log(``)
+  console.log(`${chalk.bold.underline(`Benchmark Results for v${currentVersion()}`)}`)
+  console.log(`${chalk.bold.green("green")} is fastest, ${chalk.bold.red("red")} is slowest. Each case in a benchmark suite`)
+  console.log(`is compared with the fastest case, then the base case is`)
+  console.log(`compared with the result from the previous version (if any).`)
+  console.log(`Base case is ${chalk.bold(baseCase)}.`)
+}
+
 export function processBenchmark(suite: any, baseCase: string): void {
   const items: any[] = []
   suite.forEach((item: any) => { items.push(item) })
@@ -19,6 +28,7 @@ export function processBenchmark(suite: any, baseCase: string): void {
 
   const suiteName: string = suite.name
 
+  console.log(``)
   console.log(`${chalk.bold.underline(`Benchmark: ${suiteName}`)}`)
 
   // print current suite cases

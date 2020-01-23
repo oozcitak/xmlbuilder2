@@ -1,9 +1,13 @@
 import { document } from "../lib"
 import { create } from "xmlbuilder"
 import { Suite } from "benchmark"
-import { processBenchmark } from "./"
+import { processBenchmark, benchmarkTitle } from "./"
 import { join } from "path"
 import { readFileSync } from "fs"
+
+(function () {
+  benchmarkTitle("dom")
+})();
 
 function createSmallDoc() {
   const root = create('root')
