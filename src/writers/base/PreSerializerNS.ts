@@ -13,9 +13,9 @@ import {
 } from "../../builder/dom"
 
 /**
- * Pre-serializes XML nodes.
+ * Pre-serializes XML nodes. This class is namespace aware.
  */
-export class PreSerializer {
+export class PreSerializerNS {
 
   private static _VoidElementNames = new Set(['area', 'base', 'basefont',
     'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen',
@@ -44,11 +44,11 @@ export class PreSerializer {
   currentNode!: Node
 
   /**
-   * Initializes a new instance of `PreSerializer`.
+   * Sets serialization callbacks.
    * 
    * @param functions - serializer functions
    */
-  constructor(functions: Partial<SerializerFunctions>) {
+  setCallbacks(functions: Partial<SerializerFunctions>) {
     this._docType = functions.docType
     this._comment = functions.comment
     this._text = functions.text
@@ -462,7 +462,7 @@ export class PreSerializer {
      */
     const isHTML = (ns === infraNamespace.HTML)
     if (isHTML && node.childNodes.length === 0 &&
-      PreSerializer._VoidElementNames.has(node.localName)) {
+      PreSerializerNS._VoidElementNames.has(node.localName)) {
       /* istanbul ignore else */
       if (this._endElement) this._endElement(qualifiedName)
       /* istanbul ignore else */
@@ -666,9 +666,6 @@ export class PreSerializer {
    * Produces an XML serialization of a document type node.
    * 
    * @param node - node to serialize
-   * @param namespace - context namespace
-   * @param prefixMap - namespace prefix map
-   * @param prefixIndex - generated namespace prefix index
    * @param requireWellFormed - whether to check conformance
    */
   private _serializeDocumentType(node: DocumentType,

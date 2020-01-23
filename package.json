@@ -30,21 +30,21 @@
     "@oozcitak/infra": "1.0.4"
   },
   "devDependencies": {
-    "@types/node": "*",
-    "@types/jest": "*",
-    "@types/dedent": "*",
     "@types/benchmark": "*",
     "@types/chalk": "*",
-    "typescript": "*",
-    "jest": "*",
-    "ts-jest": "*",
+    "@types/dedent": "*",
+    "@types/jest": "*",
+    "@types/node": "*",
+    "benchmark": "*",
+    "chalk": "*",
     "dedent": "*",
     "glob": "*",
-    "xpath": "*",
-    "xmlbuilder": "*",
+    "jest": "*",
+    "ts-jest": "*",
     "ts-node": "*",
-    "benchmark": "*",
-    "chalk": "*"
+    "typescript": "*",
+    "xmlbuilder": "*",
+    "xpath": "*"
   },
   "jest": {
     "transform": {

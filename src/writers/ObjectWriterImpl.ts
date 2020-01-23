@@ -3,7 +3,8 @@ import {
 } from "../builder/interfaces"
 import { applyDefaults, isArray, isString } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { PreSerializer } from "./base/PreSerializer"
+import { PreSerializerNS } from "./base/PreSerializerNS"
+import { PreSerializerNoNS } from "./base/PreSerializerNoNS"
 
 type AttrNode = { "@": { [key: string]: string } }
 type TextNode = { "#": string | string[] }
@@ -46,7 +47,10 @@ export class ObjectWriterImpl {
     let currentIndex = 0
     let listRegister: NodeList[] = [currentList]
 
-    const pre = new PreSerializer({
+    const pre = node._nodeDocument === undefined || node._nodeDocument._hasNamespaces ?
+      new PreSerializerNS() : new PreSerializerNoNS()
+
+    pre.setCallbacks({
       beginElement: (name) => {
         const childItems = this._addElement(currentList, name)
         currentIndex++

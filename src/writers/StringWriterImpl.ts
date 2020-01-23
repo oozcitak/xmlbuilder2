@@ -1,8 +1,9 @@
 import { StringWriterOptions, XMLBuilderOptions } from "../builder/interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { PreSerializer } from "./base/PreSerializer"
 import { isTextNode } from "../builder/dom"
+import { PreSerializerNS } from "./base/PreSerializerNS"
+import { PreSerializerNoNS } from "./base/PreSerializerNoNS"
 
 /**
  * Represents reference parameters passed to string writer functions.
@@ -30,7 +31,7 @@ export class StringWriterImpl {
   private _builderOptions: XMLBuilderOptions
   private _options!: Required<StringWriterOptions>
   private _refs!: StringWriterRefs
-  private _pre!: PreSerializer
+  private _pre!: PreSerializerNS | PreSerializerNoNS
   private _indentation: { [key: number]: string } = {}
 
   /**
@@ -65,7 +66,11 @@ export class StringWriterImpl {
     }) as Required<StringWriterOptions>
 
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
-    this._pre = new PreSerializer({
+
+    this._pre = node._nodeDocument === undefined || node._nodeDocument._hasNamespaces ?
+      new PreSerializerNS() : new PreSerializerNoNS()
+
+    this._pre.setCallbacks({
       docType: this._docType.bind(this),
       openTagBegin: this._openTagBegin.bind(this),
       openTagEnd: this._openTagEnd.bind(this),
