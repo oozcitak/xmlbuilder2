@@ -13,7 +13,8 @@ import {
 } from "../writers"
 import { Document, Node, Element } from "@oozcitak/dom/lib/dom/interfaces"
 import {
-  createParser, isDocumentNode, isDocumentFragmentNode, extractQName
+  createParser, isDocumentNode, isDocumentFragmentNode, extractQName, 
+  throwIfParserError
 } from "./dom"
 
 /**
@@ -56,12 +57,13 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (isString(p1) && /^\s*</.test(p1)) {
       // parse XML string
       const contents = "<TEMP_ROOT>" + p1 + "</TEMP_ROOT>"
-      const domParser = createParser(this._options.version)
+      const domParser = createParser()
       const doc = domParser.parseFromString(contents, "text/xml")
       /* istanbul ignore next */
       if (doc.documentElement === null) {
         throw new Error("Document element is null.")
       }
+      throwIfParserError(doc)
       for (const child of doc.documentElement.childNodes) {
         const newChild = doc.importNode(child, true)
         lastChild = new XMLBuilderImpl(newChild)
@@ -354,8 +356,8 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilder {
-    this._options.version = options.version
+  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilder {
+    this._options.version = options.version || "1.0"
     this._options.encoding = options.encoding
     this._options.standalone = options.standalone
 

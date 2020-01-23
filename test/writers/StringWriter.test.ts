@@ -526,12 +526,6 @@ describe('StringWriter', () => {
     expect(() => ele.end({ wellFormed: true })).toThrow()
     Object.defineProperty(ele.first().node, "data", { value: "abc\uDBFFx", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
-  })
-
-  test('wellFormed checks - invalid text node - 1.1', () => {
-    const ele = $$.document({ version: "1.1" }).ele('root').txt('abc')
-    Object.defineProperty(ele.first().node, "data", { value: "abc\uDBFFx", configurable: true})
-    expect(() => ele.end({ wellFormed: true })).toThrow()
     Object.defineProperty(ele.first().node, "data", { value: "abc\0", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
     Object.defineProperty(ele.first().node, "data", { value: "abc\uE000🌃\0", configurable: true})

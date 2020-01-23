@@ -10,9 +10,9 @@ describe('withOptions()', () => {
         )
 
     expect(
-      $$.document({ version: "1.1", encoding: "UTF-16", standalone: false })
+      $$.document({ version: "1.0", encoding: "UTF-16", standalone: false })
         .ele('root').end()).toBe(
-          '<?xml version="1.1" encoding="UTF-16" standalone="no"?><root/>'
+          '<?xml version="1.0" encoding="UTF-16" standalone="no"?><root/>'
         )
   })
 

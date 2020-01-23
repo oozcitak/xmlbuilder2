@@ -21,8 +21,6 @@ export class PreSerializer {
     'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen',
     'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'])
 
-  private _xmlVersion: "1.0" | "1.1"
-
   private _docType?: ((name: string, publicId: string, systemId: string) => void)
   private _comment?: ((data: string) => void)
   private _text?: ((data: string) => void)
@@ -48,11 +46,9 @@ export class PreSerializer {
   /**
    * Initializes a new instance of `PreSerializer`.
    * 
-   * @param xmlVersion - XML specification version
    * @param functions - serializer functions
    */
-  constructor(xmlVersion: "1.0" | "1.1", functions: Partial<SerializerFunctions>) {
-    this._xmlVersion = xmlVersion
+  constructor(functions: Partial<SerializerFunctions>) {
     this._docType = functions.docType
     this._comment = functions.comment
     this._text = functions.text
@@ -584,7 +580,7 @@ export class PreSerializer {
      * ends with a "-" (U+002D HYPHEN-MINUS) character, then throw an exception;
      * the serialization of this node's data would not be well-formed.
      */
-    if (requireWellFormed && (!isLegalChar(node.data, this._xmlVersion) ||
+    if (requireWellFormed && (!isLegalChar(node.data) ||
       node.data.indexOf("--") !== -1 || node.data.endsWith("-"))) {
       throw new Error("Comment data contains invalid characters (well-formed required).")
     }
@@ -611,7 +607,7 @@ export class PreSerializer {
      * production, then throw an exception; the serialization of this node's 
      * data would not be well-formed.
      */
-    if (requireWellFormed && !isLegalChar(node.data, this._xmlVersion)) {
+    if (requireWellFormed && !isLegalChar(node.data)) {
       throw new Error("Text data contains invalid characters (well-formed required).")
     }
 
@@ -696,7 +692,7 @@ export class PreSerializer {
      * of this node would not be a well-formed document type declaration.
      */
     if (requireWellFormed &&
-      (!isLegalChar(node.systemId, this._xmlVersion) ||
+      (!isLegalChar(node.systemId) ||
         (node.systemId.indexOf('"') !== -1 && node.systemId.indexOf("'") !== -1))) {
       throw new Error("DocType system identifier contains invalid characters (well-formed required).")
     }
@@ -759,7 +755,7 @@ export class PreSerializer {
      * U+003E GREATER-THAN SIGN), then throw an exception; the serialization of
      * this node's data would not be well-formed.
      */
-    if (requireWellFormed && (!isLegalChar(node.data, this._xmlVersion) ||
+    if (requireWellFormed && (!isLegalChar(node.data) ||
       node.data.indexOf("?>") !== -1)) {
       throw new Error("Processing instruction data contains invalid characters (well-formed required).")
     }
@@ -1180,7 +1176,7 @@ export class PreSerializer {
      * production, then throw an exception; the serialization of this attribute
      * value would fail to produce a well-formed element serialization.
      */
-    if (requireWellFormed && value !== null && !isLegalChar(value, this._xmlVersion)) {
+    if (requireWellFormed && value !== null && !isLegalChar(value)) {
       throw new Error("Invalid characters in attribute value.")
     }
 

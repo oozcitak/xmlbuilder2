@@ -46,7 +46,7 @@ export class ObjectWriterImpl {
     let currentIndex = 0
     let listRegister: NodeList[] = [currentList]
 
-    const pre = new PreSerializer(this._builderOptions.version, {
+    const pre = new PreSerializer({
       beginElement: (name) => {
         const childItems = this._addElement(currentList, name)
         currentIndex++

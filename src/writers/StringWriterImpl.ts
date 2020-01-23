@@ -65,7 +65,7 @@ export class StringWriterImpl {
     }) as Required<StringWriterOptions>
 
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
-    this._pre = new PreSerializer(this._builderOptions.version, {
+    this._pre = new PreSerializer({
       docType: this._docType.bind(this),
       openTagBegin: this._openTagBegin.bind(this),
       openTagEnd: this._openTagEnd.bind(this),

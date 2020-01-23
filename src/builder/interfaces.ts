@@ -12,9 +12,9 @@ export interface DocumentWithSettings extends Document {
  */
 export interface XMLBuilderCreateOptions {
   /**
-   * A version number string, e.g. `"1.0"`. Defaults to `"1.0"`.
+   * A version number string, always `"1.0"`.
    */
-  version?: "1.0" | "1.1"
+  version?: "1.0"
   /**
    * Encoding declaration, e.g. `"UTF-8"`. No default.
    */
@@ -51,7 +51,7 @@ export interface XMLBuilderOptions {
   /**
    * A version number string, e.g. `"1.0"`
    */
-  version: "1.0" | "1.1"
+  version: "1.0"
   /**
    * Encoding declaration, e.g. `"UTF-8"`
    */
@@ -591,7 +591,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  dec(options: { version: "1.0" | "1.1", encoding?: string, standalone?: boolean }): XMLBuilder
+  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilder
 
   /**
    * Creates a new DocType node and inserts it into the document. If the 

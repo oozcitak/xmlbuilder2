@@ -5,7 +5,7 @@ import {
 import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
 import { XMLBuilderImpl } from './builder'
-import { isNode, createDocument, createParser } from './builder/dom'
+import { isNode, createDocument, createParser, throwIfParserError } from './builder/dom'
 import { isArray } from 'util'
 
 /**
@@ -133,8 +133,9 @@ export function document(p1?: XMLBuilderCreateOptions | string | ExpandObject,
     builder.ele(contents)
   } else if (/^\s*</.test(contents)) {
     // XML document
-    const domParser = createParser(options.version)
+    const domParser = createParser()
     const doc = domParser.parseFromString(contents, "text/xml")
+    throwIfParserError(doc)
     builder = new XMLBuilderImpl(doc)
     setOptions(doc, options)
   } else {
@@ -211,8 +212,9 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
     builder.ele(contents)
   } else if (/^\s*</.test(contents)) {
     // XML document
-    const domParser = createParser(options.version)
+    const domParser = createParser()
     const doc = domParser.parseFromString("<TEMP_ROOT>" + contents + "</TEMP_ROOT>", "text/xml")
+    throwIfParserError(doc)
     setOptions(doc, options)
     /* istanbul ignore next */
     if (doc.documentElement === null) {

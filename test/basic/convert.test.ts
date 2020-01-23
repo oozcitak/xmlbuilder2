@@ -13,8 +13,8 @@ describe('convert()', () => {
   })
 
   test('From XML string to XML string with options', () => {
-    const xml = $$.convert({ version: "1.1" }, '<root att="val">text</root>', { format: "xml" })
-    expect(xml).toBe(`<?xml version="1.1"?><root att="val">text</root>`)
+    const xml = $$.convert({ version: "1.0" }, '<root att="val">text</root>', { format: "xml" })
+    expect(xml).toBe(`<?xml version="1.0"?><root att="val">text</root>`)
   })
 
   test('From XML string to JS object', () => {
@@ -38,8 +38,8 @@ describe('convert()', () => {
   })
 
   test('From JS object to XML string with options', () => {
-    const xml = $$.convert({ version: "1.1" }, { root: { "@att": "val", "#": "text" }}, { format: "xml" })
-    expect(xml).toBe(`<?xml version="1.1"?><root att="val">text</root>`)
+    const xml = $$.convert({ version: "1.0" }, { root: { "@att": "val", "#": "text" }}, { format: "xml" })
+    expect(xml).toBe(`<?xml version="1.0"?><root att="val">text</root>`)
   })
 
   test('From JS object to JS object', () => {
@@ -63,8 +63,8 @@ describe('convert()', () => {
   })
 
   test('From JSON string to XML string with options', () => {
-    const xml = $$.convert({ version: "1.1" }, `{ "root": { "@att": "val", "#": "text" }}`, { format: "xml" })
-    expect(xml).toBe(`<?xml version="1.1"?><root att="val">text</root>`)
+    const xml = $$.convert({ version: "1.0" }, `{ "root": { "@att": "val", "#": "text" }}`, { format: "xml" })
+    expect(xml).toBe(`<?xml version="1.0"?><root att="val">text</root>`)
   })
 
   test('From JSON string to JS object', () => {
@@ -88,8 +88,8 @@ describe('convert()', () => {
   })
 
   test('From Map to XML string with options', () => {
-    const xml = $$.convert({ version: "1.1" }, new Map([["root", new Map([["@att", "val"], ["#", "text" ]])]]), { format: "xml" })
-    expect(xml).toBe(`<?xml version="1.1"?><root att="val">text</root>`)
+    const xml = $$.convert({ version: "1.0" }, new Map([["root", new Map([["@att", "val"], ["#", "text" ]])]]), { format: "xml" })
+    expect(xml).toBe(`<?xml version="1.0"?><root att="val">text</root>`)
   })
 
   test('From Map to JS object', () => {

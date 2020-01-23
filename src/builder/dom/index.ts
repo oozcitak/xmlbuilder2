@@ -5,6 +5,19 @@ import {
 import { DOMParser } from "@oozcitak/dom/lib/parser/interfaces"
 
 /**
+ * Throws an error if the parser returned an error document.
+ */
+export function throwIfParserError(doc: Document): void {
+  const root = doc.documentElement
+  if (root !== null && 
+    root.localName === "parsererror" &&
+    root.namespaceURI === "http://www.mozilla.org/newlayout/xml/parsererror.xml") {
+    const msg = root.firstChild ? (root.firstChild as Element).getAttribute("message") : null
+    throw new Error(msg || "Error parsing XML string.")
+  }
+}
+
+/**
  * Creates an XML document without any child nodes.
  */
 export function createDocument(): Document {
@@ -22,10 +35,10 @@ export function createDocument(): Document {
 /**
  * Creates a DOM parser.
  */
-export function createParser(version: "1.0" | "1.1"): DOMParser {
+export function createParser(): DOMParser {
   const { getParser } = (typeof window === 'undefined' ?
     require("./node") : require("./browser"))
-  return getParser(version)
+  return getParser()
 }
 
 /**
@@ -131,15 +144,7 @@ export function extractQName(qualifiedName: string): [string | null, string] {
  */
 export function isName(name: string): boolean {
   for (let i = 0; i < name.length; i++) {
-    const c1 = name.charCodeAt(i)
-    let n = c1
-    if (c1 >= 0xD800 && c1 <= 0xDBFF && i < name.length - 1) {
-      const c2 = name.charCodeAt(i + 1)
-      if (c2 >= 0xDC00 && c2 <= 0xDFFF) {
-        n = (c1 - 0xD800) * 0x400 + c2 - 0xDC00 + 0x10000
-        i++
-      }
-    }
+    let n = name.charCodeAt(i)
 
     // NameStartChar
     if ((n >= 97 && n <= 122) || // [a-z]
@@ -155,21 +160,32 @@ export function isName(name: string): boolean {
       (n >= 0x2C00 && n <= 0x2FEF) ||
       (n >= 0x3001 && n <= 0xD7FF) ||
       (n >= 0xF900 && n <= 0xFDCF) ||
-      (n >= 0xFDF0 && n <= 0xFFFD) ||
-      (n >= 0x10000 && n <= 0xEFFFF)) {
+      (n >= 0xFDF0 && n <= 0xFFFD)) {
       continue
-    } else if (i === 0) {
-      return false
-    } else if (n === 45 || n === 46 || // '-' or '.'
-      (n >= 48 && n <= 57) || // [0-9]
-      (n === 0xB7) ||
-      (n >= 0x0300 && n <= 0x036F) ||
-      (n >= 0x203F && n <= 0x2040)) {
+    } else if (i !== 0 &&
+      (n === 45 || n === 46 || // '-' or '.'
+        (n >= 48 && n <= 57) || // [0-9]
+        (n === 0xB7) ||
+        (n >= 0x0300 && n <= 0x036F) ||
+        (n >= 0x203F && n <= 0x2040))) {
       continue
-    } else {
-      return false
     }
+
+    if (n >= 0xD800 && n <= 0xDBFF && i < name.length - 1) {
+      const n2 = name.charCodeAt(i + 1)
+      if (n2 >= 0xDC00 && n2 <= 0xDFFF) {
+        n = (n - 0xD800) * 0x400 + n2 - 0xDC00 + 0x10000
+        i++
+
+        if (n >= 0x10000 && n <= 0xEFFFF) {
+          continue
+        }
+      }
+    }
+
+    return false
   }
+
   return true
 }
 
@@ -177,41 +193,33 @@ export function isName(name: string): boolean {
  * Determines if the given string contains legal characters.
  * 
  * @param chars - sequence of characters to test
- * @param xmlVersion - XML specification version
  */
-export function isLegalChar(chars: string, xmlVersion: "1.0" | "1.1"): boolean {
+export function isLegalChar(chars: string): boolean {
   for (let i = 0; i < chars.length; i++) {
-    const c1 = chars.charCodeAt(i)
-    let n = c1
-    if (c1 >= 0xD800 && c1 <= 0xDBFF && i < chars.length - 1) {
-      const c2 = chars.charCodeAt(i + 1)
-      if (c2 >= 0xDC00 && c2 <= 0xDFFF) {
-        n = (c1 - 0xD800) * 0x400 + c2 - 0xDC00 + 0x10000
+    let n = chars.charCodeAt(i)
+
+    // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+    if (n === 0x9 || n === 0xA || n === 0xD ||
+      (n >= 0x20 && n <= 0xD7FF) ||
+      (n >= 0xE000 && n <= 0xFFFD)) {
+      continue
+    }
+
+    if (n >= 0xD800 && n <= 0xDBFF && i < chars.length - 1) {
+      const n2 = chars.charCodeAt(i + 1)
+      if (n2 >= 0xDC00 && n2 <= 0xDFFF) {
+        n = (n - 0xD800) * 0x400 + n2 - 0xDC00 + 0x10000
         i++
+
+        if (n >= 0x10000 && n <= 0x10FFFF) {
+          continue
+        }
       }
     }
 
-    if (xmlVersion === "1.0") {
-      // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-      if (n === 0x9 || n === 0xA || n === 0xD ||
-        (n >= 0x20 && n <= 0xD7FF) ||
-        (n >= 0xE000 && n <= 0xFFFD) ||
-        (n >= 0x10000 && n <= 0x10FFFF)) {
-        continue
-      } else {
-        return false
-      }
-    } else {
-      // [#x1-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-      if ((n >= 0x1 && n <= 0xD7FF) ||
-        (n >= 0xE000 && n <= 0xFFFD) ||
-        (n >= 0x10000 && n <= 0x10FFFF)) {
-        continue
-      } else {
-        return false
-      }
-    }
+    return false
   }
+
   return true
 }
 
@@ -239,5 +247,6 @@ export function isPubidChar(chars: string): boolean {
       return false
     }
   }
+
   return true
 }

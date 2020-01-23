@@ -10,6 +10,6 @@ export function getImplementation(): DOMImplementation {
 /**
  * Returns a DOM parser.
  */
-export function getParser(version: "1.0" | "1.1"): DOMParser {
+export function getParser(): DOMParser {
   return new DOMParser()
 }
