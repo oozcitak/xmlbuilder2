@@ -180,7 +180,6 @@ export class PreSerializerNoNS {
      * 9. Let inherited ns be a copy of namespace.
      * 10. Let ns be the value of node's namespaceURI attribute.
      */
-    let qualifiedName = ''
     let skipEndTag = false
 
     /** 11. If inherited ns is equal to ns, then: */
@@ -194,7 +193,7 @@ export class PreSerializerNoNS {
      * 11.3. Otherwise, append to qualified name the value of node's 
      * localName. The node's prefix if it exists, is dropped.
      */
-    qualifiedName = node.localName
+    const qualifiedName = node.localName
 
     /** 11.4. Append the value of qualified name to markup. */
     /* istanbul ignore else */
@@ -256,11 +255,11 @@ export class PreSerializerNoNS {
      * providing inherited ns, map, prefix index, and the require well-formed 
      * flag.
      */
-    for (const childNode of node.childNodes) {
+    node.childNodes.forEach(childNode => {
       this.level++
       this._serializeNode(childNode, requireWellFormed)
       this.level--
-    }
+    }, this)
 
     /**
      * 20. Append the following to markup, in the order listed:
@@ -306,9 +305,9 @@ export class PreSerializerNoNS {
      * 
      * 3. Return the value of serialized document.
     */
-    for (const childNode of node.childNodes) {
+     node.childNodes.forEach(childNode => {
       this._serializeNode(childNode, requireWellFormed)
-    }
+    }, this)
   }
 
   /**
