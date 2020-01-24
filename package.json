@@ -60,6 +60,7 @@
     "compile": "rm -rf ./lib && tsc --version && tsc",
     "test": "npm run compile && jest --coverage",
     "perf": "npm run compile && ts-node ./perf/perf.ts",
+    "prof-serialize": "npm run compile && rm -f isolate-*-v8.log && node --prof ./perf/prof-serialize.js && find . -name isolate-*-v8.log -exec mv {} isolate-v8.log ; && node --prof-process isolate-v8.log > isolate-serialize.log && rm isolate-v8.log",
     "publish-public": "npm run test && npm publish"
   }
 }
