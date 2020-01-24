@@ -71,16 +71,30 @@
   },
   "0.0.11": {
     "small document with ele()": {
-      "xmlbuilder": 56546.834720963874,
-      "xmlbuilder2": 34889.49014099267
+      "xmlbuilder": 103357.72747416106,
+      "xmlbuilder2": 88592.75524640657
     },
     "convert small JS object": {
-      "xmlbuilder": 5787.260653567804,
-      "xmlbuilder2": 3910.2301004420838
+      "xmlbuilder": 11037.97159723421,
+      "xmlbuilder2": 7781.223375810865
     },
     "serialize small document to XML string": {
-      "xmlbuilder": 11897.002105280924,
-      "xmlbuilder2": 5215.5265485162245
+      "xmlbuilder": 35580.68121208431,
+      "xmlbuilder2": 11710.115892723928
+    }
+  },
+  "0.0.11*": {
+    "small document with ele()": {
+      "xmlbuilder": 103323.1197175164,
+      "xmlbuilder2": 78681.94835044979
+    },
+    "convert small JS object": {
+      "xmlbuilder": 10759.382041976958,
+      "xmlbuilder2": 7148.334041674927
+    },
+    "serialize small document to XML string": {
+      "xmlbuilder": 35843.82767198744,
+      "xmlbuilder2": 10308.620232942936
     }
   }
 }

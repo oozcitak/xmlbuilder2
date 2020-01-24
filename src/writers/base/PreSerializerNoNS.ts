@@ -551,8 +551,7 @@ export class PreSerializerNoNS {
      * they are specified in the element's attribute list: 
      */
     for (let i = 0; i < node.attributes.length; i++) {
-      const attr = node.attributes.item(i)
-      if (!attr) continue
+      const attr = node.attributes[i]
 
       // Optimize common case
       if (!requireWellFormed) {
