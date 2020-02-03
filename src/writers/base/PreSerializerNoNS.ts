@@ -1,13 +1,9 @@
 import {
   Node, Element, Document, Comment, Text, DocumentFragment,
-  DocumentType, ProcessingInstruction, CDATASection
+  DocumentType, ProcessingInstruction, CDATASection, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { InvalidStateError } from "@oozcitak/dom/lib/dom/DOMException"
-import {
-  isName, isLegalChar, isPubidChar, isElementNode, isDocumentNode,
-  isCommentNode, isTextNode, isDocumentFragmentNode, isDocumentTypeNode,
-  isProcessingInstructionNode, isCDATASectionNode
-} from "../../builder/dom"
+import { isName, isLegalChar, isPubidChar } from "../../builder/dom"
 
 /**
  * Pre-serializes XML nodes. This class is not namespace aware.
@@ -108,24 +104,33 @@ export class PreSerializerNoNS {
 
     this.currentNode = node
 
-    if (isElementNode(node)) {
-      this._serializeElement(node, requireWellFormed)
-    } else if (isDocumentNode(node)) {
-      this._serializeDocument(node, requireWellFormed)
-    } else if (isCommentNode(node)) {
-      this._serializeComment(node, requireWellFormed)
-    } else if (isTextNode(node)) {
-      this._serializeText(node, requireWellFormed)
-    } else if (isDocumentFragmentNode(node)) {
-      this._serializeDocumentFragment(node, requireWellFormed)
-    } else if (isDocumentTypeNode(node)) {
-      this._serializeDocumentType(node, requireWellFormed)
-    } else if (isProcessingInstructionNode(node)) {
-      this._serializeProcessingInstruction(node, requireWellFormed)
-    } else if (isCDATASectionNode(node)) {
-      this._serializeCData(node, requireWellFormed)
-    } else {
-      throw new Error(`Unknown node type: ${node.nodeType}`)
+    switch (node.nodeType) {
+      case NodeType.Element:
+        this._serializeElement(node as Element, requireWellFormed)
+        break
+      case NodeType.Document:
+        this._serializeDocument(node as Document, requireWellFormed)
+        break
+      case NodeType.Comment:
+        this._serializeComment(node as Comment, requireWellFormed)
+        break
+      case NodeType.Text:
+        this._serializeText(node as Text, requireWellFormed)
+        break
+      case NodeType.DocumentFragment:
+        this._serializeDocumentFragment(node as DocumentFragment, requireWellFormed)
+        break
+      case NodeType.DocumentType:
+        this._serializeDocumentType(node as DocumentType, requireWellFormed)
+        break
+      case NodeType.ProcessingInstruction:
+        this._serializeProcessingInstruction(node as ProcessingInstruction, requireWellFormed)
+        break
+      case NodeType.CData:
+        this._serializeCData(node as CDATASection, requireWellFormed)
+        break
+      default:
+        throw new Error(`Unknown node type: ${node.nodeType}`)
     }
   }
 
@@ -223,7 +228,7 @@ export class PreSerializerNoNS {
      * tag flag to true.
      * 16. Append ">" (U+003E GREATER-THAN SIGN) to markup.
      */
-    if (node.childNodes.length === 0) {
+    if (!node.hasChildNodes()) {
       /* istanbul ignore else */
       if (this._endElement) this._endElement(qualifiedName)
       /* istanbul ignore else */
@@ -255,11 +260,19 @@ export class PreSerializerNoNS {
      * providing inherited ns, map, prefix index, and the require well-formed 
      * flag.
      */
-    node.childNodes.forEach(childNode => {
-      this.level++
-      this._serializeNode(childNode, requireWellFormed)
-      this.level--
-    }, this)
+    if (node._children !== undefined) {
+      for (const childNode of node._children) {
+        this.level++
+        this._serializeNode(childNode, requireWellFormed)
+        this.level--
+      }
+    } else {
+      node.childNodes.forEach(childNode => {
+        this.level++
+        this._serializeNode(childNode, requireWellFormed)
+        this.level--
+      }, this)
+    }
 
     /**
      * 20. Append the following to markup, in the order listed:
@@ -305,9 +318,15 @@ export class PreSerializerNoNS {
      * 
      * 3. Return the value of serialized document.
     */
-     node.childNodes.forEach(childNode => {
-      this._serializeNode(childNode, requireWellFormed)
-    }, this)
+    if (node._children !== undefined) {
+      for (const childNode of node._children) {
+        this._serializeNode(childNode, requireWellFormed)
+      }
+    } else {
+      node.childNodes.forEach(childNode => {
+        this._serializeNode(childNode, requireWellFormed)
+      }, this)
+    }
   }
 
   /**
@@ -396,8 +415,14 @@ export class PreSerializerNoNS {
      * index, and flag require well-formed. Concatenate the result to markup.
      * 3. Return the value of markup.
      */
-    for (const childNode of node.childNodes) {
-      this._serializeNode(childNode, requireWellFormed)
+    if (node._children !== undefined) {
+      for (const childNode of node._children) {
+        this._serializeNode(childNode, requireWellFormed)
+      }
+    } else {
+      node.childNodes.forEach(childNode => {
+        this._serializeNode(childNode, requireWellFormed)
+      }, this)
     }
   }
 
