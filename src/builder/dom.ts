@@ -1,9 +1,11 @@
 import {
-  Document, DocumentType, Element, Attr, Text, CDATASection, Comment,
+  Document, DocumentType, Element, Text, CDATASection, Comment,
   ProcessingInstruction, DocumentFragment, Node, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
-import { DOMParser } from "@oozcitak/dom/lib/parser/interfaces"
+import { DOMParser, DOMImplementation } from "@oozcitak/dom"
+import { dom } from "@oozcitak/dom/lib/dom"
 
+dom.setFeatures(false)
 /**
  * Throws an error if the parser returned an error document.
  */
@@ -21,9 +23,7 @@ export function throwIfParserError(doc: Document): void {
  * Creates an XML document without any child nodes.
  */
 export function createDocument(): Document {
-  const { getImplementation } = (typeof window === 'undefined' ?
-    require("./node") : require("./browser"))
-  const impl = getImplementation()
+  const impl = new DOMImplementation()
   const doc = impl.createDocument(null, 'root', null)
   /* istanbul ignore else */
   if (doc.documentElement) {
@@ -36,9 +36,7 @@ export function createDocument(): Document {
  * Creates a DOM parser.
  */
 export function createParser(): DOMParser {
-  const { getParser } = (typeof window === 'undefined' ?
-    require("./node") : require("./browser"))
-  return getParser()
+  return new DOMParser()
 }
 
 /**
