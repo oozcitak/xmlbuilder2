@@ -36,7 +36,7 @@ describe('parsing examples in wiki', () => {
       }
     }
 
-    const doc = $$.document(obj)
+    const doc = $$.create(obj)
     expect(doc.end( { prettyPrint: true })).toBe(xmlStr)
   })
 
@@ -56,7 +56,7 @@ describe('parsing examples in wiki', () => {
     </topgun>
     `
 
-    const doc = $$.document(serializedXML)
+    const doc = $$.create(serializedXML)
     expect(doc.end( { prettyPrint: true })).toBe(xmlStr)
   })
 
@@ -79,7 +79,7 @@ describe('parsing examples in wiki', () => {
       }
     }`
 
-    const doc = $$.document(jsonString)
+    const doc = $$.create(jsonString)
     expect(doc.end( { prettyPrint: true })).toBe(xmlStr)
   })
 
@@ -101,7 +101,7 @@ describe('parsing examples in wiki', () => {
     const obj = new Map<string, any>()
     obj.set("topgun", topgun)
 
-    const doc = $$.document(obj)
+    const doc = $$.create(obj)
     expect(doc.end( { prettyPrint: true })).toBe(xmlStr)
   })
 

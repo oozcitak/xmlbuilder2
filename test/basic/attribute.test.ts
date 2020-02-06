@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('att()', () => {
 
   test('add attribute', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     node1.att('att1', 'val1').att('att2', 'val2').ele('node1-2')
     const node2 = root.ele('node2')
@@ -17,7 +17,7 @@ describe('att()', () => {
   })
 
   test('add multiple attributes', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     node1.att({ 'att1': 'val1', 'att2': 'val2'}).ele('node1-2')
     const node2 = root.ele('node2')
@@ -31,7 +31,7 @@ describe('att()', () => {
   })
 
   test('replace attribute', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     node1.att('att1', 'val1').att('att1', 'val2').ele('node1-2')
     const node2 = root.ele('node2')
@@ -45,7 +45,7 @@ describe('att()', () => {
   })
 
   test('remove attribute', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     node1.att('att1', 'val1')
       .att('att2', 'val2')
@@ -65,7 +65,7 @@ describe('att()', () => {
   })
 
   test('attribute from JS object', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     root.ele('node').ele({ '@att1': 'val1', '@att2': 'val2' })
 
     expect($$.printTree(root.doc().node)).toBe($$.t`
@@ -75,7 +75,7 @@ describe('att()', () => {
   })
 
   test('attribute from JS object alternate notation', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     root.ele('node').ele({ '@': { 'att1': 'val1', 'att2': 'val2' } })
 
     expect($$.printTree(root.doc().node)).toBe($$.t`
@@ -85,7 +85,7 @@ describe('att()', () => {
   })
 
   test('skip null attribute', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     node1.ele({ '@att1': null, '@att2': 'val2' }).ele('node1-2')
     const node2 = root.ele('node2')
@@ -99,7 +99,7 @@ describe('att()', () => {
   })
 
   test('keep null attribute', () => {
-    const root = $$.document({ keepNullAttributes: true }).ele('root')
+    const root = $$.create({ keepNullAttributes: true }).ele('root')
     const node1 = root.ele('node1')
     node1.ele({ '@att1': null, '@att2': 'val2' }).ele('node1-2')
     const node2 = root.ele('node2')
@@ -113,7 +113,7 @@ describe('att()', () => {
   })
 
   test('invalid attribute value', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     expect(() => node1.ele({ '@att1': undefined })).toThrow()
   })

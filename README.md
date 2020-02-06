@@ -33,9 +33,9 @@ npm install xmlbuilder2
 can be created with the following function chain:
 
 ``` js
-const { document } = require('xmlbuilder2');
+const { create } = require('xmlbuilder2');
 
-const root = document({ version: '1.0' })
+const root = create({ version: '1.0' })
   .ele('root', { att: 'val' })
     .ele('foo')
       .ele('bar').txt('foobar').up()
@@ -53,7 +53,7 @@ ___
 The same XML document can be created by converting a JS object into XML nodes:
 
 ``` js
-const { document } = require('xmlbuilder2');
+const { create } = require('xmlbuilder2');
 
 const obj = {
   root: {
@@ -65,7 +65,7 @@ const obj = {
   }
 };
 
-const doc = document(obj);
+const doc = create(obj);
 const xml = doc.end({ prettyPrint: true });
 console.log(xml);
 ```
@@ -73,10 +73,10 @@ ___
 
 `xmlbuilder2` can also parse and serialize XML documents from different formats:
 ```js
-const { document } = require('xmlbuilder2');
+const { create } = require('xmlbuilder2');
 
 const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>';
-const doc = document(xmlStr);
+const doc = create(xmlStr);
 
 // append a 'baz' element to the root node of the document
 doc.root().ele('baz');
@@ -107,9 +107,9 @@ ___
 If you need to do some processing:
 
 ``` js
-const { document } = require('xmlbuilder2');
+const { create } = require('xmlbuilder2');
 
-const root = document().ele('squares');
+const root = create().ele('squares');
 root.com('f(x) = x^2');
 for(let i = 1; i <= 5; i++)
 {

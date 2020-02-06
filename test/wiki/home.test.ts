@@ -12,7 +12,7 @@ describe('examples in the home wiki page', () => {
       <baz/>
     </root>
     `
-    const doc = $$.document({ version: "1.0" })
+    const doc = $$.create({ version: "1.0" })
     .ele("root", { att: "val" })
       .ele("foo")
         .ele("bar").txt("foobar").up()
@@ -33,7 +33,7 @@ describe('examples in the home wiki page', () => {
       <baz/>
     </root>
     `
-    const doc = $$.document({ version: "1.0" }, {
+    const doc = $$.create({ version: "1.0" }, {
       root: {
         "@att": "val",
         "foo": {
@@ -64,7 +64,7 @@ describe('examples in the home wiki page', () => {
       <baz/>
     </root>
     `
-    const doc = $$.document(xmlStr1)
+    const doc = $$.create(xmlStr1)
     doc.root().ele("baz")
     expect(doc.end({ prettyPrint: true })).toBe(xmlStr2)
   })

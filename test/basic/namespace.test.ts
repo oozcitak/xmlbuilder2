@@ -7,7 +7,7 @@ describe('namespaces', () => {
 
   test('inherit parent namespace', () => {
     const ns1 = 'http://example.com/ns1'
-    const doc = $$.document().ele(ns1, 'root')
+    const doc = $$.create().ele(ns1, 'root')
       .ele('foo').ele('bar').txt('foobar').doc().node as any
 
     expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1"><foo><bar>foobar</bar></foo></root>')
@@ -22,7 +22,7 @@ describe('namespaces', () => {
     const ns1 = 'http://example.com/ns1'
     const xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
-    const doc = $$.document().ele(ns1, 'root', {
+    const doc = $$.create().ele(ns1, 'root', {
       "xmlns:xsi": xsi,
       "xsi:schemaLocation": "http://example.com/n1 schema.xsd" })
       .ele('foo').ele('bar').txt('foobar').doc().node as any
@@ -48,7 +48,7 @@ describe('namespaces', () => {
     const svgNs = 'http://www.w3.org/2000/svg'
     const xlinkNs = 'http://www.w3.org/1999/xlink'
 
-    const doc = $$.document().ele(svgNs, 'svg', { 
+    const doc = $$.create().ele(svgNs, 'svg', { 
       "xmlns:xlink": xlinkNs })
       .ele('script', { type: "text/ecmascript", "xlink:href": "foo.js" })
       .doc().node as any
@@ -69,7 +69,7 @@ describe('namespaces', () => {
 
   test('add attribute with namespace', () => {
     const ns1 = 'http://example.com/ns1'
-    const doc = $$.document().ele('root').att(ns1, 'att', 'val').doc().node as any
+    const doc = $$.create().ele('root').att(ns1, 'att', 'val').doc().node as any
 
     expect($$.serialize(doc)).toBe('<root xmlns:ns1="http://example.com/ns1" ns1:att="val"/>')
 
@@ -78,14 +78,14 @@ describe('namespaces', () => {
 
   test('remove attribute with namespace', () => {
     const ns1 = 'http://example.com/ns1'
-    const doc = $$.document().ele('root').att(ns1, 'att', 'val').removeAtt(ns1, 'att')
+    const doc = $$.create().ele('root').att(ns1, 'att', 'val').removeAtt(ns1, 'att')
 
     expect($$.serialize(doc.node)).toBe('<root/>')
   })
 
   test('remove multiple attributes with namespace', () => {
     const ns1 = 'http://example.com/ns1'
-    const doc = $$.document().ele('root')
+    const doc = $$.create().ele('root')
       .att(ns1, 'att1', 'val')
       .att(ns1, 'att2', 'val')
       .removeAtt(ns1, ['att1', 'att2'])

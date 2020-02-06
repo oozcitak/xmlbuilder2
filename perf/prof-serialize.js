@@ -1,6 +1,6 @@
-const { document } = require("../lib")
+const { create } = require("../lib")
 
-const doc = document()
+const doc = create()
 const root = doc.ele("root")
 for (let i = 0; i < 100; i++) {
   const node = root.ele("node" + i.toString())

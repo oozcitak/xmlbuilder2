@@ -25,7 +25,7 @@ describe('MapWriter', () => {
       }
     }
 
-    const result = $$.document({ version: "1.0", encoding: "UTF-8", standalone: true })
+    const result = $$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele('root').ele(obj).end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -57,7 +57,7 @@ describe('MapWriter', () => {
   })
 
   test('duplicate tag names', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "map" })
@@ -75,7 +75,7 @@ describe('MapWriter', () => {
   })
 
   test('mixed content', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -93,7 +93,7 @@ describe('MapWriter', () => {
   })
 
   test('mixed content and duplicate tags', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
@@ -115,7 +115,7 @@ describe('MapWriter', () => {
   })
 
   test('mixed content and interspersed duplicate tags', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -137,7 +137,7 @@ describe('MapWriter', () => {
   })
 
   test('doctype', () => {
-    const result = $$.document()
+    const result = $$.create()
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "map" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -146,7 +146,7 @@ describe('MapWriter', () => {
   })
 
   test('namespaces', () => {
-    const result = $$.document().ele('root', { xmlns: "myns" })
+    const result = $$.create().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .ele('bar').up()
       .doc()
@@ -164,7 +164,7 @@ describe('MapWriter', () => {
   })
 
   test('unknown node', () => {
-    const ele = $$.document().ele('root').ele('alien')
+    const ele = $$.create().ele('root').ele('alien')
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end({ format: "map" })).toThrow()
   })

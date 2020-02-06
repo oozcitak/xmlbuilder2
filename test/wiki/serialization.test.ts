@@ -16,7 +16,7 @@ describe('serialization examples in wiki', () => {
       </hangar>
     </topgun>
     `
-  const doc = $$.document(xmlStr)
+  const doc = $$.create(xmlStr)
 
   test('JS object', () => {
     const obj = {

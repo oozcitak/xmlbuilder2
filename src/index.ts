@@ -76,7 +76,7 @@ export function builder(p1: XMLBuilderCreateOptions | Node | Node[],
  * 
  * @returns document node
  */
-export function document(): XMLBuilder
+export function create(): XMLBuilder
 
 /**
  * Creates an XML document without any child nodes with the given options.
@@ -85,7 +85,7 @@ export function document(): XMLBuilder
  * 
  * @returns document node
  */
-export function document(options: XMLBuilderCreateOptions): XMLBuilder
+export function create(options: XMLBuilderCreateOptions): XMLBuilder
 
 /**
  * Creates an XML document by parsing the given `contents`.
@@ -95,7 +95,7 @@ export function document(options: XMLBuilderCreateOptions): XMLBuilder
  * 
  * @returns document node
  */
-export function document(contents: string | ExpandObject): XMLBuilder
+export function create(contents: string | ExpandObject): XMLBuilder
 
 /**
  * Creates an XML document.
@@ -106,11 +106,11 @@ export function document(contents: string | ExpandObject): XMLBuilder
  * 
  * @returns document node
  */
-export function document(options: XMLBuilderCreateOptions,
+export function create(options: XMLBuilderCreateOptions,
   contents: string | ExpandObject): XMLBuilder
 
 /** @inheritdoc */
-export function document(p1?: XMLBuilderCreateOptions | string | ExpandObject, 
+export function create(p1?: XMLBuilderCreateOptions | string | ExpandObject, 
   p2?: string | ExpandObject): XMLBuilder {
 
   const options = formatOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
@@ -306,7 +306,7 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
     convertOptions = p2 as WriterOptions || undefined
   }
 
-  return document(builderOptions, contents).end(convertOptions)
+  return create(builderOptions, contents).end(convertOptions)
 }
 
 function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {

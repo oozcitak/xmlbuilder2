@@ -4,12 +4,12 @@ import { empty } from '@oozcitak/infra/lib/List'
 describe('import()', () => {
 
   test('document', () => {
-    const root = $$.document().ele('roster')
+    const root = $$.create().ele('roster')
     root.com('fighter pilots')
 
-    const pilot1 = $$.document().ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell')
-    const pilot2 = $$.document().ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw')
-    const pilot3 = $$.document().ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky')
+    const pilot1 = $$.create().ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell')
+    const pilot2 = $$.create().ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw')
+    const pilot3 = $$.create().ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky')
     
     root.import(pilot1.doc())
     root.import(pilot2.doc())
@@ -28,16 +28,16 @@ describe('import()', () => {
   })
 
   test('invalid document', () => {
-    const root = $$.document().ele('roster')
+    const root = $$.create().ele('roster')
     root.com('fighter pilots')
 
-    const emptyDoc = $$.document()
+    const emptyDoc = $$.create()
     
     expect(() => root.import(emptyDoc)).toThrow()
   })
 
   test('document fragment', () => {
-    const root = $$.document().ele('roster')
+    const root = $$.create().ele('roster')
     root.com('fighter pilots')
 
     const pilots = $$.fragment()
@@ -60,12 +60,12 @@ describe('import()', () => {
   })
 
   test('node', () => {
-    const root = $$.document().ele('roster')
+    const root = $$.create().ele('roster')
     root.com('fighter pilots')
 
-    const pilot1 = $$.document().ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell')
-    const pilot2 = $$.document().ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw')
-    const pilot3 = $$.document().ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky')
+    const pilot1 = $$.create().ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell')
+    const pilot2 = $$.create().ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw')
+    const pilot3 = $$.create().ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky')
     
     root.import(pilot1)
     root.import(pilot2)

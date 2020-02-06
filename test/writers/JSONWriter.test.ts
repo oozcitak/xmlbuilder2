@@ -25,7 +25,7 @@ describe('JSONWriter', () => {
       }
     }
 
-    const result = $$.document({ version: "1.0", encoding: "UTF-8", standalone: true })
+    const result = $$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele('root').ele(obj).end({ format: "json", prettyPrint: true })
 
     expect(result).toBe($$.t`
@@ -65,7 +65,7 @@ describe('JSONWriter', () => {
       }
     }
 
-    expect($$.document().ele('root').ele(obj).root().
+    expect($$.create().ele('root').ele(obj).root().
       toString({ format: "json", prettyPrint: true, offset: 2 })).toBe(
       '    {\n' +
       '      "root": {\n' +
@@ -88,7 +88,7 @@ describe('JSONWriter', () => {
       }
     }
 
-    expect($$.document().ele('root').ele(obj).root().
+    expect($$.create().ele('root').ele(obj).root().
       toString({ format: "json", prettyPrint: true, offset: -4 })).toBe(
       '{\n' +
       '"root": {\n' +
@@ -103,7 +103,7 @@ describe('JSONWriter', () => {
   })
 
   test('duplicate tag names', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "json" })
@@ -112,7 +112,7 @@ describe('JSONWriter', () => {
   })
 
   test('mixed content', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -122,7 +122,7 @@ describe('JSONWriter', () => {
   })
 
   test('mixed content and duplicate tags', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
@@ -144,7 +144,7 @@ describe('JSONWriter', () => {
   })
 
   test('mixed content and interspersed duplicate tags', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -166,14 +166,14 @@ describe('JSONWriter', () => {
   })
 
   test('doctype', () => {
-    const result = $$.document()
+    const result = $$.create()
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "json" })
 
     expect(result).toBe('{"root":{}}')
   })
 
   test('namespaces', () => {
-    const result = $$.document().ele('root', { xmlns: "myns" })
+    const result = $$.create().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .ele('bar').up()
       .doc()
@@ -191,7 +191,7 @@ describe('JSONWriter', () => {
   })
 
   test('unknown node', () => {
-    const ele = $$.document().ele('root').ele('alien')
+    const ele = $$.create().ele('root').ele('alien')
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end({ format: "json" })).toThrow()
   })

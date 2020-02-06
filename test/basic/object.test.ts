@@ -26,7 +26,7 @@ describe('object', () => {
       }
     }
 
-    const doc = $$.document().ele('root').ele(obj).doc()
+    const doc = $$.create().ele('root').ele(obj).doc()
 
     expect($$.printTree(doc.node)).toBe($$.t`
       root
@@ -81,7 +81,7 @@ describe('object', () => {
     person.set("details", details)
     details.set("#", "classified")
 
-    const doc = $$.document().ele('root').ele(obj).doc()
+    const doc = $$.create().ele('root').ele(obj).doc()
     
     expect($$.printTree(doc.node)).toBe($$.t`
       root
@@ -111,7 +111,7 @@ describe('object', () => {
   })
 
   test('from function', () => {
-    const doc = $$.document().ele('root').ele(() => {
+    const doc = $$.create().ele('root').ele(() => {
       const arr = []
       for (let i = 1; i < 5; i++) {
         arr.push({ "#": "ele" + i.toString() })
@@ -133,7 +133,7 @@ describe('object', () => {
   })
 
   test('multiple cdata nodes', () => {
-    const doc = $$.document().ele('root').ele({
+    const doc = $$.create().ele('root').ele({
       '$': [ 'data1', 'data2' ]
     }).doc()
 
@@ -145,7 +145,7 @@ describe('object', () => {
   })
 
   test('multiple comment nodes', () => {
-    const doc = $$.document().ele('root').ele({
+    const doc = $$.create().ele('root').ele({
       '!': [ 'comment1', 'comment2' ]
     }).doc()
 
@@ -157,7 +157,7 @@ describe('object', () => {
   })
 
   test('multiple processing instruction nodes', () => {
-    const doc = $$.document().ele('root').ele({
+    const doc = $$.create().ele('root').ele({
       '?1': [ 'target0', 'target1 value1', 'target2 value2' ],
       '?2': { target3: 'value3', target4: 'value4' }
     }).doc()
@@ -180,7 +180,7 @@ describe('object', () => {
         node3: null
       }
     }
-    const doc = $$.document().ele(obj).doc()
+    const doc = $$.create().ele(obj).doc()
 
     expect($$.printTree(doc.node)).toBe($$.t`
       root
@@ -200,7 +200,7 @@ describe('object', () => {
         node3: "val3"
       }
     }
-    const doc = $$.document().ele(obj).doc()
+    const doc = $$.create().ele(obj).doc()
 
     expect($$.printTree(doc.node)).toBe($$.t`
       root
@@ -222,7 +222,7 @@ describe('object', () => {
         node: "val",
       }
     }
-    const doc = $$.document().ele(obj).doc()
+    const doc = $$.create().ele(obj).doc()
 
     expect($$.printTree(doc.node)).toBe($$.t`
       root (ns:myns) xmlns="myns" (ns:http://www.w3.org/2000/xmlns/)
@@ -238,7 +238,7 @@ describe('object', () => {
         node: "val",
       }
     }
-    const doc = $$.document().ele(obj).doc()
+    const doc = $$.create().ele(obj).doc()
 
     expect($$.printTree(doc.node)).toBe($$.t`
       ns1:root (ns:myns) xmlns:ns1="myns" (ns:http://www.w3.org/2000/xmlns/)
@@ -248,7 +248,7 @@ describe('object', () => {
   })
 
   test('error if no nodes created', () => {
-    expect(() => $$.document().ele({ })).toThrow()
+    expect(() => $$.create().ele({ })).toThrow()
   })
 
 })

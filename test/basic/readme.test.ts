@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('examples in README', () => {
 
   test('with functions', () => {
-    const root = $$.document().ele('topgun')
+    const root = $$.create().ele('topgun')
       .ele('pilots')
         .ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky').up()
         .ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell').up()
@@ -47,7 +47,7 @@ describe('examples in README', () => {
       }
     }
 
-    const root = $$.document(obj)
+    const root = $$.create(obj)
     expect(root.end( { prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <topgun>
@@ -66,7 +66,7 @@ describe('examples in README', () => {
 
   test('parsing', () => {
     const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>'
-    const doc = $$.document(xmlStr)
+    const doc = $$.create(xmlStr)
     doc.root().ele("baz")
 
     expect(doc.end( { prettyPrint: true })).toBe($$.t`
@@ -82,7 +82,7 @@ describe('examples in README', () => {
 
   test('serializing', () => {
     const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>'
-    const doc = $$.document(xmlStr)
+    const doc = $$.create(xmlStr)
     doc.root().ele("baz")
 
     expect(doc.end( { format: "object" })).toEqual(
@@ -99,7 +99,7 @@ describe('examples in README', () => {
   })
 
   test('processing', () => {
-    const root = $$.document().ele('squares')
+    const root = $$.create().ele('squares')
     root.com('f(x) = x^2')
     for(let i = 1; i <= 5; i++)
     {

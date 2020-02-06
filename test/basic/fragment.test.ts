@@ -54,7 +54,7 @@ describe('fragment()', () => {
       node2
         # val2
     `)
-    const root = $$.document().ele("root")
+    const root = $$.create().ele("root")
     root.import(frag)
     expect($$.printTree(root.node)).toBe($$.t`
       root

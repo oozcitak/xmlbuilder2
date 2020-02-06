@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('ele()', () => {
 
   test('string name', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     node1.ele('node1-1')
     node1.ele('node1-2')
@@ -25,7 +25,7 @@ describe('ele()', () => {
   })
 
   test('from JS object', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     root.ele({
       'node1': { 'node1-1': '', 'node1-2': '' },
       'node2': { 'node2-1': '', 'node2-2': '', 'node2-3': '' }
@@ -44,7 +44,7 @@ describe('ele()', () => {
   })
 
   test('from XML string', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     root.ele('<node1><node1-1/><node1-2/></node1><node2><node2-1/><node2-2/><node2-3/></node2>')
 
     expect($$.printTree(root.doc().node)).toBe($$.t`
@@ -60,12 +60,12 @@ describe('ele()', () => {
   })
 
   test('from XML string error', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     expect(() => root.ele('<?xml version="1.0"?>')).toThrow()
   })
 
   test('from JSON string', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     root.ele(`{
       "node1": { "node1-1": "", "node1-2": "" },
       "node2": { "node2-1": "", "node2-2": "", "node2-3": "" }

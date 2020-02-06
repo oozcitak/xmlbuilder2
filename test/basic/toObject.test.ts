@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('toObject() with map', () => {
 
   test('element', () => {
-    const root = $$.document().ele('root', { "att": "val", "att2": "val2" })
+    const root = $$.create().ele('root', { "att": "val", "att2": "val2" })
       .ele('node1').up()
       .ele('node2').root()
     const obj = root.toObject({ format: "map" })
@@ -22,12 +22,12 @@ describe('toObject() with map', () => {
   })
 
   test('document', () => {
-    const obj = $$.document().ele('root').doc().toObject({ format: "map" })
+    const obj = $$.create().ele('root').doc().toObject({ format: "map" })
     expect($$.printMap(obj)).toBe('M{ root: M{ } }')
   })
 
   test('document type', () => {
-    const dtd = $$.document().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
+    const dtd = $$.create().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
     expect(dtd.toObject({ format: "map" })).toEqual(new Map())
   })
 
@@ -37,32 +37,32 @@ describe('toObject() with map', () => {
   })
 
   test('element', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     expect($$.printMap(root.toObject({ format: "map" }))).toBe('M{ root: M{ } }')
   })
 
   test('text', () => {
-    const node = $$.document().ele('root').txt('content').first()
+    const node = $$.create().ele('root').txt('content').first()
     expect($$.printMap(node.toObject({ format: "map" }))).toBe('content')
   })
 
   test('cdata', () => {
-    const node = $$.document().ele('root').dat('content').first()
+    const node = $$.create().ele('root').dat('content').first()
     expect($$.printMap(node.toObject({ format: "map" }))).toBe('M{ $: content }')
   })
 
   test('comment', () => {
-    const node = $$.document().ele('root').com('content').first()
+    const node = $$.create().ele('root').com('content').first()
     expect($$.printMap(node.toObject({ format: "map" }))).toBe('M{ !: content }')
   })
 
   test('processing instruction', () => {
-    const node = $$.document().ele('root').ins('target', 'content').first()
+    const node = $$.create().ele('root').ins('target', 'content').first()
     expect($$.printMap(node.toObject({ format: "map" }))).toBe('M{ ?: target content }')
   })
 
   test('attribute', () => {
-    const root = $$.document().ele('root').att("att", "val")
+    const root = $$.create().ele('root').att("att", "val")
     expect($$.printMap(root.toObject({ format: "map" }))).toBe($$.t`
       M{ root: M{ @att: val } }
     `)
@@ -73,12 +73,12 @@ describe('toObject() with map', () => {
 describe('toObject() with object', () => {
 
   test('object is the default format', () => {
-    const obj = $$.document().ele('root').doc().toObject()
+    const obj = $$.create().ele('root').doc().toObject()
     expect(obj).toEqual({ root: { } })
   })
 
   test('element', () => {
-    const root = $$.document().ele('root', { "att": "val", "att2": "val2" })
+    const root = $$.create().ele('root', { "att": "val", "att2": "val2" })
       .ele('node1').up()
       .ele('node2').root()
     const obj = root.toObject({ format: "object" })
@@ -97,12 +97,12 @@ describe('toObject() with object', () => {
   })
 
   test('document', () => {
-    const obj = $$.document().ele('root').doc().toObject({ format: "object" })
+    const obj = $$.create().ele('root').doc().toObject({ format: "object" })
     expect($$.printMap(obj)).toBe('{ root: { } }')
   })
 
   test('document type', () => {
-    const dtd = $$.document().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
+    const dtd = $$.create().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
     expect(dtd.toObject({ format: "object" })).toEqual({})
   })
 
@@ -112,32 +112,32 @@ describe('toObject() with object', () => {
   })
 
   test('element', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     expect($$.printMap(root.toObject({ format: "object" }))).toBe('{ root: { } }')
   })
 
   test('text', () => {
-    const node = $$.document().ele('root').txt('content').first()
+    const node = $$.create().ele('root').txt('content').first()
     expect($$.printMap(node.toObject({ format: "object" }))).toBe('content')
   })
 
   test('cdata', () => {
-    const node = $$.document().ele('root').dat('content').first()
+    const node = $$.create().ele('root').dat('content').first()
     expect($$.printMap(node.toObject({ format: "object" }))).toBe('{ $: content }')
   })
 
   test('comment', () => {
-    const node = $$.document().ele('root').com('content').first()
+    const node = $$.create().ele('root').com('content').first()
     expect($$.printMap(node.toObject({ format: "object" }))).toBe('{ !: content }')
   })
 
   test('processing instruction', () => {
-    const node = $$.document().ele('root').ins('target', 'content').first()
+    const node = $$.create().ele('root').ins('target', 'content').first()
     expect($$.printMap(node.toObject({ format: "object" }))).toBe('{ ?: target content }')
   })
 
   test('attribute', () => {
-    const root = $$.document().ele('root').att("att", "val")
+    const root = $$.create().ele('root').att("att", "val")
     expect($$.printMap(root.toObject({ format: "object" }))).toBe($$.t`
       { root: { @att: val } }
     `)

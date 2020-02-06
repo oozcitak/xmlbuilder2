@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('end()', () => {
 
   test('simple document', () => {
-    const xml = $$.document()
+    const xml = $$.create()
       .dtd({ pubID: "pub", sysID: "sys" })
       .ele('root')
       .com('comment')
@@ -30,7 +30,7 @@ describe('end()', () => {
   })
 
   test('invalid writer format', () => {
-    const xml = $$.document() as any
+    const xml = $$.create() as any
     expect(() => xml.end({ format: "invalid" })).toThrow()
   })
 

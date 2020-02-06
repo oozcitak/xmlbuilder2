@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('collection', () => {
 
   test('each()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
       .ele('node3').up()
@@ -13,14 +13,14 @@ describe('collection', () => {
   })
 
   test('each() - single node', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     let str = ''
     root.each(child => str += child.node.nodeName, true, true)
     expect(str).toBe('root')
   })
 
   test('each() - recursive', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1')
         .ele('child').up()
       .up()
@@ -32,7 +32,7 @@ describe('collection', () => {
   })
 
   test('each() - self and recursive', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1')
         .ele('child')
           .ele('grandchild').up()
@@ -46,7 +46,7 @@ describe('collection', () => {
   })
 
   test('map()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
       .ele('node3').up()
@@ -55,7 +55,7 @@ describe('collection', () => {
   })
 
   test('map() - self and recursive', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1')
         .ele('child').up()
       .up()
@@ -66,7 +66,7 @@ describe('collection', () => {
   })
 
   test('reduce()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
       .ele('node3').up()
@@ -75,7 +75,7 @@ describe('collection', () => {
   })
 
   test('reduce() - self and recursive', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1')
         .ele('child').up()
       .up()
@@ -86,7 +86,7 @@ describe('collection', () => {
   })
 
   test('find()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     const node2 = root.ele('node2')
     const node3 = root.ele('node3')
@@ -98,7 +98,7 @@ describe('collection', () => {
   })
 
   test('find() - self and recursive', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     const child = node1.ele('child')
     const node2 = root.ele('node2')
@@ -112,7 +112,7 @@ describe('collection', () => {
   })
 
   test('filter()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     const node2 = root.ele('diode2')
     const node3 = root.ele('node3')
@@ -121,7 +121,7 @@ describe('collection', () => {
   })
 
   test('filter() - self and recursive', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     const child = node1.ele('child')
     const node2 = root.ele('diode2')
@@ -131,7 +131,7 @@ describe('collection', () => {
   })
   
   test('every()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
       .ele('node3').up()
@@ -142,7 +142,7 @@ describe('collection', () => {
   })
 
   test('every() - self and recursive', () => {
-    const root = $$.document().ele('nut')
+    const root = $$.create().ele('nut')
     const node1 = root.ele('node1')
     const child = node1.ele('nils')
     const node2 = root.ele('node2')
@@ -154,7 +154,7 @@ describe('collection', () => {
   })
 
   test('some()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('diode2').up()
       .ele('node3').up()
@@ -165,7 +165,7 @@ describe('collection', () => {
   })
 
   test('some() - self and recursive', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('diode2').up()
       .ele('node3').up()
@@ -176,7 +176,7 @@ describe('collection', () => {
   })
   
   test('toArray()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     const node2 = root.ele('node2')
     const node3 = root.ele('node3')
@@ -185,7 +185,7 @@ describe('collection', () => {
   })
 
   test('toArray() - self and recursive', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     const child = node1.ele('child')
     const node2 = root.ele('node2')
@@ -195,7 +195,7 @@ describe('collection', () => {
   })
 
   test('this inside callback', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
       .ele('node3').up()

@@ -3,17 +3,17 @@ import $$ from '../TestHelpers'
 describe('traversal', () => {
 
   test('root()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
 
     expect(root.first().root()).toEqual(root)
-    const emptyDoc = $$.document()
+    const emptyDoc = $$.create()
     expect(() => emptyDoc.root()).toThrow()
   })
 
   test('up()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
 
@@ -22,7 +22,7 @@ describe('traversal', () => {
   })
 
   test('prev()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
 
@@ -31,7 +31,7 @@ describe('traversal', () => {
   })
 
   test('next()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
 
@@ -40,7 +40,7 @@ describe('traversal', () => {
   })
 
   test('first()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
 
@@ -49,7 +49,7 @@ describe('traversal', () => {
   })
 
   test('last()', () => {
-    const root = $$.document().ele('root')
+    const root = $$.create().ele('root')
       .ele('node1').up()
       .ele('node2').up()
 

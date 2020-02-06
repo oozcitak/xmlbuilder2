@@ -26,7 +26,7 @@ describe('StringWriter', () => {
       }
     }
 
-    expect($$.document({ version: "1.0", encoding: "UTF-8", standalone: true })
+    expect($$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele('root').ele(obj).doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <root>
@@ -60,7 +60,7 @@ describe('StringWriter', () => {
       }
     }
 
-    expect($$.document().ele('root').ele(obj).root().
+    expect($$.create().ele('root').ele(obj).root().
       toString({ format: "xml", prettyPrint: true, offset: 2 })).toBe(
       '    <root>\n' +
       '      <ele>simple element</ele>\n' +
@@ -80,7 +80,7 @@ describe('StringWriter', () => {
       }
     }
 
-    expect($$.document().ele('root').ele(obj).root().
+    expect($$.create().ele('root').ele(obj).root().
       toString({ format: "xml", prettyPrint: true, offset: -2 })).toBe(
       '<root>\n' +
       '<ele>simple element</ele>\n' +
@@ -92,7 +92,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype with both public and system identifier', () => {
-    expect($$.document().dtd({ pubID: "pub", sysID: "sys" })
+    expect($$.create().dtd({ pubID: "pub", sysID: "sys" })
       .ele('root').doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub" "sys">
@@ -101,7 +101,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype with public identifier', () => {
-    expect($$.document().dtd({ pubID: "pub" })
+    expect($$.create().dtd({ pubID: "pub" })
       .ele('root').doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub">
@@ -110,7 +110,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype with system identifier', () => {
-    expect($$.document().dtd({ sysID: "sys" })
+    expect($$.create().dtd({ sysID: "sys" })
       .ele('root').doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root SYSTEM "sys">
@@ -119,7 +119,7 @@ describe('StringWriter', () => {
   })
 
   test('doctype without identifiers', () => {
-    expect($$.document().dtd()
+    expect($$.create().dtd()
       .ele('root').doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root>
@@ -128,7 +128,7 @@ describe('StringWriter', () => {
   })
 
   test('namespaces', () => {
-    const doc = $$.document().ele('root', { xmlns: "ns" })
+    const doc = $$.create().ele('root', { xmlns: "ns" })
       .ele('foo').up()
       .ele('bar').up()
       .doc()
@@ -141,7 +141,7 @@ describe('StringWriter', () => {
   })
 
   test('XML namespace', () => {
-    const doc = $$.document().ele('http://www.w3.org/XML/1998/namespace', 'root')
+    const doc = $$.create().ele('http://www.w3.org/XML/1998/namespace', 'root')
       .ele('foo').up()
       .ele('bar').up()
       .doc()
@@ -154,7 +154,7 @@ describe('StringWriter', () => {
   })
 
   test('duplicate namespaces', () => {
-    const doc = $$.document().ele('d:root', { "xmlns:d": "ns1" })
+    const doc = $$.create().ele('d:root', { "xmlns:d": "ns1" })
       .ele('e:foo', { "xmlns:e": "ns1" }).up()
       .ele('bar').up()
       .doc()
@@ -167,7 +167,7 @@ describe('StringWriter', () => {
   })
 
   test('attribute with namespace and no prefix', () => {
-    const doc = $$.document().ele('r', { "xmlns:x0": "ns", "xmlns:x2": "ns" })
+    const doc = $$.create().ele('r', { "xmlns:x0": "ns", "xmlns:x2": "ns" })
       .ele('b', { "xmlns:x1": "ns" })
       .att('ns', 'name', 'v')
       .doc()
@@ -179,7 +179,7 @@ describe('StringWriter', () => {
   })
 
   test('nested default namespace declaration attributes with same namespace are ignored', () => {
-    const doc = $$.document().ele('ns', 'r')
+    const doc = $$.create().ele('ns', 'r')
       .att('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns')
       .ele('ns', 'n')
       .att('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns')
@@ -192,14 +192,14 @@ describe('StringWriter', () => {
   })
 
   test('prefix of an attribute is replaced with another existing prefix mapped to the same namespace URI', () => {
-    const doc = $$.document().ele('r', { "xmlns:xx": "uri" })
+    const doc = $$.create().ele('r', { "xmlns:xx": "uri" })
       .att('uri', 'p:name', 'v')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <r xmlns:xx="uri" xx:name="v"/>
       `)
 
-    const doc2 = $$.document().ele('r', { "xmlns:xx": "uri" })
+    const doc2 = $$.create().ele('r', { "xmlns:xx": "uri" })
       .ele('b')
       .att('uri', 'p:name', 'value')
       .doc()
@@ -211,7 +211,7 @@ describe('StringWriter', () => {
   })
 
   test('prefix of an attribute is NOT preserved if neither its prefix nor its namespace URI is not already used', () => {
-    const doc = $$.document().ele('r', { "xmlns:xx": "uri" })
+    const doc = $$.create().ele('r', { "xmlns:xx": "uri" })
       .att('uri2', 'xx:name', 'value')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
@@ -220,7 +220,7 @@ describe('StringWriter', () => {
   })
 
   test('same prefix declared in an ancestor element', () => {
-    const doc = $$.document().ele('root', { "xmlns:p": "uri1" })
+    const doc = $$.create().ele('root', { "xmlns:p": "uri1" })
       .ele('child')
       .att('uri2', 'p:foobar', 'value')
       .doc()
@@ -232,7 +232,7 @@ describe('StringWriter', () => {
   })
 
   test('drop element prefix if the namespace is same as inherited default namespace', () => {
-    const doc = $$.document().ele('uri', 'root')
+    const doc = $$.create().ele('uri', 'root')
       .ele('p:child', { "xmlns:p": "uri" })
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
@@ -243,7 +243,7 @@ describe('StringWriter', () => {
   })
 
   test('find an appropriate prefix', () => {
-    const doc = $$.document().ele('root', { "xmlns:p1": "u1" })
+    const doc = $$.create().ele('root', { "xmlns:p1": "u1" })
       .ele('child', { "xmlns:p2": "u1" })
       .ele('u1', 'child2')
       .doc()
@@ -257,7 +257,7 @@ describe('StringWriter', () => {
   })
 
   test('xmlns:* attributes', () => {
-    const doc = $$.document().ele('uri1', 'p:root')
+    const doc = $$.create().ele('uri1', 'p:root')
       .att('http://www.w3.org/2000/xmlns/', 'xmlns:p', 'uri2')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
@@ -266,7 +266,7 @@ describe('StringWriter', () => {
   })
 
   test('prefix re-declared in ancestor element', () => {
-    const doc = $$.document().ele('root')
+    const doc = $$.create().ele('root')
       .att('http://www.w3.org/2000/xmlns/', 'xmlns:p', 'uri2')
       .ele('uri1', 'p:child')
       .doc()
@@ -278,7 +278,7 @@ describe('StringWriter', () => {
   })
 
   test('default namespace does not apply if was declared in an ancestor', () => {
-    const doc = $$.document().ele('root', { "xmlns:x": "uri1" })
+    const doc = $$.create().ele('root', { "xmlns:x": "uri1" })
       .ele('table', { xmlns: "uri1" })
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
@@ -289,7 +289,7 @@ describe('StringWriter', () => {
   })
 
   test('multiple generated prefixes', () => {
-    const doc = $$.document().ele('root')
+    const doc = $$.create().ele('root')
       .ele('child1').att('uri1', 'attr1', 'value1').att('uri2', 'attr2', 'value2').up()
       .ele('child2').att('uri3', 'attr3', 'value3')
       .doc()
@@ -302,7 +302,7 @@ describe('StringWriter', () => {
   })
 
   test('attributes in same namespace', () => {
-    const doc = $$.document().ele('root')
+    const doc = $$.create().ele('root')
       .ele('child').att('uri', 'attr', 'value').up()
       .ele('child').att('uri', 'attr', 'value')
       .doc()
@@ -315,7 +315,7 @@ describe('StringWriter', () => {
   })
 
   test('attributes in same namespace in a single element', () => {
-    const doc = $$.document().ele('root')
+    const doc = $$.create().ele('root')
       .att('uri', 'attr1', 'value1').att('uri', 'attr2', 'value2')
       .doc()
     expect(doc.end({ wellFormed: true, prettyPrint: true, headless: true })).toBe($$.t`
@@ -324,21 +324,21 @@ describe('StringWriter', () => {
   })
 
   test('allowEmptyTags', () => {
-    expect($$.document().ele('root').end({ allowEmptyTags: true, prettyPrint: true })).toBe($$.t`
+    expect($$.create().ele('root').end({ allowEmptyTags: true, prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <root></root>
       `)
   })
 
   test('spaceBeforeSlash', () => {
-    expect($$.document().ele('root').end({ spaceBeforeSlash: true, prettyPrint: true })).toBe($$.t`
+    expect($$.create().ele('root').end({ spaceBeforeSlash: true, prettyPrint: true })).toBe($$.t`
       <?xml version="1.0"?>
       <root />
       `)
   })
 
   test('Pretty printing with indentTextOnlyNodes, no mixed content', () => {
-    const doc = $$.document().ele('root')
+    const doc = $$.create().ele('root')
       .ele('node', { 'att': 'val' }).txt('text').up()
       .ele('node').att('att', 'val').txt('text').doc()
 
@@ -356,7 +356,7 @@ describe('StringWriter', () => {
   })
 
   test('Pretty printing with mixed content', () => {
-    const doc = $$.document().ele('root')
+    const doc = $$.create().ele('root')
       .ele('node', { 'att': 'val' }).txt('mixed content')
         .ele('node').att('att', 'val').txt('text').up()
         .txt('more text after node').doc()
@@ -374,7 +374,7 @@ describe('StringWriter', () => {
   })
 
   test('Pretty printing with indentTextOnlyNodes, mixed content', () => {
-    const doc = $$.document().ele('root')
+    const doc = $$.create().ele('root')
       .ele('node', { 'att': 'val' }).txt('mixed content')
       .ele('node').att('att', 'val').txt('text').up()
       .txt('more text after node').doc()
@@ -393,7 +393,7 @@ describe('StringWriter', () => {
   })
 
   test('Various types of text nodes', () => {
-    const doc1 = $$.document().ele('root')
+    const doc1 = $$.create().ele('root')
       .txt('text1')
       .doc()
 
@@ -401,7 +401,7 @@ describe('StringWriter', () => {
       <root>text1</root>
       `)
 
-    const doc2 = $$.document().ele('root')
+    const doc2 = $$.create().ele('root')
       .txt('text1')
       .txt('text2')
       .doc()
@@ -410,7 +410,7 @@ describe('StringWriter', () => {
       <root>text1text2</root>
       `)
 
-    const doc3 = $$.document().ele('root')
+    const doc3 = $$.create().ele('root')
       .txt('text1')
       .ele('node').up()
       .txt('text2')
@@ -424,7 +424,7 @@ describe('StringWriter', () => {
       </root>
       `)
 
-    const doc4 = $$.document().ele('root')
+    const doc4 = $$.create().ele('root')
       .txt('')
       .doc()
 
@@ -434,7 +434,7 @@ describe('StringWriter', () => {
   })
 
   test('Various types of text nodes with indentTextOnlyNodes', () => {
-    const doc1 = $$.document().ele('root')
+    const doc1 = $$.create().ele('root')
       .txt('text1')
       .doc()
 
@@ -444,7 +444,7 @@ describe('StringWriter', () => {
       </root>
       `)
 
-    const doc2 = $$.document().ele('root')
+    const doc2 = $$.create().ele('root')
       .txt('text1')
       .txt('text2')
       .doc()
@@ -456,7 +456,7 @@ describe('StringWriter', () => {
       </root>
       `)
 
-    const doc3 = $$.document().ele('root')
+    const doc3 = $$.create().ele('root')
       .txt('text1')
       .ele('node').up()
       .txt('text2')
@@ -472,33 +472,33 @@ describe('StringWriter', () => {
   })
 
   test('unknown node', () => {
-    const ele = $$.document().ele('root').ele('alien')
+    const ele = $$.create().ele('root').ele('alien')
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end()).toThrow()
   })
 
   test('escape text data', () => {
-    const ele = $$.document().ele('root').txt('&<>')
+    const ele = $$.create().ele('root').txt('&<>')
     expect(ele.toString()).toBe('<root>&amp;&lt;&gt;</root>')
   })
 
   test('escape attribute value', () => {
-    const ele1 = $$.document().ele('root').att('att', '"&<>')
+    const ele1 = $$.create().ele('root').att('att', '"&<>')
     expect(ele1.toString()).toBe('<root att="&quot;&amp;&lt;&gt;"/>')
-    const ele2 = $$.document().ele('root').att('att', 'val')
+    const ele2 = $$.create().ele('root').att('att', 'val')
     Object.defineProperty((ele2.node as Element).attributes.item(0), "value", { value: null})
     expect(ele2.toString()).toBe('<root att=""/>')
   })
 
   test('duplicate attribute name not well-formed', () => {
     // duplicate name
-    const ele1 = $$.document().ele('root').att('att', 'val').att('att2', 'val')
+    const ele1 = $$.create().ele('root').att('att', 'val').att('att2', 'val')
     Object.defineProperty((ele1.node as Element).attributes.item(1), "localName", { value: "att"})
     expect(ele1.toString()).toBe('<root att="val" att="val"/>')
   })
 
   test('wellFormed checks - invalid element node', () => {
-    const ele = $$.document().ele('root')
+    const ele = $$.create().ele('root')
     Object.defineProperty(ele.node, "localName", { value: "x:y", configurable: true })
     expect(() => ele.end({ wellFormed: true })).toThrow()
     Object.defineProperty(ele.node, "localName", { value: "abc\0", configurable: true})
@@ -516,20 +516,20 @@ describe('StringWriter', () => {
   })
 
   test('wellFormed checks - invalid document node', () => {
-    const doc = $$.document()
+    const doc = $$.create()
     Object.defineProperty(doc.node, "documentElement", { value: null})
     expect(() => doc.end({ wellFormed: true })).toThrow()
   })
 
   test('wellFormed checks - invalid comment node', () => {
-    const ele1 = $$.document().ele('root').com('--')
+    const ele1 = $$.create().ele('root').com('--')
     expect(() => ele1.end({ wellFormed: true })).toThrow()
-    const ele2 = $$.document().ele('root').com('text-')
+    const ele2 = $$.create().ele('root').com('text-')
     expect(() => ele2.end({ wellFormed: true })).toThrow()
   })
 
   test('wellFormed checks - invalid text node - 1.0', () => {
-    const ele = $$.document().ele('root').txt('abc😊\0')
+    const ele = $$.create().ele('root').txt('abc😊\0')
     expect(() => ele.end({ wellFormed: true })).toThrow()
     Object.defineProperty(ele.first().node, "data", { value: "abc\uDBFFx", configurable: true})
     expect(() => ele.end({ wellFormed: true })).toThrow()
@@ -542,51 +542,51 @@ describe('StringWriter', () => {
   })
 
   test('wellFormed checks - invalid document type node', () => {
-    const ele1 = $$.document().ele('root').dtd({ pubID: 'abc😊\0' })
+    const ele1 = $$.create().ele('root').dtd({ pubID: 'abc😊\0' })
     expect(() => ele1.end({ wellFormed: true })).toThrow()
-    const ele2 = $$.document().ele('root').dtd({ sysID: '\0' })
+    const ele2 = $$.create().ele('root').dtd({ sysID: '\0' })
     expect(() => ele2.end({ wellFormed: true })).toThrow()
-    const ele3 = $$.document().ele('root').dtd({ sysID: '\'quote mismatch"' })
+    const ele3 = $$.create().ele('root').dtd({ sysID: '\'quote mismatch"' })
     expect(() => ele3.end({ wellFormed: true })).toThrow()
   })
 
   test('wellFormed checks - invalid processing instruction node', () => {
-    const ele1 = $$.document().ele('root').ins(':')
+    const ele1 = $$.create().ele('root').ins(':')
     expect(() => ele1.end({ wellFormed: true })).toThrow()
-    const ele2 = $$.document().ele('root').ins('xml')
+    const ele2 = $$.create().ele('root').ins('xml')
     expect(() => ele2.end({ wellFormed: true })).toThrow()
-    const ele3 = $$.document().ele('root').ins('name', '\0')
+    const ele3 = $$.create().ele('root').ins('name', '\0')
     expect(() => ele3.end({ wellFormed: true })).toThrow()
-    const ele4 = $$.document().ele('root').ins('name', 'data')
+    const ele4 = $$.create().ele('root').ins('name', 'data')
     Object.defineProperty(ele4.node.firstChild, "data", { value: "?>"})
     expect(() => ele4.end({ wellFormed: true })).toThrow()
   })
 
   test('wellFormed checks - invalid cdata node', () => {
-    const ele = $$.document().ele('root').dat('data')
+    const ele = $$.create().ele('root').dat('data')
     Object.defineProperty(ele.node.firstChild, "data", { value: "]]>"})
     expect(() => ele.end({ wellFormed: true })).toThrow()
   })
 
   test('wellFormed checks - invalid attribute', () => {
     // duplicate name
-    const ele1 = $$.document().ele('root').att('att', 'val').att('att2', 'val')
+    const ele1 = $$.create().ele('root').att('att', 'val').att('att2', 'val')
     Object.defineProperty((ele1.node as Element).attributes.item(1), "localName", { value: "att"})
     expect(() => ele1.end({ wellFormed: true })).toThrow()
     // invalid name
-    const ele4 = $$.document().ele('root').att('att', '')
+    const ele4 = $$.create().ele('root').att('att', '')
     Object.defineProperty((ele4.node as Element).attributes.item(0), "localName", { value: "att:name"})
     expect(() => ele4.end({ wellFormed: true })).toThrow()
-    const ele5 = $$.document().ele('root').att('att', '')
+    const ele5 = $$.create().ele('root').att('att', '')
     Object.defineProperty((ele5.node as Element).attributes.item(0), "localName", { value: "att\0"})
     expect(() => ele5.end({ wellFormed: true })).toThrow()
     // invalid value
-    const ele7 = $$.document().ele('root').att('att', '\0')
+    const ele7 = $$.create().ele('root').att('att', '\0')
     expect(() => ele7.end({ wellFormed: true })).toThrow()
   })
 
   test('void HTML element', () => {
-    const doc = $$.document().ele('root')
+    const doc = $$.create().ele('root')
       .ele('http://www.w3.org/1999/xhtml', 'hr')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`

@@ -2,11 +2,11 @@ import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { isObject, isArray, isMap, forEachObject, objectLength, forEachArray } from "@oozcitak/util"
-import { builder, document, fragment, convert } from "../src"
+import { builder, create, fragment, convert } from "../src"
 
 export default class TestHelpers {
   static builder = builder
-  static document = document
+  static create = create
   static fragment = fragment
   static convert = convert
   

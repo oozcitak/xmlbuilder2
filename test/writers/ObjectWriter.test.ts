@@ -25,7 +25,7 @@ describe('ObjectWriter', () => {
       }
     }
 
-    const result = $$.document({ version: "1.0", encoding: "UTF-8", standalone: true })
+    const result = $$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele('root').ele(obj).end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -57,7 +57,7 @@ describe('ObjectWriter', () => {
   })
 
   test('consecutive attributes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .att("att1", "val1")
       .att("att2", "val2")
       .att("att3", "val3")
@@ -79,7 +79,7 @@ describe('ObjectWriter', () => {
   })
 
   test('consecutive text nodes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .txt("text1")
       .txt("text2")
       .txt("text3")
@@ -101,7 +101,7 @@ describe('ObjectWriter', () => {
   })
 
   test('consecutive comment nodes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .com("text1")
       .com("text2")
       .com("text3")
@@ -123,7 +123,7 @@ describe('ObjectWriter', () => {
   })
 
   test('consecutive cdata nodes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .dat("text1")
       .dat("text2")
       .dat("text3")
@@ -145,7 +145,7 @@ describe('ObjectWriter', () => {
   })
 
   test('consecutive instruction nodes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .ins("target1", "text1")
       .ins("target2", "text2")
       .ins("target3", "text3")
@@ -167,7 +167,7 @@ describe('ObjectWriter', () => {
   })
 
   test('duplicate tag names', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .ele('person').up()
       .ele('person').up()
       .end({ format: "object" })
@@ -176,7 +176,7 @@ describe('ObjectWriter', () => {
   })
 
   test('duplicate tag names with attributes', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "object" })
@@ -194,7 +194,7 @@ describe('ObjectWriter', () => {
   })
 
   test('duplicate tag names with text child nodes', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .ele('person').txt("text").up()
       .ele('person').txt("text").up()
       .end({ format: "object" })
@@ -212,7 +212,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -230,7 +230,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content and duplicate tags', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('text1')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
@@ -258,7 +258,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content and interspersed duplicate tags', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
@@ -288,7 +288,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - attributes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .att("att", "val")
       .ele("node").att("att", "val").up()
       .txt("text")
@@ -310,7 +310,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - consecutive attributes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .att("att1", "val1")
       .att("att2", "val2")
       .att("att3", "val3")
@@ -340,7 +340,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - consecutive text nodes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .txt("text1")
       .txt("text2")
       .txt("text3")
@@ -370,7 +370,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - consecutive comment nodes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .com("text1")
       .com("text2")
       .com("text3")
@@ -400,7 +400,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - consecutive cdata nodes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .dat("text1")
       .dat("text2")
       .dat("text3")
@@ -430,7 +430,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - consecutive instruction nodes', () => {
-    const result = $$.document().ele('root')
+    const result = $$.create().ele('root')
       .ins("target1", "text1")
       .ins("target2", "text2")
       .ins("target3", "text3")
@@ -460,7 +460,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - text suffix', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .txt('text1')
       .ele('person').up()
       .txt('text2')
@@ -478,7 +478,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - comment suffix', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .com('text1')
       .ele('person').up()
       .com('text2')
@@ -496,7 +496,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - cdata suffix', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .dat('text1')
       .ele('person').up()
       .dat('text2')
@@ -514,7 +514,7 @@ describe('ObjectWriter', () => {
   })
 
   test('mixed content - processing instruction suffix', () => {
-    const result = $$.document().ele('people')
+    const result = $$.create().ele('people')
       .ins('target1', 'text1')
       .ele('person').up()
       .ins('target2', 'text2')
@@ -532,7 +532,7 @@ describe('ObjectWriter', () => {
   })
 
   test('doctype', () => {
-    const result = $$.document()
+    const result = $$.create()
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "object" })
 
     expect($$.printMap(result)).toBe($$.t`
@@ -541,7 +541,7 @@ describe('ObjectWriter', () => {
   })
 
   test('namespaces', () => {
-    const result = $$.document().ele('root', { xmlns: "myns" })
+    const result = $$.create().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .ele('bar').up()
       .doc()
@@ -559,7 +559,7 @@ describe('ObjectWriter', () => {
   })
 
   test('unknown node', () => {
-    const ele = $$.document().ele('root').ele('alien')
+    const ele = $$.create().ele('root').ele('alien')
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end({ format: "object" })).toThrow()
   })
