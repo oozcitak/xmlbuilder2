@@ -260,18 +260,10 @@ export class PreSerializerNoNS {
      * providing inherited ns, map, prefix index, and the require well-formed 
      * flag.
      */
-    if (node._children !== undefined) {
-      for (const childNode of node._children) {
-        this.level++
-        this._serializeNode(childNode, requireWellFormed)
-        this.level--
-      }
-    } else {
-      node.childNodes.forEach(childNode => {
-        this.level++
-        this._serializeNode(childNode, requireWellFormed)
-        this.level--
-      }, this)
+    for (const childNode of node._children) {
+      this.level++
+      this._serializeNode(childNode, requireWellFormed)
+      this.level--
     }
 
     /**
@@ -318,14 +310,8 @@ export class PreSerializerNoNS {
      * 
      * 3. Return the value of serialized document.
     */
-    if (node._children !== undefined) {
-      for (const childNode of node._children) {
-        this._serializeNode(childNode, requireWellFormed)
-      }
-    } else {
-      node.childNodes.forEach(childNode => {
-        this._serializeNode(childNode, requireWellFormed)
-      }, this)
+    for (const childNode of node._children) {
+      this._serializeNode(childNode, requireWellFormed)
     }
   }
 
@@ -415,14 +401,8 @@ export class PreSerializerNoNS {
      * index, and flag require well-formed. Concatenate the result to markup.
      * 3. Return the value of markup.
      */
-    if (node._children !== undefined) {
-      for (const childNode of node._children) {
-        this._serializeNode(childNode, requireWellFormed)
-      }
-    } else {
-      node.childNodes.forEach(childNode => {
-        this._serializeNode(childNode, requireWellFormed)
-      }, this)
+    for (const childNode of node._children) {
+      this._serializeNode(childNode, requireWellFormed)
     }
   }
 
