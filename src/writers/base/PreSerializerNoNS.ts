@@ -555,9 +555,7 @@ export class PreSerializerNoNS {
      * 3. Loop: For each attribute attr in element's attributes, in the order 
      * they are specified in the element's attribute list: 
      */
-    for (let i = 0; i < node.attributes.length; i++) {
-      const attr = node.attributes[i]
-
+    for (const attr of node.attributes) {
       // Optimize common case
       if (!requireWellFormed) {
         /* istanbul ignore else */
@@ -583,6 +581,7 @@ export class PreSerializerNoNS {
        * 3.3. Let attribute namespace be the value of attr's namespaceURI value.
        * 3.4. Let candidate prefix be null.
        */
+      /* istanbul ignore else */
       if (requireWellFormed && localNameSet) localNameSet[attr.localName] = true
 
       /** 3.5. If attribute namespace is not null, then run these sub-steps: */

@@ -165,19 +165,20 @@ export class XMLBuilderImpl implements XMLBuilder {
           }, this)
         } else if (isMap(val) || isObject(val)) {
           // check for a namespace declaration attribute
+          let attNamespace: string | undefined
           const qName = extractQName(key)
           forEachObject(val, (attName, attValue) => {
             if (attName[0] === this._options.convert.att) {
               const attQName = extractQName(attName.slice(1))
               if ((attQName[0] === null && attQName[1] === "xmlns") ||
                 (attQName[0] === "xmlns" && attQName[1] === qName[0])) {
-                namespace = attValue
+                attNamespace = attValue
               }
             }
           }, this)
 
           // create a parent node
-          lastChild = this._node(namespace, key)
+          lastChild = this._node(attNamespace, key)
 
           // expand child nodes under parent
           lastChild.ele(val)

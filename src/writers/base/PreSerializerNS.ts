@@ -1,16 +1,12 @@
 import {
   Node, Element, Document, Comment, Text, DocumentFragment,
-  DocumentType, ProcessingInstruction, CDATASection
+  DocumentType, ProcessingInstruction, CDATASection, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { LocalNameSet } from "./LocalNameSet"
 import { NamespacePrefixMap } from "./NamespacePrefixMap"
 import { InvalidStateError } from "@oozcitak/dom/lib/dom/DOMException"
 import { namespace as infraNamespace } from "@oozcitak/infra"
-import { 
-  isName, isLegalChar, isPubidChar, isElementNode, isDocumentNode, 
-  isCommentNode, isTextNode, isDocumentFragmentNode, isDocumentTypeNode, 
-  isProcessingInstructionNode, isCDATASectionNode 
-} from "../../builder/dom"
+import { isName, isLegalChar, isPubidChar } from "../../builder/dom"
 
 /**
  * Pre-serializes XML nodes. This class is namespace aware.
@@ -125,24 +121,33 @@ export class PreSerializerNS {
 
     this.currentNode = node
 
-    if (isElementNode(node)) {
-      this._serializeElement(node, namespace, prefixMap, prefixIndex, requireWellFormed)
-    } else if (isDocumentNode(node)) {
-      this._serializeDocument(node, namespace, prefixMap, prefixIndex, requireWellFormed)
-    } else if (isCommentNode(node)) {
-      this._serializeComment(node, requireWellFormed)
-    } else if (isTextNode(node)) {
-      this._serializeText(node, requireWellFormed)
-    } else if (isDocumentFragmentNode(node)) {
-      this._serializeDocumentFragment(node, namespace, prefixMap, prefixIndex, requireWellFormed)
-    } else if (isDocumentTypeNode(node)) {
-      this._serializeDocumentType(node, requireWellFormed)
-    } else if (isProcessingInstructionNode(node)) {
-      this._serializeProcessingInstruction(node, requireWellFormed)
-    } else if (isCDATASectionNode(node)) {
-      this._serializeCData(node, requireWellFormed)
-    } else {
-      throw new Error(`Unknown node type: ${node.nodeType}`)
+    switch (node.nodeType) {
+      case NodeType.Element:
+        this._serializeElement(node as Element, namespace, prefixMap, prefixIndex, requireWellFormed)
+        break
+      case NodeType.Document:
+        this._serializeDocument(node as Document, namespace, prefixMap, prefixIndex, requireWellFormed)
+        break
+      case NodeType.Comment:
+        this._serializeComment(node as Comment, requireWellFormed)
+        break
+      case NodeType.Text:
+        this._serializeText(node as Text, requireWellFormed)
+        break
+      case NodeType.DocumentFragment:
+        this._serializeDocumentFragment(node as DocumentFragment, namespace, prefixMap, prefixIndex, requireWellFormed)
+        break
+      case NodeType.DocumentType:
+        this._serializeDocumentType(node as DocumentType, requireWellFormed)
+        break
+      case NodeType.ProcessingInstruction:
+        this._serializeProcessingInstruction(node as ProcessingInstruction, requireWellFormed)
+        break
+      case NodeType.CData:
+        this._serializeCData(node as CDATASection, requireWellFormed)
+        break
+      default:
+        throw new Error(`Unknown node type: ${node.nodeType}`)
     }
   }
 
@@ -818,10 +823,7 @@ export class PreSerializerNS {
      * 3. Loop: For each attribute attr in element's attributes, in the order 
      * they are specified in the element's attribute list: 
      */
-    for (let i = 0; i < node.attributes.length; i++) {
-      const attr = node.attributes.item(i)
-      if (!attr) continue
-
+    for (const attr of node.attributes) {
       // Optimize common case
       if (!requireWellFormed && attr.namespaceURI === null) {
         /* istanbul ignore else */
