@@ -4,8 +4,9 @@ import {
 } from './builder/interfaces'
 import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
+import { Guard } from '@oozcitak/dom/lib/util'
 import { XMLBuilderImpl } from './builder'
-import { isNode, createDocument, createParser, throwIfParserError } from './builder/dom'
+import { createDocument, createParser, throwIfParserError } from './builder/dom'
 import { isArray } from 'util'
 
 /**
@@ -51,7 +52,7 @@ export function builder(p1: XMLBuilderCreateOptions | Node | Node[],
   p2?: Node | Node[]): XMLBuilder | XMLBuilder[] {
 
   const options = formatOptions(isXMLBuilderCreateOptions(p1) ? p1 : DefaultBuilderOptions)
-  const nodes = isNode(p1) || isArray(p1) ? p1 : p2
+  const nodes = Guard.isNode(p1) || isArray(p1) ? p1 : p2
   if (nodes === undefined) {
     throw new Error("Invalid arguments.")
   }

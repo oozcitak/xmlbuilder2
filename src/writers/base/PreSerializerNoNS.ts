@@ -3,7 +3,7 @@ import {
   DocumentType, ProcessingInstruction, CDATASection, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { InvalidStateError } from "@oozcitak/dom/lib/dom/DOMException"
-import { isName, isLegalChar, isPubidChar } from "../../builder/dom"
+import { xml_isName, xml_isLegalChar, xml_isPubidChar } from "@oozcitak/dom/lib/algorithm"
 
 /**
  * Pre-serializes XML nodes. This class is not namespace aware.
@@ -151,7 +151,7 @@ export class PreSerializerNoNS {
      * serialization of this node would not be a well-formed element.
      */
     if (requireWellFormed && (node.localName.indexOf(":") !== -1 ||
-      !isName(node.localName))) {
+      !xml_isName(node.localName))) {
       throw new Error("Node local name contains invalid characters (well-formed required).")
     }
 
@@ -330,7 +330,7 @@ export class PreSerializerNoNS {
      * ends with a "-" (U+002D HYPHEN-MINUS) character, then throw an exception;
      * the serialization of this node's data would not be well-formed.
      */
-    if (requireWellFormed && (!isLegalChar(node.data) ||
+    if (requireWellFormed && (!xml_isLegalChar(node.data) ||
       node.data.indexOf("--") !== -1 || node.data.endsWith("-"))) {
       throw new Error("Comment data contains invalid characters (well-formed required).")
     }
@@ -357,7 +357,7 @@ export class PreSerializerNoNS {
      * production, then throw an exception; the serialization of this node's 
      * data would not be well-formed.
      */
-    if (requireWellFormed && !isLegalChar(node.data)) {
+    if (requireWellFormed && !xml_isLegalChar(node.data)) {
       throw new Error("Text data contains invalid characters (well-formed required).")
     }
 
@@ -421,7 +421,7 @@ export class PreSerializerNoNS {
      *  production, then throw an exception; the serialization of this node 
      * would not be a well-formed document type declaration.
      */
-    if (requireWellFormed && !isPubidChar(node.publicId)) {
+    if (requireWellFormed && !xml_isPubidChar(node.publicId)) {
       throw new Error("DocType public identifier does not match PubidChar construct (well-formed required).")
     }
 
@@ -433,7 +433,7 @@ export class PreSerializerNoNS {
      * of this node would not be a well-formed document type declaration.
      */
     if (requireWellFormed &&
-      (!isLegalChar(node.systemId) ||
+      (!xml_isLegalChar(node.systemId) ||
         (node.systemId.indexOf('"') !== -1 && node.systemId.indexOf("'") !== -1))) {
       throw new Error("DocType system identifier contains invalid characters (well-formed required).")
     }
@@ -496,7 +496,7 @@ export class PreSerializerNoNS {
      * U+003E GREATER-THAN SIGN), then throw an exception; the serialization of
      * this node's data would not be well-formed.
      */
-    if (requireWellFormed && (!isLegalChar(node.data) ||
+    if (requireWellFormed && (!xml_isLegalChar(node.data) ||
       node.data.indexOf("?>") !== -1)) {
       throw new Error("Processing instruction data contains invalid characters (well-formed required).")
     }
@@ -600,7 +600,7 @@ export class PreSerializerNoNS {
        * well-formed attribute.
        */
       if (requireWellFormed && (attr.localName.indexOf(":") !== -1 ||
-        !isName(attr.localName))) {
+        !xml_isName(attr.localName))) {
         throw new Error("Attribute local name contains invalid characters (well-formed required).")
       }
 
@@ -637,7 +637,7 @@ export class PreSerializerNoNS {
      * production, then throw an exception; the serialization of this attribute
      * value would fail to produce a well-formed element serialization.
      */
-    if (requireWellFormed && value !== null && !isLegalChar(value)) {
+    if (requireWellFormed && value !== null && !xml_isLegalChar(value)) {
       throw new Error("Invalid characters in attribute value.")
     }
 

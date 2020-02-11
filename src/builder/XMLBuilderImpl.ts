@@ -12,10 +12,9 @@ import {
   StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
 } from "../writers"
 import { Document, Node, Element } from "@oozcitak/dom/lib/dom/interfaces"
-import {
-  createParser, isDocumentNode, isDocumentFragmentNode, extractQName, 
-  throwIfParserError
-} from "./dom"
+import { createParser, throwIfParserError } from "./dom"
+import { namespace_extractQName } from "@oozcitak/dom/lib/algorithm"
+import { Guard } from "@oozcitak/dom/lib/util"
 
 /**
  * Represents a wrapper that extends XML nodes to implement easy to use and
@@ -166,10 +165,10 @@ export class XMLBuilderImpl implements XMLBuilder {
         } else if (isMap(val) || isObject(val)) {
           // check for a namespace declaration attribute
           let attNamespace: string | undefined
-          const qName = extractQName(key)
+          const qName = namespace_extractQName(key)
           forEachObject(val, (attName, attValue) => {
             if (attName[0] === this._options.convert.att) {
-              const attQName = extractQName(attName.slice(1))
+              const attQName = namespace_extractQName(attName.slice(1))
               if ((attQName[0] === null && attQName[1] === "xmlns") ||
                 (attQName[0] === "xmlns" && attQName[1] === qName[0])) {
                 attNamespace = attValue
@@ -266,7 +265,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     // check if this is a namespace declaration attribute
     if (namespace === undefined) {
-      const attQName = extractQName(name)
+      const attQName = namespace_extractQName(name)
       if (attQName[0] === "xmlns") {
         namespace = infraNamespace.XMLNS
       } else if (attQName[0] !== null) {
@@ -393,7 +392,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     const importedNode = node.node
 
-    if (isDocumentNode(importedNode)) {
+    if (Guard.isDocumentNode(importedNode)) {
       // import document node
       const elementNode = importedNode.documentElement
       if (elementNode === null) {
@@ -401,7 +400,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       }
       const clone = hostDoc.importNode(elementNode, true)
       hostNode.appendChild(clone)
-    } else if (isDocumentFragmentNode(importedNode)) {
+    } else if (Guard.isDocumentFragmentNode(importedNode)) {
       // import child nodes
       for (const childNode of importedNode.childNodes) {
         const clone = hostDoc.importNode(childNode, true)
@@ -696,7 +695,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     // inherit namespace from parent
     if (namespace === null || namespace === undefined) {
-      const qName = extractQName(name)
+      const qName = namespace_extractQName(name)
       const parent = this.node.parentNode
       if (parent) {
         namespace = parent.lookupNamespaceURI(qName[0])
@@ -709,7 +708,7 @@ export class XMLBuilderImpl implements XMLBuilder {
           if (attName === "xmlns") {
             namespace = attValue
           } else {
-            const attQName = extractQName(attName)
+            const attQName = namespace_extractQName(attName)
             if (attQName[0] === "xmlns" && attQName[1] === qName[0]) {
               namespace = attValue
             }
@@ -764,7 +763,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    */
   protected get _doc(): Document {
     const node = this.node
-    if (isDocumentNode(node)) {
+    if (Guard.isDocumentNode(node)) {
       return node
     } else {
       const docNode = node.ownerDocument

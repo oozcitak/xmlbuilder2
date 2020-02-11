@@ -6,7 +6,7 @@ import { LocalNameSet } from "./LocalNameSet"
 import { NamespacePrefixMap } from "./NamespacePrefixMap"
 import { InvalidStateError } from "@oozcitak/dom/lib/dom/DOMException"
 import { namespace as infraNamespace } from "@oozcitak/infra"
-import { isName, isLegalChar, isPubidChar } from "../../builder/dom"
+import { xml_isName, xml_isLegalChar, xml_isPubidChar } from "@oozcitak/dom/lib/algorithm"
 
 /**
  * Pre-serializes XML nodes. This class is namespace aware.
@@ -173,7 +173,7 @@ export class PreSerializerNS {
      * serialization of this node would not be a well-formed element.
      */
     if (requireWellFormed && (node.localName.indexOf(":") !== -1 ||
-      !isName(node.localName))) {
+      !xml_isName(node.localName))) {
       throw new Error("Node local name contains invalid characters (well-formed required).")
     }
 
@@ -585,7 +585,7 @@ export class PreSerializerNS {
      * ends with a "-" (U+002D HYPHEN-MINUS) character, then throw an exception;
      * the serialization of this node's data would not be well-formed.
      */
-    if (requireWellFormed && (!isLegalChar(node.data) ||
+    if (requireWellFormed && (!xml_isLegalChar(node.data) ||
       node.data.indexOf("--") !== -1 || node.data.endsWith("-"))) {
       throw new Error("Comment data contains invalid characters (well-formed required).")
     }
@@ -612,7 +612,7 @@ export class PreSerializerNS {
      * production, then throw an exception; the serialization of this node's 
      * data would not be well-formed.
      */
-    if (requireWellFormed && !isLegalChar(node.data)) {
+    if (requireWellFormed && !xml_isLegalChar(node.data)) {
       throw new Error("Text data contains invalid characters (well-formed required).")
     }
 
@@ -682,7 +682,7 @@ export class PreSerializerNS {
      *  production, then throw an exception; the serialization of this node 
      * would not be a well-formed document type declaration.
      */
-    if (requireWellFormed && !isPubidChar(node.publicId)) {
+    if (requireWellFormed && !xml_isPubidChar(node.publicId)) {
       throw new Error("DocType public identifier does not match PubidChar construct (well-formed required).")
     }
 
@@ -694,7 +694,7 @@ export class PreSerializerNS {
      * of this node would not be a well-formed document type declaration.
      */
     if (requireWellFormed &&
-      (!isLegalChar(node.systemId) ||
+      (!xml_isLegalChar(node.systemId) ||
         (node.systemId.indexOf('"') !== -1 && node.systemId.indexOf("'") !== -1))) {
       throw new Error("DocType system identifier contains invalid characters (well-formed required).")
     }
@@ -757,7 +757,7 @@ export class PreSerializerNS {
      * U+003E GREATER-THAN SIGN), then throw an exception; the serialization of
      * this node's data would not be well-formed.
      */
-    if (requireWellFormed && (!isLegalChar(node.data) ||
+    if (requireWellFormed && (!xml_isLegalChar(node.data) ||
       node.data.indexOf("?>") !== -1)) {
       throw new Error("Processing instruction data contains invalid characters (well-formed required).")
     }
@@ -991,7 +991,7 @@ export class PreSerializerNS {
        * well-formed attribute.
        */
       if (requireWellFormed && (attr.localName.indexOf(":") !== -1 ||
-        !isName(attr.localName) ||
+        !xml_isName(attr.localName) ||
         (attr.localName === "xmlns" && attributeNamespace === null))) {
         throw new Error("Attribute local name contains invalid characters (well-formed required).")
       }
@@ -1035,9 +1035,7 @@ export class PreSerializerNS {
      * 2. Main: For each attribute attr in element's attributes, in the order
      * they are specified in the element's attribute list:
      */
-    for (let i = 0; i < node.attributes.length; i++) {
-      const attr = node.attributes.item(i)
-      if (!attr) continue
+    for (const attr of node.attributes) {
       /**
        * _Note:_ The following conditional steps find namespace prefixes. Only 
        * attributes in the XMLNS namespace are considered (e.g., attributes made 
@@ -1175,7 +1173,7 @@ export class PreSerializerNS {
      * production, then throw an exception; the serialization of this attribute
      * value would fail to produce a well-formed element serialization.
      */
-    if (requireWellFormed && value !== null && !isLegalChar(value)) {
+    if (requireWellFormed && value !== null && !xml_isLegalChar(value)) {
       throw new Error("Invalid characters in attribute value.")
     }
 
