@@ -146,6 +146,8 @@ export class StringWriterImpl {
       let textOnlyNode = true
       let emptyNode = true
       let childNode = this._pre.currentNode.firstChild
+      let cdataCount = 0
+      let textCount = 0
       while (childNode) {
         if (!Guard.isTextNode(childNode)) {
           textOnlyNode = false
@@ -154,9 +156,16 @@ export class StringWriterImpl {
         } else if (childNode.data !== '') {
           emptyNode = false
         }
+
+        if (Guard.isCDATASectionNode(childNode)) {
+          cdataCount++
+        } else if (Guard.isExclusiveTextNode(childNode)) {
+          textCount++
+        }
+
         childNode = childNode.nextSibling
       }
-      this._refs.suppressPretty = textOnlyNode
+      this._refs.suppressPretty = textOnlyNode && ((cdataCount <= 1 && textCount === 0) || cdataCount === 0)
       this._refs.emptyNode = emptyNode
     }
 
@@ -195,18 +204,22 @@ export class StringWriterImpl {
    * Produces the serialization of a text node.
    */
   private _text(data: string): void {
-    this._beginLine()
-    this._refs.markup += data
-    this._endLine()
+    if (data !== '') {
+      this._beginLine()
+      this._refs.markup += data
+      this._endLine()
+    }
   }
 
   /**
    * Produces the serialization of a cdata section node.
    */
   private _cdata(data: string): void {
-    this._beginLine()
-    this._refs.markup += "<![CDATA[" + data + "]]>"
-    this._endLine()
+    if (data !== '') {
+      this._beginLine()
+      this._refs.markup += "<![CDATA[" + data + "]]>"
+      this._endLine()
+    }
   }
 
   /**

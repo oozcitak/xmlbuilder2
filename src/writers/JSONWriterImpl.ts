@@ -78,7 +78,7 @@ export class JSONWriterImpl {
       }
       markup += this._endLine(options, level) + this._beginLine(options, level)
       markup += ']'
-    } else if (isMap(obj) || isObject(obj)) {
+    } else if (isObject(obj)) {
       markup += '{'
       const len = objectLength(obj)
       let i = 0

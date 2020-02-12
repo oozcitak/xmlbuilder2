@@ -471,6 +471,100 @@ describe('StringWriter', () => {
       `)
   })
 
+  test('Various types of cdata nodes', () => {
+    const doc1 = $$.create().ele('root')
+      .dat('text1')
+      .doc()
+
+    expect(doc1.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root><![CDATA[text1]]></root>
+      `)
+
+    const doc2 = $$.create().ele('root')
+      .dat('text1')
+      .dat('text2')
+      .doc()
+
+    expect(doc2.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        <![CDATA[text1]]>
+        <![CDATA[text2]]>
+      </root>
+      `)
+
+    const doc2a = $$.create().ele('root')
+      .txt('text1')
+      .dat('text2')
+      .doc()
+
+    expect(doc2a.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        text1
+        <![CDATA[text2]]>
+      </root>
+      `)
+
+    const doc3 = $$.create().ele('root')
+      .dat('text1')
+      .ele('node').up()
+      .dat('text2')
+      .doc()
+
+    expect(doc3.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        <![CDATA[text1]]>
+        <node/>
+        <![CDATA[text2]]>
+      </root>
+      `)
+
+    const doc4 = $$.create().ele('root')
+      .dat('')
+      .doc()
+
+    expect(doc4.end({ headless: true, prettyPrint: true })).toBe($$.t`
+      <root/>
+      `)
+  })
+
+  test('Various types of cdata nodes with indentTextOnlyNodes', () => {
+    const doc1 = $$.create().ele('root')
+      .dat('text1')
+      .doc()
+
+    expect(doc1.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        <![CDATA[text1]]>
+      </root>
+      `)
+
+    const doc2 = $$.create().ele('root')
+      .dat('text1')
+      .dat('text2')
+      .doc()
+
+    expect(doc2.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        <![CDATA[text1]]>
+        <![CDATA[text2]]>
+      </root>
+      `)
+
+    const doc3 = $$.create().ele('root')
+      .dat('text1')
+      .ele('node').up()
+      .dat('text2')
+      .doc()
+
+    expect(doc3.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+      <root>
+        <![CDATA[text1]]>
+        <node/>
+        <![CDATA[text2]]>
+      </root>
+      `)
+  })
+
   test('element node with xml prefix', () => {
     const ele = $$.create().ele('http://www.w3.org/2000/xmlns/', 'xmlns:root')
     expect(ele.end({ headless: true })).toBe('<xmlns:root/>')
