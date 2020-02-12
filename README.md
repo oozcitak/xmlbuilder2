@@ -102,6 +102,28 @@ console.log(obj);
   }
 }
 ```
+
+You can convert between formats in one go with the `convert` function:
+
+```js
+const { convert } = require('xmlbuilder2');
+
+const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>';
+const obj = convert(xmlStr, { format: "object" });
+
+console.log(obj);
+```
+```js
+{
+  root: {
+    '@att': 'val',
+    foo: {
+      bar: 'foobar'
+    }
+  }
+}
+```
+
 ___
 
 If you need to do some processing:
