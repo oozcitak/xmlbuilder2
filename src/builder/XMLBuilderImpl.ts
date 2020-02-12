@@ -28,7 +28,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * 
    * @param domNode - the DOM node to wrap
    */
-  constructor (domNode: Node) {
+  constructor(domNode: Node) {
     this._domNode = domNode
   }
 
@@ -149,7 +149,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         } else if ((isArray(val) || isSet(val)) && isEmpty(val)) {
           // skip empty arrays
           lastChild = this._dummy()
-        } else if (( isMap(val) || isObject(val)) && isEmpty(val)) {
+        } else if ((isMap(val) || isObject(val)) && isEmpty(val)) {
           // empty objects produce one node
           lastChild = this.ele(key)
         } else if (!this._options.keepNullNodes && (val === null)) {
@@ -488,7 +488,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  map<T>(callback: ((node: XMLBuilder, index: number) => T), self = false, 
+  map<T>(callback: ((node: XMLBuilder, index: number) => T), self = false,
     recursive = false, thisArg?: any): T[] {
     let result: T[] = []
     this.each((node, index) =>
@@ -510,7 +510,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  find(predicate: ((node: XMLBuilder, index: number) => boolean), self = false, 
+  find(predicate: ((node: XMLBuilder, index: number) => boolean), self = false,
     recursive = false, thisArg?: any): XMLBuilder | undefined {
     let node = this._getFirstDescendantNode(this._domNode, self, recursive)
     let index = 0
@@ -525,7 +525,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  filter(predicate: ((node: XMLBuilder, index: number) => boolean), self = false, 
+  filter(predicate: ((node: XMLBuilder, index: number) => boolean), self = false,
     recursive = false, thisArg?: any): XMLBuilder[] {
     let result: XMLBuilder[] = []
     this.each((node, index) => {
@@ -537,7 +537,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  every(predicate: ((node: XMLBuilder, index: number) => boolean), self = false, 
+  every(predicate: ((node: XMLBuilder, index: number) => boolean), self = false,
     recursive = false, thisArg?: any): boolean {
     let node = this._getFirstDescendantNode(this._domNode, self, recursive)
     let index = 0
@@ -552,7 +552,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  some(predicate: ((node: XMLBuilder, index: number) => boolean), self = false, 
+  some(predicate: ((node: XMLBuilder, index: number) => boolean), self = false,
     recursive = false, thisArg?: any): boolean {
     let node = this._getFirstDescendantNode(this._domNode, self, recursive)
     let index = 0
@@ -620,7 +620,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     else
       return this._domNode.firstChild
   }
-  
+
   /**
    * Gets the next descendant of the given node of the tree rooted at `root`
    * in depth-first pre-order.
@@ -634,12 +634,12 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (recursive) {
       // traverse child nodes
       if (node.firstChild) return node.firstChild
-    
+
       if (node === root) return null
-    
+
       // traverse siblings
       if (node.nextSibling) return node.nextSibling
-    
+
       // traverse parent's next sibling
       let parent = node.parentNode
       while (parent && parent !== root) {
@@ -648,11 +648,11 @@ export class XMLBuilderImpl implements XMLBuilder {
       }
     } else {
       if (root === node)
-        return node.firstChild 
+        return node.firstChild
       else
         return node.nextSibling
     }
-  
+
     return null
   }
 

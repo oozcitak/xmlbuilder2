@@ -1,8 +1,9 @@
-import { Document, Element } from "@oozcitak/dom/lib/dom/interfaces"
+import { Document } from "@oozcitak/dom/lib/dom/interfaces"
 import { DOMParser, DOMImplementation } from "@oozcitak/dom"
 import { dom } from "@oozcitak/dom/lib/dom"
 
 dom.setFeatures(false)
+
 /**
  * Throws an error if the parser returned an error document.
  */
@@ -11,8 +12,13 @@ export function throwIfParserError(doc: Document): void {
   if (root !== null &&
     root.localName === "parsererror" &&
     root.namespaceURI === "http://www.mozilla.org/newlayout/xml/parsererror.xml") {
-    const msg = root.firstChild ? (root.firstChild as Element).getAttribute("message") : null
-    throw new Error(msg || "Error parsing XML string.")
+    const msgElement = root.firstElementChild
+    /* istanbul ignore next */
+    if (msgElement === null) throw new Error("Error parsing XML string.")
+    const msg = msgElement.getAttribute("message")
+    /* istanbul ignore next */
+    if (msg === null) throw new Error("Error parsing XML string.")
+    throw new Error(msg)
   }
 }
 
