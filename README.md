@@ -160,5 +160,7 @@ This will result in:
 </squares>
 ```
 
+### Documentation:
+
 See the [wiki](https://github.com/oozcitak/xmlbuilder2/wiki) for details.
 
