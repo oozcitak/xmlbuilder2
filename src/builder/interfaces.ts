@@ -380,7 +380,7 @@ interface XMLSerializedArray extends Array<XMLSerializedValue> { }
  * into nodes.
  */
 export type ExpandObject = { [key: string]: any } | Map<string, any> |
-  any[] | ((...args: any) => any)
+  any[] | Set<any> | ((...args: any) => any)
 
 /**
  * Represents the type of a variable that is a JS object defining
