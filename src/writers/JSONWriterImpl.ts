@@ -37,8 +37,7 @@ export class JSONWriterImpl {
       prettyPrint: false,
       indent: '  ',
       newline: '\n',
-      offset: 0,
-      noDoubleEncoding: false
+      offset: 0
     }) as Required<JSONWriterOptions>
 
     // convert to object

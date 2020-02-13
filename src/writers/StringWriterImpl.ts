@@ -61,8 +61,7 @@ export class StringWriterImpl {
       width: 0,
       allowEmptyTags: false,
       indentTextOnlyNodes: false,
-      spaceBeforeSlash: false,
-      noDoubleEncoding: false
+      spaceBeforeSlash: false
     }) as Required<StringWriterOptions>
 
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
