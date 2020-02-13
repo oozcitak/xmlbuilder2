@@ -291,7 +291,8 @@ export type StringWriterOptions = BaseWriterOptions & {
    */
   offset?: number
   /**
-   * Determines the maximum column width. Defaults to `80`.
+   * Wraps attributes to the next line if the column width exceeds the given
+   * value. Defaults to `0` which disables attribute wrapping.
    */
   width?: number
   /**

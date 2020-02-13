@@ -33,6 +33,7 @@ export class StringWriterImpl {
   private _refs!: StringWriterRefs
   private _pre!: PreSerializerNS | PreSerializerNoNS
   private _indentation: { [key: number]: string } = {}
+  private _lengthToLastNewline = 0
 
   /**
    * Initializes a new instance of `StringWriterImpl`.
@@ -58,7 +59,7 @@ export class StringWriterImpl {
       indent: "  ",
       newline: "\n",
       offset: 0,
-      width: 80,
+      width: 0,
       allowEmptyTags: false,
       indentTextOnlyNodes: false,
       spaceBeforeSlash: false,
@@ -149,18 +150,18 @@ export class StringWriterImpl {
       let cdataCount = 0
       let textCount = 0
       while (childNode) {
-        if (!Guard.isTextNode(childNode)) {
+        if (Guard.isExclusiveTextNode(childNode)) {
+          textCount++
+        } else if (Guard.isCDATASectionNode(childNode)) {
+          cdataCount++
+        } else {
           textOnlyNode = false
           emptyNode = false
           break
-        } else if (childNode.data !== '') {
-          emptyNode = false
         }
 
-        if (Guard.isCDATASectionNode(childNode)) {
-          cdataCount++
-        } else if (Guard.isExclusiveTextNode(childNode)) {
-          textCount++
+        if (childNode.data !== '') {
+          emptyNode = false
         }
 
         childNode = childNode.nextSibling
@@ -197,7 +198,15 @@ export class StringWriterImpl {
    * Produces the serialization of an attribute node.
    */
   private _attribute(name: string, value: string): void {
-    this._refs.markup += " " + name + "=\"" + value + "\""
+    const str = name + "=\"" + value + "\""
+    if (this._options.prettyPrint && this._options.width > 0 &&
+      this._refs.markup.length - this._lengthToLastNewline + 1 + str.length > this._options.width) {
+      this._endLine()
+      this._beginLine()
+      this._refs.markup += this._indent(1) + str
+    } else {
+      this._refs.markup += " " + str
+    }
   }
 
   /**
@@ -257,6 +266,7 @@ export class StringWriterImpl {
   private _endLine(): void {
     if (this._options.prettyPrint && !this._refs.suppressPretty) {
       this._refs.markup += this._options.newline
+      this._lengthToLastNewline = this._refs.markup.length
     }
   }
 
