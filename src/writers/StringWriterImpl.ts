@@ -1,8 +1,7 @@
 import { StringWriterOptions, XMLBuilderOptions } from "../builder/interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { PreSerializerNS } from "./base/PreSerializerNS"
-import { PreSerializerNoNS } from "./base/PreSerializerNoNS"
+import { PreSerializer } from "./base/PreSerializer"
 import { Guard } from "@oozcitak/dom/lib/util"
 
 /**
@@ -31,7 +30,7 @@ export class StringWriterImpl {
   private _builderOptions: XMLBuilderOptions
   private _options!: Required<StringWriterOptions>
   private _refs!: StringWriterRefs
-  private _pre!: PreSerializerNS | PreSerializerNoNS
+  private _pre!: PreSerializer
   private _indentation: { [key: number]: string } = {}
   private _lengthToLastNewline = 0
 
@@ -68,8 +67,7 @@ export class StringWriterImpl {
 
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
 
-    this._pre = node._nodeDocument === undefined || node._nodeDocument._hasNamespaces ?
-      new PreSerializerNS() : new PreSerializerNoNS()
+    this._pre = new PreSerializer()
 
     this._pre.setCallbacks({
       docType: this._docType.bind(this),
