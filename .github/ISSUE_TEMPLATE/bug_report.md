@@ -17,8 +17,8 @@ Steps to reproduce the behavior preferably with some sample code.
 A clear and concise description of what you expected to happen.
 
 **Version:**
- - node.js: [e.g. 11.8.0]
- - xmlbuilder2 [e.g. 1.0.0]
+ - node.js: [x.x.x]
+ - xmlbuilder2 [x.x.x]
 
 **Additional context**
 Add any other context about the problem here.
