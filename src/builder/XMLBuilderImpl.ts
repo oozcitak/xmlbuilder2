@@ -251,34 +251,12 @@ export class XMLBuilderImpl implements XMLBuilder {
       return this
     }
 
-    // xmlns defaults to XMLNS namespace
-    if ((namespace === null || namespace === undefined) && name === "xmlns") {
-      namespace = infraNamespace.XMLNS
-    }
-
     const ele = this.node as Element
 
-    // convert to string
-    if (namespace !== undefined && namespace !== null) namespace += ""
-    name += ""
-    value += ""
-
-    // check if this is a namespace declaration attribute
-    if (namespace === undefined) {
-      const attQName = namespace_extractQName(name)
-      if (attQName[0] === "xmlns") {
-        namespace = infraNamespace.XMLNS
-      } else if (attQName[0] !== null) {
-        namespace = ele.lookupNamespaceURI(attQName[0])
-      } else {
-        namespace = ele.lookupNamespaceURI(attQName[0])
-      }
-    }
-
-    if (namespace !== null && namespace !== undefined && !ele.isDefaultNamespace(namespace)) {
-      ele.setAttributeNS(namespace, name, value)
+    if (namespace !== null && namespace !== undefined) {
+      ele.setAttributeNS(namespace + "", name + "", value + "")
     } else {
-      ele.setAttribute(name, value)
+      ele.setAttribute(name + "", value + "")
     }
 
     return this
@@ -693,38 +671,12 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     name += ""
 
-    // inherit namespace from parent
-    if (namespace === null || namespace === undefined) {
-      const qName = namespace_extractQName(name)
-      const parent = this.node.parentNode
-      if (parent) {
-        namespace = parent.lookupNamespaceURI(qName[0])
-      }
-
-      // override namespace if there is a namespace declaration
-      // attribute
-      if (attributes !== undefined) {
-        forEachObject(attributes, (attName, attValue) => {
-          if (attName === "xmlns") {
-            namespace = attValue
-          } else {
-            const attQName = namespace_extractQName(attName)
-            if (attQName[0] === "xmlns" && attQName[1] === qName[0]) {
-              namespace = attValue
-            }
-          }
-        })
-      }
-    }
-
-    const node = this.node
-
     const child = (namespace !== null && namespace !== undefined ?
       this._doc.createElementNS(namespace + "", name) :
       this._doc.createElement(name)
     )
 
-    node.appendChild(child)
+    this.node.appendChild(child)
     const builder = new XMLBuilderImpl(child)
 
     // update doctype node if the new node is the document element node

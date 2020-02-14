@@ -162,7 +162,8 @@ describe('StringWriter with namespaces', () => {
   })
 
   test('prefix of an attribute is replaced with another existing prefix mapped to the same namespace URI', () => {
-    const doc = $$.create().ele('r', { "xmlns:xx": "uri" })
+    const doc = $$.create().ele('r')
+      .att('xmlns:xx', 'uri')
       .att('uri', 'p:name', 'v')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
@@ -181,48 +182,49 @@ describe('StringWriter with namespaces', () => {
   })
 
   test('prefix of an attribute is NOT preserved if neither its prefix nor its namespace URI is not already used', () => {
-    const doc = $$.create().ele('r', { "xmlns:xx": "uri" })
-      .att('uri2', 'xx:name', 'value')
+    const doc = $$.create().ele('r')
+      .att('xmlns:xx', 'uri')
+      .att('uri2', 'p:name', 'value')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
-      <r xmlns:xx="uri" xmlns:ns1="uri2" ns1:name="value"/>
+      <r xmlns:xx="uri" xmlns:p="uri2" p:name="value"/>
       `)
   })
 
   test('same prefix declared in an ancestor element', () => {
-    const doc = $$.create().ele('root', { "xmlns:p": "uri1" })
+    const doc = $$.create().ele('uri1', 'p:root')
       .ele('child')
       .att('uri2', 'p:foobar', 'value')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
-      <root xmlns:p="uri1">
+      <p:root xmlns:p="uri1">
         <child xmlns:ns1="uri2" ns1:foobar="value"/>
-      </root>
+      </p:root>
       `)
   })
 
   test('drop element prefix if the namespace is same as inherited default namespace', () => {
     const doc = $$.create().ele('uri', 'root')
-      .ele('p:child', { "xmlns:p": "uri" })
+      .ele('uri', 'p:child')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <root xmlns="uri">
-        <child xmlns:p="uri"/>
+        <child/>
       </root>
       `)
   })
 
   test('find an appropriate prefix', () => {
-    const doc = $$.create().ele('root', { "xmlns:p1": "u1" })
-      .ele('child', { "xmlns:p2": "u1" })
+    const doc = $$.create().ele('u1', 'p1:root')
+      .ele('u1', 'p2:child')
       .ele('u1', 'child2')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
-      <root xmlns:p1="u1">
-        <child xmlns:p2="u1">
-          <p2:child2/>
-        </child>
-      </root>
+      <p1:root xmlns:p1="u1">
+        <p1:child>
+          <p1:child2/>
+        </p1:child>
+      </p1:root>
       `)
   })
 
@@ -253,7 +255,7 @@ describe('StringWriter with namespaces', () => {
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <root xmlns:x="uri1">
-        <x:table xmlns="uri1"/>
+        <table xmlns="uri1"/>
       </root>
       `)
   })

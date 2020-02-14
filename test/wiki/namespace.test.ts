@@ -7,7 +7,7 @@ describe('namespaces examples in the wiki', () => {
     const doc = $$.create().ele(ns1, 'root')
       .ele('foo').txt('bar').doc()
 
-    expect(doc.end({ headless: true })).toBe('<root xmlns="http://example.com/ns1"><foo>bar</foo></root>')
+    expect(doc.end({ headless: true })).toBe('<root xmlns="http://example.com/ns1"><foo xmlns="">bar</foo></root>')
   })
 
   test('reset default namespace', () => {
@@ -31,7 +31,7 @@ describe('namespaces examples in the wiki', () => {
       '<root xmlns="http://example.com/ns1"' +
         ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
         ' xsi:schemaLocation="http://example.com/n1 schema.xsd">' +
-        '<foo>bar</foo>' +
+        '<foo xmlns="">bar</foo>' +
       '</root>')
   })
 
@@ -47,7 +47,7 @@ describe('namespaces examples in the wiki', () => {
     expect(doc.end({ headless: true })).toBe(
       '<svg xmlns="http://www.w3.org/2000/svg"' +
         ' xmlns:xlink="http://www.w3.org/1999/xlink">' +
-        '<script type="text/ecmascript" xlink:href="foo.js"/>' +
+        '<script xmlns="" type="text/ecmascript" xlink:href="foo.js"/>' +
       '</svg>')
   })
 
