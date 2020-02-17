@@ -40,6 +40,30 @@ describe('namespaces', () => {
       '</root>')
   })
 
+  test('namespace prefix with JS object', () => {
+    const ns1 = 'http://example.com/ns1'
+    const xsi = 'http://www.w3.org/2001/XMLSchema-instance'
+
+    const obj = {
+      [`root@${ns1}`]: {
+        '@': { [`xsi:schemaLocation@${xsi}`]: 'http://example.com/n1 schema.xsd' },
+        [`foo@${ns1}`]: {
+          [`bar@${ns1}`]: 'foobar'
+        }
+      }
+    }
+    const doc = $$.create(obj).node as any
+
+    expect($$.serialize(doc)).toBe(
+      '<root xmlns="http://example.com/ns1"' +
+        ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
+        ' xsi:schemaLocation="http://example.com/n1 schema.xsd">' +
+        '<foo>' +
+          '<bar>foobar</bar>' +
+        '</foo>' +
+      '</root>')
+  })
+
   test('child namespace declared on parent', () => {
     const svgNs = 'http://www.w3.org/2000/svg'
     const xlinkNs = 'http://www.w3.org/1999/xlink'

@@ -12,7 +12,6 @@ import {
 } from "../writers"
 import { Document, Node, Element } from "@oozcitak/dom/lib/dom/interfaces"
 import { createParser, throwIfParserError } from "./dom"
-import { namespace_extractQName } from "@oozcitak/dom/lib/algorithm"
 import { Guard } from "@oozcitak/dom/lib/util"
 
 /**
@@ -83,10 +82,11 @@ export class XMLBuilderImpl implements XMLBuilder {
       [namespace, name, attributes] = [p1, p2, p3]
     } else if (isString(p1) && isObject(p2)) {
       // ele(name: string, attributes: AttributesObject)
-      [namespace, name, attributes] = [undefined, p1, p2]
+      [namespace, name] = this._extractNamespace(p1)
+      attributes = p2
     } else {
       // ele(name: string)
-      [namespace, name, attributes] = [undefined, p1, undefined]
+      [namespace, name] = this._extractNamespace(p1)
     }
 
     if (attributes) {
@@ -163,7 +163,8 @@ export class XMLBuilderImpl implements XMLBuilder {
           }, this)
         } else if (isMap(val) || isObject(val)) {
           // create a parent node
-          lastChild = this._node(null, key)
+          [namespace, name] = this._extractNamespace(key)
+          lastChild = this._node(namespace, name)
 
           // expand child nodes under parent
           lastChild.ele(val)
@@ -224,7 +225,8 @@ export class XMLBuilderImpl implements XMLBuilder {
       [namespace, name, value] = [p1 as string, p2, p3]
     } else if (p1 !== undefined && p2 !== undefined) {
       // ele(name: string, value: string)
-      [namespace, name, value] = [undefined, p1 as string, p2]
+      [namespace, name] = this._extractNamespace(p1 as string)
+      value = p2
     } else {
       throw new Error("Attribute name and value not specified. " + this._debugInfo())
     }
@@ -694,6 +696,21 @@ export class XMLBuilderImpl implements XMLBuilder {
    */
   private _dummy(): XMLBuilder {
     return new XMLBuilderImpl(this._doc.createElement('dummy_node'))
+  }
+
+  /**
+   * Extracts a namespace and name from the given string.
+   * 
+   * @param str - a string containing both a name and namespace separated by an
+   * '@' character.
+   */
+  private _extractNamespace(str: string): [string | undefined, string] {
+    const atIndex = str.indexOf("@")
+    if (atIndex <= 0) {
+      return [undefined, str]
+    } else {
+      return[str.slice(atIndex + 1), str.slice(0, atIndex)]
+    }
   }
 
   /**
