@@ -223,6 +223,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (p1 !== undefined && p2 !== undefined && p3 !== undefined) {
       // att(namespace: string, name: string, value: string)
       [namespace, name, value] = [p1 as string, p2, p3]
+      namespace = this._applyNamespaceAlias(namespace)
     } else if (p1 !== undefined && p2 !== undefined) {
       // ele(name: string, value: string)
       [namespace, name] = this._extractNamespace(p1 as string)
@@ -230,6 +231,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else {
       throw new Error("Attribute name and value not specified. " + this._debugInfo())
     }
+    namespace = this._lookupDefaultNamespace(namespace, false)
 
     if (this._options.keepNullAttributes && (value === null)) {
       // keep null attributes
@@ -241,7 +243,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     const ele = this.node as Element
 
-    if (namespace !== null && namespace !== undefined) {
+    if (namespace !== undefined) {
       ele.setAttributeNS(namespace + "", name + "", value + "")
     } else {
       ele.setAttribute(name + "", value + "")
@@ -259,18 +261,29 @@ export class XMLBuilderImpl implements XMLBuilder {
       p2 = getValue(p2)
     }
 
-    if (isArray(p1) || isSet(p1)) {
+    let namespace: undefined | string
+    let name: string | string[]
+
+    if (p2 === undefined) {
+      name = p1
+    } else if (isString(p1)) {
+      namespace = p1
+      name = p2
+    } else {
+      throw new Error("Attribute namespace must be a string. " + this._debugInfo())
+    }
+
+    if (isArray(name) || isSet(name)) {
       // removeAtt(names: string[])
-      forEachArray(p1, attName => this.removeAtt(attName), this)
-    } else if (isArray(p2) || isSet(p2)) {
       // removeAtt(namespace: string, names: string[])
-      forEachArray(p2, attName => this.removeAtt(p1 + "", attName), this)
-    } else if (p1 !== undefined && p2 !== undefined) {
+      forEachArray(name, attName => 
+        namespace === undefined ? this.removeAtt(attName) : this.removeAtt(namespace, attName), this)
+    } else if (namespace !== undefined) {
       // removeAtt(namespace: string, name: string)
-      (this.node as Element).removeAttributeNS(p1 + "", p2 + "")
+      (this.node as Element).removeAttributeNS(this._applyNamespaceAlias(namespace), name + "")
     } else {
       // removeAtt(name: string)
-      (this.node as Element).removeAttribute(p1 + "")
+      (this.node as Element).removeAttribute(name + "")
     }
 
     return this
@@ -657,10 +670,11 @@ export class XMLBuilderImpl implements XMLBuilder {
   private _node(namespace: string | null | undefined, name: string,
     attributes?: AttributesObject): XMLBuilder {
 
+    namespace = this._lookupDefaultNamespace(namespace, true)
     name += ""
 
-    const child = (namespace !== null && namespace !== undefined ?
-      this._doc.createElementNS(namespace + "", name) :
+    const child = (namespace !== undefined ?
+      this._doc.createElementNS(namespace, name) :
       this._doc.createElement(name)
     )
 
@@ -702,15 +716,52 @@ export class XMLBuilderImpl implements XMLBuilder {
    * Extracts a namespace and name from the given string.
    * 
    * @param str - a string containing both a name and namespace separated by an
-   * '@' character.
+   * '@' character
    */
   private _extractNamespace(str: string): [string | undefined, string] {
     const atIndex = str.indexOf("@")
     if (atIndex <= 0) {
       return [undefined, str]
     } else {
-      return[str.slice(atIndex + 1), str.slice(0, atIndex)]
+      return [this._applyNamespaceAlias(str.slice(atIndex + 1)), str.slice(0, atIndex)]
     }
+  }
+
+  /**
+   * Converts a namespace alias to a namespace.
+   * 
+   * @param str - a string containing a namespace alias
+   */
+  private _applyNamespaceAlias(str: string): string {
+    if (str[0] === '@') {
+      const alias = str.slice(1)
+      const namespace = this._options.namespaceAlias[alias]
+      if (namespace === undefined) {
+        throw new Error(`Namespace alias "${alias}" not defined.`)
+      }
+      return namespace
+    } else {
+      return str
+    }
+  }
+
+  /**
+   * Looks-up a default namespace.
+   * 
+   * @param namespace - namespace
+   * @param ele - `true` if this is an element namespace; otherwise `false`
+   */
+  private _lookupDefaultNamespace(namespace: string | undefined | null, ele: boolean): string | undefined | null {
+    if (namespace === undefined) {
+      const defaultNS = (ele ? this._options.defaultNamespace.ele : this._options.defaultNamespace.att)
+      if (defaultNS !== undefined) {
+        namespace = defaultNS
+        if (namespace !== null && namespace !== undefined) {
+          namespace = this._applyNamespaceAlias(namespace)
+        }
+      }
+    }
+    return namespace
   }
 
   /**

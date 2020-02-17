@@ -42,6 +42,12 @@ export interface XMLBuilderCreateOptions {
    * Defines string keys used while converting JS objects to nodes.
    */
   convert?: Partial<ConvertOptions>
+  /**
+   * Defines an object with namespace aliases. These aliases can be used instead
+   * of actual namespaces by appending them to element and attribute names after
+   * '@@'.
+   */
+  namespaceAlias?: { [key: string]: string }  
 }
 
 /**
@@ -77,7 +83,28 @@ export interface XMLBuilderOptions {
    * Defines string keys used while converting JS objects to nodes.
    */
   convert: ConvertOptions
+  /**
+   * Defines an object with namespace aliases. These aliases can be used instead
+   * of actual namespaces by appending them to element and attribute names after
+   * '@@'.
+   */
+  namespaceAlias: { [key: string]: string }
+  /**
+   * Defines default namespaces to apply to all elements and attributes.
+   */
+  defaultNamespace: { 
+    "ele": undefined | null | string, 
+    "att": undefined | null | string 
+  }
 }
+
+/**
+ * Contains keys of `XMLBuilderOptions`.
+ */
+export const XMLBuilderOptionKeys = new Set([
+  "version", "encoding", "standalone", "keepNullNodes", "keepNullAttributes",
+  "ignoreConverters", "convert", "namespaceAlias", "defaultNamespace"
+])
 
 /**
  * Defines the identifier strings of the DocType node.
@@ -221,13 +248,25 @@ export const DefaultBuilderOptions: Partial<XMLBuilderOptions> = {
     text: "#",
     cdata: "$",
     comment: "!"
+  },
+  namespaceAlias: {
+    html: "http://www.w3.org/1999/xhtml",
+    xml: "http://www.w3.org/XML/1998/namespace",
+    xmlns: "http://www.w3.org/2000/xmlns/",
+    mathml: "http://www.w3.org/1998/Math/MathML",
+    svg: "http://www.w3.org/2000/svg",
+    xlink: "http://www.w3.org/1999/xlink"
+  },
+  defaultNamespace: {
+    ele: undefined,
+    att: undefined
   }
 }
 
 /**
  * Defines the options passed to the writer.
  */
-type BaseWriterOptions  = {
+type BaseWriterOptions = {
   /**
    * Output format. Defaults to `"xml"`.
    * - `"xml"` - Serializes the document as a string in XML format.
@@ -340,7 +379,7 @@ export type StringWriterOptions = BaseWriterOptions & {
  */
 export type JSONWriterOptions = BaseWriterOptions & {
   /** @inheritdoc */
-  format?: "json"  
+  format?: "json"
   /**
    * Pretty-prints the XML tree. Defaults to `false`.
    */
@@ -364,7 +403,7 @@ export type JSONWriterOptions = BaseWriterOptions & {
 /**
  * Defines the options passed to the writer.
  */
-export type WriterOptions = StringWriterOptions | ObjectWriterOptions | 
+export type WriterOptions = StringWriterOptions | ObjectWriterOptions |
   JSONWriterOptions | MapWriterOptions
 
 /**
@@ -414,7 +453,7 @@ export type PIObject = Map<string, string> | string[] | {
  * chainable document builder methods.
  */
 export interface XMLBuilder {
-  
+
   /**
    * Returns the underlying DOM node.
    */
@@ -667,7 +706,7 @@ export interface XMLBuilder {
    * only the immediate child nodes
    * @param thisArg - value to use as this when executing callback
    */
-  each(callback: ((node: XMLBuilder, index: number) => void), 
+  each(callback: ((node: XMLBuilder, index: number) => void),
     self?: boolean, recursive?: boolean, thisArg?: any): XMLBuilder
 
   /**
@@ -680,7 +719,7 @@ export interface XMLBuilder {
    * only the immediate child nodes
    * @param thisArg - value to use as this when executing callback
    */
-  map<T>(callback: ((node: XMLBuilder, index: number) => T), 
+  map<T>(callback: ((node: XMLBuilder, index: number) => T),
     self?: boolean, recursive?: boolean, thisArg?: any): T[]
 
   /**
@@ -707,7 +746,7 @@ export interface XMLBuilder {
    * only the immediate child nodes
    * @param thisArg - value to use as this when executing predicate
    */
-  find(predicate: ((node: XMLBuilder, index: number) => boolean), 
+  find(predicate: ((node: XMLBuilder, index: number) => boolean),
     self?: boolean, recursive?: boolean, thisArg?: any): XMLBuilder | undefined
 
   /**
@@ -720,7 +759,7 @@ export interface XMLBuilder {
    * only the immediate child nodes
    * @param thisArg - value to use as this when executing predicate
    */
-  filter(predicate: ((node: XMLBuilder, index: number) => boolean), 
+  filter(predicate: ((node: XMLBuilder, index: number) => boolean),
     self?: boolean, recursive?: boolean, thisArg?: any): XMLBuilder[]
 
   /**
@@ -733,7 +772,7 @@ export interface XMLBuilder {
    * only the immediate child nodes
    * @param thisArg - value to use as this when executing predicate
    */
-  every(predicate: ((node: XMLBuilder, index: number) => boolean), 
+  every(predicate: ((node: XMLBuilder, index: number) => boolean),
     self?: boolean, recursive?: boolean, thisArg?: any): boolean
 
   /**
@@ -746,7 +785,7 @@ export interface XMLBuilder {
    * only the immediate child nodes
    * @param thisArg - value to use as this when executing predicate
    */
-  some(predicate: ((node: XMLBuilder, index: number) => boolean), 
+  some(predicate: ((node: XMLBuilder, index: number) => boolean),
     self?: boolean, recursive?: boolean, thisArg?: any): boolean
 
   /**

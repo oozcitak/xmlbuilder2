@@ -1,6 +1,7 @@
 import { 
   XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions, 
-  XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions, DocumentWithSettings
+  XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions, 
+  DocumentWithSettings, XMLBuilderOptionKeys
 } from './builder/interfaces'
 import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
@@ -313,12 +314,10 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
 function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {
   if (!isPlainObject(obj)) return false
   
-  const keys = new Set(["version", "encoding", "standalone", "keepNullNodes",
-    "keepNullAttributes", "ignoreConverters", "convert"])
   for (const key in obj) {
     /* istanbul ignore else */
     if (obj.hasOwnProperty(key)) {
-      if (!keys.has(key)) return false
+      if (!XMLBuilderOptionKeys.has(key)) return false
     }
   }
   return true

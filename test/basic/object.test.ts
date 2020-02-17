@@ -17,7 +17,7 @@ describe('object', () => {
           street: "End of long and winding road"
         },
         contact: {
-          phone: [ "555-1234", "555-1235" ]
+          phone: ["555-1234", "555-1235"]
         },
         id: () => 42,
         details: {
@@ -82,7 +82,7 @@ describe('object', () => {
     details.set("#", "classified")
 
     const doc = $$.create().ele('root').ele(obj).doc()
-    
+
     expect($$.printTree(doc.node)).toBe($$.t`
       root
         ele
@@ -134,7 +134,7 @@ describe('object', () => {
 
   test('multiple cdata nodes', () => {
     const doc = $$.create().ele('root').ele({
-      '$': [ 'data1', 'data2' ]
+      '$': ['data1', 'data2']
     }).doc()
 
     expect($$.printTree(doc.node)).toBe($$.t`
@@ -146,7 +146,7 @@ describe('object', () => {
 
   test('multiple comment nodes', () => {
     const doc = $$.create().ele('root').ele({
-      '!': [ 'comment1', 'comment2' ]
+      '!': ['comment1', 'comment2']
     }).doc()
 
     expect($$.printTree(doc.node)).toBe($$.t`
@@ -158,7 +158,7 @@ describe('object', () => {
 
   test('multiple processing instruction nodes', () => {
     const doc = $$.create().ele('root').ele({
-      '?1': [ 'target0', 'target1 value1', 'target2 value2' ],
+      '?1': ['target0', 'target1 value1', 'target2 value2'],
       '?2': { target3: 'value3', target4: 'value4' }
     }).doc()
 
@@ -173,7 +173,7 @@ describe('object', () => {
   })
 
   test('empty nodes', () => {
-    const obj = { 
+    const obj = {
       root: {
         node1: [],
         node2: {},
@@ -189,7 +189,7 @@ describe('object', () => {
   })
 
   test('mixed content', () => {
-    const obj = { 
+    const obj = {
       root: {
         node1: "val1",
         "#": {
@@ -216,7 +216,7 @@ describe('object', () => {
   })
 
   test('namespace', () => {
-    const obj = { 
+    const obj = {
       root: {
         "@xmlns": "myns",
         node: "val",
@@ -231,8 +231,74 @@ describe('object', () => {
     `)
   })
 
+  test('namespace alias', () => {
+    const obj = {
+      'root@@ns': {
+        'xmlns:node@@xmlns': "val",
+      }
+    }
+    const doc = $$.create({ namespaceAlias: { ns: 'my-ns' } }).ele(obj).doc()
+
+    expect($$.printTree(doc.node)).toBe($$.t`
+      root (ns:my-ns)
+        xmlns:node (ns:http://www.w3.org/2000/xmlns/)
+          # val
+    `)
+  })
+
+  test('invalid namespace alias', () => {
+    const obj = {
+      'root@@ns': {
+        'node@@ns': "val",
+      }
+    }
+    expect(() => $$.create().ele(obj)).toThrow()
+  })
+
+  test('default namespace with alias', () => {
+    const obj = {
+      svg: {
+        '@width': 100,
+        '@height': 100,
+        circle: {
+          '@cx': 50,
+          '@cy': 50,
+          '@r': 25,
+          '@fill': 'blue'
+        }
+      }
+    }
+    const doc = $$.create({ defaultNamespace: { ele: '@svg', att: null } }).ele(obj).doc()
+
+    expect($$.printTree(doc.node)).toBe($$.t`
+      svg (ns:http://www.w3.org/2000/svg) width="100" (ns:null) height="100" (ns:null)
+        circle (ns:http://www.w3.org/2000/svg) cx="50" (ns:null) cy="50" (ns:null) r="25" (ns:null) fill="blue" (ns:null)
+    `)
+  })
+
+  test('default custom namespace', () => {
+    const obj = { ele: { '@att': 'val' } }
+    const doc = $$.create({ defaultNamespace: { ele: 'ele-ns', att: 'att-ns' } }).ele(obj).doc()
+
+    expect($$.printTree(doc.node)).toBe($$.t`
+      ele (ns:ele-ns) att="val" (ns:att-ns)
+    `)
+  })
+
+  test('invalid default namespace alias 1', () => {
+    const obj = { ele: { '@att': 'val' } }
+    const doc = $$.create({ defaultNamespace: { ele: '@ele-ns', att: 'att-ns' } })
+    expect(() => doc.ele(obj)).toThrow()
+  })
+
+  test('invalid default namespace alias 2', () => {
+    const obj = { ele: { '@att': 'val' } }
+    const doc = $$.create({ defaultNamespace: { ele: 'ele-ns', att: '@att-ns' } })
+    expect(() => doc.ele(obj)).toThrow()
+  })
+
   test('namespace prefix', () => {
-    const obj = { 
+    const obj = {
       "ns1:root": {
         "@xmlns:ns1": "myns",
         node: "val",
@@ -247,8 +313,19 @@ describe('object', () => {
     `)
   })
 
+  test('custom converter', () => {
+    const obj = {
+      'root': {
+        '_att': 'val',
+        '#': '42'
+      }
+    }
+    const doc = $$.create({ convert: { att: '_' } }).ele(obj).doc()
+    expect(doc.end({ headless: true })).toBe('<root att="val">42</root>')
+  })
+
   test('error if no nodes created', () => {
-    expect(() => $$.create().ele({ })).toThrow()
+    expect(() => $$.create().ele({})).toThrow()
   })
 
 })
