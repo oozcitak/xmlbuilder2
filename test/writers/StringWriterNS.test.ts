@@ -117,8 +117,8 @@ describe('StringWriter with namespaces', () => {
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <xml:root>
-        <xml:foo/>
-        <xml:bar/>
+        <foo/>
+        <bar/>
       </xml:root>
       `)
   })
@@ -143,7 +143,7 @@ describe('StringWriter with namespaces', () => {
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <r xmlns:x0="ns" xmlns:x2="ns">
-        <b xmlns:x1="ns" x1:name="v"/>
+        <b xmlns:x1="ns" xmlns:ns1="ns" ns1:name="v"/>
       </r>
       `)
   })
@@ -167,7 +167,7 @@ describe('StringWriter with namespaces', () => {
       .att('uri', 'p:name', 'v')
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
-      <r xmlns:xx="uri" xx:name="v"/>
+      <r xmlns:xx="uri" xmlns:p="uri" p:name="v"/>
       `)
 
     const doc2 = $$.create().ele('r', { "xmlns:xx": "uri" })
@@ -176,7 +176,7 @@ describe('StringWriter with namespaces', () => {
       .doc()
     expect(doc2.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <r xmlns:xx="uri">
-        <b xx:name="value"/>
+        <b xmlns:p="uri" p:name="value"/>
       </r>
       `)
   })

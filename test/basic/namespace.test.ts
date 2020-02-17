@@ -8,9 +8,14 @@ describe('namespaces', () => {
   test('inherit parent namespace', () => {
     const ns1 = 'http://example.com/ns1'
     const doc = $$.create().ele(ns1, 'root')
-      .ele('foo').ele('bar').txt('foobar').doc().node as any
+      .ele(ns1, 'foo').ele(ns1, 'bar').txt('foobar').doc().node as any
 
-    expect($$.serialize(doc)).toBe('<root xmlns="http://example.com/ns1"><foo><bar>foobar</bar></foo></root>')
+    expect($$.serialize(doc)).toBe(
+      '<root xmlns="http://example.com/ns1">' +
+        '<foo>' +
+          '<bar>foobar</bar>' +
+        '</foo>' +
+      '</root>')
 
     expect(doc.documentElement.namespaceURI).toBe(ns1)
     expect(doc.getElementsByTagName("foo")[0].namespaceURI).toBe(ns1)
@@ -18,14 +23,12 @@ describe('namespaces', () => {
   })
 
   test('namespace prefix', () => {
-    const xmlNs = 'http://www.w3.org/2000/xmlns/'
     const ns1 = 'http://example.com/ns1'
     const xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
-    const doc = $$.create().ele(ns1, 'root', {
-      "xmlns:xsi": xsi,
-      "xsi:schemaLocation": "http://example.com/n1 schema.xsd" })
-      .ele('foo').ele('bar').txt('foobar').doc().node as any
+    const doc = $$.create().ele(ns1, 'root')
+      .att(xsi, 'xsi:schemaLocation', 'http://example.com/n1 schema.xsd')
+      .ele(ns1, 'foo').ele(ns1, 'bar').txt('foobar').doc().node as any
 
     expect($$.serialize(doc)).toBe(
       '<root xmlns="http://example.com/ns1"' +
@@ -35,22 +38,17 @@ describe('namespaces', () => {
           '<bar>foobar</bar>' +
         '</foo>' +
       '</root>')
-
-    expect(doc.documentElement.namespaceURI).toBe(ns1)
-    expect(doc.documentElement.getAttributeNode("xmlns:xsi").namespaceURI).toBe(xmlNs)
-    expect(doc.documentElement.getAttributeNode("xsi:schemaLocation").namespaceURI).toBe(xsi)
-    expect(doc.getElementsByTagName("foo")[0].namespaceURI).toBe(ns1)
-    expect(doc.getElementsByTagName("bar")[0].namespaceURI).toBe(ns1)
   })
 
   test('child namespace declared on parent', () => {
-    const xmlNs = 'http://www.w3.org/2000/xmlns/'
     const svgNs = 'http://www.w3.org/2000/svg'
     const xlinkNs = 'http://www.w3.org/1999/xlink'
 
-    const doc = $$.create().ele(svgNs, 'svg', { 
-      "xmlns:xlink": xlinkNs })
-      .ele('script', { type: "text/ecmascript", "xlink:href": "foo.js" })
+    const doc = $$.create().ele(svgNs, 'svg')
+      .att('http://www.w3.org/2000/xmlns/', 'xmlns:xlink', xlinkNs)
+      .ele(svgNs, 'script')
+        .att('type', 'text/ecmascript')
+        .att(xlinkNs, 'xlink:href', 'foo.js')
       .doc().node as any
 
     expect($$.serialize(doc)).toBe(
@@ -58,13 +56,6 @@ describe('namespaces', () => {
         ' xmlns:xlink="http://www.w3.org/1999/xlink">' +
         '<script type="text/ecmascript" xlink:href="foo.js"/>' +
       '</svg>')
-
-    expect(doc.documentElement.namespaceURI).toBe(svgNs)
-    expect(doc.documentElement.getAttributeNode("xmlns:xlink").namespaceURI).toBe(xmlNs)
-    const script = doc.getElementsByTagName("script")[0]
-    expect(script.namespaceURI).toBe(svgNs)
-    expect(script.getAttributeNode("type").namespaceURI).toBeNull()
-    expect(script.getAttributeNode("xlink:href").namespaceURI).toBe(xlinkNs)
   })
 
   test('add attribute with namespace', () => {

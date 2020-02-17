@@ -7,7 +7,6 @@ import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
-import { namespace as infraNamespace } from "@oozcitak/infra"
 import {
   StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
 } from "../writers"
@@ -163,21 +162,8 @@ export class XMLBuilderImpl implements XMLBuilder {
             lastChild = this.ele(childNode)
           }, this)
         } else if (isMap(val) || isObject(val)) {
-          // check for a namespace declaration attribute
-          let attNamespace: string | undefined
-          const qName = namespace_extractQName(key)
-          forEachObject(val, (attName, attValue) => {
-            if (attName[0] === this._options.convert.att) {
-              const attQName = namespace_extractQName(attName.slice(1))
-              if ((attQName[0] === null && attQName[1] === "xmlns") ||
-                (attQName[0] === "xmlns" && attQName[1] === qName[0])) {
-                attNamespace = attValue
-              }
-            }
-          }, this)
-
           // create a parent node
-          lastChild = this._node(attNamespace, key)
+          lastChild = this._node(null, key)
 
           // expand child nodes under parent
           lastChild.ele(val)
