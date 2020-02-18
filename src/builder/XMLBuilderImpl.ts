@@ -227,28 +227,23 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
 
     // get primitive values
-    p1 = getValue(p1)
-    if (p2 !== undefined && p2 !== null) {
-      p2 = getValue(p2)
-    }
-    if (p3 !== undefined && p3 !== null) {
-      p3 = getValue(p3)
-    }
+    if (p1 !== undefined && p1 !== null) p1 = getValue(p1 + "")
+    if (p2 !== undefined && p2 !== null) p2 = getValue(p2 + "")
+    if (p3 !== undefined && p3 !== null) p3 = getValue(p3 + "")
 
     let namespace: string | null | undefined
     let name: string | undefined
     let value: string
 
-    if (p1 !== undefined && p2 !== undefined && p3 !== undefined) {
+    if ((p1 === null || isString(p1)) && isString(p2) && (p3 === null || isString(p3))) {
       // att(namespace: string, name: string, value: string)
-      [namespace, name, value] = [p1 as string, p2, p3]
-    } else if (p1 !== undefined && p2 !== undefined) {
+      [namespace, name, value] = [p1, p2, p3]
+    } else if (isString(p1) && (p2 === null || isString(p2))) {
       // ele(name: string, value: string)
-      [namespace, name, value] = [undefined, p1 as string, p2]
+      [namespace, name, value] = [undefined, p1, p2]
     } else {
       throw new Error("Attribute name and value not specified. " + this._debugInfo())
     }
-    [namespace, name] = this._extractNamespace(namespace, name, false)
 
     if (this._options.keepNullAttributes && (value === null)) {
       // keep null attributes
@@ -259,11 +254,12 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
 
     const ele = this.node as Element
+    [namespace, name] = this._extractNamespace(namespace, name, false)
 
     if (namespace !== undefined) {
-      ele.setAttributeNS(namespace + "", name + "", value + "")
+      ele.setAttributeNS(namespace, name, value)
     } else {
-      ele.setAttribute(name + "", value + "")
+      ele.setAttribute(name, value)
     }
 
     return this

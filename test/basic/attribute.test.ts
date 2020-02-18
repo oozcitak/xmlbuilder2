@@ -16,6 +16,11 @@ describe('att()', () => {
       `)
   })
 
+  test('add attribute - undefined namespace', () => {
+    const root = $$.create().ele('root')
+    expect(() => root.att(undefined as any, 'att', 'val')).toThrow()
+  })
+
   test('add multiple attributes', () => {
     const root = $$.create().ele('root')
     const node1 = root.ele('node1')
