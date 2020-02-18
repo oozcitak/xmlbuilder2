@@ -42,12 +42,13 @@ export interface XMLBuilderCreateOptions {
    * Defines string keys used while converting JS objects to nodes.
    */
   convert?: Partial<ConvertOptions>
-  /**
-   * Defines an object with namespace aliases. These aliases can be used instead
-   * of actual namespaces by appending them to element and attribute names after
-   * '@@'.
+    /**
+   * Defines default namespaces to apply to all elements and attributes.
    */
-  namespaceAlias?: { [key: string]: string }  
+  defaultNamespace?: { 
+    ele?: null | string, 
+    att?: null | string 
+  }
 }
 
 /**
@@ -84,17 +85,11 @@ export interface XMLBuilderOptions {
    */
   convert: ConvertOptions
   /**
-   * Defines an object with namespace aliases. These aliases can be used instead
-   * of actual namespaces by appending them to element and attribute names after
-   * '@@'.
-   */
-  namespaceAlias: { [key: string]: string }
-  /**
    * Defines default namespaces to apply to all elements and attributes.
    */
   defaultNamespace: { 
-    "ele": undefined | null | string, 
-    "att": undefined | null | string 
+    ele: undefined | null | string, 
+    att: undefined | null | string 
   }
 }
 
@@ -103,7 +98,7 @@ export interface XMLBuilderOptions {
  */
 export const XMLBuilderOptionKeys = new Set([
   "version", "encoding", "standalone", "keepNullNodes", "keepNullAttributes",
-  "ignoreConverters", "convert", "namespaceAlias", "defaultNamespace"
+  "ignoreConverters", "convert", "defaultNamespace"
 ])
 
 /**
@@ -248,14 +243,6 @@ export const DefaultBuilderOptions: Partial<XMLBuilderOptions> = {
     text: "#",
     cdata: "$",
     comment: "!"
-  },
-  namespaceAlias: {
-    html: "http://www.w3.org/1999/xhtml",
-    xml: "http://www.w3.org/XML/1998/namespace",
-    xmlns: "http://www.w3.org/2000/xmlns/",
-    mathml: "http://www.w3.org/1998/Math/MathML",
-    svg: "http://www.w3.org/2000/svg",
-    xlink: "http://www.w3.org/1999/xlink"
   },
   defaultNamespace: {
     ele: undefined,
@@ -477,8 +464,7 @@ export interface XMLBuilder {
    * 
    * @returns the new element node
    */
-  ele(namespace: string, name: string,
-    attributes?: AttributesObject): XMLBuilder
+  ele(namespace: string, name: string, attributes?: AttributesObject): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -516,7 +502,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  att(namespace: string, name: string, value: string): XMLBuilder
+  att(namespace: string | null, name: string, value: string): XMLBuilder
 
   /**
    * Creates or updates an element attribute.

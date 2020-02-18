@@ -69,19 +69,6 @@ describe('att()', () => {
     expect(() => (root as any).removeAtt(['ns1', 'ns2'], ['att1', 'att2', 'att4'])).toThrow()
   })
 
-  test('remove attribute with alias', () => {
-    const doc = $$.create({ namespaceAlias: { ns: 'my-ns' } }).ele('root')
-      .att('@ns', 'att1', 'val1')
-      .att('att2', 'val2')
-      .att('@ns', 'att3', 'val3')
-      .removeAtt('@ns', ['att1', 'att3'])
-    .doc()
-
-    expect($$.printTree(doc.node)).toBe($$.t`
-      root att2="val2"
-    `)
-  })
-
   test('attribute from JS object', () => {
     const root = $$.create().ele('root')
     root.ele('node').ele({ '@att1': 'val1', '@att2': 'val2' })

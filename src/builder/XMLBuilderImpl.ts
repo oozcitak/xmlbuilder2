@@ -45,7 +45,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   ele(p1: string | ExpandObject, p2?: AttributesObject | string,
     p3?: AttributesObject): XMLBuilder {
 
-    let namespace: string | undefined
+    let namespace: string | null | undefined
     let name: string | ExpandObject | undefined
     let attributes: AttributesObject | undefined
 
@@ -77,7 +77,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else if (isObject(p1)) {
       // ele(obj: ExpandObject)
       [namespace, name, attributes] = [undefined, p1, undefined]
-    } else if (isString(p1) && isString(p2)) {
+    } else if ((p1 === null || isString(p1)) && isString(p2)) {
       // ele(namespace: string, name: string, attributes?: AttributesObject)
       [namespace, name, attributes] = [p1, p2, p3]
     } else if (isString(p1) && isObject(p2)) {
@@ -163,8 +163,7 @@ export class XMLBuilderImpl implements XMLBuilder {
           }, this)
         } else if (isMap(val) || isObject(val)) {
           // create a parent node
-          [namespace, name] = this._extractNamespace(key)
-          lastChild = this._node(namespace, name)
+          lastChild = this.ele(key)
 
           // expand child nodes under parent
           lastChild.ele(val)
@@ -178,8 +177,31 @@ export class XMLBuilderImpl implements XMLBuilder {
         }
       }, this)
     } else {
-      // element node
-      lastChild = this._node(namespace, name, attributes)
+      namespace = this._lookupDefaultNamespace(namespace, true)
+      name += ""
+  
+      // create a child element node
+      const childNode = (namespace !== undefined ?
+        this._doc.createElementNS(namespace, name) :
+        this._doc.createElement(name)
+      )
+  
+      this.node.appendChild(childNode)
+      lastChild = new XMLBuilderImpl(childNode)
+  
+      // update doctype node if the new node is the document element node
+      const oldDocType = this._doc.doctype
+      if (childNode === this._doc.documentElement && oldDocType !== null) {
+        const docType = this._doc.implementation.createDocumentType(
+          this._doc.documentElement.tagName,
+          oldDocType.publicId, oldDocType.systemId)
+        this._doc.replaceChild(docType, oldDocType)
+      }
+  
+      // create attributes
+      if (attributes && !isEmpty(attributes)) {
+        lastChild.att(attributes)
+      }
     }
 
     if (lastChild === null) {
@@ -198,7 +220,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  att(p1: AttributesObject | string, p2?: string, p3?: string): XMLBuilder {
+  att(p1: AttributesObject | string | null, p2?: string, p3?: string): XMLBuilder {
 
     if (isMap(p1) || isObject(p1)) {
       // att(obj: AttributesObject)
@@ -223,7 +245,6 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (p1 !== undefined && p2 !== undefined && p3 !== undefined) {
       // att(namespace: string, name: string, value: string)
       [namespace, name, value] = [p1 as string, p2, p3]
-      namespace = this._applyNamespaceAlias(namespace)
     } else if (p1 !== undefined && p2 !== undefined) {
       // ele(name: string, value: string)
       [namespace, name] = this._extractNamespace(p1 as string)
@@ -280,7 +301,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         namespace === undefined ? this.removeAtt(attName) : this.removeAtt(namespace, attName), this)
     } else if (namespace !== undefined) {
       // removeAtt(namespace: string, name: string)
-      (this.node as Element).removeAttributeNS(this._applyNamespaceAlias(namespace), name + "")
+      (this.node as Element).removeAttributeNS(namespace, name + "")
     } else {
       // removeAtt(name: string)
       (this.node as Element).removeAttribute(name + "")
@@ -659,46 +680,6 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /**
-   * Creates a new element node and appends it to the list of child nodes.
-   * 
-   * @param name - element name
-   * @param attributes - a JS object with element attributes
-   * @param text - contents of a text child node
-   *  
-   * @returns the new element node
-   */
-  private _node(namespace: string | null | undefined, name: string,
-    attributes?: AttributesObject): XMLBuilder {
-
-    namespace = this._lookupDefaultNamespace(namespace, true)
-    name += ""
-
-    const child = (namespace !== undefined ?
-      this._doc.createElementNS(namespace, name) :
-      this._doc.createElement(name)
-    )
-
-    this.node.appendChild(child)
-    const builder = new XMLBuilderImpl(child)
-
-    // update doctype node if the new node is the document element node
-    const oldDocType = this._doc.doctype
-    if (child === this._doc.documentElement && oldDocType !== null) {
-      const docType = this._doc.implementation.createDocumentType(
-        this._doc.documentElement.tagName,
-        oldDocType.publicId, oldDocType.systemId)
-      this._doc.replaceChild(docType, oldDocType)
-    }
-
-    // create attributes
-    if (attributes && !isEmpty(attributes)) {
-      builder.att(attributes)
-    }
-
-    return builder
-  }
-
-  /**
    * Creates a dummy element node without adding it to the list of child nodes.
    * 
    * Dummy nodes are special nodes representing a node with a `null` value. 
@@ -723,25 +704,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (atIndex <= 0) {
       return [undefined, str]
     } else {
-      return [this._applyNamespaceAlias(str.slice(atIndex + 1)), str.slice(0, atIndex)]
-    }
-  }
-
-  /**
-   * Converts a namespace alias to a namespace.
-   * 
-   * @param str - a string containing a namespace alias
-   */
-  private _applyNamespaceAlias(str: string): string {
-    if (str[0] === '@') {
-      const alias = str.slice(1)
-      const namespace = this._options.namespaceAlias[alias]
-      if (namespace === undefined) {
-        throw new Error(`Namespace alias "${alias}" not defined.`)
-      }
-      return namespace
-    } else {
-      return str
+      return [str.slice(atIndex + 1), str.slice(0, atIndex)]
     }
   }
 
@@ -756,9 +719,6 @@ export class XMLBuilderImpl implements XMLBuilder {
       const defaultNS = (ele ? this._options.defaultNamespace.ele : this._options.defaultNamespace.att)
       if (defaultNS !== undefined) {
         namespace = defaultNS
-        if (namespace !== null && namespace !== undefined) {
-          namespace = this._applyNamespaceAlias(namespace)
-        }
       }
     }
     return namespace

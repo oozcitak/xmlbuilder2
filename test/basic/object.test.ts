@@ -231,51 +231,6 @@ describe('object', () => {
     `)
   })
 
-  test('namespace alias', () => {
-    const obj = {
-      'root@@ns': {
-        'xmlns:node@@xmlns': "val",
-      }
-    }
-    const doc = $$.create({ namespaceAlias: { ns: 'my-ns' } }).ele(obj).doc()
-
-    expect($$.printTree(doc.node)).toBe($$.t`
-      root (ns:my-ns)
-        xmlns:node (ns:http://www.w3.org/2000/xmlns/)
-          # val
-    `)
-  })
-
-  test('invalid namespace alias', () => {
-    const obj = {
-      'root@@ns': {
-        'node@@ns': "val",
-      }
-    }
-    expect(() => $$.create().ele(obj)).toThrow()
-  })
-
-  test('default namespace with alias', () => {
-    const obj = {
-      svg: {
-        '@width': 100,
-        '@height': 100,
-        circle: {
-          '@cx': 50,
-          '@cy': 50,
-          '@r': 25,
-          '@fill': 'blue'
-        }
-      }
-    }
-    const doc = $$.create({ defaultNamespace: { ele: '@svg', att: null } }).ele(obj).doc()
-
-    expect($$.printTree(doc.node)).toBe($$.t`
-      svg (ns:http://www.w3.org/2000/svg) width="100" (ns:null) height="100" (ns:null)
-        circle (ns:http://www.w3.org/2000/svg) cx="50" (ns:null) cy="50" (ns:null) r="25" (ns:null) fill="blue" (ns:null)
-    `)
-  })
-
   test('default custom namespace', () => {
     const obj = { ele: { '@att': 'val' } }
     const doc = $$.create({ defaultNamespace: { ele: 'ele-ns', att: 'att-ns' } }).ele(obj).doc()
@@ -283,18 +238,6 @@ describe('object', () => {
     expect($$.printTree(doc.node)).toBe($$.t`
       ele (ns:ele-ns) att="val" (ns:att-ns)
     `)
-  })
-
-  test('invalid default namespace alias 1', () => {
-    const obj = { ele: { '@att': 'val' } }
-    const doc = $$.create({ defaultNamespace: { ele: '@ele-ns', att: 'att-ns' } })
-    expect(() => doc.ele(obj)).toThrow()
-  })
-
-  test('invalid default namespace alias 2', () => {
-    const obj = { ele: { '@att': 'val' } }
-    const doc = $$.create({ defaultNamespace: { ele: 'ele-ns', att: '@att-ns' } })
-    expect(() => doc.ele(obj)).toThrow()
   })
 
   test('namespace prefix', () => {
