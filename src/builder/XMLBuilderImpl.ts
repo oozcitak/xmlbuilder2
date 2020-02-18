@@ -42,7 +42,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  ele(p1: string | ExpandObject, p2?: AttributesObject | string,
+  ele(p1: string | null | ExpandObject, p2?: AttributesObject | string,
     p3?: AttributesObject): XMLBuilder {
 
     let namespace: string | null | undefined
@@ -80,13 +80,11 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else if ((p1 === null || isString(p1)) && isString(p2)) {
       // ele(namespace: string, name: string, attributes?: AttributesObject)
       [namespace, name, attributes] = [p1, p2, p3]
-    } else if (isString(p1) && isObject(p2)) {
-      // ele(name: string, attributes: AttributesObject)
-      [namespace, name] = this._extractNamespace(p1)
-      attributes = p2
+    } else if (p1 !== null) {
+      // ele(name: string, attributes?: AttributesObject)
+      [namespace, name, attributes] = [undefined, p1, isObject(p2) ? p2 : undefined]
     } else {
-      // ele(name: string)
-      [namespace, name] = this._extractNamespace(p1)
+      throw new Error("Element name cannot be null. " + this._debugInfo())
     }
 
     if (attributes) {
@@ -177,18 +175,17 @@ export class XMLBuilderImpl implements XMLBuilder {
         }
       }, this)
     } else {
-      namespace = this._lookupDefaultNamespace(namespace, true)
-      name += ""
-  
+      [namespace, name] = this._extractNamespace(namespace, name, true)
+
       // create a child element node
       const childNode = (namespace !== undefined ?
         this._doc.createElementNS(namespace, name) :
         this._doc.createElement(name)
       )
-  
+
       this.node.appendChild(childNode)
       lastChild = new XMLBuilderImpl(childNode)
-  
+
       // update doctype node if the new node is the document element node
       const oldDocType = this._doc.doctype
       if (childNode === this._doc.documentElement && oldDocType !== null) {
@@ -197,7 +194,7 @@ export class XMLBuilderImpl implements XMLBuilder {
           oldDocType.publicId, oldDocType.systemId)
         this._doc.replaceChild(docType, oldDocType)
       }
-  
+
       // create attributes
       if (attributes && !isEmpty(attributes)) {
         lastChild.att(attributes)
@@ -247,12 +244,11 @@ export class XMLBuilderImpl implements XMLBuilder {
       [namespace, name, value] = [p1 as string, p2, p3]
     } else if (p1 !== undefined && p2 !== undefined) {
       // ele(name: string, value: string)
-      [namespace, name] = this._extractNamespace(p1 as string)
-      value = p2
+      [namespace, name, value] = [undefined, p1 as string, p2]
     } else {
       throw new Error("Attribute name and value not specified. " + this._debugInfo())
     }
-    namespace = this._lookupDefaultNamespace(namespace, false)
+    [namespace, name] = this._extractNamespace(namespace, name, false)
 
     if (this._options.keepNullAttributes && (value === null)) {
       // keep null attributes
@@ -274,7 +270,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  removeAtt(p1: string | string[], p2?: string | string[]): XMLBuilder {
+  removeAtt(p1: string | null | string[], p2?: string | string[]): XMLBuilder {
 
     // get primitive values
     p1 = getValue(p1)
@@ -282,12 +278,12 @@ export class XMLBuilderImpl implements XMLBuilder {
       p2 = getValue(p2)
     }
 
-    let namespace: undefined | string
+    let namespace: undefined | null | string
     let name: string | string[]
 
-    if (p2 === undefined) {
+    if (p1 !== null && p2 === undefined) {
       name = p1
-    } else if (isString(p1)) {
+    } else if ((p1 === null || isString(p1)) && p2 !== undefined) {
       namespace = p1
       name = p2
     } else {
@@ -297,7 +293,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (isArray(name) || isSet(name)) {
       // removeAtt(names: string[])
       // removeAtt(namespace: string, names: string[])
-      forEachArray(name, attName => 
+      forEachArray(name, attName =>
         namespace === undefined ? this.removeAtt(attName) : this.removeAtt(namespace, attName), this)
     } else if (namespace !== undefined) {
       // removeAtt(namespace: string, name: string)
@@ -696,32 +692,24 @@ export class XMLBuilderImpl implements XMLBuilder {
   /**
    * Extracts a namespace and name from the given string.
    * 
-   * @param str - a string containing both a name and namespace separated by an
-   * '@' character
-   */
-  private _extractNamespace(str: string): [string | undefined, string] {
-    const atIndex = str.indexOf("@")
-    if (atIndex <= 0) {
-      return [undefined, str]
-    } else {
-      return [str.slice(atIndex + 1), str.slice(0, atIndex)]
-    }
-  }
-
-  /**
-   * Looks-up a default namespace.
-   * 
    * @param namespace - namespace
+   * @param name - a string containing both a name and namespace separated by an
+   * '@' character
    * @param ele - `true` if this is an element namespace; otherwise `false`
    */
-  private _lookupDefaultNamespace(namespace: string | undefined | null, ele: boolean): string | undefined | null {
-    if (namespace === undefined) {
-      const defaultNS = (ele ? this._options.defaultNamespace.ele : this._options.defaultNamespace.att)
-      if (defaultNS !== undefined) {
-        namespace = defaultNS
-      }
+  private _extractNamespace(namespace: string | null | undefined, name: string, ele: boolean): [string | null | undefined, string] {
+    // extract from name
+    const atIndex = name.indexOf("@")
+    if (atIndex > 0) {
+      if (namespace === undefined) namespace = name.slice(atIndex + 1)
+      name = name.slice(0, atIndex)
     }
-    return namespace
+    // look-up default namespace
+    if (namespace === undefined) {
+      namespace = (ele ? this._options.defaultNamespace.ele : this._options.defaultNamespace.att)
+    }
+
+    return [namespace, name]
   }
 
   /**

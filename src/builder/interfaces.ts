@@ -415,10 +415,6 @@ export type ExpandObject = { [key: string]: any } | Map<string, any> |
  */
 export type AttributesObject = Map<string, any> | {
   /**
-   * Default namespace
-   */
-  xmlns?: string | null,
-  /**
    * Attribute key/value pairs
    */
   [key: string]: any
@@ -464,7 +460,7 @@ export interface XMLBuilder {
    * 
    * @returns the new element node
    */
-  ele(namespace: string, name: string, attributes?: AttributesObject): XMLBuilder
+  ele(namespace: string | null, name: string, attributes?: AttributesObject): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -524,7 +520,7 @@ export interface XMLBuilder {
   att(obj: AttributesObject): XMLBuilder
 
   /**
-   * Removes an attribute
+   * Removes an attribute.
    * 
    * @param name - attribute name
    * 
@@ -542,14 +538,14 @@ export interface XMLBuilder {
   removeAtt(names: string[]): XMLBuilder
 
   /**
-   * Removes an attribute
+   * Removes an attribute.
    * 
    * @param namespace - namespace of the attribute to remove
    * @param name - attribute name
    * 
    * @returns current element node
    */
-  removeAtt(namespace: string, name: string): XMLBuilder
+  removeAtt(namespace: string | null, name: string): XMLBuilder
 
   /**
    * Removes a list of attributes.
@@ -559,7 +555,7 @@ export interface XMLBuilder {
    * 
    * @returns current element node
    */
-  removeAtt(namespace: string, names: string[]): XMLBuilder
+  removeAtt(namespace: string | null, names: string[]): XMLBuilder
 
   /**
    * Creates a new text node and appends it to the list of child nodes.

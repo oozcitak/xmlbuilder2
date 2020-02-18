@@ -24,6 +24,15 @@ describe('ele()', () => {
       `)
   })
 
+  test('null name', () => {
+    expect(() => $$.create().ele(null as any)).toThrow()
+  })
+
+  test('element namespace cannot be overwritten', () => {
+    const root = $$.create().ele('ns1', 'root@ns2')
+    expect((root.node as any).namespaceURI).toBe('ns1')
+  })
+
   test('from JS object', () => {
     const root = $$.create().ele('root')
     root.ele({
