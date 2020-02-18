@@ -108,4 +108,39 @@ describe('namespaces', () => {
     expect($$.serialize(doc.node)).toBe('<root/>')
   })
 
+  test('built-in namespace alias', () => {
+    const doc1 = $$.create().ele('@xml', 'root').att('@xml', 'att', 'val')
+    expect($$.serialize(doc1.node)).toBe('<xml:root xml:att="val"/>')
+    const doc2 = $$.create().ele('@svg', 'root')
+    expect($$.serialize(doc2.node)).toBe('<root xmlns="http://www.w3.org/2000/svg"/>')
+  })
+
+  test('custom namespace alias', () => {
+    const doc = $$.create({ namespaceAlias: { ns: "ns1" } }).ele('@ns', 'p:root').att('@ns', 'p:att', 'val')
+    expect($$.serialize(doc.node)).toBe('<p:root xmlns:p="ns1" p:att="val"/>')
+  })
+
+  test('invalid namespace alias', () => {
+    const doc = $$.create({ namespaceAlias: { ns: "ns1" } })
+    expect(() => doc.ele('@ns1', 'root')).toThrow()
+  })
+
+  test('built-in namespace alias with JS object', () => {
+    const doc1 = $$.create().ele({ 'root@@xml': { '@att@@xml': 'val' }})
+    expect($$.serialize(doc1.node)).toBe('<xml:root xml:att="val"/>')
+    const doc2 = $$.create().ele({ 'root@@svg': {} })
+    expect($$.serialize(doc2.node)).toBe('<root xmlns="http://www.w3.org/2000/svg"/>')
+  })
+
+  test('custom namespace alias with JS object', () => {
+    const doc = $$.create({ namespaceAlias: { ns: "ns1" } })
+      .ele({ 'p:root@@ns': { '@p:att@@ns': 'val' } })
+    expect($$.serialize(doc.node)).toBe('<p:root xmlns:p="ns1" p:att="val"/>')
+  })
+
+  test('invalid namespace alias with JS object', () => {
+    const doc = $$.create({ namespaceAlias: { ns: "ns1" } })
+    expect(() => doc.ele({ 'root@@ns1': {} })).toThrow()
+  })
+
 })

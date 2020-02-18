@@ -42,13 +42,17 @@ export interface XMLBuilderCreateOptions {
    * Defines string keys used while converting JS objects to nodes.
    */
   convert?: Partial<ConvertOptions>
-    /**
+  /**
    * Defines default namespaces to apply to all elements and attributes.
    */
   defaultNamespace?: { 
     ele?: null | string, 
     att?: null | string 
   }
+  /**
+   * Defines namespace aliases.
+   */
+  namespaceAlias?: { [key: string]: string | null }
 }
 
 /**
@@ -91,6 +95,10 @@ export interface XMLBuilderOptions {
     ele: undefined | null | string, 
     att: undefined | null | string 
   }
+  /**
+   * Defines namespace aliases.
+   */
+  namespaceAlias: { [key: string]: string | null }
 }
 
 /**
@@ -98,7 +106,7 @@ export interface XMLBuilderOptions {
  */
 export const XMLBuilderOptionKeys = new Set([
   "version", "encoding", "standalone", "keepNullNodes", "keepNullAttributes",
-  "ignoreConverters", "convert", "defaultNamespace"
+  "ignoreConverters", "convert", "defaultNamespace", "namespaceAlias"
 ])
 
 /**
@@ -247,6 +255,14 @@ export const DefaultBuilderOptions: Partial<XMLBuilderOptions> = {
   defaultNamespace: {
     ele: undefined,
     att: undefined
+  },
+  namespaceAlias: {
+    html: "http://www.w3.org/1999/xhtml",
+    xml: "http://www.w3.org/XML/1998/namespace",
+    xmlns: "http://www.w3.org/2000/xmlns/",
+    mathml: "http://www.w3.org/1998/Math/MathML",
+    svg: "http://www.w3.org/2000/svg",
+    xlink: "http://www.w3.org/1999/xlink"
   }
 }
 

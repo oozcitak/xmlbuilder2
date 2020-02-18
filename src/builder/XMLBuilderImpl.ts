@@ -700,9 +700,17 @@ export class XMLBuilderImpl implements XMLBuilder {
       if (namespace === undefined) namespace = name.slice(atIndex + 1)
       name = name.slice(0, atIndex)
     }
-    // look-up default namespace
+
     if (namespace === undefined) {
+      // look-up default namespace
       namespace = (ele ? this._options.defaultNamespace.ele : this._options.defaultNamespace.att)
+    } else if (namespace !== null && namespace[0] === "@") {
+      // look-up namespace aliases
+      const alias = namespace.slice(1)
+      namespace = this._options.namespaceAlias[alias]
+      if (namespace === undefined) {
+        throw new Error("Namespace alias `" + alias + "` is not defined. " + this._debugInfo())
+      }
     }
 
     return [namespace, name]
@@ -718,7 +726,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else {
       const docNode = node.ownerDocument
       /* istanbul ignore next */
-      if (!docNode) throw new Error("Owner document is null")
+      if (!docNode) throw new Error("Owner document is null. " + this._debugInfo())
       return docNode
     }
   }
