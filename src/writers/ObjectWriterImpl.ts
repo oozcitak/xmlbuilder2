@@ -161,6 +161,12 @@ export class ObjectWriterImpl {
       }
     }
 
+    const defAttrKey = this._getAttrKey()
+    const defTextKey = this._getNodeKey(NodeType.Text)
+    const defCommentKey = this._getNodeKey(NodeType.Comment)
+    const defInstructionKey = this._getNodeKey(NodeType.ProcessingInstruction)
+    const defCdataKey = this._getNodeKey(NodeType.CData)
+
     if (textCount === 1 && items.length === 1 && isString((items[0] as TextNode)["#"])) {
       // special case of an element node with a single text node
       return (items[0] as TextNode)["#"]
@@ -168,7 +174,7 @@ export class ObjectWriterImpl {
       // list contains element nodes with non-unique names
       // return an array with mixed content notation
       const result: XMLSerializedValue = []
-      const obj: XMLSerializedValue = { "#": result }
+      const obj: XMLSerializedValue = { [defTextKey]: result }
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
         const key = Object.keys(item)[0]
@@ -177,26 +183,22 @@ export class ObjectWriterImpl {
             const attrs = (item as AttrNode)["@"]
             const attrKeys = Object.keys(attrs)
             if (attrKeys.length === 1) {
-              result.push({ [this._getAttrKey() + attrKeys[0]]: attrs[attrKeys[0]] })
+              result.push({ [defAttrKey + attrKeys[0]]: attrs[attrKeys[0]] })
             } else {
-              result.push({ [this._getAttrKey()]: (item as AttrNode)["@"] })
+              result.push({ [defAttrKey]: (item as AttrNode)["@"] })
             }
             break
           case "#":
-            const textKey = this._getNodeKey(NodeType.Text)
-            result.push({ [textKey]: (item as TextNode)["#"] })
+            result.push({ [defTextKey]: (item as TextNode)["#"] })
             break
           case "!":
-            const commentKey = this._getNodeKey(NodeType.Comment)
-            result.push({ [commentKey]: (item as CommentNode)["!"] })
+            result.push({ [defCommentKey]: (item as CommentNode)["!"] })
             break
           case "?":
-            const instructionKey = this._getNodeKey(NodeType.ProcessingInstruction)
-            result.push({ [instructionKey]: (item as InstructionNode)["?"] })
+            result.push({ [defInstructionKey]: (item as InstructionNode)["?"] })
             break
           case "$":
-            const cdataKey = this._getNodeKey(NodeType.CData)
-            result.push({ [cdataKey]: (item as CDATANode)["$"] })
+            result.push({ [defCdataKey]: (item as CDATANode)["$"] })
             break
           default:
             // element node
@@ -233,25 +235,25 @@ export class ObjectWriterImpl {
             const attrs = (item as AttrNode)["@"]
             const attrKeys = Object.keys(attrs)
             if (attrKeys.length === 1) {
-              obj[this._getAttrKey() + attrKeys[0]] = attrs[attrKeys[0]]
+              obj[defAttrKey + attrKeys[0]] = attrs[attrKeys[0]]
             } else {
-              obj[this._getAttrKey()] = (item as AttrNode)["@"]
+              obj[defAttrKey] = (item as AttrNode)["@"]
             }
             break
           case "#":
-            const textKey = textCount > 1 ? this._getNodeKey(NodeType.Text) + (textId++).toString() : this._getNodeKey(NodeType.Text)
+            const textKey = textCount > 1 ? defTextKey + (textId++).toString() : defTextKey
             obj[textKey] = (item as TextNode)["#"]
             break
           case "!":
-            const commentKey = commentCount > 1 ? this._getNodeKey(NodeType.Comment) + (commentId++).toString() : this._getNodeKey(NodeType.Comment)
+            const commentKey = commentCount > 1 ? defCommentKey + (commentId++).toString() : defCommentKey
             obj[commentKey] = (item as CommentNode)["!"]
             break
           case "?":
-            const instructionKey = instructionCount > 1 ? this._getNodeKey(NodeType.ProcessingInstruction) + (instructionId++).toString() : this._getNodeKey(NodeType.ProcessingInstruction)
+            const instructionKey = instructionCount > 1 ? defInstructionKey + (instructionId++).toString() : defInstructionKey
             obj[instructionKey] = (item as InstructionNode)["?"]
             break
           case "$":
-            const cdataKey = cdataCount > 1 ? this._getNodeKey(NodeType.CData) + (cdataId++).toString() : this._getNodeKey(NodeType.CData)
+            const cdataKey = cdataCount > 1 ? defCdataKey + (cdataId++).toString() : defCdataKey
             obj[cdataKey] = (item as CDATANode)["$"]
             break
           default:
