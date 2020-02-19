@@ -2,6 +2,7 @@ import $$ from '../TestHelpers'
 
 describe('Replicate issue', () => {
 
+  // https://github.com/oozcitak/xmlbuilder2/issues/1
   test('#1 - xmlns attribute added to the root element is shown on its child elements', () => {
     const doc = $$.create()
       .ele('SomeRootTag')
