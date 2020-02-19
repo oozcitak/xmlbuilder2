@@ -419,13 +419,6 @@ interface XMLSerializedMap extends Map<string, XMLSerializedValue> { }
 interface XMLSerializedArray extends Array<XMLSerializedValue> { }
 
 /**
- * Represents the type of a variable that can be expanded by the `ele` function 
- * into nodes.
- */
-export type ExpandObject = { [key: string]: any } | Map<string, any> |
-  any[] | Set<any> | ((...args: any) => any)
-
-/**
  * Represents the type of a variable that is a JS object defining
  * attributes.
  */
@@ -496,7 +489,7 @@ export interface XMLBuilder {
    * 
    * @returns the last top level element node created
    */
-  ele(obj: ExpandObject): XMLBuilder
+  ele(obj: XMLSerializedValue): XMLBuilder
 
   /**
    * Removes this node from the XML document.

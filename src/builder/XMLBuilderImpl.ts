@@ -1,7 +1,7 @@
 import {
-  XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
-  WriterOptions, XMLSerializedValue, DTDOptions,
-  DefaultBuilderOptions, PIObject, DocumentWithSettings
+  XMLBuilderOptions, XMLBuilder, AttributesObject, WriterOptions,
+  XMLSerializedValue, DTDOptions, DefaultBuilderOptions, PIObject,
+  DocumentWithSettings
 } from "./interfaces"
 import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
@@ -42,11 +42,11 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  ele(p1: string | null | ExpandObject, p2?: AttributesObject | string,
+  ele(p1: null | XMLSerializedValue, p2?: AttributesObject | string,
     p3?: AttributesObject): XMLBuilder {
 
     let namespace: string | null | undefined
-    let name: string | ExpandObject | undefined
+    let name: XMLSerializedValue | undefined
     let attributes: AttributesObject | undefined
 
     let lastChild: XMLBuilder | null = null
@@ -72,10 +72,10 @@ export class XMLBuilderImpl implements XMLBuilder {
       return lastChild
     } else if (isString(p1) && /^\s*[\{\[]/.test(p1)) {
       // parse JSON string
-      const obj = JSON.parse(p1) as ExpandObject
+      const obj = JSON.parse(p1) as XMLSerializedValue
       return this.ele(obj)
     } else if (isObject(p1)) {
-      // ele(obj: ExpandObject)
+      // ele(obj: XMLSerializedValue)
       [namespace, name, attributes] = [undefined, p1, undefined]
     } else if ((p1 === null || isString(p1)) && isString(p2)) {
       // ele(namespace: string, name: string, attributes?: AttributesObject)
@@ -109,7 +109,7 @@ export class XMLBuilderImpl implements XMLBuilder {
           if (key === this._options.convert.att) {
             lastChild = this.att(val)
           } else {
-            lastChild = this.att(key.substr(this._options.convert.att.length), val)
+            lastChild = this.att(key.substr(this._options.convert.att.length), val as string)
           }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.text) === 0) {
           // text node
@@ -124,14 +124,14 @@ export class XMLBuilderImpl implements XMLBuilder {
           if (isArray(val) || isSet(val)) {
             forEachArray(val, item => lastChild = this.dat(item), this)
           } else {
-            lastChild = this.dat(val)
+            lastChild = this.dat(val as string)
           }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.comment) === 0) {
           // comment node
           if (isArray(val) || isSet(val)) {
             forEachArray(val, item => lastChild = this.com(item), this)
           } else {
-            lastChild = this.com(val)
+            lastChild = this.com(val as string)
           }
         } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.ins) === 0) {
           // processing instruction
@@ -141,7 +141,7 @@ export class XMLBuilderImpl implements XMLBuilder {
             const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
             lastChild = this.ins(insTarget, insValue)
           } else {
-            lastChild = this.ins(val)
+            lastChild = this.ins(val as PIObject)
           }
         } else if ((isArray(val) || isSet(val)) && isEmpty(val)) {
           // skip empty arrays

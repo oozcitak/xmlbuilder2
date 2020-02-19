@@ -1,5 +1,5 @@
 import { 
-  XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions, 
+  XMLBuilderCreateOptions, XMLBuilder, WriterOptions, 
   XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions, 
   DocumentWithSettings, XMLBuilderOptionKeys
 } from './builder/interfaces'
@@ -97,7 +97,7 @@ export function create(options: XMLBuilderCreateOptions): XMLBuilder
  * 
  * @returns document node
  */
-export function create(contents: string | ExpandObject): XMLBuilder
+export function create(contents: XMLSerializedValue): XMLBuilder
 
 /**
  * Creates an XML document.
@@ -109,15 +109,15 @@ export function create(contents: string | ExpandObject): XMLBuilder
  * @returns document node
  */
 export function create(options: XMLBuilderCreateOptions,
-  contents: string | ExpandObject): XMLBuilder
+  contents: XMLSerializedValue): XMLBuilder
 
 /** @inheritdoc */
-export function create(p1?: XMLBuilderCreateOptions | string | ExpandObject, 
-  p2?: string | ExpandObject): XMLBuilder {
+export function create(p1?: XMLBuilderCreateOptions | XMLSerializedValue, 
+  p2?: XMLSerializedValue): XMLBuilder {
 
   const options = formatOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
     p1 : DefaultBuilderOptions)
-  const contents: string | ExpandObject | undefined = 
+  const contents: XMLSerializedValue | undefined = 
     isXMLBuilderCreateOptions(p1) ? p2 : p1
 
   let builder: XMLBuilder
@@ -145,7 +145,7 @@ export function create(p1?: XMLBuilderCreateOptions | string | ExpandObject,
     const doc = createDocument()
     builder = new XMLBuilderImpl(doc)
     setOptions(doc, options)
-    const obj = JSON.parse(contents) as ExpandObject
+    const obj = JSON.parse(contents) as XMLSerializedValue
     builder.ele(obj)
   }
 
@@ -176,7 +176,7 @@ export function fragment(options: XMLBuilderCreateOptions): XMLBuilder
  * 
  * @returns document fragment node
  */
-export function fragment(contents: string | ExpandObject): XMLBuilder
+export function fragment(contents: XMLSerializedValue): XMLBuilder
 
 /**
  * Creates a new document fragment.
@@ -188,15 +188,15 @@ export function fragment(contents: string | ExpandObject): XMLBuilder
  * @returns document fragment node
  */
 export function fragment(options: XMLBuilderCreateOptions,
-  contents: string | ExpandObject): XMLBuilder
+  contents: XMLSerializedValue): XMLBuilder
 
 /** @inheritdoc */
-export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
-  p2?: string | ExpandObject): XMLBuilder {
+export function fragment(p1?: XMLBuilderCreateOptions | XMLSerializedValue,
+  p2?: XMLSerializedValue): XMLBuilder {
 
   const options = formatOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
     p1 : DefaultBuilderOptions)
-  const contents: string | ExpandObject | undefined = 
+  const contents: XMLSerializedValue | undefined = 
     isXMLBuilderCreateOptions(p1) ? p2 : p1
 
   let builder: XMLBuilder
@@ -233,7 +233,7 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
     const doc = createDocument()
     setOptions(doc, options)
     builder = new XMLBuilderImpl(doc.createDocumentFragment())
-    const obj = JSON.parse(contents) as ExpandObject
+    const obj = JSON.parse(contents) as XMLSerializedValue
     builder.ele(obj)
   }
 
@@ -249,7 +249,7 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
  * 
  * @returns document node
  */
-export function convert(contents: string | ExpandObject): XMLSerializedValue
+export function convert(contents: XMLSerializedValue): XMLSerializedValue
 
 /**
  * Parses an XML document with the given options and converts it to the default
@@ -262,7 +262,7 @@ export function convert(contents: string | ExpandObject): XMLSerializedValue
  * @returns document node
  */
 export function convert(builderOptions: XMLBuilderCreateOptions, 
-  contents: string | ExpandObject): XMLSerializedValue
+  contents: XMLSerializedValue): XMLSerializedValue
 
 /**
  * Parses an XML document with the default options and converts it to the given
@@ -274,7 +274,7 @@ export function convert(builderOptions: XMLBuilderCreateOptions,
  * 
  * @returns document node
  */
-export function convert(contents: string | ExpandObject,
+export function convert(contents: XMLSerializedValue,
   convertOptions: WriterOptions): XMLSerializedValue
 
 /**
@@ -289,22 +289,22 @@ export function convert(contents: string | ExpandObject,
  * @returns document node
  */
 export function convert(builderOptions: XMLBuilderCreateOptions, 
-  contents: string | ExpandObject, convertOptions: WriterOptions): XMLSerializedValue
+  contents: XMLSerializedValue, convertOptions: WriterOptions): XMLSerializedValue
 
 /** @inheritdoc */
-export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject, 
-  p2?: string | ExpandObject | WriterOptions, p3?: WriterOptions): XMLSerializedValue {
+export function convert(p1: XMLBuilderCreateOptions | XMLSerializedValue, 
+  p2?: XMLSerializedValue | WriterOptions, p3?: WriterOptions): XMLSerializedValue {
 
   let builderOptions: XMLBuilderCreateOptions
-  let contents: string | ExpandObject
+  let contents: XMLSerializedValue
   let convertOptions: WriterOptions | undefined
   if (isXMLBuilderCreateOptions(p1) && p2 !== undefined) {
     builderOptions = p1
-    contents = p2
+    contents = p2 as XMLSerializedValue
     convertOptions = p3
   } else {
     builderOptions = DefaultBuilderOptions
-    contents = p1
+    contents = p1 as XMLSerializedValue
     convertOptions = p2 as WriterOptions || undefined
   }
 
