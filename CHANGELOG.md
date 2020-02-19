@@ -18,7 +18,7 @@ All notable changes to this project are documented in this file. This project ad
 
 ## [1.1.2] - 2020-02-17
 
-- Prevented child element namespaces to be inherited from their parent elements (issue #1).
+- Prevented child element namespaces to be inherited from their parent elements (See [#1](https://github.com/oozcitak/xmlbuilder2/issues/1)).
 - Fixed JS object parser to allow namespaces for both element nodes and attributes with the `{ "prefix:name@ns": {} }` notation.
 
 ## [1.1.1] - 2020-02-13
