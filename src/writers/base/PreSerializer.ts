@@ -520,15 +520,15 @@ export class PreSerializer {
     if (isHTML && node.childNodes.length === 0 &&
       PreSerializer._VoidElementNames.has(node.localName)) {
       /* istanbul ignore else */
-      if (this._endElement) this._endElement(qualifiedName)
-      /* istanbul ignore else */
       if (this._openTagEnd) this._openTagEnd(qualifiedName, true, true)
+      /* istanbul ignore else */
+      if (this._endElement) this._endElement(qualifiedName)
       skipEndTag = true
     } else if (!isHTML && node.childNodes.length === 0) {
       /* istanbul ignore else */
-      if (this._endElement) this._endElement(qualifiedName)
-      /* istanbul ignore else */
       if (this._openTagEnd) this._openTagEnd(qualifiedName, true, false)
+      /* istanbul ignore else */
+      if (this._endElement) this._endElement(qualifiedName)
       skipEndTag = true
     } else {
       /* istanbul ignore else */
@@ -574,9 +574,9 @@ export class PreSerializer {
      * 21. Return the value of markup.
      */
     /* istanbul ignore else */
-    if (this._endElement) this._endElement(qualifiedName)
-    /* istanbul ignore else */
     if (this._closeTag) this._closeTag(qualifiedName)
+    /* istanbul ignore else */
+    if (this._endElement) this._endElement(qualifiedName)
   }
 
   /**
@@ -675,9 +675,9 @@ export class PreSerializer {
      */
     if (!node.hasChildNodes()) {
       /* istanbul ignore else */
-      if (this._endElement) this._endElement(qualifiedName)
-      /* istanbul ignore else */
       if (this._openTagEnd) this._openTagEnd(qualifiedName, true, false)
+      /* istanbul ignore else */
+      if (this._endElement) this._endElement(qualifiedName)
       skipEndTag = true
     } else {
       /* istanbul ignore else */
@@ -719,9 +719,9 @@ export class PreSerializer {
      * 21. Return the value of markup.
      */
     /* istanbul ignore else */
-    if (this._endElement) this._endElement(qualifiedName)
-    /* istanbul ignore else */
     if (this._closeTag) this._closeTag(qualifiedName)
+    /* istanbul ignore else */
+    if (this._endElement) this._endElement(qualifiedName)
   }
 
   /**
