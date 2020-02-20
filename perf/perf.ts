@@ -1,50 +1,52 @@
 import { create as create2 } from "../lib"
-import { create } from "xmlbuilder"
+import { create, XMLElement } from "xmlbuilder"
 import { Suite } from "benchmark"
 import { processBenchmark, benchmarkTitle } from "./"
-import { join } from "path"
-import { readFileSync } from "fs"
+import { XMLBuilder } from "../lib/builder/interfaces"
+
+const smallObj = createSmallDoc2().end({ format: "object", group: false });
+const mediumObj = createMediumDoc2().end({ format: "object", group: false });
 
 (function () {
   benchmarkTitle("dom")
 })();
 
-function createSmallDoc() {
+function createSmallDoc(): XMLElement {
   const root = create('root')
   for (let i = 0; i < 100; i++) {
     root.ele('node')
-      .ele('node1-1', {att1: "val1", att2: "val2" }, "text")
-      .ele('node1-2')
+      .ele('node11', {att1: "val1", att2: "val2" }, "text")
+      .ele('node12')
   }
   return root
 }
 
-function createSmallDoc2() {
-  const root = create2().ele('root')
+function createSmallDoc2(): XMLBuilder {
+  const root = create2({ convert: { text: "#text" } }).ele('root')
   for (let i = 0; i < 100; i++) {
     root.ele('node')
-      .ele('node1-1', {att1: "val1", att2: "val2" }).txt("text")
-      .ele('node1-2')
+      .ele('node11', {att1: "val1", att2: "val2" }).txt("text")
+      .ele('node12')
   }
   return root
 }
 
-function createMediumDoc(): any {
+function createMediumDoc(): XMLElement {
   const root = create('root')
   for (let i = 0; i < 10000; i++) {
     root.ele('node')
-      .ele('node1-1', {att1: "val1", att2: "val2" }, "text")
-      .ele('node1-2')
+      .ele('node11', {att1: "val1", att2: "val2" }, "text")
+      .ele('node12')
   }
   return root
 }
 
-function createMediumDoc2(): any {
-  const root = create2().ele('root')
+function createMediumDoc2(): XMLBuilder {
+  const root = create2({ convert: { text: "#text" } }).ele('root')
   for (let i = 0; i < 10000; i++) {
     root.ele('node')
-      .ele('node1-1', {att1: "val1", att2: "val2" }).txt("text")
-      .ele('node1-2')
+      .ele('node11', {att1: "val1", att2: "val2" }).txt("text")
+      .ele('node12')
   }
   return root
 }
@@ -71,15 +73,22 @@ function createMediumDoc2(): any {
 
 })();
 
-const filename = join(__dirname, "./assets/small.json");
-const str = readFileSync(filename, 'utf8');
-const smallObj = JSON.parse(str);
-
 (function () {
   const suite = new Suite("convert small JS object")
    
-  suite.add("xmlbuilder", () => create("root").ele(smallObj))
-  suite.add("xmlbuilder2", () => create2().ele("root").ele(smallObj))
+  suite.add("xmlbuilder", () => create(smallObj as any))
+  suite.add("xmlbuilder2", () => create2(smallObj))
+
+  suite.on("complete", () => processBenchmark(suite, "xmlbuilder2"))
+  suite.run()
+
+})();
+
+(function () {
+  const suite = new Suite("convert medium JS object")
+   
+  suite.add("xmlbuilder", () => create(mediumObj as any))
+  suite.add("xmlbuilder2", () => create2(mediumObj))
 
   suite.on("complete", () => processBenchmark(suite, "xmlbuilder2"))
   suite.run()
@@ -89,8 +98,8 @@ const smallObj = JSON.parse(str);
 (function () {
   const suite = new Suite("serialize small document to XML string")
   
-  const doc = create("root").ele(smallObj).doc()
-  const doc2 = create2().ele("root").ele(smallObj).doc()
+  const doc = createSmallDoc().doc()
+  const doc2 = createSmallDoc2().doc()
 
   suite.add("xmlbuilder", () => doc.end({ pretty: true }))
   suite.add("xmlbuilder2", () => doc2.end({ prettyPrint: true }))
