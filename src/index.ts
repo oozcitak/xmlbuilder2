@@ -1,14 +1,16 @@
-import { 
-  XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions, 
-  XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions, 
-  DocumentWithSettings, XMLBuilderOptionKeys
-} from './builder/interfaces'
+import {
+  XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions,
+  XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions,
+  DocumentWithSettings, XMLBuilderOptionKeys, StringWriterOptions,
+  JSONWriterOptions, XMLStream, StreamWriterOptions
+} from './interfaces'
 import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
 import { Guard } from '@oozcitak/dom/lib/util'
 import { XMLBuilderImpl } from './builder'
 import { createDocument, createParser, throwIfParserError } from './builder/dom'
 import { isArray } from 'util'
+import { XMLStreamImpl } from './stream'
 
 /**
  * Wraps a DOM node for use with XML builder with default options.
@@ -37,7 +39,7 @@ export function builder(nodes: Node[]): XMLBuilder[]
  * @returns an XML builder
  */
 export function builder(options: XMLBuilderCreateOptions, node: Node): XMLBuilder
-  
+
 /**
  * Wraps an array of DOM nodes for use with XML builder with the given options.
  * 
@@ -49,10 +51,10 @@ export function builder(options: XMLBuilderCreateOptions, node: Node): XMLBuilde
 export function builder(options: XMLBuilderCreateOptions, nodes: Node[]): XMLBuilder[]
 
 /** @inheritdoc */
-export function builder(p1: XMLBuilderCreateOptions | Node | Node[], 
+export function builder(p1: XMLBuilderCreateOptions | Node | Node[],
   p2?: Node | Node[]): XMLBuilder | XMLBuilder[] {
 
-  const options = formatOptions(isXMLBuilderCreateOptions(p1) ? p1 : DefaultBuilderOptions)
+  const options = formatBuilderOptions(isXMLBuilderCreateOptions(p1) ? p1 : DefaultBuilderOptions)
   const nodes = Guard.isNode(p1) || isArray(p1) ? p1 : p2
   if (nodes === undefined) {
     throw new Error("Invalid arguments.")
@@ -112,12 +114,12 @@ export function create(options: XMLBuilderCreateOptions,
   contents: string | ExpandObject): XMLBuilder
 
 /** @inheritdoc */
-export function create(p1?: XMLBuilderCreateOptions | string | ExpandObject, 
+export function create(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   p2?: string | ExpandObject): XMLBuilder {
 
-  const options = formatOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
+  const options = formatBuilderOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
     p1 : DefaultBuilderOptions)
-  const contents: string | ExpandObject | undefined = 
+  const contents: string | ExpandObject | undefined =
     isXMLBuilderCreateOptions(p1) ? p2 : p1
 
   let builder: XMLBuilder
@@ -194,9 +196,9 @@ export function fragment(options: XMLBuilderCreateOptions,
 export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   p2?: string | ExpandObject): XMLBuilder {
 
-  const options = formatOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
+  const options = formatBuilderOptions(p1 === undefined || isXMLBuilderCreateOptions(p1) ?
     p1 : DefaultBuilderOptions)
-  const contents: string | ExpandObject | undefined = 
+  const contents: string | ExpandObject | undefined =
     isXMLBuilderCreateOptions(p1) ? p2 : p1
 
   let builder: XMLBuilder
@@ -261,7 +263,7 @@ export function convert(contents: string | ExpandObject): XMLSerializedValue
  * 
  * @returns document node
  */
-export function convert(builderOptions: XMLBuilderCreateOptions, 
+export function convert(builderOptions: XMLBuilderCreateOptions,
   contents: string | ExpandObject): XMLSerializedValue
 
 /**
@@ -288,11 +290,11 @@ export function convert(contents: string | ExpandObject,
  * 
  * @returns document node
  */
-export function convert(builderOptions: XMLBuilderCreateOptions, 
+export function convert(builderOptions: XMLBuilderCreateOptions,
   contents: string | ExpandObject, convertOptions: WriterOptions): XMLSerializedValue
 
 /** @inheritdoc */
-export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject, 
+export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
   p2?: string | ExpandObject | WriterOptions, p3?: WriterOptions): XMLSerializedValue {
 
   let builderOptions: XMLBuilderCreateOptions
@@ -311,9 +313,20 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
   return create(builderOptions, contents).end(convertOptions)
 }
 
+/**
+ * Creates an XML stream.
+ * 
+ * @param options - stream writer options
+ * 
+ * @returns XML stream
+ */
+export function xmlStream(options?: StreamWriterOptions): XMLStream {
+  return new XMLStreamImpl(options)
+}
+
 function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {
   if (!isPlainObject(obj)) return false
-  
+
   for (const key in obj) {
     /* istanbul ignore else */
     if (obj.hasOwnProperty(key)) {
@@ -323,7 +336,7 @@ function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {
   return true
 }
 
-function formatOptions(createOptions: XMLBuilderCreateOptions = {}) {
+function formatBuilderOptions(createOptions: XMLBuilderCreateOptions = {}) {
   const options = applyDefaults(createOptions, DefaultBuilderOptions) as XMLBuilderOptions
 
   if (options.convert.att.length === 0 ||

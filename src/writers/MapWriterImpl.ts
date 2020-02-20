@@ -1,6 +1,6 @@
 import {
   XMLSerializedValue, MapWriterOptions, XMLBuilderOptions, ObjectWriterOptions
-} from "../builder/interfaces"
+} from "../interfaces"
 import { applyDefaults, isArray, isObject, isMap, isPlainObject } from "@oozcitak/util"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { ObjectWriterImpl } from "./ObjectWriterImpl"

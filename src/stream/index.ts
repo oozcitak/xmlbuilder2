@@ -1,0 +1,1 @@
+export { XMLStreamImpl } from "./XMLStreamImpl"

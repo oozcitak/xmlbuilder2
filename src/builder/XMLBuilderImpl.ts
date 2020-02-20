@@ -2,7 +2,7 @@ import {
   XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, DTDOptions,
   DefaultBuilderOptions, PIObject, DocumentWithSettings
-} from "./interfaces"
+} from "../interfaces"
 import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
   getValue, forEachObject, forEachArray, isSet

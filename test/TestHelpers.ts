@@ -2,17 +2,31 @@ import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { isObject, isArray, isMap, forEachObject, objectLength, forEachArray } from "@oozcitak/util"
-import { builder, create, fragment, convert } from "../src"
+import { builder, create, fragment, convert, xmlStream } from "../src"
+import { XMLStream } from "../src/interfaces"
 
 export default class TestHelpers {
   static builder = builder
   static create = create
   static fragment = fragment
   static convert = convert
-  
+  static xmlStream = xmlStream
+ 
   static serialize(node: Node): string {
     const s = new XMLSerializer()
     return s.serializeToString(node)
+  }
+
+  static expectStreamResult(str: XMLStream, result: string, done: any) {
+    let res = ""
+    str.on("data", chunk => {
+      res += chunk.toString()
+    })
+
+    str.on("end", () => {
+      expect(res).toBe(result)
+      done()
+    })
   }
 
   private static indent(indentLevel: number): string { 

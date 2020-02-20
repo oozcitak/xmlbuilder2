@@ -1,4 +1,4 @@
-import { StringWriterOptions, XMLBuilderOptions } from "../builder/interfaces"
+import { StringWriterOptions, XMLBuilderOptions } from "../interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { PreSerializer } from "./base/PreSerializer"

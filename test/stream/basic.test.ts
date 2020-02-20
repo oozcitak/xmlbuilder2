@@ -1,0 +1,96 @@
+import $$ from '../TestHelpers'
+
+describe('basic XMLStream tests', () => {
+
+  test('ele', (done) => {
+    const xmlStream = $$.xmlStream()
+
+    xmlStream.ele("root").end()
+
+    $$.expectStreamResult(xmlStream, `<root/>`, done)
+  })
+
+  test('ele with children', (done) => {
+    const xmlStream = $$.xmlStream()
+
+    xmlStream.ele("root")
+      .ele("foo")
+        .ele("bar").up()
+        .ele("baz").up()
+      .end()
+
+    $$.expectStreamResult(xmlStream, `<root><foo><bar/><baz/></foo></root>`, done)
+  })
+
+  test('dec', (done) => {
+    const xmlStream = $$.xmlStream()
+
+    xmlStream.dec({ version: "1.0", encoding: "UTF-8", standalone: true })
+      .ele("root")
+      .end()
+
+    $$.expectStreamResult(xmlStream, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root/>`, done)
+  })
+
+  test('dtd', (done) => {
+    const xmlStream = $$.xmlStream()
+
+    xmlStream.dtd("root", { pubID: "pub", sysID: "sys" })
+      .ele("root")
+      .end()
+
+    $$.expectStreamResult(xmlStream, `<!DOCTYPE root PUBLIC "pub" "sys"><root/>`, done)
+  })
+
+  test('att', (done) => {
+    const xmlStream = $$.xmlStream()
+
+    xmlStream.ele("root")
+      .att("att1", "val1")
+      .att("att2", "val2")
+      .end()
+
+    $$.expectStreamResult(xmlStream, `<root att1="val1" att2="val2"/>`, done)
+  })
+
+  test('txt', (done) => {
+    const xmlStream = $$.xmlStream()
+
+    xmlStream.ele("root")
+      .txt("text")
+      .end()
+
+    $$.expectStreamResult(xmlStream, `<root>text</root>`, done)
+  })
+
+  test('com', (done) => {
+    const xmlStream = $$.xmlStream()
+
+    xmlStream.ele("root")
+      .com("text")
+      .end()
+
+    $$.expectStreamResult(xmlStream, `<root><!--text--></root>`, done)
+  })
+
+  test('dat', (done) => {
+    const xmlStream = $$.xmlStream()
+
+    xmlStream.ele("root")
+      .dat("text")
+      .end()
+
+    $$.expectStreamResult(xmlStream, `<root><![CDATA[text]]></root>`, done)
+  })
+
+  test('ins', (done) => {
+    const xmlStream = $$.xmlStream()
+
+    xmlStream.ele("root")
+      .ins("target", "value")
+      .end()
+
+    $$.expectStreamResult(xmlStream, `<root><?target value?></root>`, done)
+  })
+
+})

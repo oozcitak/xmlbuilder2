@@ -1,6 +1,6 @@
 import {
   JSONWriterOptions, XMLBuilderOptions, XMLSerializedValue, ObjectWriterOptions
-} from "../builder/interfaces"
+} from "../interfaces"
 import { ObjectWriterImpl } from "./ObjectWriterImpl"
 import {
   applyDefaults, isArray, isObject, isMap, objectLength, forEachObject,

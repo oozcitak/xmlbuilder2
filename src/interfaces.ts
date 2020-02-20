@@ -1,4 +1,5 @@
 import { Node, Document } from "@oozcitak/dom/lib/dom/interfaces"
+import { Readable } from "stream"
 
 /**
  * Represents a document with XML builder settings applied.
@@ -830,4 +831,199 @@ export interface XMLBuilder {
    * @param options - serialization options
    */
   end(writerOptions?: WriterOptions): XMLSerializedValue
+}
+
+/**
+ * Represents a readable XML document stream.
+ */
+export interface XMLStream extends Readable {
+  /**
+   * Creates a new element node and appends it to the list of child nodes.
+   * 
+   * @param namespace - element namespace
+   * @param name - element name
+   * @param attributes - a JS object with element attributes
+   * 
+   * @returns the XML stream
+   */
+  ele(namespace: string | null, name: string, attributes?: AttributesObject): XMLStream
+
+  /**
+   * Creates a new element node and appends it to the list of child nodes.
+   * 
+   * @param name - element name
+   * @param attributes - a JS object with element attributes
+   * 
+   * @returns the XML stream
+   */
+  ele(name: string, attributes?: AttributesObject): XMLStream
+
+  /**
+   * Creates or updates an element attribute.
+   * 
+   * @param namespace - namespace of the attribute
+   * @param name - attribute name
+   * @param value - attribute value
+   * 
+   * @returns current element node
+   */
+  att(namespace: string | null, name: string, value: string): XMLStream
+
+  /**
+   * Creates or updates an element attribute.
+   * 
+   * @param name - attribute name
+   * @param value - attribute value
+   * 
+   * @returns current element node
+   */
+  att(name: string, value: string): XMLStream
+
+  /**
+   * Creates or updates an element attribute.
+   * 
+   * @param obj - a JS object containing element attributes and values
+   * 
+   * @returns current element node
+   */
+  att(obj: AttributesObject): XMLStream
+
+  /**
+   * Creates a new text node and appends it to the list of child nodes.
+   * 
+   * @param content - node content
+   * 
+   * @returns current element node
+   */
+  txt(content: string): XMLStream
+
+  /**
+   * Creates a new comment node and appends it to the list of child nodes.
+   * 
+   * @param content - node content
+   * 
+   * @returns current element node
+   */
+  com(content: string): XMLStream
+
+  /**
+   * Creates a new CDATA node and appends it to the list of child nodes.
+   * 
+   * @param content - node content
+   * 
+   * @returns current element node
+   */
+  dat(content: string): XMLStream
+
+  /**
+   * Creates a new processing instruction node and appends it to the list of 
+   * child nodes.
+   * 
+   * @param target - instruction target
+   * @param content - node content
+   * 
+   * @returns current element node
+   */
+  ins(target: string, content?: string): XMLStream
+
+  /**
+   * Creates new processing instruction nodes by expanding the given object and
+   * appends them to the list of child nodes.
+   * 
+   * @param contents - a JS object containing processing instruction targets 
+   * and values or an array of strings
+   * 
+   * @returns current element node
+   */
+  ins(target: PIObject): XMLStream
+
+  /**
+   * Creates the XML declaration.
+   * 
+   * @param options - declaration options
+   * 
+   * @returns current element node
+   */
+  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLStream
+
+  /**
+   * Creates a new DocType node and inserts it into the document.
+   * 
+   * @param name - name of the document element
+   * @param options - DocType identifiers
+   * 
+   * @returns current element node
+   */
+  dtd(name: string, options?: DTDOptions): XMLStream
+
+  /**
+   * Closes the current element node.
+   * 
+   * @returns current element node
+   */
+  up(): XMLStream
+
+  /**
+   * Completes serializing the XML document.
+   * 
+   * @returns current element node
+   */
+  end(): XMLStream
+}
+
+/**
+ * Defines the options passed to the object writer.
+ */
+export type StreamWriterOptions = {
+  /**
+   * Ensures that the document adheres to the syntax rules specified by the
+   * XML specification. If this flag is set and the document is not well-formed
+   * errors will be thrown. Defaults to `false`.
+   */
+  wellFormed?: boolean  
+  /**
+   * Pretty-prints the XML tree. Defaults to `false`.
+   */
+  prettyPrint?: boolean
+  /**
+   * Determines the indentation string for pretty printing. Defaults to two
+   * space characters.
+   */
+  indent?: string
+  /**
+   * Determines the newline string for pretty printing. Defaults to `"\n"`.
+   */
+  newline?: string
+  /**
+   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * `0`.
+   */
+  offset?: number
+  /**
+   * Wraps attributes to the next line if the column width exceeds the given
+   * value. Defaults to `0` which disables attribute wrapping.
+   */
+  width?: number
+  /**
+   * Produces closing tags for empty element nodes. Defaults to `false`. With
+   * this option set to `true`, closing tags will be produced for element nodes
+   * without child nodes, e.g.
+   * ```xml
+   * <node></node>
+   * ```
+   * Otherwise, empty element nodes will be self-closed, e.g.
+   * ```xml
+   * <node/>
+   * ```
+   */
+  allowEmptyTags?: boolean
+  /**
+   * Inserts a space character before the slash character of self-closing tags. 
+   * Defaults to `false`. With this options set to `true`, a space character 
+   * will be inserted before the slash character of self-closing tags, e.g.
+   * ```xml
+   * <node />
+   * ```
+   */
+  spaceBeforeSlash?: boolean
 }
