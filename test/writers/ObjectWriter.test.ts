@@ -459,6 +459,52 @@ describe('ObjectWriter', () => {
       `)
   })
 
+  test('mixed content - consecutive nodes without group', () => {
+    const result = $$.create().ele('root')
+      .att("att1", "val1")
+      .att("att2", "val2")
+      .ins("target1", "text1")
+      .ins("target2", "text2")
+      .ele("node")
+        .ins("t", "tt")
+        .txt("hello")
+        .dat("dat1")
+        .txt("world")
+        .ins("t", "tt")
+        .dat("dat2")
+      .up()
+      .ins("target3", "text3")
+      .com("com1")
+      .com("com2")
+      .ins("target4", "text4")
+      .txt("text")
+      .end({ format: "object", group: false })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        root: {
+          @att1: val1,
+          @att2: val2,
+          ?1: target1 text1,
+          ?2: target2 text2,
+          node: {
+            ?1: t tt,
+            #1: hello,
+            $1: dat1,
+            #2: world,
+            ?2: t tt,
+            $2: dat2
+          },
+          ?3: target3 text3,
+          !1: com1,
+          !2: com2,
+          ?4: target4 text4,
+          #: text
+        }
+      }
+      `)
+  })
+
   test('mixed content - text suffix', () => {
     const result = $$.create().ele('people')
       .txt('text1')

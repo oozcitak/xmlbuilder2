@@ -39,7 +39,8 @@ export class ObjectWriterImpl {
   serialize(node: Node, writerOptions?: ObjectWriterOptions): XMLSerializedValue {
     const options = applyDefaults(writerOptions, {
       format: "object",
-      wellFormed: false
+      wellFormed: false,
+      group: true
     }) as Required<ObjectWriterOptions> 
 
     let currentList: NodeList = []
@@ -120,10 +121,10 @@ export class ObjectWriterImpl {
      *   }
      * }
      */
-    return this._process(currentList)
+    return this._process(currentList, options)
   }
 
-  private _process(items: NodeList): XMLSerializedValue {
+  private _process(items: NodeList, options: Required<ObjectWriterOptions>): XMLSerializedValue {
     if (items.length === 0) return { }
 
     // determine if there are non-unique element names
@@ -170,7 +171,7 @@ export class ObjectWriterImpl {
     if (textCount === 1 && items.length === 1 && isString((items[0] as TextNode)["#"])) {
       // special case of an element node with a single text node
       return (items[0] as TextNode)["#"]
-    } else if (hasNonUniqueNames) {
+    } else if (options.group && hasNonUniqueNames) {
       // list contains element nodes with non-unique names
       // return an array with mixed content notation
       const result: XMLSerializedValue = []
@@ -208,12 +209,12 @@ export class ObjectWriterImpl {
               const eleGroup: XMLSerializedValue = []
               const listOfLists = ele[key] as NodeList[]
               for (let i = 0; i < listOfLists.length; i++) {
-                eleGroup.push(this._process(listOfLists[i]))
+                eleGroup.push(this._process(listOfLists[i], options))
               }
               result.push({ [key]: eleGroup })
             } else {
               // single element node
-              result.push({ [key]: this._process(ele[key] as NodeList) })
+              result.push({ [key]: this._process(ele[key] as NodeList, options) })
             }
             break
         }
@@ -234,27 +235,33 @@ export class ObjectWriterImpl {
           case "@":
             const attrs = (item as AttrNode)["@"]
             const attrKeys = Object.keys(attrs)
-            if (attrKeys.length === 1) {
-              obj[defAttrKey + attrKeys[0]] = attrs[attrKeys[0]]
+            if (!options.group || attrKeys.length === 1) {
+              for (const attrName in attrs) {
+                obj[defAttrKey + attrName] = attrs[attrName]
+              }
             } else {
-              obj[defAttrKey] = (item as AttrNode)["@"]
+              obj[defAttrKey] = attrs
             }
             break
           case "#":
-            const textKey = textCount > 1 ? defTextKey + (textId++).toString() : defTextKey
-            obj[textKey] = (item as TextNode)["#"]
+            textId = this._processSpecItem((item as TextNode)["#"], 
+              obj as any, options.group, defTextKey,
+              textCount, textId)              
             break
           case "!":
-            const commentKey = commentCount > 1 ? defCommentKey + (commentId++).toString() : defCommentKey
-            obj[commentKey] = (item as CommentNode)["!"]
+            commentId = this._processSpecItem((item as CommentNode)["!"], 
+              obj as any, options.group, defCommentKey,
+              commentCount, commentId)            
             break
           case "?":
-            const instructionKey = instructionCount > 1 ? defInstructionKey + (instructionId++).toString() : defInstructionKey
-            obj[instructionKey] = (item as InstructionNode)["?"]
+            instructionId = this._processSpecItem((item as InstructionNode)["?"], 
+              obj as any, options.group, defInstructionKey,
+              instructionCount, instructionId)
             break
           case "$":
-            const cdataKey = cdataCount > 1 ? defCdataKey + (cdataId++).toString() : defCdataKey
-            obj[cdataKey] = (item as CDATANode)["$"]
+            cdataId = this._processSpecItem((item as CDATANode)["$"], 
+              obj as any, options.group, defCdataKey,
+              cdataCount, cdataId)
             break
           default:
             // element node
@@ -264,18 +271,33 @@ export class ObjectWriterImpl {
               const eleGroup: XMLSerializedValue = []
               const listOfLists = ele[key] as NodeList[]
               for (let i = 0; i < listOfLists.length; i++) {
-                eleGroup.push(this._process(listOfLists[i]))
+                eleGroup.push(this._process(listOfLists[i], options))
               }
               obj[key] = eleGroup
             } else {
               // single element node
-              obj[key] = this._process(ele[key] as NodeList)
+              obj[key] = this._process(ele[key] as NodeList, options)
             }
             break
         }
       }
       return obj
     }
+  }
+
+  private _processSpecItem(item: string | string[], 
+    obj: { [key: string]: string | string[] }, group: boolean, defKey: string, 
+    count: number, id: number): number {
+    if (!group && isArray(item) && count + item.length > 2) {
+      for (const subItem of item) {
+        const key = defKey + (id++).toString()
+        obj[key] = subItem
+      }
+    } else {
+      const key = count > 1 ? defKey + (id++).toString() : defKey
+      obj[key] = item
+    }
+    return id
   }
 
   private _addAttr(items: NodeList, name: string, value: string): void {

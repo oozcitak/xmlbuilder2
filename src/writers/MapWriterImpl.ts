@@ -39,7 +39,8 @@ export class MapWriterImpl {
   serialize(node: Node, writerOptions?: MapWriterOptions): XMLSerializedValue {
     const options: MapWriterOptions = applyDefaults(writerOptions, {
       format: "map",
-      wellFormed: false
+      wellFormed: false,
+      group: true
     })
 
     // convert to object

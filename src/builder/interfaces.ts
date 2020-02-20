@@ -294,6 +294,11 @@ type BaseWriterOptions = {
 export type MapWriterOptions = BaseWriterOptions & {
   /** @inheritdoc */
   format?: "map"
+  /**
+   * Groups consecutive nodes of same type under a single object. Defaults to
+   * `true`.
+   */
+  group?: boolean
 }
 
 /**
@@ -302,6 +307,11 @@ export type MapWriterOptions = BaseWriterOptions & {
 export type ObjectWriterOptions = BaseWriterOptions & {
   /** @inheritdoc */
   format?: "object"
+  /**
+   * Groups consecutive nodes of same type under a single object. Defaults to
+   * `true`.
+   */
+  group?: boolean
 }
 
 /**
@@ -401,6 +411,11 @@ export type JSONWriterOptions = BaseWriterOptions & {
    * `0`.
    */
   offset?: number
+  /**
+   * Groups consecutive nodes of same type under a single object. Defaults to
+   * `true`.
+   */
+  group?: boolean
 }
 
 /**
@@ -417,6 +432,13 @@ export type XMLSerializedValue = string | XMLSerializedMap | XMLSerializedArray 
 type XMLSerializedObject = { [key: string]: XMLSerializedValue }
 interface XMLSerializedMap extends Map<string, XMLSerializedValue> { }
 interface XMLSerializedArray extends Array<XMLSerializedValue> { }
+
+/**
+ * Represents the type of a variable that can be expanded by the `ele` function 
+ * into nodes.
+ */
+export type ExpandObject = { [key: string]: any } | Map<string, any> |
+  any[] | Set<any> | ((...args: any) => any)
 
 /**
  * Represents the type of a variable that is a JS object defining
@@ -489,7 +511,7 @@ export interface XMLBuilder {
    * 
    * @returns the last top level element node created
    */
-  ele(obj: XMLSerializedValue): XMLBuilder
+  ele(obj: ExpandObject): XMLBuilder
 
   /**
    * Removes this node from the XML document.
