@@ -1,8 +1,8 @@
 import {
   XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions,
   XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions,
-  DocumentWithSettings, XMLBuilderOptionKeys, StringWriterOptions,
-  JSONWriterOptions, XMLStream, StreamWriterOptions
+  DocumentWithSettings, XMLBuilderOptionKeys, XMLBuilderStream,
+  StreamWriterOptions
 } from './interfaces'
 import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
@@ -10,7 +10,7 @@ import { Guard } from '@oozcitak/dom/lib/util'
 import { XMLBuilderImpl } from './builder'
 import { createDocument, createParser, throwIfParserError } from './builder/dom'
 import { isArray } from 'util'
-import { XMLStreamImpl } from './stream'
+import { XMLBuilderStreamImpl } from './stream'
 
 /**
  * Wraps a DOM node for use with XML builder with default options.
@@ -314,14 +314,14 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
 }
 
 /**
- * Creates an XML stream.
+ * Creates an XML builder stream.
  * 
  * @param options - stream writer options
  * 
- * @returns XML stream
+ * @returns XML builder stream
  */
-export function xmlStream(options?: StreamWriterOptions): XMLStream {
-  return new XMLStreamImpl(options)
+export function createStream(options?: StreamWriterOptions): XMLBuilderStream {
+  return new XMLBuilderStreamImpl(options)
 }
 
 function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {

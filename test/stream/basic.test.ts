@@ -2,8 +2,9 @@ import $$ from '../TestHelpers'
 
 describe('basic XMLStream tests', () => {
 
+
   test('ele', (done) => {
-    const xmlStream = $$.xmlStream()
+    const xmlStream = $$.createStream()
 
     xmlStream.ele("root").end()
 
@@ -11,7 +12,7 @@ describe('basic XMLStream tests', () => {
   })
 
   test('ele with children', (done) => {
-    const xmlStream = $$.xmlStream()
+    const xmlStream = $$.createStream()
 
     xmlStream.ele("root")
       .ele("foo")
@@ -23,7 +24,7 @@ describe('basic XMLStream tests', () => {
   })
 
   test('dec', (done) => {
-    const xmlStream = $$.xmlStream()
+    const xmlStream = $$.createStream()
 
     xmlStream.dec({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele("root")
@@ -33,7 +34,7 @@ describe('basic XMLStream tests', () => {
   })
 
   test('dtd', (done) => {
-    const xmlStream = $$.xmlStream()
+    const xmlStream = $$.createStream()
 
     xmlStream.dtd("root", { pubID: "pub", sysID: "sys" })
       .ele("root")
@@ -43,7 +44,7 @@ describe('basic XMLStream tests', () => {
   })
 
   test('att', (done) => {
-    const xmlStream = $$.xmlStream()
+    const xmlStream = $$.createStream()
 
     xmlStream.ele("root")
       .att("att1", "val1")
@@ -54,7 +55,7 @@ describe('basic XMLStream tests', () => {
   })
 
   test('txt', (done) => {
-    const xmlStream = $$.xmlStream()
+    const xmlStream = $$.createStream()
 
     xmlStream.ele("root")
       .txt("text")
@@ -64,7 +65,7 @@ describe('basic XMLStream tests', () => {
   })
 
   test('com', (done) => {
-    const xmlStream = $$.xmlStream()
+    const xmlStream = $$.createStream()
 
     xmlStream.ele("root")
       .com("text")
@@ -74,7 +75,7 @@ describe('basic XMLStream tests', () => {
   })
 
   test('dat', (done) => {
-    const xmlStream = $$.xmlStream()
+    const xmlStream = $$.createStream()
 
     xmlStream.ele("root")
       .dat("text")
@@ -84,7 +85,7 @@ describe('basic XMLStream tests', () => {
   })
 
   test('ins', (done) => {
-    const xmlStream = $$.xmlStream()
+    const xmlStream = $$.createStream()
 
     xmlStream.ele("root")
       .ins("target", "value")

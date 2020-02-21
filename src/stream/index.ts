@@ -1,1 +1,1 @@
-export { XMLStreamImpl } from "./XMLStreamImpl"
+export { XMLBuilderStreamImpl } from "./XMLBuilderStreamImpl"

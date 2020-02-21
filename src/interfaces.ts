@@ -836,7 +836,7 @@ export interface XMLBuilder {
 /**
  * Represents a readable XML document stream.
  */
-export interface XMLStream extends Readable {
+export interface XMLBuilderStream extends Readable {
   /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
@@ -846,7 +846,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns the XML stream
    */
-  ele(namespace: string | null, name: string, attributes?: AttributesObject): XMLStream
+  ele(namespace: string | null, name: string, attributes?: AttributesObject): XMLBuilderStream
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -856,7 +856,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns the XML stream
    */
-  ele(name: string, attributes?: AttributesObject): XMLStream
+  ele(name: string, attributes?: AttributesObject): XMLBuilderStream
 
   /**
    * Creates or updates an element attribute.
@@ -867,7 +867,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  att(namespace: string | null, name: string, value: string): XMLStream
+  att(namespace: string | null, name: string, value: string): XMLBuilderStream
 
   /**
    * Creates or updates an element attribute.
@@ -877,7 +877,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  att(name: string, value: string): XMLStream
+  att(name: string, value: string): XMLBuilderStream
 
   /**
    * Creates or updates an element attribute.
@@ -886,7 +886,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  att(obj: AttributesObject): XMLStream
+  att(obj: AttributesObject): XMLBuilderStream
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
@@ -895,7 +895,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  txt(content: string): XMLStream
+  txt(content: string): XMLBuilderStream
 
   /**
    * Creates a new comment node and appends it to the list of child nodes.
@@ -904,7 +904,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  com(content: string): XMLStream
+  com(content: string): XMLBuilderStream
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.
@@ -913,7 +913,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  dat(content: string): XMLStream
+  dat(content: string): XMLBuilderStream
 
   /**
    * Creates a new processing instruction node and appends it to the list of 
@@ -924,7 +924,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  ins(target: string, content?: string): XMLStream
+  ins(target: string, content?: string): XMLBuilderStream
 
   /**
    * Creates new processing instruction nodes by expanding the given object and
@@ -935,7 +935,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  ins(target: PIObject): XMLStream
+  ins(target: PIObject): XMLBuilderStream
 
   /**
    * Creates the XML declaration.
@@ -944,7 +944,7 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLStream
+  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilderStream
 
   /**
    * Creates a new DocType node and inserts it into the document.
@@ -954,21 +954,21 @@ export interface XMLStream extends Readable {
    * 
    * @returns current element node
    */
-  dtd(name: string, options?: DTDOptions): XMLStream
+  dtd(name: string, options?: DTDOptions): XMLBuilderStream
 
   /**
    * Closes the current element node.
    * 
    * @returns current element node
    */
-  up(): XMLStream
+  up(): XMLBuilderStream
 
   /**
    * Completes serializing the XML document.
    * 
    * @returns current element node
    */
-  end(): XMLStream
+  end(): XMLBuilderStream
 }
 
 /**

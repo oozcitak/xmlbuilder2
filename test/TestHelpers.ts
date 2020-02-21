@@ -2,22 +2,22 @@ import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { isObject, isArray, isMap, forEachObject, objectLength, forEachArray } from "@oozcitak/util"
-import { builder, create, fragment, convert, xmlStream } from "../src"
-import { XMLStream } from "../src/interfaces"
+import { builder, create, fragment, convert, createStream } from "../src"
+import { XMLBuilderStream } from "../src/interfaces"
 
 export default class TestHelpers {
   static builder = builder
   static create = create
   static fragment = fragment
   static convert = convert
-  static xmlStream = xmlStream
+  static createStream = createStream
  
   static serialize(node: Node): string {
     const s = new XMLSerializer()
     return s.serializeToString(node)
   }
 
-  static expectStreamResult(str: XMLStream, result: string, done: any) {
+  static expectStreamResult(str: XMLBuilderStream, result: string, done: any) {
     let res = ""
     str.on("data", chunk => {
       res += chunk.toString()
