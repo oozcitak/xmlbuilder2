@@ -295,4 +295,25 @@ describe('namespaces', () => {
       </root>`, done)
   })
 
+  test('xmlns element prefix', (done) => {
+    const xmlStream = $$.createStream({ prettyPrint: true })
+    
+    xmlStream.ele('http://www.w3.org/2000/xmlns/', 'xmlns:root')
+      .end()
+
+    $$.expectStreamResult(xmlStream, $$.t`
+      <xmlns:root/>`, done)
+  })
+
+  test('void HTML element', (done) => {
+    const xmlStream = $$.createStream({ prettyPrint: true })
+    xmlStream.ele('root')
+      .ele('http://www.w3.org/1999/xhtml', 'hr')
+      .end()
+    $$.expectStreamResult(xmlStream, $$.t`
+      <root>
+        <hr xmlns="http://www.w3.org/1999/xhtml" />
+      </root>`, done)      
+  })
+
 })
