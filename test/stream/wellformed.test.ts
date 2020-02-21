@@ -25,23 +25,34 @@ describe('well-formed checks', () => {
   })
 
   test('attribute cannot be child of document', () => {
-    const xmlStream = $$.createStream({ wellFormed: true })
+    const xmlStream = $$.createStream()
     expect(() => xmlStream.att('att', 'val')).toThrow()
   })
 
   test('text cannot be child of document', () => {
-    const xmlStream = $$.createStream({ wellFormed: true })
+    const xmlStream = $$.createStream()
     expect(() => xmlStream.txt('text')).toThrow()
   })
 
+  test('cannot have multiple document elements', () => {
+    const xmlStream = $$.createStream()
+    expect(() => xmlStream.ele('root').up().ele('root')).toThrow()
+  })
+
   test('cannot have multiple doctypes', () => {
-    const xmlStream = $$.createStream({ wellFormed: true })
+    const xmlStream = $$.createStream()
     xmlStream.dtd('root')
     expect(() => xmlStream.dtd('root', { pubID: 'pub' })).toThrow()
   })
 
+  test('cannot have doctype after an element node', () => {
+    const xmlStream = $$.createStream()
+    xmlStream.ele('root').up()
+    expect(() => xmlStream.dtd('root', { pubID: 'pub' })).toThrow()
+  })
+
   test('cannot have multiple XML declarations', () => {
-    const xmlStream = $$.createStream({ wellFormed: true })
+    const xmlStream = $$.createStream()
     xmlStream.dec({ version: "1.0" })
     expect(() => xmlStream.dec({ version: "1.0" })).toThrow()
   })

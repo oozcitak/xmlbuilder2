@@ -81,148 +81,15 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
 
     this._serializeOpenTag(true)
 
+    if (this._hasDocumentElement && this._level === 0) {
+      throw new Error("Document cannot have multiple document element nodes.")
+    }
+
     this._currentElement = fragment().ele(p1 as any, p2 as any, p3 as any)
     this._currentElementSerialized = false
     this._hasDocumentElement = true
 
     return this
-  }
-
-  private _serializeOpenTag(hasChildren: boolean): void {
-    if (this._currentElementSerialized) return
-    if (this._currentElement === undefined) return
-    const node = this._currentElement.node as Element
-
-    if (this._options.wellFormed && (node.localName.indexOf(":") !== -1 ||
-      !xml_isName(node.localName))) {
-      throw new Error("Node local name contains invalid characters (well-formed required).")
-    }
-
-    let markup = "<"
-    let qualifiedName = ''
-    let ignoreNamespaceDefinitionAttribute = false
-    let map = this._prefixMap.copy()
-    let localPrefixesMap: { [key: string]: string } = {}
-    let localDefaultNamespace = this._recordNamespaceInformation(node, map, localPrefixesMap)
-    let inheritedNS = this._namespace
-    let ns = node.namespaceURI
-
-    if (inheritedNS === ns) {
-      if (localDefaultNamespace !== null) {
-        ignoreNamespaceDefinitionAttribute = true
-      }
-
-      if (ns === infraNamespace.XML) {
-        qualifiedName = 'xml:' + node.localName
-      } else {
-        qualifiedName = node.localName
-      }
-
-      markup += qualifiedName
-    } else {
-      let prefix = node.prefix
-      let candidatePrefix = map.get(prefix, ns)
-      if (prefix === "xmlns") {
-        if (this._options.wellFormed) {
-          throw new Error("An element cannot have the 'xmlns' prefix (well-formed required).")
-        }
-
-        candidatePrefix = prefix
-      }
-
-      if (candidatePrefix !== null) {
-        qualifiedName = candidatePrefix + ':' + node.localName
-        if (localDefaultNamespace !== null && localDefaultNamespace !== infraNamespace.XML) {
-          inheritedNS = localDefaultNamespace || null
-        }
-
-        markup += qualifiedName
-      } else if (prefix !== null) {
-        if (prefix in localPrefixesMap) {
-          prefix = this._generatePrefix(ns, map, this._prefixIndex)
-        }
-
-        map.set(prefix, ns)
-        qualifiedName += prefix + ':' + node.localName
-        markup += qualifiedName
-
-        markup += " xmlns:" + prefix + "=\"" +
-          this._serializeAttributeValue(ns, this._options.wellFormed) + "\""
-
-        if (localDefaultNamespace !== null) {
-          inheritedNS = localDefaultNamespace || null
-        }
-
-      } else if (localDefaultNamespace === null ||
-        (localDefaultNamespace !== null && localDefaultNamespace !== ns)) {
-        ignoreNamespaceDefinitionAttribute = true
-        qualifiedName += node.localName
-        inheritedNS = ns
-
-        markup += qualifiedName + " xmlns" + "=\"" +
-          this._serializeAttributeValue(ns, this._options.wellFormed) + "\""
-
-      } else {
-        qualifiedName += node.localName
-        inheritedNS = ns
-        markup += qualifiedName
-      }
-    }
-
-    markup += this._serializeAttributesNS(node, map, this._prefixIndex, localPrefixesMap,
-      ignoreNamespaceDefinitionAttribute, this._options.wellFormed)
-
-    const isHTML = (ns === infraNamespace.HTML)
-    if (isHTML && !hasChildren &&
-      XMLBuilderStreamImpl._VoidElementNames.has(node.localName)) {
-      markup += " /"
-    } else if (!isHTML && !hasChildren) {
-      if (this._options.spaceBeforeSlash) markup += " "
-      markup += "/"
-    }
-    markup += ">"
-
-    this._addData(this._beginLine() + markup)
-
-    this._currentElementSerialized = true
-    /**
-     * Save qualified name, original inherited ns, original prefix map, and
-     * hasChildren flag.
-     */
-    this._openTags.push([qualifiedName, this._namespace, this._prefixMap, hasChildren])
-
-    /**
-     * New values of inherited namespace and prefix map will be used while
-     * serializing child nodes. They will be returned to their original values
-     * when this node is closed using the _openTags array item we saved above.
-     */
-    this._namespace = inheritedNS
-    this._prefixMap = map
-
-    /**
-     * Calls following this will either serialize child nodes or close this tag.
-     */
-    this._level++
-  }
-
-  private _serializeCloseTag(): void {
-    this._level--
-    const lastEle = this._openTags.pop()
-    /* istanbul ignore next */
-    if (lastEle === undefined) {
-      throw new Error("Last element is undefined.")
-    }
-
-    const [qualifiedName, ns, map, hasChildren] = lastEle
-    /**
-     * Restore original values of inherited namespace and prefix map.
-     */
-    this._namespace = ns
-    this._prefixMap = map
-    if (!hasChildren) return
-
-    let markup = "</" + qualifiedName + ">"
-    this._addData(this._beginLine() + markup)
   }
 
   /** @inheritdoc */
@@ -333,6 +200,10 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       throw new Error("DocType declaration is already inserted.")
     }
 
+    if (this._hasDocumentElement) {
+      throw new Error("Cannot insert DocType declaration after document element.")
+    }
+
     if (!xml_isName(name)) {
       throw new Error(`Invalid XML name: ${name}`)
     }
@@ -383,6 +254,156 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
 
     this._addData(null)
     return this
+  }
+
+  /**
+   * Serializes the opening tag of an element node.
+   * 
+   * @param hasChildren - whether the element node has child nodes
+   */
+  private _serializeOpenTag(hasChildren: boolean): void {
+    if (this._currentElementSerialized) return
+    if (this._currentElement === undefined) return
+    const node = this._currentElement.node as Element
+
+    if (this._options.wellFormed && (node.localName.indexOf(":") !== -1 ||
+      !xml_isName(node.localName))) {
+      throw new Error("Node local name contains invalid characters (well-formed required).")
+    }
+
+    let markup = "<"
+    let qualifiedName = ''
+    let ignoreNamespaceDefinitionAttribute = false
+    let map = this._prefixMap.copy()
+    let localPrefixesMap: { [key: string]: string } = {}
+    let localDefaultNamespace = this._recordNamespaceInformation(node, map, localPrefixesMap)
+    let inheritedNS = this._namespace
+    let ns = node.namespaceURI
+
+    if (inheritedNS === ns) {
+      if (localDefaultNamespace !== null) {
+        ignoreNamespaceDefinitionAttribute = true
+      }
+
+      if (ns === infraNamespace.XML) {
+        qualifiedName = 'xml:' + node.localName
+      } else {
+        qualifiedName = node.localName
+      }
+
+      markup += qualifiedName
+    } else {
+      let prefix = node.prefix
+      let candidatePrefix = map.get(prefix, ns)
+      if (prefix === "xmlns") {
+        if (this._options.wellFormed) {
+          throw new Error("An element cannot have the 'xmlns' prefix (well-formed required).")
+        }
+
+        candidatePrefix = prefix
+      }
+
+      if (candidatePrefix !== null) {
+        qualifiedName = candidatePrefix + ':' + node.localName
+        if (localDefaultNamespace !== null && localDefaultNamespace !== infraNamespace.XML) {
+          inheritedNS = localDefaultNamespace || null
+        }
+
+        markup += qualifiedName
+      } else if (prefix !== null) {
+        if (prefix in localPrefixesMap) {
+          prefix = this._generatePrefix(ns, map, this._prefixIndex)
+        }
+
+        map.set(prefix, ns)
+        qualifiedName += prefix + ':' + node.localName
+        markup += qualifiedName
+
+        markup += this._serializeAttribute("xmlns:" + prefix,
+          ns, this._options.wellFormed, markup.length)
+
+        if (localDefaultNamespace !== null) {
+          inheritedNS = localDefaultNamespace || null
+        }
+
+      } else if (localDefaultNamespace === null ||
+        (localDefaultNamespace !== null && localDefaultNamespace !== ns)) {
+        ignoreNamespaceDefinitionAttribute = true
+        qualifiedName += node.localName
+        inheritedNS = ns
+
+        markup += qualifiedName + this._serializeAttribute("xmlns", ns,
+          this._options.wellFormed, markup.length)
+
+      } else {
+        qualifiedName += node.localName
+        inheritedNS = ns
+        markup += qualifiedName
+      }
+    }
+
+    markup += this._serializeAttributesNS(node, map, this._prefixIndex, localPrefixesMap,
+      ignoreNamespaceDefinitionAttribute, this._options.wellFormed)
+
+    const isHTML = (ns === infraNamespace.HTML)
+    if (isHTML && !hasChildren &&
+      XMLBuilderStreamImpl._VoidElementNames.has(node.localName)) {
+      markup += " /"
+    } else if (!isHTML && !hasChildren) {
+      if (this._options.allowEmptyTags) {
+        markup += "></" + qualifiedName
+      } else if (this._options.spaceBeforeSlash) {
+        markup += " /"
+      } else {
+        markup += "/"
+      }
+    }
+    markup += ">"
+
+    this._addData(this._beginLine() + markup)
+
+    this._currentElementSerialized = true
+    /**
+     * Save qualified name, original inherited ns, original prefix map, and
+     * hasChildren flag.
+     */
+    this._openTags.push([qualifiedName, this._namespace, this._prefixMap, hasChildren])
+
+    /**
+     * New values of inherited namespace and prefix map will be used while
+     * serializing child nodes. They will be returned to their original values
+     * when this node is closed using the _openTags array item we saved above.
+     */
+    this._namespace = inheritedNS
+    this._prefixMap = map
+
+    /**
+     * Calls following this will either serialize child nodes or close this tag.
+     */
+    this._level++
+  }
+
+  /**
+   * Serializes the closing tag of an element node.
+   */
+  private _serializeCloseTag(): void {
+    this._level--
+    const lastEle = this._openTags.pop()
+    /* istanbul ignore next */
+    if (lastEle === undefined) {
+      throw new Error("Last element is undefined.")
+    }
+
+    const [qualifiedName, ns, map, hasChildren] = lastEle
+    /**
+     * Restore original values of inherited namespace and prefix map.
+     */
+    this._namespace = ns
+    this._prefixMap = map
+    if (!hasChildren) return
+
+    let markup = "</" + qualifiedName + ">"
+    this._addData(this._beginLine() + markup)
   }
 
   /**
@@ -449,8 +470,8 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     for (const attr of node.attributes) {
       // Optimize common case
       if (!requireWellFormed && attr.namespaceURI === null) {
-        result += " " + attr.localName + "=\"" +
-          this._serializeAttributeValue(attr.value, requireWellFormed) + "\""
+        result += this._serializeAttribute(attr.localName, attr.value,
+          requireWellFormed, result.length)
         continue
       }
 
@@ -503,14 +524,9 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
             candidatePrefix = this._generatePrefix(attributeNamespace, map, prefixIndex)
           }
 
-          result += " xmlns:" + candidatePrefix + "=\"" +
-            this._serializeAttributeValue(attributeNamespace, requireWellFormed) + "\""
+          result += this._serializeAttribute("xmlns:" + candidatePrefix,
+            attributeNamespace, requireWellFormed, result.length)
         }
-      }
-
-      result += " "
-      if (candidatePrefix !== null) {
-        result += candidatePrefix + ':'
       }
 
       if (requireWellFormed && (attr.localName.indexOf(":") !== -1 ||
@@ -519,11 +535,33 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
         throw new Error("Attribute local name contains invalid characters (well-formed required).")
       }
 
-      result += attr.localName + "=\"" +
-        this._serializeAttributeValue(attr.value, requireWellFormed) + "\""
+      result += this._serializeAttribute(
+        (candidatePrefix !== null ? candidatePrefix + ":" : "") + attr.localName,
+        attr.value, requireWellFormed, result.length)
     }
 
     return result
+  }
+
+  /**
+   * Produces an XML serialization of an attribute.
+   * 
+   * @param value - attribute value
+   * @param requireWellFormed - whether to check conformance
+   */
+
+  private _serializeAttribute(name: string, value: string | null, 
+    requireWellFormed: boolean, strLen: number): string {
+
+    const str = name + "=\"" +
+      this._serializeAttributeValue(value, requireWellFormed) + "\""
+
+    if (this._options.prettyPrint && this._options.width > 0 &&
+      strLen + 1 + str.length > this._options.width) {
+      return this._beginLine() + this._indent(1) + str
+    } else {
+      return " " + str
+    }
   }
 
   /**

@@ -101,4 +101,22 @@ describe('basic XMLStream tests', () => {
     $$.expectStreamResult(xmlStream, `<root><?target value?></root>`, done)
   })
 
+  test('nodes at root level', (done) => {
+    const xmlStream = $$.createStream({ prettyPrint: true })
+
+    xmlStream.dec()
+      .dtd("root")
+      .com("comment1")
+      .ele("root").up()
+      .com("comment2")
+      .end()
+
+    $$.expectStreamResult(xmlStream, $$.t`
+      <?xml version="1.0"?>
+      <!DOCTYPE root>
+      <!--comment1-->
+      <root/>
+      <!--comment2-->`, done)
+  })
+
 })
