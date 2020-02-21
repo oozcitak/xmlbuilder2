@@ -3,7 +3,7 @@ import {
 } from "../interfaces"
 import { applyDefaults, isArray, isString } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { PreSerializer } from "./base/PreSerializer"
+import { PreSerializer } from "./PreSerializer"
 
 type AttrNode = { "@": { [key: string]: string } }
 type TextNode = { "#": string | string[] }

@@ -1,7 +1,7 @@
 import { StringWriterOptions, XMLBuilderOptions } from "../interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { PreSerializer } from "./base/PreSerializer"
+import { PreSerializer } from "./PreSerializer"
 import { Guard } from "@oozcitak/dom/lib/util"
 
 /**

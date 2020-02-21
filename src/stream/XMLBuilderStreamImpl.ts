@@ -9,11 +9,11 @@ import {
   xml_isName, xml_isLegalChar, xml_isQName, xml_isPubidChar
 } from "@oozcitak/dom/lib/algorithm"
 import { namespace as infraNamespace } from "@oozcitak/infra"
-import { NamespacePrefixMap } from "../writers/base/NamespacePrefixMap"
+import { NamespacePrefixMap } from "@oozcitak/dom/lib/serializer/NamespacePrefixMap"
 import {
   Comment, Text, ProcessingInstruction, CDATASection, DocumentType, Element
 } from "@oozcitak/dom/lib/dom/interfaces"
-import { LocalNameSet } from "../writers/base/LocalNameSet"
+import { LocalNameSet } from "@oozcitak/dom/lib/serializer/LocalNameSet"
 
 /**
  * Stores the last generated prefix. An object is used instead of a number so

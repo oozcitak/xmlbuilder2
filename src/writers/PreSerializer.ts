@@ -2,8 +2,8 @@ import {
   Node, Element, Document, Comment, Text, DocumentFragment,
   DocumentType, ProcessingInstruction, CDATASection, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
-import { LocalNameSet } from "./LocalNameSet"
-import { NamespacePrefixMap } from "./NamespacePrefixMap"
+import { LocalNameSet } from "@oozcitak/dom/lib/serializer/LocalNameSet"
+import { NamespacePrefixMap } from "@oozcitak/dom/lib/serializer/NamespacePrefixMap"
 import { InvalidStateError } from "@oozcitak/dom/lib/dom/DOMException"
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { xml_isName, xml_isLegalChar, xml_isPubidChar } from "@oozcitak/dom/lib/algorithm"
