@@ -944,7 +944,7 @@ export interface XMLBuilderStream extends Readable {
    * 
    * @returns current element node
    */
-  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilderStream
+  dec(options?: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilderStream
 
   /**
    * Creates a new DocType node and inserts it into the document.

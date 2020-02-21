@@ -91,6 +91,10 @@ describe('StringWriter', () => {
       )
   })
 
+  test('empty document', () => {
+    expect($$.create().end()).toBe(`<?xml version="1.0"?>`)
+  })
+
   test('doctype with both public and system identifier', () => {
     expect($$.create().dtd({ pubID: "pub", sysID: "sys" })
       .ele('root').doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`

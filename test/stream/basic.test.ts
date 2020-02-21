@@ -2,6 +2,13 @@ import $$ from '../TestHelpers'
 
 describe('basic XMLStream tests', () => {
 
+  test('empty document', (done) => {
+    const xmlStream = $$.createStream()
+
+    xmlStream.dec().end()
+
+    $$.expectStreamResult(xmlStream, `<?xml version="1.0"?>`, done)
+  })
 
   test('ele', (done) => {
     const xmlStream = $$.createStream()

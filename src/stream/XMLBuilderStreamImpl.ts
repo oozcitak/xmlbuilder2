@@ -181,7 +181,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     }
     markup += ">"
 
-    this.push(this._beginLine() + markup + this._endLine())
+    this.push(this._beginLine() + markup)
 
     this._currentElementSerialized = true
     /**
@@ -215,13 +215,13 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     const [qualifiedName, ns, map, hasChildren] = lastEle
     /**
      * Restore original values of inherited namespace and prefix map.
-     */    
+     */
     this._namespace = ns
     this._prefixMap = map
     if (!hasChildren) return
 
     let markup = "</" + qualifiedName + ">"
-    this.push(this._beginLine() + markup + this._endLine())
+    this.push(this._beginLine() + markup)
   }
 
   /** @inheritdoc */
@@ -243,7 +243,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       throw new Error("Comment data contains invalid characters (well-formed required).")
     }
 
-    this.push(this._beginLine() + "<!--" + node.data + "-->" + this._endLine())
+    this.push(this._beginLine() + "<!--" + node.data + "-->")
     return this
   }
 
@@ -273,7 +273,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
         result += c
     }
 
-    this.push(this._beginLine() + result + this._endLine())
+    this.push(this._beginLine() + result)
     return this
   }
 
@@ -286,12 +286,11 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       throw new Error("Processing instruction target contains invalid characters (well-formed required).")
     }
 
-    if (this._options.wellFormed && (!xml_isLegalChar(node.data) ||
-      node.data.indexOf("?>") !== -1)) {
+    if (this._options.wellFormed && !xml_isLegalChar(node.data)) {
       throw new Error("Processing instruction data contains invalid characters (well-formed required).")
     }
 
-    this.push(this._beginLine() + "<?" + node.target + " " + node.data + "?>" + this._endLine())
+    this.push(this._beginLine() + "<?" + node.target + " " + node.data + "?>")
     return this
   }
 
@@ -300,24 +299,19 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     this._serializeOpenTag(true)
     const node = fragment().dat(content).first().node as CDATASection
 
-    if (this._options.wellFormed && (node.data.indexOf("]]>") !== -1)) {
-      throw new Error("CDATA contains invalid characters (well-formed required).")
-    }
-
-    this.push(this._beginLine() + "<![CDATA[" + node.data + "]]>" + this._endLine())
+    this.push(this._beginLine() + "<![CDATA[" + node.data + "]]>")
     return this
   }
 
   /** @inheritdoc */
-  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilderStream {
+  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean } = { version: "1.0" }): XMLBuilderStream {
     if (this._hasDeclaration) {
       throw new Error("XML declaration is already inserted.")
     }
 
     let markup = ""
-    markup += this._beginLine()
-    markup = "<?xml"
-    markup += " version=\"" + options.version + "\""
+    markup = this._beginLine() + "<?xml"
+    markup += " version=\"" + (options.version || "1.0") + "\""
     if (options.encoding !== undefined) {
       markup += " encoding=\"" + options.encoding + "\""
     }
@@ -325,7 +319,6 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       markup += " standalone=\"" + (options.standalone ? "yes" : "no") + "\""
     }
     markup += "?>"
-    markup += this._endLine()
 
     this.push(markup)
     this._hasDeclaration = true
@@ -347,7 +340,6 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       throw new Error(`Invalid XML qualified name: ${name}.`)
     }
 
-    this._docTypeName = name
     const node = create().dtd(options).first().node as DocumentType
 
     if (this._options.wellFormed && !xml_isPubidChar(node.publicId)) {
@@ -369,7 +361,8 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
           :
           "<!DOCTYPE " + name + ">"
 
-    this.push(this._beginLine() + markup + this._endLine())
+    this._docTypeName = name
+    this.push(this._beginLine() + markup)
     return this
   }
 
@@ -387,9 +380,6 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       this._serializeCloseTag()
     }
 
-    if (!this._hasDocumentElement) {
-      throw new Error("Document has no document element node.")
-    }
     this.push(null)
     return this
   }
@@ -402,18 +392,6 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     if (this._options.prettyPrint) {
       return (this.readableLength !== 0 ? this._options.newline : "") +
         this._indent(this._options.offset + this._level)
-    } else {
-      return ""
-    }
-  }
-
-  /**
-   * Produces characters to be appended to a line of string in pretty-print
-   * mode.
-   */
-  private _endLine(): string {
-    if (this._options.prettyPrint) {
-      return "" //this._options.newline
     } else {
       return ""
     }

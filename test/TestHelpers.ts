@@ -29,6 +29,12 @@ export default class TestHelpers {
     })
   }
 
+  static expectStreamError(str: XMLBuilderStream, done: any) {
+    str.on("error", () => {
+      done()
+    })
+  }
+
   private static indent(indentLevel: number): string { 
     return '  '.repeat(indentLevel) 
   }
