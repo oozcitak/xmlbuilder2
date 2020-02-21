@@ -118,16 +118,6 @@ describe('well-formed checks', () => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     expect(() => xmlStream.txt('abc😊\0')).toThrow()
-    /*
-    Object.defineProperty(ele.first().node, "data", { value: "abc\uDBFFx", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
-    Object.defineProperty(ele.first().node, "data", { value: "abc\0", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
-    Object.defineProperty(ele.first().node, "data", { value: "abc\uE000🌃\0", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
-    Object.defineProperty(ele.first().node, "data", { value: "abc\uE000🌃", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).not.toThrow()
-    */
   })
 
   test('invalid document type node', () => {

@@ -32,6 +32,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
 
   private _options: Required<StreamWriterOptions>
 
+  private _hasData = false
   private _hasDeclaration = false
   private _docTypeName = ""
   private _hasDocumentElement = false
@@ -181,7 +182,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     }
     markup += ">"
 
-    this.push(this._beginLine() + markup)
+    this._addData(this._beginLine() + markup)
 
     this._currentElementSerialized = true
     /**
@@ -221,7 +222,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     if (!hasChildren) return
 
     let markup = "</" + qualifiedName + ">"
-    this.push(this._beginLine() + markup)
+    this._addData(this._beginLine() + markup)
   }
 
   /** @inheritdoc */
@@ -243,7 +244,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       throw new Error("Comment data contains invalid characters (well-formed required).")
     }
 
-    this.push(this._beginLine() + "<!--" + node.data + "-->")
+    this._addData(this._beginLine() + "<!--" + node.data + "-->")
     return this
   }
 
@@ -273,7 +274,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
         result += c
     }
 
-    this.push(this._beginLine() + result)
+    this._addData(this._beginLine() + result)
     return this
   }
 
@@ -290,7 +291,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       throw new Error("Processing instruction data contains invalid characters (well-formed required).")
     }
 
-    this.push(this._beginLine() + "<?" + node.target + " " + node.data + "?>")
+    this._addData(this._beginLine() + "<?" + node.target + " " + node.data + "?>")
     return this
   }
 
@@ -299,7 +300,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     this._serializeOpenTag(true)
     const node = fragment().dat(content).first().node as CDATASection
 
-    this.push(this._beginLine() + "<![CDATA[" + node.data + "]]>")
+    this._addData(this._beginLine() + "<![CDATA[" + node.data + "]]>")
     return this
   }
 
@@ -320,7 +321,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     }
     markup += "?>"
 
-    this.push(markup)
+    this._addData(markup)
     this._hasDeclaration = true
 
     return this
@@ -362,7 +363,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
           "<!DOCTYPE " + name + ">"
 
     this._docTypeName = name
-    this.push(this._beginLine() + markup)
+    this._addData(this._beginLine() + markup)
     return this
   }
 
@@ -380,8 +381,20 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       this._serializeCloseTag()
     }
 
-    this.push(null)
+    this._addData(null)
     return this
+  }
+
+  /**
+   * Pushes data to internal buffer.
+   * 
+   * @param data - data
+   */
+  private _addData(data: string | null): void {
+    if (data !== null && data.length !== 0) {
+      this._hasData = true
+    }
+    this.push(data)
   }
 
   /**
@@ -390,7 +403,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
    */
   private _beginLine(): string {
     if (this._options.prettyPrint) {
-      return (this.readableLength !== 0 ? this._options.newline : "") +
+      return (this._hasData ? this._options.newline : "") +
         this._indent(this._options.offset + this._level)
     } else {
       return ""
