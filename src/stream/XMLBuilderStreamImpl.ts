@@ -41,7 +41,6 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
   private _openTags: Array<[string, string | null, NamespacePrefixMap, boolean]> = []
 
   private _level = 0
-  private _indentation: { [key: number]: string } = {}
 
   private _namespace: string | null
   private _prefixMap: NamespacePrefixMap
@@ -375,7 +374,9 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
      * when this node is closed using the _openTags array item we saved above.
      */
     this._namespace = inheritedNS
-    this._prefixMap = map
+    if (this._isPrefixMapModified(this._prefixMap, map)) {
+      this._prefixMap = map
+    }
 
     /**
      * Calls following this will either serialize child nodes or close this tag.
@@ -439,12 +440,8 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
   private _indent(level: number): string {
     if (level <= 0) {
       return ""
-    } else if (this._indentation[level] !== undefined) {
-      return this._indentation[level]
     } else {
-      const str = this._options.indent.repeat(level)
-      this._indentation[level] = str
-      return str
+      return this._options.indent.repeat(level)
     }
   }
 
@@ -653,6 +650,36 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     return generatedPrefix
   }
 
-  _read(size: number): void { }
+  /**
+   * Determines if the namespace prefix map was modified from its original.
+   * 
+   * @param originalMap - original namespace prefix map
+   * @param newMap - new namespace prefix map
+   */
+  private _isPrefixMapModified(originalMap: NamespacePrefixMap, newMap: NamespacePrefixMap) {
+    const items1: { [key: string]: string[] } = (originalMap as any)._items
+    const items2: { [key: string]: string[] } = (newMap as any)._items
+    const nullItems1: string[] = (originalMap as any)._nullItems
+    const nullItems2: string[] = (newMap as any)._nullItems
+
+    for (const key in items2) {
+      const arr1 = items1[key]
+      if (arr1 === undefined) return true
+      const arr2 = items2[key]
+      if (arr1.length !== arr2.length) return true
+      for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) return true
+      }
+    }
+
+    if (nullItems1.length !== nullItems2.length) return true
+    for (let i = 0; i < nullItems1.length; i++) {
+      if (nullItems1[i] !== nullItems2[i]) return true
+    }
+
+    return false
+  }
+
+  _read(_size: number): void { }
 
 }
