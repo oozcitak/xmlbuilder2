@@ -32,6 +32,9 @@ describe('XMLStream options', () => {
       svg: "http://www.w3.org/2000/svg",
       xlink: "http://www.w3.org/1999/xlink"
     })
+
+    // this won't throw; errors should be handled in error function
+    xmlStream.ele('\0')
   })
 
   test('no options', (done) => {
