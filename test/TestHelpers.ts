@@ -2,7 +2,7 @@ import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { isObject, isArray, isMap, forEachObject, objectLength, forEachArray } from "@oozcitak/util"
-import { builder, create, fragment, convert, createStream } from "../src"
+import { builder, create, fragment, convert, documentStream, fragmentStream } from "../src"
 import { XMLBuilderStream, StreamWriterOptions } from "../src/interfaces"
 
 export default class TestHelpers {
@@ -16,7 +16,7 @@ export default class TestHelpers {
     return s.serializeToString(node)
   }
 
-  static createStream(options?: Partial<StreamWriterOptions>): XMLBuilderStream {
+  static documentStream(options?: Partial<StreamWriterOptions>): XMLBuilderStream {
     options = options || {}
     options.data = options.data || (function (this: XMLBuilderStream, chunk) {
       (this as any).streamResult += chunk
@@ -25,7 +25,22 @@ export default class TestHelpers {
     options.error = options.error || (function (this: XMLBuilderStream, err) {
       str.streamError = err
     })
-    const str = createStream(options as StreamWriterOptions) as any
+    const str = documentStream(options as StreamWriterOptions) as any
+    str.streamError = "Did not throw"
+    str.streamResult = ""
+    return str
+  }
+
+  static fragmentStream(options?: Partial<StreamWriterOptions>): XMLBuilderStream {
+    options = options || {}
+    options.data = options.data || (function (this: XMLBuilderStream, chunk) {
+      (this as any).streamResult += chunk
+    })
+    options.end = options.end || (() => { })
+    options.error = options.error || (function (this: XMLBuilderStream, err) {
+      str.streamError = err
+    })
+    const str = fragmentStream(options as StreamWriterOptions) as any
     str.streamError = "Did not throw"
     str.streamResult = ""
     return str

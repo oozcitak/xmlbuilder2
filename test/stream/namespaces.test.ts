@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('namespaces', () => {
 
   test('default namespace', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.ele('root', { xmlns: "ns" })
       .ele('foo').up()
@@ -17,7 +17,7 @@ describe('namespaces', () => {
   })
 
   test('XML namespace', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.ele('http://www.w3.org/XML/1998/namespace', 'root')
       .ele('foo').up()
@@ -32,7 +32,7 @@ describe('namespaces', () => {
   })
 
   test('duplicate namespaces', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('d:root', { "xmlns:d": "ns1" })
       .ele('e:foo', { "xmlns:e": "ns1" }).up()
@@ -48,7 +48,7 @@ describe('namespaces', () => {
   })
 
   test('attribute with namespace and no prefix', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('r', { "xmlns:x0": "ns", "xmlns:x2": "ns" })
       .ele('b', { "xmlns:x1": "ns" })
@@ -62,7 +62,7 @@ describe('namespaces', () => {
   })
 
   test('nested default namespace declaration attributes with same namespace are ignored', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('ns', 'r')
       .att('http://www.w3.org/2000/xmlns/', 'xmlns', 'ns')
@@ -77,7 +77,7 @@ describe('namespaces', () => {
   })
 
   test('prefix of an attribute is replaced with another existing prefix mapped to the same namespace URI', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('r')
       .att('xmlns:xx', 'uri')
@@ -89,7 +89,7 @@ describe('namespaces', () => {
   })
 
   test('prefix of an attribute is replaced with another existing prefix mapped to the same namespace URI - 2', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.ele('r', { "xmlns:xx": "uri" })
       .ele('b')
@@ -103,7 +103,7 @@ describe('namespaces', () => {
   })
 
   test('prefix of an attribute is NOT preserved if neither its prefix nor its namespace URI is not already used', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('r')
       .att('xmlns:xx', 'uri')
@@ -115,7 +115,7 @@ describe('namespaces', () => {
   })
 
   test('same prefix declared in an ancestor element', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('uri1', 'p:root')
       .ele('child')
@@ -129,7 +129,7 @@ describe('namespaces', () => {
   })
 
   test('drop element prefix if the namespace is same as inherited default namespace', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('uri', 'root')
       .ele('uri', 'p:child')
@@ -142,7 +142,7 @@ describe('namespaces', () => {
   })
 
   test('find an appropriate prefix', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('u1', 'p1:root')
       .ele('u1', 'p2:child')
@@ -158,7 +158,7 @@ describe('namespaces', () => {
   })
 
   test('xmlns:* attributes', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('uri1', 'p:root')
       .att('http://www.w3.org/2000/xmlns/', 'xmlns:p', 'uri2')
@@ -169,7 +169,7 @@ describe('namespaces', () => {
   })
 
   test('prefix re-declared in ancestor element', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('root')
       .att('http://www.w3.org/2000/xmlns/', 'xmlns:p', 'uri2')
@@ -183,7 +183,7 @@ describe('namespaces', () => {
   })
 
   test('default namespace does not apply if was declared in an ancestor', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('root', { "xmlns:x": "uri1" })
       .ele('table', { xmlns: "uri1" })
@@ -196,7 +196,7 @@ describe('namespaces', () => {
   })
 
   test('multiple generated prefixes', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('root')
       .ele('child1').att('uri1', 'attr1', 'value1').att('uri2', 'attr2', 'value2').up()
@@ -211,7 +211,7 @@ describe('namespaces', () => {
   })
 
   test('attributes in same namespace', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('root')
       .ele('child').att('uri', 'attr', 'value').up()
@@ -226,7 +226,7 @@ describe('namespaces', () => {
   })
 
   test('attributes in same namespace in a single element', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('root')
       .att('uri', 'attr1', 'value1').att('uri', 'attr2', 'value2')
@@ -237,25 +237,25 @@ describe('namespaces', () => {
   })
 
   test('redundant xmlns is dropped - 1', (done) => {
-    const xmlStream = $$.createStream()
+    const xmlStream = $$.documentStream()
     xmlStream.ele('root').ele('', 'child').end()
     $$.expectStreamResult(xmlStream, '<root><child/></root>', done)
   })
 
   test('redundant xmlns is dropped - 2', (done) => {
-    const xmlStream = $$.createStream()
+    const xmlStream = $$.documentStream()
     xmlStream.ele('', 'root').ele('', 'child').end()
     $$.expectStreamResult(xmlStream, '<root><child/></root>', done)
   })
 
   test('redundant xmlns is dropped - 3', (done) => {
-    const xmlStream = $$.createStream()
+    const xmlStream = $$.documentStream()
     xmlStream.ele('u1', 'root').ele('u1', 'child').end()
     $$.expectStreamResult(xmlStream, '<root xmlns="u1"><child/></root>', done)
   })
 
   test('attribute with no prefix and namespace - 1', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.ele('r', { 'xmlns:x0': 'uri', 'xmlns:x2': 'uri' })
       .ele('b', { 'xmlns:x1': 'uri' })
@@ -269,7 +269,7 @@ describe('namespaces', () => {
   })
 
   test('attribute with no prefix and namespace - 2', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.ele('el1', { 'xmlns:p': 'u1', 'xmlns:q': 'u1' })
       .ele('el2', { 'xmlns:q': 'u2' })
@@ -283,7 +283,7 @@ describe('namespaces', () => {
   })
 
   test('element prefix is dropped if the namespace is same as inherited default namespace', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('u1', 'root')
       .ele('u1', 'p:child')
@@ -296,7 +296,7 @@ describe('namespaces', () => {
   })
 
   test('xmlns element prefix', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     
     xmlStream.ele('http://www.w3.org/2000/xmlns/', 'xmlns:root')
       .end()
@@ -306,7 +306,7 @@ describe('namespaces', () => {
   })
 
   test('void HTML element', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
     xmlStream.ele('root')
       .ele('http://www.w3.org/1999/xhtml', 'hr')
       .end()
@@ -317,23 +317,23 @@ describe('namespaces', () => {
   })
 
   test('built-in namespace alias', (done) => {
-    const xmlStream1 = $$.createStream()
+    const xmlStream1 = $$.documentStream()
     xmlStream1.ele('@xml', 'root').att('@xml', 'att', 'val').end()
     $$.expectStreamResult(xmlStream1, '<xml:root xml:att="val"/>', done)
 
-    const xmlStream2 = $$.createStream()
+    const xmlStream2 = $$.documentStream()
     xmlStream2.ele('@svg', 'root').end()
     $$.expectStreamResult(xmlStream2, '<root xmlns="http://www.w3.org/2000/svg"/>', done)
   })
 
   test('custom namespace alias', (done) => {
-    const xmlStream = $$.createStream({ namespaceAlias: { ns: "ns1" } })
+    const xmlStream = $$.documentStream({ namespaceAlias: { ns: "ns1" } })
     xmlStream.ele('@ns', 'p:root').att('@ns', 'p:att', 'val').end()
     $$.expectStreamResult(xmlStream, '<p:root xmlns:p="ns1" p:att="val"/>', done)
   })
 
   test('invalid namespace alias', (end) => {
-    const xmlStream = $$.createStream({ namespaceAlias: { ns: "ns1" } })
+    const xmlStream = $$.documentStream({ namespaceAlias: { ns: "ns1" } })
     $$.expectStreamError(xmlStream, () => xmlStream.ele('@ns1', 'root'), end)
   })
 

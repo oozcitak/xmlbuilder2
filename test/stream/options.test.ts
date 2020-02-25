@@ -35,7 +35,7 @@ describe('XMLStream options', () => {
   })
 
   test('no options', (done) => {
-    const xmlStream = $$.createStream()
+    const xmlStream = $$.documentStream()
 
     xmlStream.dec().ele('root').end()
 
@@ -43,7 +43,7 @@ describe('XMLStream options', () => {
   })
 
   test('prettyPrint', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec().ele('root').end()
 
@@ -53,13 +53,13 @@ describe('XMLStream options', () => {
   })
 
   test('wellFormed', (done) => {
-    const xmlStream = $$.createStream({ wellFormed: true })
+    const xmlStream = $$.documentStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     $$.expectStreamError(xmlStream, () => xmlStream.com('--'), done)
   })
 
   test('indent', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true, indent: "    " })
+    const xmlStream = $$.documentStream({ prettyPrint: true, indent: "    " })
     xmlStream.ele('root').ele('node').end()
     $$.expectStreamResult(xmlStream, $$.t`
       <root>
@@ -68,13 +68,13 @@ describe('XMLStream options', () => {
   })
 
   test('newline', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true, indent: '', newline: "!" })
+    const xmlStream = $$.documentStream({ prettyPrint: true, indent: '', newline: "!" })
     xmlStream.ele('root').ele('node').end()
     $$.expectStreamResult(xmlStream, `<root>!<node/>!</root>`, done)
   })
 
   test('offset', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true, offset: 2 })
+    const xmlStream = $$.documentStream({ prettyPrint: true, offset: 2 })
     xmlStream.ele('root').ele('node').end()
     $$.expectStreamResult(xmlStream,
       '    <root>\n' +
@@ -83,7 +83,7 @@ describe('XMLStream options', () => {
   })
 
   test('allowEmptyTags', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true, allowEmptyTags: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true, allowEmptyTags: true })
     xmlStream.ele('root').ele('node').end()
     $$.expectStreamResult(xmlStream, $$.t`
       <root>
@@ -92,7 +92,7 @@ describe('XMLStream options', () => {
   })
 
   test('spaceBeforeSlash', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true, spaceBeforeSlash: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true, spaceBeforeSlash: true })
     xmlStream.ele('root').ele('node').end()
     $$.expectStreamResult(xmlStream, $$.t`
       <root>
@@ -101,7 +101,7 @@ describe('XMLStream options', () => {
   })
 
   test('width', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true, width: 20 })
+    const xmlStream = $$.documentStream({ prettyPrint: true, width: 20 })
     xmlStream.ele('test').ele('node', { "first": "1", "second": "2" }).end()
     $$.expectStreamResult(xmlStream, $$.t`
       <test>

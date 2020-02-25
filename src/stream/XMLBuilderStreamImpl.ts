@@ -31,6 +31,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
   private _options: Required<StreamWriterOptions>
   private _builderOptions: XMLBuilderCreateOptions
+  private _fragment: boolean
 
   private _hasData = false
   private _hasDeclaration = false
@@ -56,10 +57,13 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
    * Initializes a new instance of `XMLStream`.
    * 
    * @param options - stream writer options
+   * @param fragment - whether to create fragment stream or a document stream
    * 
    * @returns XML stream
    */
-  public constructor(options: StreamWriterOptions) {
+  public constructor(options: StreamWriterOptions, fragment = false) {
+    this._fragment = fragment
+
     // provide default options
     this._options = applyDefaults(options,
       DefaultStreamWriterOptions
@@ -86,7 +90,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
     this._serializeOpenTag(true)
 
-    if (this._hasDocumentElement && this._level === 0) {
+    if (!this._fragment && this._hasDocumentElement && this._level === 0) {
       this._onError.call(this, new Error("Document cannot have multiple document element nodes."))
       return this
     }
@@ -98,13 +102,15 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
       return this
     }
 
-    if (!this._hasDocumentElement && this._docTypeName !== "" && (this._currentElement.node as Element)._qualifiedName !== this._docTypeName) {
+    if (!this._fragment && !this._hasDocumentElement && this._docTypeName !== "" && (this._currentElement.node as Element)._qualifiedName !== this._docTypeName) {
       this._onError.call(this, new Error("Document element name does not match DocType declaration name."))
       return this
     }
 
     this._currentElementSerialized = false
-    this._hasDocumentElement = true
+    if (!this._fragment) {
+      this._hasDocumentElement = true
+    }
 
     return this
   }
@@ -150,7 +156,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
   /** @inheritdoc */
   txt(content: string): XMLBuilderStream {
-    if (this._currentElement === undefined) {
+    if (!this._fragment && this._currentElement === undefined) {
       this._onError.call(this, new Error("Cannot insert a text node as child of a document node."))
       return this
     }
@@ -234,6 +240,11 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
   /** @inheritdoc */
   dec(options: { version?: "1.0", encoding?: string, standalone?: boolean } = { version: "1.0" }): XMLBuilderStream {
+    if (this._fragment) {
+      this._onError.call(this, Error("Cannot insert an XML declaration into a document fragment."))
+      return this
+    }
+
     if (this._hasDeclaration) {
       this._onError.call(this, Error("XML declaration is already inserted."))
       return this
@@ -258,6 +269,11 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
   /** @inheritdoc */
   dtd(options: DTDOptions & { name: string }): XMLBuilderStream {
+    if (this._fragment) {
+      this._onError.call(this, Error("Cannot insert a DocType declaration into a document fragment."))
+      return this
+    }
+
     if (this._docTypeName !== "") {
       this._onError.call(this, new Error("DocType declaration is already inserted."))
       return this

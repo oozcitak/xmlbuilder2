@@ -314,14 +314,25 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
 }
 
 /**
- * Creates an XML builder stream.
+ * Creates an XML builder document stream.
  * 
  * @param options - stream writer options
  * 
  * @returns XML builder stream
  */
-export function createStream(options: StreamWriterOptions): XMLBuilderStream {
+export function documentStream(options: StreamWriterOptions): XMLBuilderStream {
   return new XMLBuilderStreamImpl(options)
+}
+
+/**
+ * Creates an XML builder fragment stream.
+ * 
+ * @param options - stream writer options
+ * 
+ * @returns XML builder stream
+ */
+export function fragmentStream(options: StreamWriterOptions): XMLBuilderStream {
+  return new XMLBuilderStreamImpl(options, true)
 }
 
 function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {

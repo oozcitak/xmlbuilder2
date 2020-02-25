@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('dec()', () => {
 
   test('dec() with default version', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec().ele('root').end()
 
@@ -13,7 +13,7 @@ describe('dec()', () => {
   })
 
   test('dec() with version', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" }).ele('root').end()
 
@@ -23,7 +23,7 @@ describe('dec()', () => {
   })
 
   test('dec() with encoding', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec({ encoding: "US-ASCII" }).ele('root').end()
 
@@ -33,7 +33,7 @@ describe('dec()', () => {
   })
 
   test('dec() with standalone true', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec({ standalone: true }).ele('root').end()
 
@@ -43,7 +43,7 @@ describe('dec()', () => {
   })
 
   test('dec() with standalone false', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec({ standalone: false }).ele('root').end()
 
@@ -53,7 +53,7 @@ describe('dec()', () => {
   })
 
   test('dec() with all settings', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0", encoding: "US-ASCII", standalone: false }).ele('root').end()
 

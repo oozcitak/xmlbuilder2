@@ -3,7 +3,7 @@ import $$ from '../TestHelpers'
 describe('dtd()', () => {
 
   test('doctype with both public and system identifier', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" })
       .dtd({ name: 'root', pubID: "pub", sysID: "sys" })
@@ -16,7 +16,7 @@ describe('dtd()', () => {
   })
 
   test('doctype with public identifier', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" })
       .dtd({ name: 'root', pubID: "pub" })
@@ -29,7 +29,7 @@ describe('dtd()', () => {
   })
 
   test('doctype with system identifier', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" })
       .dtd({ name: 'root', sysID: "sys" })
@@ -42,7 +42,7 @@ describe('dtd()', () => {
   })
 
   test('doctype without identifiers', (done) => {
-    const xmlStream = $$.createStream({ prettyPrint: true })
+    const xmlStream = $$.documentStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" })
       .dtd({ name: 'root' })
