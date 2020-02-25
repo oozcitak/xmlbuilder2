@@ -6,7 +6,7 @@ describe('dtd()', () => {
     const xmlStream = $$.createStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" })
-      .dtd('root', { pubID: "pub", sysID: "sys" })
+      .dtd({ name: 'root', pubID: "pub", sysID: "sys" })
       .ele('ns', 'root').end()
 
     $$.expectStreamResult(xmlStream, $$.t`
@@ -19,7 +19,7 @@ describe('dtd()', () => {
     const xmlStream = $$.createStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" })
-      .dtd('root', { pubID: "pub" })
+      .dtd({ name: 'root', pubID: "pub" })
       .ele('ns', 'root').end()
 
     $$.expectStreamResult(xmlStream, $$.t`
@@ -32,7 +32,7 @@ describe('dtd()', () => {
     const xmlStream = $$.createStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" })
-      .dtd('root', { sysID: "sys" })
+      .dtd({ name: 'root', sysID: "sys" })
       .ele('ns', 'root').end()
 
     $$.expectStreamResult(xmlStream, $$.t`
@@ -45,7 +45,7 @@ describe('dtd()', () => {
     const xmlStream = $$.createStream({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" })
-      .dtd('root')
+      .dtd({ name: 'root' })
       .ele('ns', 'root').end()
 
     $$.expectStreamResult(xmlStream, $$.t`

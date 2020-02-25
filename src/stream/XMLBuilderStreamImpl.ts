@@ -61,7 +61,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   public constructor(options: StreamWriterOptions) {
     // provide default options
     this._options = applyDefaults(options, {
-      error: (function(err: Error) { }),
+      error: (function (err: Error) { }),
       wellFormed: false,
       prettyPrint: false,
       indent: "  ",
@@ -99,6 +99,12 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
       this._onError.call(this, err)
       return this
     }
+
+    if (!this._hasDocumentElement && this._docTypeName !== "" && (this._currentElement.node as Element)._qualifiedName !== this._docTypeName) {
+      this._onError.call(this, new Error("Document element name does not match DocType declaration name."))
+      return this
+    }
+
     this._currentElementSerialized = false
     this._hasDocumentElement = true
 
@@ -128,7 +134,9 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
     try {
       node = fragment().com(content).first().node as Comment
     } catch (err) {
+      /* istanbul ignore next */
       this._onError.call(this, err)
+      /* istanbul ignore next */
       return this
     }
 
@@ -154,7 +162,9 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
     try {
       node = fragment().txt(content).first().node as Text
     } catch (err) {
+      /* istanbul ignore next */
       this._onError.call(this, err)
+      /* istanbul ignore next */
       return this
     }
 
@@ -188,7 +198,9 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
     try {
       node = fragment().ins(target as any, content).first().node as ProcessingInstruction
     } catch (err) {
+      /* istanbul ignore next */
       this._onError.call(this, err)
+      /* istanbul ignore next */
       return this
     }
 
@@ -247,7 +259,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   }
 
   /** @inheritdoc */
-  dtd(name: string, options?: DTDOptions): XMLBuilderStream {
+  dtd(options: DTDOptions & { name: string }): XMLBuilderStream {
     if (this._docTypeName !== "") {
       this._onError.call(this, new Error("DocType declaration is already inserted."))
       return this
@@ -255,16 +267,6 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
     if (this._hasDocumentElement) {
       this._onError.call(this, new Error("Cannot insert DocType declaration after document element."))
-      return this
-    }
-
-    if (!xml_isName(name)) {
-      this._onError.call(this, new Error(`Invalid XML name: ${name}`))
-      return this
-    }
-
-    if (!xml_isQName(name)) {
-      this._onError.call(this, new Error(`Invalid XML qualified name: ${name}.`))
       return this
     }
 
@@ -288,16 +290,18 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
       return this
     }
 
-    const markup = node.publicId && node.systemId ?
-      "<!DOCTYPE " + name + " PUBLIC \"" + node.publicId + "\" \"" + node.systemId + "\">"
-      : node.publicId ?
-        "<!DOCTYPE " + name + " PUBLIC \"" + node.publicId + "\">"
-        : node.systemId ?
-          "<!DOCTYPE " + name + " SYSTEM \"" + node.systemId + "\">"
-          :
-          "<!DOCTYPE " + name + ">"
+    let markup = ""
+    if (node.publicId && node.systemId) {
+      markup = "<!DOCTYPE " + options.name + " PUBLIC \"" + node.publicId + "\" \"" + node.systemId + "\">"
+    } else if (node.publicId) {
+      markup = "<!DOCTYPE " + options.name + " PUBLIC \"" + node.publicId + "\">"
+    } else if (node.systemId) {
+      markup = "<!DOCTYPE " + options.name + " SYSTEM \"" + node.systemId + "\">"
+    } else {
+      markup = "<!DOCTYPE " + options.name + ">"
+    }
 
-    this._docTypeName = name
+    this._docTypeName = options.name
     this._push(this._beginLine() + markup)
     return this
   }

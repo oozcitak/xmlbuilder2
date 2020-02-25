@@ -26,7 +26,7 @@ export default class TestHelpers {
       str.streamError = err
     })
     const str = createStream(options as Required<StreamWriterOptions>) as any
-    str.streamError = undefined
+    str.streamError = "Did not throw"
     str.streamResult = ""
     return str
   }
@@ -38,7 +38,7 @@ export default class TestHelpers {
 
   static expectStreamError(str: XMLBuilderStream, testFunc: () => any, done: any) {
     testFunc()
-    expect((str as any).streamError).not.toBe(undefined)
+    expect((str as any).streamError).toBeInstanceOf(Error)
     done()
   }
 

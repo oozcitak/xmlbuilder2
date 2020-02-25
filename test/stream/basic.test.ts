@@ -43,7 +43,7 @@ describe('basic XMLStream tests', () => {
   test('dtd', (done) => {
     const xmlStream = $$.createStream()
 
-    xmlStream.dtd("root", { pubID: "pub", sysID: "sys" })
+    xmlStream.dtd({ name: "root", pubID: "pub", sysID: "sys" })
       .ele("root")
       .end()
 
@@ -66,6 +66,7 @@ describe('basic XMLStream tests', () => {
 
     xmlStream.ele("root")
       .txt("text")
+      .txt("")
       .end()
 
     $$.expectStreamResult(xmlStream, `<root>text</root>`, done)
@@ -105,7 +106,7 @@ describe('basic XMLStream tests', () => {
     const xmlStream = $$.createStream({ prettyPrint: true })
 
     xmlStream.dec()
-      .dtd("root")
+      .dtd({ name: "root" })
       .com("comment1")
       .ele("root").up()
       .com("comment2")
