@@ -45,9 +45,9 @@ export interface XMLBuilderCreateOptions {
   /**
    * Defines default namespaces to apply to all elements and attributes.
    */
-  defaultNamespace?: { 
-    ele?: null | string, 
-    att?: null | string 
+  defaultNamespace?: {
+    ele?: null | string,
+    att?: null | string
   }
   /**
    * Defines namespace aliases.
@@ -91,9 +91,9 @@ export interface XMLBuilderOptions {
   /**
    * Defines default namespaces to apply to all elements and attributes.
    */
-  defaultNamespace: { 
-    ele: undefined | null | string, 
-    att: undefined | null | string 
+  defaultNamespace: {
+    ele: undefined | null | string,
+    att: undefined | null | string
   }
   /**
    * Defines namespace aliases.
@@ -989,13 +989,26 @@ export type StreamWriterOptions = {
   /**
    * A callback function which is called when an error occurs.
    */
-  error?: ((err: Error) => void)  
+  error?: ((err: Error) => void)
+
+  /**
+   * Defines default namespaces to apply to all elements and attributes.
+   */
+  defaultNamespace?: {
+    ele?: null | string,
+    att?: null | string
+  }
+  /**
+   * Defines namespace aliases.
+   */
+  namespaceAlias?: { [key: string]: string | null }
+
   /**
    * Ensures that the document adheres to the syntax rules specified by the
    * XML specification. If this flag is set and the document is not well-formed
    * errors will be thrown. Defaults to `false`.
    */
-  wellFormed?: boolean  
+  wellFormed?: boolean
   /**
    * Pretty-prints the XML tree. Defaults to `false`.
    */
@@ -1041,4 +1054,31 @@ export type StreamWriterOptions = {
    * ```
    */
   spaceBeforeSlash?: boolean
+}
+
+/**
+ * Defines default values for builder options.
+ */
+export const DefaultStreamWriterOptions: Partial<StreamWriterOptions> = {
+  error: (() => { }),
+  wellFormed: false,
+  prettyPrint: false,
+  indent: "  ",
+  newline: "\n",
+  offset: 0,
+  width: 0,
+  allowEmptyTags: false,
+  spaceBeforeSlash: false,
+  defaultNamespace: {
+    ele: undefined,
+    att: undefined
+  },
+  namespaceAlias: {
+    html: "http://www.w3.org/1999/xhtml",
+    xml: "http://www.w3.org/XML/1998/namespace",
+    xmlns: "http://www.w3.org/2000/xmlns/",
+    mathml: "http://www.w3.org/1998/Math/MathML",
+    svg: "http://www.w3.org/2000/svg",
+    xlink: "http://www.w3.org/1999/xlink"
+  }
 }

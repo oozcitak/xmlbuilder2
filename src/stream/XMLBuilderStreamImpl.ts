@@ -1,6 +1,6 @@
 import {
   XMLBuilderStream, AttributesObject, PIObject, DTDOptions, XMLBuilder,
-  StreamWriterOptions
+  StreamWriterOptions, XMLBuilderCreateOptions, DefaultStreamWriterOptions
 } from "../interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { fragment, create } from ".."
@@ -30,6 +30,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
     'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'])
 
   private _options: Required<StreamWriterOptions>
+  private _builderOptions: XMLBuilderCreateOptions
 
   private _hasData = false
   private _hasDeclaration = false
@@ -60,17 +61,14 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
    */
   public constructor(options: StreamWriterOptions) {
     // provide default options
-    this._options = applyDefaults(options, {
-      error: (function (err: Error) { }),
-      wellFormed: false,
-      prettyPrint: false,
-      indent: "  ",
-      newline: "\n",
-      offset: 0,
-      width: 0,
-      allowEmptyTags: false,
-      spaceBeforeSlash: false
-    }) as Required<StreamWriterOptions>
+    this._options = applyDefaults(options,
+      DefaultStreamWriterOptions
+    ) as Required<StreamWriterOptions>
+
+    this._builderOptions = {
+      defaultNamespace: this._options.defaultNamespace,
+      namespaceAlias: this._options.namespaceAlias
+    }
 
     this._onData = this._options.data
     this._onEnd = this._options.end
@@ -94,7 +92,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
     }
 
     try {
-      this._currentElement = fragment().ele(p1 as any, p2 as any, p3 as any)
+      this._currentElement = fragment(this._builderOptions).ele(p1 as any, p2 as any, p3 as any)
     } catch (err) {
       this._onError.call(this, err)
       return this
@@ -132,7 +130,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
     let node: Comment
     try {
-      node = fragment().com(content).first().node as Comment
+      node = fragment(this._builderOptions).com(content).first().node as Comment
     } catch (err) {
       /* istanbul ignore next */
       this._onError.call(this, err)
@@ -160,7 +158,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
     let node: Text
     try {
-      node = fragment().txt(content).first().node as Text
+      node = fragment(this._builderOptions).txt(content).first().node as Text
     } catch (err) {
       /* istanbul ignore next */
       this._onError.call(this, err)
@@ -196,7 +194,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
     let node: ProcessingInstruction
     try {
-      node = fragment().ins(target as any, content).first().node as ProcessingInstruction
+      node = fragment(this._builderOptions).ins(target as any, content).first().node as ProcessingInstruction
     } catch (err) {
       /* istanbul ignore next */
       this._onError.call(this, err)
@@ -224,7 +222,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
     let node: CDATASection
     try {
-      node = fragment().dat(content).first().node as CDATASection
+      node = fragment(this._builderOptions).dat(content).first().node as CDATASection
     } catch (err) {
       this._onError.call(this, err)
       return this

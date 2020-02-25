@@ -316,4 +316,25 @@ describe('namespaces', () => {
       </root>`, done)      
   })
 
+  test('built-in namespace alias', (done) => {
+    const xmlStream1 = $$.createStream()
+    xmlStream1.ele('@xml', 'root').att('@xml', 'att', 'val').end()
+    $$.expectStreamResult(xmlStream1, '<xml:root xml:att="val"/>', done)
+
+    const xmlStream2 = $$.createStream()
+    xmlStream2.ele('@svg', 'root').end()
+    $$.expectStreamResult(xmlStream2, '<root xmlns="http://www.w3.org/2000/svg"/>', done)
+  })
+
+  test('custom namespace alias', (done) => {
+    const xmlStream = $$.createStream({ namespaceAlias: { ns: "ns1" } })
+    xmlStream.ele('@ns', 'p:root').att('@ns', 'p:att', 'val').end()
+    $$.expectStreamResult(xmlStream, '<p:root xmlns:p="ns1" p:att="val"/>', done)
+  })
+
+  test('invalid namespace alias', (end) => {
+    const xmlStream = $$.createStream({ namespaceAlias: { ns: "ns1" } })
+    $$.expectStreamError(xmlStream, () => xmlStream.ele('@ns1', 'root'), end)
+  })
+
 })

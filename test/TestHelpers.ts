@@ -25,7 +25,7 @@ export default class TestHelpers {
     options.error = options.error || (function (this: XMLBuilderStream, err) {
       str.streamError = err
     })
-    const str = createStream(options as Required<StreamWriterOptions>) as any
+    const str = createStream(options as StreamWriterOptions) as any
     str.streamError = "Did not throw"
     str.streamResult = ""
     return str

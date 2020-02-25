@@ -1,6 +1,38 @@
 import $$ from '../TestHelpers'
+import { XMLBuilderStreamImpl } from '../../src/stream'
 
 describe('XMLStream options', () => {
+
+  test('options defaults', () => {
+    const xmlStream = new XMLBuilderStreamImpl({
+      data: ((chunk, level) => { }),
+      end: (() => { })
+    }) as any
+
+    const options = xmlStream._options
+
+    expect(typeof options.error).toBe('function')
+    expect(options.wellFormed).toBe(false)
+    expect(options.prettyPrint).toBe(false)
+    expect(options.indent).toBe("  ")
+    expect(options.newline).toBe("\n")
+    expect(options.offset).toBe(0)
+    expect(options.width).toBe(0)
+    expect(options.allowEmptyTags).toBe(false)
+    expect(options.spaceBeforeSlash).toBe(false)
+    expect(options.defaultNamespace).toEqual({
+      ele: undefined,
+      att: undefined
+    })
+    expect(options.namespaceAlias).toEqual({
+      html: "http://www.w3.org/1999/xhtml",
+      xml: "http://www.w3.org/XML/1998/namespace",
+      xmlns: "http://www.w3.org/2000/xmlns/",
+      mathml: "http://www.w3.org/1998/Math/MathML",
+      svg: "http://www.w3.org/2000/svg",
+      xlink: "http://www.w3.org/1999/xlink"
+    })
+  })
 
   test('no options', (done) => {
     const xmlStream = $$.createStream()
@@ -70,7 +102,7 @@ describe('XMLStream options', () => {
 
   test('width', (done) => {
     const xmlStream = $$.createStream({ prettyPrint: true, width: 20 })
-    xmlStream.ele('test').ele('node', { "first":"1", "second":"2" }).end()
+    xmlStream.ele('test').ele('node', { "first": "1", "second": "2" }).end()
     $$.expectStreamResult(xmlStream, $$.t`
       <test>
         <node first="1"
