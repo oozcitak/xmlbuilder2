@@ -358,13 +358,17 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   dtd(options?: DTDOptions): XMLBuilder {
+    const name =  ((options && options.name) || (this._doc.documentElement ? this._doc.documentElement.tagName: "ROOT")) + ""
     const pubID = ((options && options.pubID) || "") + ""
     const sysID = ((options && options.sysID) || "") + ""
 
+    // name must match document element
+    if (this._doc.documentElement !== null && name !== this._doc.documentElement.tagName) {
+      throw new Error("DocType name does not match document element name.")
+    }
+
     // create doctype node
-    const docType = this._doc.implementation.createDocumentType(
-      this._doc.documentElement !== null ? this._doc.documentElement.tagName : 'ROOT',
-      pubID, sysID)
+    const docType = this._doc.implementation.createDocumentType(name, pubID, sysID)
 
     if (this._doc.doctype !== null) {
       // replace existing doctype

@@ -48,6 +48,11 @@ describe('dtd()', () => {
       `)
   })
 
+  test('name must match document element node', () => {
+    const doc = $$.create().ele('root')
+    expect(() => doc.dtd({ name: 'newroot' })).toThrow()
+  })
+
   test('update when element node changes', () => {
     const doc = $$.create().dtd({ pubID: "pub", sysID: "sys" })
     doc.ele('newroot')

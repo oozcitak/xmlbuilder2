@@ -114,6 +114,11 @@ export const XMLBuilderOptionKeys = new Set([
  */
 export interface DTDOptions {
   /**
+   * Name of the DTD. If name is omitted, it will be taken from the document
+   * element node.
+   */
+  name?: string
+  /**
    * Public identifier of the DTD
    */
   pubID?: string
@@ -948,12 +953,11 @@ export interface XMLBuilderStream {
   /**
    * Creates a new DocType node and inserts it into the document.
    * 
-   * @param name - name of the document element
    * @param options - DocType identifiers
    * 
    * @returns current element node
    */
-  dtd(name: string, options?: DTDOptions): XMLBuilderStream
+  dtd(options: DTDOptions & { name: string }): XMLBuilderStream
 
   /**
    * Closes the current element node.
