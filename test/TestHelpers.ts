@@ -3,40 +3,47 @@ import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { isObject, isArray, isMap, forEachObject, objectLength, forEachArray } from "@oozcitak/util"
 import { builder, create, fragment, convert, createStream } from "../src"
-import { XMLBuilderStream } from "../src/interfaces"
+import { XMLBuilderStream, StreamWriterOptions } from "../src/interfaces"
 
 export default class TestHelpers {
   static builder = builder
   static create = create
   static fragment = fragment
   static convert = convert
-  static createStream = createStream
- 
+
   static serialize(node: Node): string {
     const s = new XMLSerializer()
     return s.serializeToString(node)
   }
 
+  static createStream(options?: Partial<StreamWriterOptions>): XMLBuilderStream {
+    options = options || {}
+    options.data = (function (this: XMLBuilderStream, chunk) {
+      (this as any).streamResult += chunk
+    })
+    options.end = (() => { })
+    options.error = (function (this: XMLBuilderStream, err) {
+      str.streamError = err
+    })
+    const str = createStream(options as Required<StreamWriterOptions>) as any
+    str.streamError = undefined
+    str.streamResult = ""
+    return str
+  }
+
   static expectStreamResult(str: XMLBuilderStream, result: string, done: any) {
-    let res = ""
-    str.on("data", chunk => {
-      res += chunk.toString()
-    })
-
-    str.on("end", () => {
-      expect(res).toBe(result)
-      done()
-    })
+    expect((str as any).streamResult).toBe(result)
+    done()
   }
 
-  static expectStreamError(str: XMLBuilderStream, done: any) {
-    str.on("error", () => {
-      done()
-    })
+  static expectStreamError(str: XMLBuilderStream, testFunc: () => any, done: any) {
+    testFunc()
+    expect((str as any).streamError).not.toBe(undefined)
+    done()
   }
 
-  private static indent(indentLevel: number): string { 
-    return '  '.repeat(indentLevel) 
+  private static indent(indentLevel: number): string {
+    return '  '.repeat(indentLevel)
   }
   private static isLeafNode(obj: any): boolean {
     return this.descendantCount(obj) <= 1
@@ -70,7 +77,7 @@ export default class TestHelpers {
     if (isArray(map)) {
       r += '['
       const len = map.length
-      let i = 0      
+      let i = 0
       forEachArray(map, val => {
         r += (leaf ? ' ' : '\n' + TestHelpers.indent(level + 1)) + TestHelpers.printMap(val, level + 1)
         if (i < len - 1) { r += ',' }
@@ -92,7 +99,7 @@ export default class TestHelpers {
     }
     return r
   }
-  
+
   /**
    * De-indents template literals.
    */
@@ -112,12 +119,12 @@ export default class TestHelpers {
     switch (node.nodeType) {
       case 1: // Element
         str = `${indent}${node.tagName}`
-        if(node.namespaceURI) {
+        if (node.namespaceURI) {
           str += ` (ns:${node.namespaceURI})`
         }
         for (const attr of node.attributes) {
           str += ` ${attr.name}="${attr.value}"`
-          if(attr.namespaceURI) {
+          if (attr.namespaceURI) {
             str += ` (ns:${attr.namespaceURI})`
           }
         }

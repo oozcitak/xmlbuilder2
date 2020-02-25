@@ -1,4 +1,3 @@
-import { Readable } from "stream"
 import {
   XMLBuilderStream, AttributesObject, PIObject, DTDOptions, XMLBuilder,
   StreamWriterOptions
@@ -24,7 +23,7 @@ type PrefixIndex = { value: number }
 /**
  * Represents a readable XML document stream.
  */
-export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
+export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
   private static _VoidElementNames = new Set(['area', 'base', 'basefont',
     'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen',
@@ -46,6 +45,12 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
   private _prefixMap: NamespacePrefixMap
   private _prefixIndex: PrefixIndex
 
+  private _ended = false
+
+  private _onData: ((chunk: string) => void)
+  private _onEnd: (() => void)
+  private _onError: ((err: Error) => void)
+
   /**
    * Initializes a new instance of `XMLStream`.
    * 
@@ -53,11 +58,10 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
    * 
    * @returns XML stream
    */
-  public constructor(options?: StreamWriterOptions) {
-    super()
-
+  public constructor(options: StreamWriterOptions) {
     // provide default options
     this._options = applyDefaults(options, {
+      error: (function(err: Error) { }),
       wellFormed: false,
       prettyPrint: false,
       indent: "  ",
@@ -67,6 +71,10 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       allowEmptyTags: false,
       spaceBeforeSlash: false
     }) as Required<StreamWriterOptions>
+
+    this._onData = this._options.data
+    this._onEnd = this._options.end
+    this._onError = this._options.error
 
     this._namespace = null
     this._prefixMap = new NamespacePrefixMap()
@@ -81,10 +89,16 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     this._serializeOpenTag(true)
 
     if (this._hasDocumentElement && this._level === 0) {
-      throw new Error("Document cannot have multiple document element nodes.")
+      this._onError.call(this, new Error("Document cannot have multiple document element nodes."))
+      return this
     }
 
-    this._currentElement = fragment().ele(p1 as any, p2 as any, p3 as any)
+    try {
+      this._currentElement = fragment().ele(p1 as any, p2 as any, p3 as any)
+    } catch (err) {
+      this._onError.call(this, err)
+      return this
+    }
     this._currentElementSerialized = false
     this._hasDocumentElement = true
 
@@ -94,37 +108,59 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
   /** @inheritdoc */
   att(p1: AttributesObject | string | null, p2?: string, p3?: string): XMLBuilderStream {
     if (this._currentElement === undefined) {
-      throw new Error("Cannot insert an attribute node as child of a document node.")
+      this._onError.call(this, new Error("Cannot insert an attribute node as child of a document node."))
+      return this
     }
-    this._currentElement.att(p1 as any, p2 as any, p3 as any)
+    try {
+      this._currentElement.att(p1 as any, p2 as any, p3 as any)
+    } catch (err) {
+      this._onError.call(this, err)
+      return this
+    }
     return this
   }
 
   /** @inheritdoc */
   com(content: string): XMLBuilderStream {
     this._serializeOpenTag(true)
-    const node = fragment().com(content).first().node as Comment
+
+    let node: Comment
+    try {
+      node = fragment().com(content).first().node as Comment
+    } catch (err) {
+      this._onError.call(this, err)
+      return this
+    }
 
     if (this._options.wellFormed && (!xml_isLegalChar(node.data) ||
       node.data.indexOf("--") !== -1 || node.data.endsWith("-"))) {
-      throw new Error("Comment data contains invalid characters (well-formed required).")
+      this._onError.call(this, new Error("Comment data contains invalid characters (well-formed required)."))
+      return this
     }
 
-    this._addData(this._beginLine() + "<!--" + node.data + "-->")
+    this._push(this._beginLine() + "<!--" + node.data + "-->")
     return this
   }
 
   /** @inheritdoc */
   txt(content: string): XMLBuilderStream {
     if (this._currentElement === undefined) {
-      throw new Error("Cannot insert a text node as child of a document node.")
+      this._onError.call(this, new Error("Cannot insert a text node as child of a document node."))
+      return this
     }
     this._serializeOpenTag(true)
 
-    const node = fragment().txt(content).first().node as Text
+    let node: Text
+    try {
+      node = fragment().txt(content).first().node as Text
+    } catch (err) {
+      this._onError.call(this, err)
+      return this
+    }
 
     if (this._options.wellFormed && !xml_isLegalChar(node.data)) {
-      throw new Error("Text data contains invalid characters (well-formed required).")
+      this._onError.call(this, new Error("Text data contains invalid characters (well-formed required)."))
+      return this
     }
 
     let result = ""
@@ -140,40 +176,57 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
         result += c
     }
 
-    this._addData(this._beginLine() + result)
+    this._push(this._beginLine() + result)
     return this
   }
 
   /** @inheritdoc */
   ins(target: string | PIObject, content: string = ''): XMLBuilderStream {
     this._serializeOpenTag(true)
-    const node = fragment().ins(target as any, content).first().node as ProcessingInstruction
+
+    let node: ProcessingInstruction
+    try {
+      node = fragment().ins(target as any, content).first().node as ProcessingInstruction
+    } catch (err) {
+      this._onError.call(this, err)
+      return this
+    }
 
     if (this._options.wellFormed && (node.target.indexOf(":") !== -1 || (/^xml$/i).test(node.target))) {
-      throw new Error("Processing instruction target contains invalid characters (well-formed required).")
+      this._onError.call(this, new Error("Processing instruction target contains invalid characters (well-formed required)."))
+      return this
     }
 
     if (this._options.wellFormed && !xml_isLegalChar(node.data)) {
-      throw new Error("Processing instruction data contains invalid characters (well-formed required).")
+      this._onError.call(this, Error("Processing instruction data contains invalid characters (well-formed required)."))
+      return this
     }
 
-    this._addData(this._beginLine() + "<?" + node.target + " " + node.data + "?>")
+    this._push(this._beginLine() + "<?" + node.target + " " + node.data + "?>")
     return this
   }
 
   /** @inheritdoc */
   dat(content: string): XMLBuilderStream {
     this._serializeOpenTag(true)
-    const node = fragment().dat(content).first().node as CDATASection
 
-    this._addData(this._beginLine() + "<![CDATA[" + node.data + "]]>")
+    let node: CDATASection
+    try {
+      node = fragment().dat(content).first().node as CDATASection
+    } catch (err) {
+      this._onError.call(this, err)
+      return this
+    }
+
+    this._push(this._beginLine() + "<![CDATA[" + node.data + "]]>")
     return this
   }
 
   /** @inheritdoc */
   dec(options: { version?: "1.0", encoding?: string, standalone?: boolean } = { version: "1.0" }): XMLBuilderStream {
     if (this._hasDeclaration) {
-      throw new Error("XML declaration is already inserted.")
+      this._onError.call(this, Error("XML declaration is already inserted."))
+      return this
     }
 
     let markup = ""
@@ -187,7 +240,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     }
     markup += "?>"
 
-    this._addData(markup)
+    this._push(markup)
     this._hasDeclaration = true
 
     return this
@@ -196,31 +249,43 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
   /** @inheritdoc */
   dtd(name: string, options?: DTDOptions): XMLBuilderStream {
     if (this._docTypeName !== "") {
-      throw new Error("DocType declaration is already inserted.")
+      this._onError.call(this, new Error("DocType declaration is already inserted."))
+      return this
     }
 
     if (this._hasDocumentElement) {
-      throw new Error("Cannot insert DocType declaration after document element.")
+      this._onError.call(this, new Error("Cannot insert DocType declaration after document element."))
+      return this
     }
 
     if (!xml_isName(name)) {
-      throw new Error(`Invalid XML name: ${name}`)
+      this._onError.call(this, new Error(`Invalid XML name: ${name}`))
+      return this
     }
 
     if (!xml_isQName(name)) {
-      throw new Error(`Invalid XML qualified name: ${name}.`)
+      this._onError.call(this, new Error(`Invalid XML qualified name: ${name}.`))
+      return this
     }
 
-    const node = create().dtd(options).first().node as DocumentType
+    let node: DocumentType
+    try {
+      node = create().dtd(options).first().node as DocumentType
+    } catch (err) {
+      this._onError.call(this, err)
+      return this
+    }
 
     if (this._options.wellFormed && !xml_isPubidChar(node.publicId)) {
-      throw new Error("DocType public identifier does not match PubidChar construct (well-formed required).")
+      this._onError.call(this, new Error("DocType public identifier does not match PubidChar construct (well-formed required)."))
+      return this
     }
 
     if (this._options.wellFormed &&
       (!xml_isLegalChar(node.systemId) ||
         (node.systemId.indexOf('"') !== -1 && node.systemId.indexOf("'") !== -1))) {
-      throw new Error("DocType system identifier contains invalid characters (well-formed required).")
+      this._onError.call(this, new Error("DocType system identifier contains invalid characters (well-formed required)."))
+      return this
     }
 
     const markup = node.publicId && node.systemId ?
@@ -233,7 +298,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
           "<!DOCTYPE " + name + ">"
 
     this._docTypeName = name
-    this._addData(this._beginLine() + markup)
+    this._push(this._beginLine() + markup)
     return this
   }
 
@@ -251,7 +316,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       this._serializeCloseTag()
     }
 
-    this._addData(null)
+    this._push(null)
     return this
   }
 
@@ -267,7 +332,8 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
 
     if (this._options.wellFormed && (node.localName.indexOf(":") !== -1 ||
       !xml_isName(node.localName))) {
-      throw new Error("Node local name contains invalid characters (well-formed required).")
+      this._onError.call(this, new Error("Node local name contains invalid characters (well-formed required)."))
+      return
     }
 
     let markup = "<"
@@ -296,7 +362,8 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       let candidatePrefix = map.get(prefix, ns)
       if (prefix === "xmlns") {
         if (this._options.wellFormed) {
-          throw new Error("An element cannot have the 'xmlns' prefix (well-formed required).")
+          this._onError.call(this, new Error("An element cannot have the 'xmlns' prefix (well-formed required)."))
+          return
         }
 
         candidatePrefix = prefix
@@ -359,7 +426,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     }
     markup += ">"
 
-    this._addData(this._beginLine() + markup)
+    this._push(this._beginLine() + markup)
 
     this._currentElementSerialized = true
     /**
@@ -392,7 +459,8 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     const lastEle = this._openTags.pop()
     /* istanbul ignore next */
     if (lastEle === undefined) {
-      throw new Error("Last element is undefined.")
+      this._onError.call(this, new Error("Last element is undefined."))
+      return
     }
 
     const [qualifiedName, ns, map, hasChildren] = lastEle
@@ -404,7 +472,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
     if (!hasChildren) return
 
     let markup = "</" + qualifiedName + ">"
-    this._addData(this._beginLine() + markup)
+    this._push(this._beginLine() + markup)
   }
 
   /**
@@ -412,11 +480,16 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
    * 
    * @param data - data
    */
-  private _addData(data: string | null): void {
-    if (data !== null && data.length !== 0) {
+  private _push(data: string | null): void {
+    if (data === null) {
+      this._ended = true
+      this._onEnd.call(this)
+    } else if (this._ended) {
+      this._onError.call(this, new Error("Cannot push to ended stream."))
+    } else if (data.length !== 0) {
       this._hasData = true
+      this._onData.call(this, data)
     }
-    this.push(data)
   }
 
   /**
@@ -473,7 +546,8 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       }
 
       if (requireWellFormed && localNameSet && localNameSet.has(attr.namespaceURI, attr.localName)) {
-        throw new Error("Element contains duplicate attributes (well-formed required).")
+        this._onError.call(this, new Error("Element contains duplicate attributes (well-formed required)."))
+        return ""
       }
 
       if (requireWellFormed && localNameSet) localNameSet.set(attr.namespaceURI, attr.localName)
@@ -492,11 +566,13 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
             continue
 
           if (requireWellFormed && attr.value === infraNamespace.XMLNS) {
-            throw new Error("XMLNS namespace is reserved (well-formed required).")
+            this._onError.call(this, new Error("XMLNS namespace is reserved (well-formed required)."))
+            return ""
           }
 
           if (requireWellFormed && attr.value === '') {
-            throw new Error("Namespace prefix declarations cannot be used to undeclare a namespace (well-formed required).")
+            this._onError.call(this, new Error("Namespace prefix declarations cannot be used to undeclare a namespace (well-formed required)."))
+            return ""
           }
 
           if (attr.prefix === 'xmlns') candidatePrefix = 'xmlns'
@@ -529,7 +605,8 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
       if (requireWellFormed && (attr.localName.indexOf(":") !== -1 ||
         !xml_isName(attr.localName) ||
         (attr.localName === "xmlns" && attributeNamespace === null))) {
-        throw new Error("Attribute local name contains invalid characters (well-formed required).")
+        this._onError.call(this, new Error("Attribute local name contains invalid characters (well-formed required)."))
+        return ""
       }
 
       result += this._serializeAttribute(
@@ -547,7 +624,7 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
    * @param requireWellFormed - whether to check conformance
    */
 
-  private _serializeAttribute(name: string, value: string | null, 
+  private _serializeAttribute(name: string, value: string | null,
     requireWellFormed: boolean, strLen: number): string {
 
     const str = name + "=\"" +
@@ -569,7 +646,8 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
    */
   private _serializeAttributeValue(value: string | null, requireWellFormed: boolean): string {
     if (requireWellFormed && value !== null && !xml_isLegalChar(value)) {
-      throw new Error("Invalid characters in attribute value.")
+      this._onError.call(this, new Error("Invalid characters in attribute value."))
+      return ""
     }
 
     if (value === null) return ""
@@ -679,7 +757,5 @@ export class XMLBuilderStreamImpl extends Readable implements XMLBuilderStream {
 
     return false
   }
-
-  _read(_size: number): void { }
 
 }

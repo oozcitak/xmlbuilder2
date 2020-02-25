@@ -1,5 +1,4 @@
 import { Node, Document } from "@oozcitak/dom/lib/dom/interfaces"
-import { Readable } from "stream"
 
 /**
  * Represents a document with XML builder settings applied.
@@ -836,7 +835,7 @@ export interface XMLBuilder {
 /**
  * Represents a readable XML document stream.
  */
-export interface XMLBuilderStream extends Readable {
+export interface XMLBuilderStream {
   /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
@@ -975,6 +974,18 @@ export interface XMLBuilderStream extends Readable {
  * Defines the options passed to the object writer.
  */
 export type StreamWriterOptions = {
+  /**
+   * A callback function which is called when a chunk of XML is serialized.
+   */
+  data: ((chunk: string) => void)
+  /**
+   * A callback function which is called when XML serialization is completed.
+   */
+  end: (() => void)
+  /**
+   * A callback function which is called when an error occurs.
+   */
+  error?: ((err: Error) => void)  
   /**
    * Ensures that the document adheres to the syntax rules specified by the
    * XML specification. If this flag is set and the document is not well-formed

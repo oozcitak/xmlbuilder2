@@ -20,10 +20,10 @@ describe('XMLStream options', () => {
       <root/>`, done)
   })
 
-  test('wellFormed', () => {
+  test('wellFormed', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
-    expect(() => xmlStream.com('--')).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.com('--'), done)
   })
 
   test('indent', (done) => {

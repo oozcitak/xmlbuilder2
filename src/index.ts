@@ -320,7 +320,7 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
  * 
  * @returns XML builder stream
  */
-export function createStream(options?: StreamWriterOptions): XMLBuilderStream {
+export function createStream(options: StreamWriterOptions): XMLBuilderStream {
   return new XMLBuilderStreamImpl(options)
 }
 

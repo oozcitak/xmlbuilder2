@@ -24,44 +24,44 @@ describe('well-formed checks', () => {
     $$.expectStreamResult(xmlStream, `<root xmlns="ns" att=""/>`, done)
   })
 
-  test('attribute cannot be child of document', () => {
+  test('attribute cannot be child of document', (done) => {
     const xmlStream = $$.createStream()
-    expect(() => xmlStream.att('att', 'val')).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.att('att', 'val'), done)
   })
 
-  test('text cannot be child of document', () => {
+  test('text cannot be child of document', (done) => {
     const xmlStream = $$.createStream()
-    expect(() => xmlStream.txt('text')).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.txt('text'), done)
   })
 
-  test('cannot have multiple document elements', () => {
+  test('cannot have multiple document elements', (done) => {
     const xmlStream = $$.createStream()
-    expect(() => xmlStream.ele('root').up().ele('root')).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.ele('root').up().ele('root'), done)
   })
 
-  test('cannot have multiple doctypes', () => {
+  test('cannot have multiple doctypes', (done) => {
     const xmlStream = $$.createStream()
     xmlStream.dtd('root')
-    expect(() => xmlStream.dtd('root', { pubID: 'pub' })).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.dtd('root', { pubID: 'pub' }), done)
   })
 
-  test('cannot have doctype after an element node', () => {
+  test('cannot have doctype after an element node', (done) => {
     const xmlStream = $$.createStream()
     xmlStream.ele('root').up()
-    expect(() => xmlStream.dtd('root', { pubID: 'pub' })).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.dtd('root', { pubID: 'pub' }), done)
   })
 
-  test('cannot have multiple XML declarations', () => {
+  test('cannot have multiple XML declarations', (done) => {
     const xmlStream = $$.createStream()
     xmlStream.dec({ version: "1.0" })
-    expect(() => xmlStream.dec({ version: "1.0" })).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.dec({ version: "1.0" }), done)
   })
 
   test('invalid element node - 1', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     Object.defineProperty((xmlStream as any)._currentElement.node, "localName", { value: "x:y" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
     done()
   })
 
@@ -69,7 +69,7 @@ describe('well-formed checks', () => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     Object.defineProperty((xmlStream as any)._currentElement.node, "localName", { value: "abc\0" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
     done()
   })
 
@@ -77,7 +77,7 @@ describe('well-formed checks', () => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     Object.defineProperty((xmlStream as any)._currentElement.node, "localName", { value: "\0abc" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
     done()
   })
 
@@ -85,7 +85,7 @@ describe('well-formed checks', () => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     Object.defineProperty((xmlStream as any)._currentElement.node, "prefix", { value: "xmlns" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
     done()
   })
 
@@ -93,7 +93,7 @@ describe('well-formed checks', () => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     Object.defineProperty((xmlStream as any)._currentElement.node, "localName", { value: "abc\uDBFF" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
     done()
   })
 
@@ -101,7 +101,7 @@ describe('well-formed checks', () => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     Object.defineProperty((xmlStream as any)._currentElement.node, "localName", { value: "abc🌃\0" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
     done()
   })
 
@@ -109,95 +109,95 @@ describe('well-formed checks', () => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     Object.defineProperty((xmlStream as any)._currentElement.node, "localName", { value: "abc\uDBFFx" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
     done()
   })
 
-  test('invalid comment node - 1', () => {
+  test('invalid comment node - 1', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
-    expect(() => xmlStream.com('--')).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.com('--'), done)
   })
 
-  test('invalid comment node - 2', () => {
+  test('invalid comment node - 2', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
-    expect(() => xmlStream.com('text-')).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.com('text-'), done)
   })
 
-  test('invalid text node', () => {
+  test('invalid text node', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
-    expect(() => xmlStream.txt('abc😊\0')).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.txt('abc😊\0'), done)
   })
 
-  test('invalid document type node', () => {
+  test('invalid document type node', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
-    expect(() => xmlStream.dtd('root\0', { pubID: 'pub' })).toThrow()
-    expect(() => xmlStream.dtd('x:y:z', { pubID: 'pub' })).toThrow()
-    expect(() => xmlStream.dtd('root', { pubID: 'abc😊\0' })).toThrow()
-    expect(() => xmlStream.dtd('root', { sysID: '\0' })).toThrow()
-    expect(() => xmlStream.dtd('root', { sysID: '\'quote mismatch"' })).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.dtd('root\0', { pubID: 'pub' }), done)
+    $$.expectStreamError(xmlStream, () => xmlStream.dtd('x:y:z', { pubID: 'pub' }), done)
+    $$.expectStreamError(xmlStream, () => xmlStream.dtd('root', { pubID: 'abc😊\0' }), done)
+    $$.expectStreamError(xmlStream, () => xmlStream.dtd('root', { sysID: '\0' }), done)
+    $$.expectStreamError(xmlStream, () => xmlStream.dtd('root', { sysID: '\'quote mismatch"' }), done)
   })
 
-  test('invalid processing instruction node', () => {
-    const xmlStream = $$.createStream({ wellFormed: true })
-    xmlStream.ele('ns', 'root')
-    expect(() => xmlStream.ins(':')).toThrow()
-    expect(() => xmlStream.ins('xml')).toThrow()
-    expect(() => xmlStream.ins('name', '\0')).toThrow()
-  })
-
-  test('invalid cdata node', () => {
+  test('invalid processing instruction node', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root')
-    expect(() => xmlStream.dat(']]>')).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.ins(':'), done)
+    $$.expectStreamError(xmlStream, () => xmlStream.ins('xml'), done)
+    $$.expectStreamError(xmlStream, () => xmlStream.ins('name', '\0'), done)
   })
 
-  test('same attribute', () => {
+  test('invalid cdata node', (done) => {
+    const xmlStream = $$.createStream({ wellFormed: true })
+    xmlStream.ele('ns', 'root')
+    $$.expectStreamError(xmlStream, () => xmlStream.dat(']]>'), done)
+  })
+
+  test('same attribute', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root').att('name', 'val').att('name2', 'val')
     Object.defineProperty((xmlStream as any)._currentElement.node.attributes.item(1), "localName", { value: "name" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
   })
 
-  test('cannot declare XMLNS', () => {
+  test('cannot declare XMLNS', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root').att('http://www.w3.org/2000/xmlns/', 'xmlns:name', 'http://www.w3.org/2000/xmlns/')
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
   })
 
-  test('cannot undeclare XMLNS', () => {
+  test('cannot undeclare XMLNS', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('ns', 'root').att('http://www.w3.org/2000/xmlns/', 'xmlns:name', '')
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
   })
 
-  test('invalid attribute name - 1', () => {
+  test('invalid attribute name - 1', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:att', '')
     Object.defineProperty((xmlStream as any)._currentElement.node.attributes.item(0), "localName", { value: ":" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
   })
 
-  test('invalid attribute name - 2', () => {
+  test('invalid attribute name - 2', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:att', '')
     Object.defineProperty((xmlStream as any)._currentElement.node.attributes.item(0), "localName", { value: "\0" })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
   })
 
-  test('invalid attribute name - 3', () => {
+  test('invalid attribute name - 3', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns', 'value')
     Object.defineProperty((xmlStream as any)._currentElement.node.attributes.item(0), "namespaceURI", { value: null })
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
   })
 
-  test('invalid attribute value', () => {
+  test('invalid attribute value', (done) => {
     const xmlStream = $$.createStream({ wellFormed: true })
     xmlStream.ele('root').att('att', '\0')
-    expect(() => xmlStream.end()).toThrow()
+    $$.expectStreamError(xmlStream, () => xmlStream.end(), done)
   })
 
 })
