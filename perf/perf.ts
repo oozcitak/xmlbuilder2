@@ -2,7 +2,7 @@ import { create as create2 } from "../lib"
 import { create, XMLElement } from "xmlbuilder"
 import { Suite } from "benchmark"
 import { processBenchmark, benchmarkTitle } from "./"
-import { XMLBuilder } from "../lib/builder/interfaces"
+import { XMLBuilder } from "../lib/interfaces"
 
 const smallObj = createSmallDoc2().end({ format: "object", group: false });
 const mediumObj = createMediumDoc2().end({ format: "object", group: false });
