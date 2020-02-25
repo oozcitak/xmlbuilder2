@@ -18,11 +18,11 @@ export default class TestHelpers {
 
   static createStream(options?: Partial<StreamWriterOptions>): XMLBuilderStream {
     options = options || {}
-    options.data = (function (this: XMLBuilderStream, chunk) {
+    options.data = options.data || (function (this: XMLBuilderStream, chunk) {
       (this as any).streamResult += chunk
     })
-    options.end = (() => { })
-    options.error = (function (this: XMLBuilderStream, err) {
+    options.end = options.end || (() => { })
+    options.error = options.error || (function (this: XMLBuilderStream, err) {
       str.streamError = err
     })
     const str = createStream(options as Required<StreamWriterOptions>) as any

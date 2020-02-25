@@ -23,8 +23,8 @@ describe('basic XMLStream tests', () => {
 
     xmlStream.ele("root")
       .ele("foo")
-        .ele("bar").up()
-        .ele("baz").up()
+      .ele("bar").up()
+      .ele("baz").up()
       .end()
 
     $$.expectStreamResult(xmlStream, `<root><foo><bar/><baz/></foo></root>`, done)
@@ -118,6 +118,32 @@ describe('basic XMLStream tests', () => {
       <!--comment1-->
       <root/>
       <!--comment2-->`, done)
+  })
+
+  test('test level', (done) => {
+    const xmlStream = $$.createStream({
+      data: (chunk, level) => {
+        if (chunk === "<root>") {
+          expect(level).toBe(0)
+        } else if (chunk === "<child>") {
+          expect(level).toBe(1)
+        } else if (chunk === "<grandchild>") {
+          expect(level).toBe(2)
+        }
+
+        done()
+      }
+    })
+
+    xmlStream.dec()
+      .dtd({ name: "root" })
+      .com("comment1")
+      .ele("root")
+    xmlStream.ele('child')
+    xmlStream.ele('grandchild').txt("text")
+    xmlStream.up()
+    xmlStream.up()
+    xmlStream.com("comment2")
   })
 
 })

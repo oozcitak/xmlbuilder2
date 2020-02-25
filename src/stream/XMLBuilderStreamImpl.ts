@@ -5,7 +5,7 @@ import {
 import { applyDefaults } from "@oozcitak/util"
 import { fragment, create } from ".."
 import {
-  xml_isName, xml_isLegalChar, xml_isQName, xml_isPubidChar
+  xml_isName, xml_isLegalChar, xml_isPubidChar
 } from "@oozcitak/dom/lib/algorithm"
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { NamespacePrefixMap } from "@oozcitak/dom/lib/serializer/NamespacePrefixMap"
@@ -47,7 +47,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
   private _ended = false
 
-  private _onData: ((chunk: string) => void)
+  private _onData: ((chunk: string, level: number) => void)
   private _onEnd: (() => void)
   private _onError: ((err: Error) => void)
 
@@ -492,7 +492,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
       this._onError.call(this, new Error("Cannot push to ended stream."))
     } else if (data.length !== 0) {
       this._hasData = true
-      this._onData.call(this, data)
+      this._onData.call(this, data, this._level)
     }
   }
 

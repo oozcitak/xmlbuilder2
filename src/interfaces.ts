@@ -981,7 +981,7 @@ export type StreamWriterOptions = {
   /**
    * A callback function which is called when a chunk of XML is serialized.
    */
-  data: ((chunk: string) => void)
+  data: ((chunk: string, level: number) => void)
   /**
    * A callback function which is called when XML serialization is completed.
    */
