@@ -74,8 +74,8 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
       namespaceAlias: this._options.namespaceAlias
     }
 
-    this._onData = this._options.data
-    this._onEnd = this._options.end
+    this._onData = options.data
+    this._onEnd = options.end
     this._onError = this._options.error
 
     this._namespace = null
@@ -501,12 +501,13 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   private _push(data: string | null): void {
     if (data === null) {
       this._ended = true
-      this._onEnd.call(this)
+      this._onEnd()
     } else if (this._ended) {
       this._onError.call(this, new Error("Cannot push to ended stream."))
     } else if (data.length !== 0) {
       this._hasData = true
-      this._onData.call(this, data, this._level)
+      this._onData(data, this._level)
+      const a=5
     }
   }
 
