@@ -1,10 +1,10 @@
 import $$ from '../TestHelpers'
-import { XMLBuilderStreamImpl } from '../../src/stream'
+import { XMLBuilderCBImpl } from '../../src/callback'
 
 describe('XMLStream options', () => {
 
   test('options defaults', () => {
-    const xmlStream = new XMLBuilderStreamImpl({
+    const xmlStream = new XMLBuilderCBImpl({
       data: ((chunk, level) => { }),
       end: (() => { })
     }) as any
@@ -38,75 +38,75 @@ describe('XMLStream options', () => {
   })
 
   test('no options', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.dec().ele('root').end()
 
-    $$.expectStreamResult(xmlStream, `<?xml version="1.0"?><root/>`, done)
+    $$.expectCBResult(xmlStream, `<?xml version="1.0"?><root/>`, done)
   })
 
   test('prettyPrint', (done) => {
-    const xmlStream = $$.documentStream({ prettyPrint: true })
+    const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec().ele('root').end()
 
-    $$.expectStreamResult(xmlStream, $$.t`
+    $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0"?>
       <root/>`, done)
   })
 
   test('wellFormed', (done) => {
-    const xmlStream = $$.documentStream({ wellFormed: true })
+    const xmlStream = $$.createCB({ wellFormed: true })
     xmlStream.ele('ns', 'root')
-    $$.expectStreamError(xmlStream, () => xmlStream.com('--'), done)
+    $$.expectCBError(xmlStream, () => xmlStream.com('--'), done)
   })
 
   test('indent', (done) => {
-    const xmlStream = $$.documentStream({ prettyPrint: true, indent: "    " })
+    const xmlStream = $$.createCB({ prettyPrint: true, indent: "    " })
     xmlStream.ele('root').ele('node').end()
-    $$.expectStreamResult(xmlStream, $$.t`
+    $$.expectCBResult(xmlStream, $$.t`
       <root>
           <node/>
       </root>`, done)
   })
 
   test('newline', (done) => {
-    const xmlStream = $$.documentStream({ prettyPrint: true, indent: '', newline: "!" })
+    const xmlStream = $$.createCB({ prettyPrint: true, indent: '', newline: "!" })
     xmlStream.ele('root').ele('node').end()
-    $$.expectStreamResult(xmlStream, `<root>!<node/>!</root>`, done)
+    $$.expectCBResult(xmlStream, `<root>!<node/>!</root>`, done)
   })
 
   test('offset', (done) => {
-    const xmlStream = $$.documentStream({ prettyPrint: true, offset: 2 })
+    const xmlStream = $$.createCB({ prettyPrint: true, offset: 2 })
     xmlStream.ele('root').ele('node').end()
-    $$.expectStreamResult(xmlStream,
+    $$.expectCBResult(xmlStream,
       '    <root>\n' +
       '      <node/>\n' +
       '    </root>', done)
   })
 
   test('allowEmptyTags', (done) => {
-    const xmlStream = $$.documentStream({ prettyPrint: true, allowEmptyTags: true })
+    const xmlStream = $$.createCB({ prettyPrint: true, allowEmptyTags: true })
     xmlStream.ele('root').ele('node').end()
-    $$.expectStreamResult(xmlStream, $$.t`
+    $$.expectCBResult(xmlStream, $$.t`
       <root>
         <node></node>
       </root>`, done)
   })
 
   test('spaceBeforeSlash', (done) => {
-    const xmlStream = $$.documentStream({ prettyPrint: true, spaceBeforeSlash: true })
+    const xmlStream = $$.createCB({ prettyPrint: true, spaceBeforeSlash: true })
     xmlStream.ele('root').ele('node').end()
-    $$.expectStreamResult(xmlStream, $$.t`
+    $$.expectCBResult(xmlStream, $$.t`
       <root>
         <node />
       </root>`, done)
   })
 
   test('width', (done) => {
-    const xmlStream = $$.documentStream({ prettyPrint: true, width: 20 })
+    const xmlStream = $$.createCB({ prettyPrint: true, width: 20 })
     xmlStream.ele('test').ele('node', { "first": "1", "second": "2" }).end()
-    $$.expectStreamResult(xmlStream, $$.t`
+    $$.expectCBResult(xmlStream, $$.t`
       <test>
         <node first="1"
           second="2"/>

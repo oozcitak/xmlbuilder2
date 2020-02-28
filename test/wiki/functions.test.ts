@@ -51,11 +51,11 @@ describe('examples in the function reference wiki page', () => {
       .toBe('<root att1="value1" att2="value2">text</root>')
   })
 
-  test('documentStream()', async () => {
-    const filename = resolve(__dirname, 'functions-documentStream.test.out')
+  test('documentCB()', async () => {
+    const filename = resolve(__dirname, 'functions-documentCB.test.out')
     const outFile = await promises.open(filename, 'w')
     
-    const xmlStream = $$.documentStream({ 
+    const xmlStream = $$.createCB({ 
       data: async (chunk) => await outFile.write(chunk),
       end: async () => await outFile.close()
     })
@@ -69,11 +69,11 @@ describe('examples in the function reference wiki page', () => {
     expect(result).toBe('<root><foo/><bar fizz="buzz"/></root>')
   })
 
-  test('fragmentStream()', async () => {
-    const filename = resolve(__dirname, 'functions-fragmentStream.test.out')
+  test('fragmentCB()', async () => {
+    const filename = resolve(__dirname, 'functions-fragmentCB.test.out')
     const outFile = await promises.open(filename, 'w')
     
-    const xmlStream = $$.fragmentStream({ 
+    const xmlStream = $$.fragmentCB({ 
       data: async (chunk) => await outFile.write(chunk),
       end: async () => await outFile.close()
     })

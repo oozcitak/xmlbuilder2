@@ -1,4 +1,4 @@
-import { documentStream } from "../lib"
+import { createCB } from "../lib"
 import { resolve } from "path"
 import { createWriteStream, unlink } from "fs"
 import { memoryUsage, hrtime } from "process"
@@ -8,7 +8,7 @@ import chalk from "chalk"
   const filename = resolve(__dirname, 'stream-perf.log')
   const outFile = createWriteStream(filename)
 
-  const xmlStream = documentStream({
+  const xmlStream = createCB({
     data: (chunk) => outFile.write(chunk),
     end: () => {
       outFile.close()
@@ -18,7 +18,7 @@ import chalk from "chalk"
     prettyPrint: true
   })
 
-  console.log(`${chalk.bold.underline(`XML Stream Benchmark`)}`)
+  console.log(`${chalk.bold.underline(`Callback API Benchmark`)}`)
   let maxMem = 0
   const t0 = hrtime.bigint()
   outFile.on("close", () => {

@@ -2,8 +2,8 @@ import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { isObject, isArray, isMap, forEachObject, objectLength, forEachArray } from "@oozcitak/util"
-import { builder, create, fragment, convert, documentStream, fragmentStream } from "../src"
-import { XMLBuilderStream, StreamWriterOptions } from "../src/interfaces"
+import { builder, create, fragment, convert, createCB, fragmentCB } from "../src"
+import { XMLBuilderCB, XMLBuilderCBOptions } from "../src/interfaces"
 
 export default class TestHelpers {
   static builder = builder
@@ -16,44 +16,44 @@ export default class TestHelpers {
     return s.serializeToString(node)
   }
 
-  static documentStream(options?: Partial<StreamWriterOptions>): XMLBuilderStream {
+  static createCB(options?: Partial<XMLBuilderCBOptions>): XMLBuilderCB {
     options = options || {}
-    options.data = options.data || (function (this: XMLBuilderStream, chunk) {
-      (this as any).streamResult += chunk
+    options.data = options.data || (function (this: XMLBuilderCB, chunk) {
+      (this as any).result += chunk
     })
     options.end = options.end || (() => { })
-    options.error = options.error || (function (this: XMLBuilderStream, err) {
-      str.streamError = err
+    options.error = options.error || (function (this: XMLBuilderCB, err) {
+      str.error = err
     })
-    const str = documentStream(options as StreamWriterOptions) as any
-    str.streamError = "Did not throw"
-    str.streamResult = ""
+    const str = createCB(options as XMLBuilderCBOptions) as any
+    str.error = "Did not throw"
+    str.result = ""
     return str
   }
 
-  static fragmentStream(options?: Partial<StreamWriterOptions>): XMLBuilderStream {
+  static fragmentCB(options?: Partial<XMLBuilderCBOptions>): XMLBuilderCB {
     options = options || {}
-    options.data = options.data || (function (this: XMLBuilderStream, chunk) {
-      (this as any).streamResult += chunk
+    options.data = options.data || (function (this: XMLBuilderCB, chunk) {
+      (this as any).result += chunk
     })
     options.end = options.end || (() => { })
-    options.error = options.error || (function (this: XMLBuilderStream, err) {
-      str.streamError = err
+    options.error = options.error || (function (this: XMLBuilderCB, err) {
+      str.error = err
     })
-    const str = fragmentStream(options as StreamWriterOptions) as any
-    str.streamError = "Did not throw"
-    str.streamResult = ""
+    const str = fragmentCB(options as XMLBuilderCBOptions) as any
+    str.error = "Did not throw"
+    str.result = ""
     return str
   }
 
-  static expectStreamResult(str: XMLBuilderStream, result: string, done: any) {
-    expect((str as any).streamResult).toBe(result)
+  static expectCBResult(str: XMLBuilderCB, result: string, done: any) {
+    expect((str as any).result).toBe(result)
     done()
   }
 
-  static expectStreamError(str: XMLBuilderStream, testFunc: () => any, done: any) {
+  static expectCBError(str: XMLBuilderCB, testFunc: () => any, done: any) {
     testFunc()
-    expect((str as any).streamError).toBeInstanceOf(Error)
+    expect((str as any).error).toBeInstanceOf(Error)
     done()
   }
 

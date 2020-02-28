@@ -1,25 +1,25 @@
 import $$ from '../TestHelpers'
 
-describe('basic XMLStream tests', () => {
+describe('basic callback API tests', () => {
 
   test('empty document', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.dec().end()
 
-    $$.expectStreamResult(xmlStream, `<?xml version="1.0"?>`, done)
+    $$.expectCBResult(xmlStream, `<?xml version="1.0"?>`, done)
   })
 
   test('ele', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.ele("root").end()
 
-    $$.expectStreamResult(xmlStream, `<root/>`, done)
+    $$.expectCBResult(xmlStream, `<root/>`, done)
   })
 
   test('ele with children', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
       .ele("foo")
@@ -27,83 +27,83 @@ describe('basic XMLStream tests', () => {
       .ele("baz").up()
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root><foo><bar/><baz/></foo></root>`, done)
+    $$.expectCBResult(xmlStream, `<root><foo><bar/><baz/></foo></root>`, done)
   })
 
   test('dec', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.dec({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele("root")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root/>`, done)
+    $$.expectCBResult(xmlStream, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root/>`, done)
   })
 
   test('dtd', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.dtd({ name: "root", pubID: "pub", sysID: "sys" })
       .ele("root")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<!DOCTYPE root PUBLIC "pub" "sys"><root/>`, done)
+    $$.expectCBResult(xmlStream, `<!DOCTYPE root PUBLIC "pub" "sys"><root/>`, done)
   })
 
   test('att', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
       .att("att1", "val1")
       .att("att2", "val2")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root att1="val1" att2="val2"/>`, done)
+    $$.expectCBResult(xmlStream, `<root att1="val1" att2="val2"/>`, done)
   })
 
   test('txt', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
       .txt("text")
       .txt("")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root>text</root>`, done)
+    $$.expectCBResult(xmlStream, `<root>text</root>`, done)
   })
 
   test('com', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
       .com("text")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root><!--text--></root>`, done)
+    $$.expectCBResult(xmlStream, `<root><!--text--></root>`, done)
   })
 
   test('dat', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
       .dat("text")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root><![CDATA[text]]></root>`, done)
+    $$.expectCBResult(xmlStream, `<root><![CDATA[text]]></root>`, done)
   })
 
   test('ins', (done) => {
-    const xmlStream = $$.documentStream()
+    const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
       .ins("target", "value")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root><?target value?></root>`, done)
+    $$.expectCBResult(xmlStream, `<root><?target value?></root>`, done)
   })
 
   test('nodes at root level', (done) => {
-    const xmlStream = $$.documentStream({ prettyPrint: true })
+    const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec()
       .dtd({ name: "root" })
@@ -112,7 +112,7 @@ describe('basic XMLStream tests', () => {
       .com("comment2")
       .end()
 
-    $$.expectStreamResult(xmlStream, $$.t`
+    $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root>
       <!--comment1-->
@@ -121,7 +121,7 @@ describe('basic XMLStream tests', () => {
   })
 
   test('test level', (done) => {
-    const xmlStream = $$.documentStream({
+    const xmlStream = $$.createCB({
       data: (chunk, level) => {
         if (chunk === "<root>") {
           expect(level).toBe(0)

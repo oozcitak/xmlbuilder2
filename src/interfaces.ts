@@ -838,9 +838,9 @@ export interface XMLBuilder {
 }
 
 /**
- * Represents a readable XML document stream.
+ * Builds and serializes an XML document in chunks.
  */
-export interface XMLBuilderStream {
+export interface XMLBuilderCB {
   /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
@@ -848,9 +848,9 @@ export interface XMLBuilderStream {
    * @param name - element name
    * @param attributes - a JS object with element attributes
    * 
-   * @returns the XML stream
+   * @returns the builder
    */
-  ele(namespace: string | null, name: string, attributes?: AttributesObject): XMLBuilderStream
+  ele(namespace: string | null, name: string, attributes?: AttributesObject): XMLBuilderCB
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -858,9 +858,9 @@ export interface XMLBuilderStream {
    * @param name - element name
    * @param attributes - a JS object with element attributes
    * 
-   * @returns the XML stream
+   * @returns callback builder
    */
-  ele(name: string, attributes?: AttributesObject): XMLBuilderStream
+  ele(name: string, attributes?: AttributesObject): XMLBuilderCB
 
   /**
    * Creates or updates an element attribute.
@@ -869,9 +869,9 @@ export interface XMLBuilderStream {
    * @param name - attribute name
    * @param value - attribute value
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  att(namespace: string | null, name: string, value: string): XMLBuilderStream
+  att(namespace: string | null, name: string, value: string): XMLBuilderCB
 
   /**
    * Creates or updates an element attribute.
@@ -879,45 +879,45 @@ export interface XMLBuilderStream {
    * @param name - attribute name
    * @param value - attribute value
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  att(name: string, value: string): XMLBuilderStream
+  att(name: string, value: string): XMLBuilderCB
 
   /**
    * Creates or updates an element attribute.
    * 
    * @param obj - a JS object containing element attributes and values
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  att(obj: AttributesObject): XMLBuilderStream
+  att(obj: AttributesObject): XMLBuilderCB
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
    * 
    * @param content - node content
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  txt(content: string): XMLBuilderStream
+  txt(content: string): XMLBuilderCB
 
   /**
    * Creates a new comment node and appends it to the list of child nodes.
    * 
    * @param content - node content
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  com(content: string): XMLBuilderStream
+  com(content: string): XMLBuilderCB
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.
    * 
    * @param content - node content
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  dat(content: string): XMLBuilderStream
+  dat(content: string): XMLBuilderCB
 
   /**
    * Creates a new processing instruction node and appends it to the list of 
@@ -926,9 +926,9 @@ export interface XMLBuilderStream {
    * @param target - instruction target
    * @param content - node content
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  ins(target: string, content?: string): XMLBuilderStream
+  ins(target: string, content?: string): XMLBuilderCB
 
   /**
    * Creates new processing instruction nodes by expanding the given object and
@@ -937,47 +937,47 @@ export interface XMLBuilderStream {
    * @param contents - a JS object containing processing instruction targets 
    * and values or an array of strings
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  ins(target: PIObject): XMLBuilderStream
+  ins(target: PIObject): XMLBuilderCB
 
   /**
    * Creates the XML declaration.
    * 
    * @param options - declaration options
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  dec(options?: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilderStream
+  dec(options?: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilderCB
 
   /**
    * Creates a new DocType node and inserts it into the document.
    * 
    * @param options - DocType identifiers
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  dtd(options: DTDOptions & { name: string }): XMLBuilderStream
+  dtd(options: DTDOptions & { name: string }): XMLBuilderCB
 
   /**
    * Closes the current element node.
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  up(): XMLBuilderStream
+  up(): XMLBuilderCB
 
   /**
    * Completes serializing the XML document.
    * 
-   * @returns current element node
+   * @returns callback builder
    */
-  end(): XMLBuilderStream
+  end(): XMLBuilderCB
 }
 
 /**
- * Defines the options passed to the object writer.
+ * Defines the options passed to the callback builder.
  */
-export type StreamWriterOptions = {
+export type XMLBuilderCBOptions = {
   /**
    * A callback function which is called when a chunk of XML is serialized.
    */
@@ -1059,7 +1059,7 @@ export type StreamWriterOptions = {
 /**
  * Defines default values for builder options.
  */
-export const DefaultStreamWriterOptions: Partial<StreamWriterOptions> = {
+export const DefaultXMLBuilderCBOptions: Partial<XMLBuilderCBOptions> = {
   error: (() => { }),
   wellFormed: false,
   prettyPrint: false,

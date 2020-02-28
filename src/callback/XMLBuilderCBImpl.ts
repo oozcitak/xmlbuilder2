@@ -1,6 +1,6 @@
 import {
-  XMLBuilderStream, AttributesObject, PIObject, DTDOptions, XMLBuilder,
-  StreamWriterOptions, XMLBuilderCreateOptions, DefaultStreamWriterOptions
+  XMLBuilderCB, AttributesObject, PIObject, DTDOptions, XMLBuilder,
+  XMLBuilderCBOptions, XMLBuilderCreateOptions, DefaultXMLBuilderCBOptions
 } from "../interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { fragment, create } from ".."
@@ -23,13 +23,13 @@ type PrefixIndex = { value: number }
 /**
  * Represents a readable XML document stream.
  */
-export class XMLBuilderStreamImpl implements XMLBuilderStream {
+export class XMLBuilderCBImpl implements XMLBuilderCB {
 
   private static _VoidElementNames = new Set(['area', 'base', 'basefont',
     'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen',
     'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'])
 
-  private _options: Required<StreamWriterOptions>
+  private _options: Required<XMLBuilderCBOptions>
   private _builderOptions: XMLBuilderCreateOptions
   private _fragment: boolean
 
@@ -61,13 +61,13 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
    * 
    * @returns XML stream
    */
-  public constructor(options: StreamWriterOptions, fragment = false) {
+  public constructor(options: XMLBuilderCBOptions, fragment = false) {
     this._fragment = fragment
 
     // provide default options
     this._options = applyDefaults(options,
-      DefaultStreamWriterOptions
-    ) as Required<StreamWriterOptions>
+      DefaultXMLBuilderCBOptions
+    ) as Required<XMLBuilderCBOptions>
 
     this._builderOptions = {
       defaultNamespace: this._options.defaultNamespace,
@@ -86,7 +86,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
   /** @inheritdoc */
   ele(p1: string | null, p2?: AttributesObject | string,
-    p3?: AttributesObject): XMLBuilderStream {
+    p3?: AttributesObject): XMLBuilderCB {
 
     this._serializeOpenTag(true)
 
@@ -117,7 +117,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   }
 
   /** @inheritdoc */
-  att(p1: AttributesObject | string | null, p2?: string, p3?: string): XMLBuilderStream {
+  att(p1: AttributesObject | string | null, p2?: string, p3?: string): XMLBuilderCB {
     if (this._currentElement === undefined) {
       this._onError.call(this, new Error("Cannot insert an attribute node as child of a document node."))
       return this
@@ -132,7 +132,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   }
 
   /** @inheritdoc */
-  com(content: string): XMLBuilderStream {
+  com(content: string): XMLBuilderCB {
     this._serializeOpenTag(true)
 
     let node: Comment
@@ -156,7 +156,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   }
 
   /** @inheritdoc */
-  txt(content: string): XMLBuilderStream {
+  txt(content: string): XMLBuilderCB {
     if (!this._fragment && this._currentElement === undefined) {
       this._onError.call(this, new Error("Cannot insert a text node as child of a document node."))
       return this
@@ -196,7 +196,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   }
 
   /** @inheritdoc */
-  ins(target: string | PIObject, content: string = ''): XMLBuilderStream {
+  ins(target: string | PIObject, content: string = ''): XMLBuilderCB {
     this._serializeOpenTag(true)
 
     let node: ProcessingInstruction
@@ -224,7 +224,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   }
 
   /** @inheritdoc */
-  dat(content: string): XMLBuilderStream {
+  dat(content: string): XMLBuilderCB {
     this._serializeOpenTag(true)
 
     let node: CDATASection
@@ -240,7 +240,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   }
 
   /** @inheritdoc */
-  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean } = { version: "1.0" }): XMLBuilderStream {
+  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean } = { version: "1.0" }): XMLBuilderCB {
     if (this._fragment) {
       this._onError.call(this, Error("Cannot insert an XML declaration into a document fragment."))
       return this
@@ -269,7 +269,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   }
 
   /** @inheritdoc */
-  dtd(options: DTDOptions & { name: string }): XMLBuilderStream {
+  dtd(options: DTDOptions & { name: string }): XMLBuilderCB {
     if (this._fragment) {
       this._onError.call(this, Error("Cannot insert a DocType declaration into a document fragment."))
       return this
@@ -322,14 +322,14 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
   }
 
   /** @inheritdoc */
-  up(): XMLBuilderStream {
+  up(): XMLBuilderCB {
     this._serializeOpenTag(false)
     this._serializeCloseTag()
     return this
   }
 
   /** @inheritdoc */
-  end(): XMLBuilderStream {
+  end(): XMLBuilderCB {
     this._serializeOpenTag(false)
     while (this._openTags.length > 0) {
       this._serializeCloseTag()
@@ -432,7 +432,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
 
     const isHTML = (ns === infraNamespace.HTML)
     if (isHTML && !hasChildren &&
-      XMLBuilderStreamImpl._VoidElementNames.has(node.localName)) {
+      XMLBuilderCBImpl._VoidElementNames.has(node.localName)) {
       markup += " /"
     } else if (!isHTML && !hasChildren) {
       if (this._options.allowEmptyTags) {

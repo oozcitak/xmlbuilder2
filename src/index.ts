@@ -1,8 +1,8 @@
 import {
   XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions,
   XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions,
-  DocumentWithSettings, XMLBuilderOptionKeys, XMLBuilderStream,
-  StreamWriterOptions
+  DocumentWithSettings, XMLBuilderOptionKeys, XMLBuilderCB,
+  XMLBuilderCBOptions
 } from './interfaces'
 import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
@@ -10,7 +10,7 @@ import { Guard } from '@oozcitak/dom/lib/util'
 import { XMLBuilderImpl } from './builder'
 import { createDocument, createParser, throwIfParserError } from './builder/dom'
 import { isArray } from 'util'
-import { XMLBuilderStreamImpl } from './stream'
+import { XMLBuilderCBImpl } from './callback'
 
 /**
  * Wraps a DOM node for use with XML builder with default options.
@@ -314,25 +314,25 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
 }
 
 /**
- * Creates an XML builder document stream.
+ * Creates an XML builder which serializes the document in chunks.
  * 
- * @param options - stream writer options
+ * @param options - callback builder options
  * 
- * @returns XML builder stream
+ * @returns callback builder
  */
-export function documentStream(options: StreamWriterOptions): XMLBuilderStream {
-  return new XMLBuilderStreamImpl(options)
+export function createCB(options: XMLBuilderCBOptions): XMLBuilderCB {
+  return new XMLBuilderCBImpl(options)
 }
 
 /**
- * Creates an XML builder fragment stream.
+ * Creates an XML builder which serializes the fragment in chunks.
  * 
- * @param options - stream writer options
+ * @param options - callback builder options
  * 
- * @returns XML builder stream
+ * @returns callback builder
  */
-export function fragmentStream(options: StreamWriterOptions): XMLBuilderStream {
-  return new XMLBuilderStreamImpl(options, true)
+export function fragmentCB(options: XMLBuilderCBOptions): XMLBuilderCB {
+  return new XMLBuilderCBImpl(options, true)
 }
 
 function isXMLBuilderCreateOptions(obj: any): obj is XMLBuilderCreateOptions {

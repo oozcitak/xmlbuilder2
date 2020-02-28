@@ -3,23 +3,23 @@ import $$ from '../TestHelpers'
 describe('basic XMLStream tests', () => {
 
   test('empty document', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
     xmlStream.end()
 
-    $$.expectStreamResult(xmlStream, ``, done)
+    $$.expectCBResult(xmlStream, ``, done)
   })
 
   test('ele', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
     xmlStream.ele("root").end()
 
-    $$.expectStreamResult(xmlStream, `<root/>`, done)
+    $$.expectCBResult(xmlStream, `<root/>`, done)
   })
 
   test('ele with children', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
     xmlStream.ele("root")
       .ele("foo")
@@ -27,11 +27,11 @@ describe('basic XMLStream tests', () => {
       .ele("baz").up()
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root><foo><bar/><baz/></foo></root>`, done)
+    $$.expectCBResult(xmlStream, `<root><foo><bar/><baz/></foo></root>`, done)
   })
 
   test('multiple elements at root level', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
     xmlStream.ele("node").up()
       .ele("node")
@@ -40,69 +40,69 @@ describe('basic XMLStream tests', () => {
       .up()
       .end()
 
-    $$.expectStreamResult(xmlStream, `<node/><node><bar/><baz/></node>`, done)
+    $$.expectCBResult(xmlStream, `<node/><node><bar/><baz/></node>`, done)
   })
 
   test('dec', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
-    $$.expectStreamError(xmlStream, () => xmlStream.dec({ version: "1.0", encoding: "UTF-8", standalone: true }), done)
+    $$.expectCBError(xmlStream, () => xmlStream.dec({ version: "1.0", encoding: "UTF-8", standalone: true }), done)
   })
 
   test('dtd', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
-    $$.expectStreamError(xmlStream, () => xmlStream.dtd({ name: "root", pubID: "pub", sysID: "sys" }), done)
+    $$.expectCBError(xmlStream, () => xmlStream.dtd({ name: "root", pubID: "pub", sysID: "sys" }), done)
   })
 
   test('txt', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
     xmlStream.ele("root")
       .txt("text")
       .txt("")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root>text</root>`, done)
+    $$.expectCBResult(xmlStream, `<root>text</root>`, done)
   })
 
   test('txt at root level', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
     xmlStream.txt("text")
       .end()
 
-    $$.expectStreamResult(xmlStream, `text`, done)
+    $$.expectCBResult(xmlStream, `text`, done)
   })
 
   test('com', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
     xmlStream.ele("root")
       .com("text")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root><!--text--></root>`, done)
+    $$.expectCBResult(xmlStream, `<root><!--text--></root>`, done)
   })
 
   test('dat', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
     xmlStream.ele("root")
       .dat("text")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root><![CDATA[text]]></root>`, done)
+    $$.expectCBResult(xmlStream, `<root><![CDATA[text]]></root>`, done)
   })
 
   test('ins', (done) => {
-    const xmlStream = $$.fragmentStream()
+    const xmlStream = $$.fragmentCB()
 
     xmlStream.ele("root")
       .ins("target", "value")
       .end()
 
-    $$.expectStreamResult(xmlStream, `<root><?target value?></root>`, done)
+    $$.expectCBResult(xmlStream, `<root><?target value?></root>`, done)
   })
 
 })
