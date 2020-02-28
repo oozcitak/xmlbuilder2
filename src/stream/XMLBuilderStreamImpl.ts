@@ -102,7 +102,8 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
       return this
     }
 
-    if (!this._fragment && !this._hasDocumentElement && this._docTypeName !== "" && (this._currentElement.node as Element)._qualifiedName !== this._docTypeName) {
+    if (!this._fragment && !this._hasDocumentElement && this._docTypeName !== ""
+      && (this._currentElement.node as Element)._qualifiedName !== this._docTypeName) {
       this._onError.call(this, new Error("Document element name does not match DocType declaration name."))
       return this
     }
@@ -507,7 +508,7 @@ export class XMLBuilderStreamImpl implements XMLBuilderStream {
     } else if (data.length !== 0) {
       this._hasData = true
       this._onData(data, this._level)
-      const a=5
+      const a = 5
     }
   }
 
