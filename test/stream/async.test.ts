@@ -1,16 +1,22 @@
 import $$ from '../TestHelpers'
-import { promises } from 'fs'
+import fs from 'fs'
 import { resolve } from 'path'
+import { promisify } from 'util'
+
+const open = promisify(fs.open)
+const write = promisify(fs.write)
+const close = promisify(fs.close)
+const readFile = promisify(fs.readFile)
 
 describe('Use callback API with fs async', () => {
 
   test('basic', async () => {
     const filename = resolve(__dirname, 'async-basic.test.out')
-    const outFile = await promises.open(filename, 'w')
+    const outFile = await open(filename, 'w')
     
     const xml = $$.createCB({ 
-      data: async (chunk) => await outFile.write(chunk),
-      end: async () => await outFile.close()
+      data: async (chunk) => await write(outFile, chunk),
+      end: async () => await close(outFile)
     })
 
     xml.ele("root")
@@ -18,7 +24,7 @@ describe('Use callback API with fs async', () => {
       .ele("bar").att("fizz", "buzz").up()
       .end()
 
-    const result = await promises.readFile(filename, { encoding: 'utf8' })
+    const result = await readFile(filename, { encoding: 'utf8' })
     expect(result).toBe(`<root><foo/><bar fizz="buzz"/></root>`)
   })
 

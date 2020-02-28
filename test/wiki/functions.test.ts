@@ -1,6 +1,4 @@
 import $$ from '../TestHelpers'
-import { promises } from 'fs'
-import { resolve } from 'path'
 
 describe('examples in the function reference wiki page', () => {
 
