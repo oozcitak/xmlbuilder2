@@ -1,4 +1,6 @@
 import $$ from '../TestHelpers'
+import { promises } from 'fs'
+import { resolve } from 'path'
 
 describe('examples in the function reference wiki page', () => {
 
@@ -47,6 +49,42 @@ describe('examples in the function reference wiki page', () => {
       .ele({ "root": { "@att1": "value1", "@att2": "value2", "#": "text" }})
     expect(doc3.end({ prettyPrint: true, headless: true }))
       .toBe('<root att1="value1" att2="value2">text</root>')
+  })
+
+  test('documentStream()', async () => {
+    const filename = resolve(__dirname, 'functions-documentStream.test.out')
+    const outFile = await promises.open(filename, 'w')
+    
+    const xmlStream = $$.documentStream({ 
+      data: async (chunk) => await outFile.write(chunk),
+      end: async () => await outFile.close()
+    })
+    
+    xmlStream.ele("root")
+      .ele("foo").up()
+      .ele("bar").att("fizz", "buzz").up()
+      .end()
+
+    const result = await promises.readFile(filename, { encoding: 'utf8' })
+    expect(result).toBe('<root><foo/><bar fizz="buzz"/></root>')
+  })
+
+  test('fragmentStream()', async () => {
+    const filename = resolve(__dirname, 'functions-fragmentStream.test.out')
+    const outFile = await promises.open(filename, 'w')
+    
+    const xmlStream = $$.fragmentStream({ 
+      data: async (chunk) => await outFile.write(chunk),
+      end: async () => await outFile.close()
+    })
+    
+    xmlStream.ele("foo").up()
+      .ele("foo").att("fizz", "buzz").up()
+      .ele("foo").up()
+      .end()
+
+    const result = await promises.readFile(filename, { encoding: 'utf8' })
+    expect(result).toBe('<foo/><foo fizz="buzz"/><foo/>')
   })
 
 })
