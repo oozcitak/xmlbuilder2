@@ -51,40 +51,4 @@ describe('examples in the function reference wiki page', () => {
       .toBe('<root att1="value1" att2="value2">text</root>')
   })
 
-  test('documentCB()', async () => {
-    const filename = resolve(__dirname, 'functions-documentCB.test.out')
-    const outFile = await promises.open(filename, 'w')
-    
-    const xmlStream = $$.createCB({ 
-      data: async (chunk) => await outFile.write(chunk),
-      end: async () => await outFile.close()
-    })
-    
-    xmlStream.ele("root")
-      .ele("foo").up()
-      .ele("bar").att("fizz", "buzz").up()
-      .end()
-
-    const result = await promises.readFile(filename, { encoding: 'utf8' })
-    expect(result).toBe('<root><foo/><bar fizz="buzz"/></root>')
-  })
-
-  test('fragmentCB()', async () => {
-    const filename = resolve(__dirname, 'functions-fragmentCB.test.out')
-    const outFile = await promises.open(filename, 'w')
-    
-    const xmlStream = $$.fragmentCB({ 
-      data: async (chunk) => await outFile.write(chunk),
-      end: async () => await outFile.close()
-    })
-    
-    xmlStream.ele("foo").up()
-      .ele("foo").att("fizz", "buzz").up()
-      .ele("foo").up()
-      .end()
-
-    const result = await promises.readFile(filename, { encoding: 'utf8' })
-    expect(result).toBe('<foo/><foo fizz="buzz"/><foo/>')
-  })
-
 })
