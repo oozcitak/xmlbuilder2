@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [1.4.0] - 2020-02-28
+
+- Added callback API (See [#2](https://github.com/oozcitak/xmlbuilder2/issues/2)).
+
 
 ## [1.3.0] - 2020-02-18
 
@@ -33,6 +37,7 @@ All notable changes to this project are documented in this file. This project ad
 
 - Initial release
 
+[1.4.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/oozcitak/xmlbuilder2/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.1.2...v1.2.0
