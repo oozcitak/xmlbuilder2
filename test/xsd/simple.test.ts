@@ -8,8 +8,7 @@ describe('Simple XSD validation', () => {
       .ele('xs:schema', { 'xmlns:xs': 'http://www.w3.org/2001/XMLSchema' })
         .ele('xs:element', { name: 'book' }).doc()
     const xmlDoc1 = $$.create().ele('book').doc()
-    const xmlDoc2 = $$.create().ele('boob').doc()
-
+    const xmlDoc2 = $$.create().ele('booze').doc()
 
     const xsd = parseXml(xsdDoc.end() as string)
     
