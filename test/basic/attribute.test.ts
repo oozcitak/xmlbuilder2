@@ -21,6 +21,18 @@ describe('att()', () => {
     expect(() => root.att(undefined as any, 'att', 'val')).toThrow()
   })
 
+  test('add attribute - should skip undefined att value', () => {
+    const root = $$.create().ele('root')
+    const node1 = root.ele('node1')
+    node1.att({ att: 'val', att1: 'val1', att2: null, att3: undefined })
+    expect($$.printTree(root.doc().node)).toBe($$.t`
+      root
+        node1 att="val" att1="val1"
+      `)
+  })
+
+  
+
   test('add multiple attributes', () => {
     const root = $$.create().ele('root')
     const node1 = root.ele('node1')
