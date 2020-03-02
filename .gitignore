@@ -1,7 +1,6 @@
 lib/
 node_modules/
 coverage/
-docs/
 .vs/
 .nyc_output/
 *.log
