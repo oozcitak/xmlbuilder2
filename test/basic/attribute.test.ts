@@ -125,7 +125,10 @@ describe('att()', () => {
   test('invalid attribute value', () => {
     const root = $$.create().ele('root')
     const node1 = root.ele('node1')
-    expect(() => node1.ele({ '@att1': undefined })).toThrow()
+    expect($$.printTree(root.doc().node)).toBe($$.t`
+      root
+        node1
+      `)
   })
 
 })

@@ -233,12 +233,12 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     let namespace: string | null | undefined
     let name: string | undefined
-    let value: string
+    let value: string | undefined
 
     if ((p1 === null || isString(p1)) && isString(p2) && (p3 === null || isString(p3))) {
       // att(namespace: string, name: string, value: string)
       [namespace, name, value] = [p1, p2, p3]
-    } else if (isString(p1) && (p2 === null || isString(p2))) {
+    } else if (isString(p1) && (p2 == null || isString(p2))) {
       // ele(name: string, value: string)
       [namespace, name, value] = [undefined, p1, p2]
     } else {
@@ -248,8 +248,8 @@ export class XMLBuilderImpl implements XMLBuilder {
     if (this._options.keepNullAttributes && (value === null)) {
       // keep null attributes
       value = ""
-    } else if (value === null) {
-      // skip null attributes
+    } else if (value == null) {
+      // skip null|undefined attributes
       return this
     }
 
