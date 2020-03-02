@@ -24,6 +24,7 @@
   "files": [
     "lib/**/*"
   ],
+  "types": "./lib/index.d.ts",
   "dependencies": {
     "@oozcitak/util": "8.3.1",
     "@oozcitak/dom": "1.15.2",
