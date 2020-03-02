@@ -123,6 +123,30 @@ describe('StringWriter with namespaces', () => {
       `)
   })
 
+  test('XML namespace inherited - 1', () => {
+    const doc = $$.create().ele('http://www.w3.org/XML/1998/namespace', 'xml:root')
+      .ele('http://www.w3.org/XML/1998/namespace', 'xml:foo').up()
+      .doc()
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <xml:root>
+        <xml:foo/>
+      </xml:root>
+      `)
+  })
+
+  test('XML namespace inherited - 2', () => {
+    const doc = $$.create().ele('ns', 'z:r')
+      .att('http://www.w3.org/2000/xmlns/', 'xmlns', 'http://www.w3.org/XML/1998/namespace')
+      .ele('http://www.w3.org/XML/1998/namespace', 'n')
+      .doc()
+
+    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+      <z:r xmlns:z="ns">
+        <xml:n/>
+      </z:r>
+      `)
+  })
+
   test('duplicate namespaces', () => {
     const doc = $$.create().ele('d:root', { "xmlns:d": "ns1" })
       .ele('e:foo', { "xmlns:e": "ns1" }).up()

@@ -305,6 +305,32 @@ describe('namespaces', () => {
       <xmlns:root/>`, done)
   })
 
+  test('XML namespace inherited - 1', (done) => {
+    const xmlStream = $$.createCB({ prettyPrint: true })
+    xmlStream.ele('http://www.w3.org/XML/1998/namespace', 'xml:root')
+      .ele('http://www.w3.org/XML/1998/namespace', 'xml:foo')
+      .end()
+    $$.expectCBResult(xmlStream, $$.t`
+      <xml:root>
+        <xml:foo/>
+      </xml:root>
+      `, done)
+  })
+
+  test('XML namespace inherited - 2', (done) => {
+    const xmlStream = $$.createCB({ prettyPrint: true })
+    xmlStream.ele('ns', 'z:r')
+      .att('http://www.w3.org/2000/xmlns/', 'xmlns', 'http://www.w3.org/XML/1998/namespace')
+      .ele('http://www.w3.org/XML/1998/namespace', 'n')
+      .end()
+
+    $$.expectCBResult(xmlStream, $$.t`
+      <z:r xmlns:z="ns">
+        <xml:n/>
+      </z:r>
+      `, done)
+  })
+
   test('void HTML element', (done) => {
     const xmlStream = $$.createCB({ prettyPrint: true })
     xmlStream.ele('root')
