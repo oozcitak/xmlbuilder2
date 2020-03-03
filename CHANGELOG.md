@@ -6,6 +6,7 @@ All notable changes to this project are documented in this file. This project ad
 
 - `keepNullNodes` and `keepNullAttributes` flags now properly keep `null` 
 **and** `undefined` values (See [#5](https://github.com/oozcitak/xmlbuilder2/issues/5)).
+Without these flags, `null` **and** `undefined` will be silently skipped.
 
 ## [1.4.2] - 2020-03-02
 
