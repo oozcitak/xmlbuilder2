@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [1.4.3] - 2020-03-03
+
+- `keepNullNodes` and `keepNullAttributes` flags now properly keep `null` 
+**and** `undefined` values (See [#5](https://github.com/oozcitak/xmlbuilder2/issues/5)).
+
+## [1.4.2] - 2020-03-02
+
+- Added `types` to `package.json` to help IDEs infer types (See [#4](https://github.com/oozcitak/xmlbuilder2/issues/4)).
+
 ## [1.4.1] - 2020-02-28
 
 - Renamed callback API functions.
@@ -41,6 +50,8 @@ All notable changes to this project are documented in this file. This project ad
 
 - Initial release
 
+[1.4.3]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.2...v1.4.3
+[1.4.2]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.2.1...v1.3.0
