@@ -256,6 +256,74 @@ describe('object', () => {
     `)
   })
 
+  test('skip null and undefined att values', () => {
+    const root = $$.create().ele({
+      root: {
+        node1: {
+          '@att': 'val',
+          '@att1': 'val1',
+          '@att2': null,
+          '@att3': undefined
+        }
+      }
+    })
+    expect($$.printTree(root.doc().node)).toBe($$.t`
+      root
+        node1 att="val" att1="val1"
+      `)
+  })
+
+  test('keep null att value with keepNullAttributes flag', () => {
+    const root = $$.create({ keepNullAttributes: true }).ele({
+      root: {
+        node1: {
+          '@att': 'val',
+          '@att1': 'val1',
+          '@att2': null,
+          '@att3': undefined
+        }
+      }
+    })
+    expect($$.printTree(root.doc().node)).toBe($$.t`
+      root
+        node1 att="val" att1="val1" att2="" att3=""
+      `)
+  })
+
+  test('skip null and undefined node value', () => {
+    const root = $$.create({ keepNullAttributes: true }).ele({
+      root: {
+        node1: '',
+        node2: {},
+        node3: null,
+        node4: undefined
+      }
+    })
+    expect($$.printTree(root.doc().node)).toBe($$.t`
+      root
+        node1
+        node2
+      `)
+  })
+
+  test('keep null node value with keepNullNodes flag', () => {
+    const root = $$.create({ keepNullNodes: true }).ele({
+      root: {
+        node1: '',
+        node2: {},
+        node3: null,
+        node4: undefined
+      }
+    })
+    expect($$.printTree(root.doc().node)).toBe($$.t`
+      root
+        node1
+        node2
+        node3
+        node4
+      `)
+  })
+
   test('custom converter', () => {
     const obj = {
       'root': {

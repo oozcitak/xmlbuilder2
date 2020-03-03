@@ -31,8 +31,6 @@ describe('att()', () => {
       `)
   })
 
-  
-
   test('add multiple attributes', () => {
     const root = $$.create().ele('root')
     const node1 = root.ele('node1')
@@ -109,7 +107,7 @@ describe('att()', () => {
   test('skip null attribute', () => {
     const root = $$.create().ele('root')
     const node1 = root.ele('node1')
-    node1.ele({ '@att1': null, '@att2': 'val2' }).ele('node1-2')
+    node1.ele({ '@att1': null, '@att2': 'val2', '@att3': undefined }).ele('node1-2')
     const node2 = root.ele('node2')
 
     expect($$.printTree(root.doc().node)).toBe($$.t`
@@ -123,12 +121,12 @@ describe('att()', () => {
   test('keep null attribute', () => {
     const root = $$.create({ keepNullAttributes: true }).ele('root')
     const node1 = root.ele('node1')
-    node1.ele({ '@att1': null, '@att2': 'val2' }).ele('node1-2')
+    node1.ele({ '@att1': null, '@att2': 'val2', '@att3': undefined }).ele('node1-2')
     const node2 = root.ele('node2')
 
     expect($$.printTree(root.doc().node)).toBe($$.t`
       root
-        node1 att1="" att2="val2"
+        node1 att1="" att2="val2" att3=""
           node1-2
         node2
       `)

@@ -15,7 +15,7 @@ describe('Use callback API with fs async', () => {
     const outFile = await open(filename, 'w')
     
     const xml = $$.createCB({ 
-      data: (chunk) => write(outFile, chunk),
+      data: async (chunk) => await write(outFile, chunk),
       end: async () => {
         await close(outFile)
         const result = await readFile(filename, { encoding: 'utf8' })

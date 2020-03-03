@@ -149,7 +149,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         } else if ((isMap(val) || isObject(val)) && isEmpty(val)) {
           // empty objects produce one node
           lastChild = this.ele(key)
-        } else if (!this._options.keepNullNodes && (val === null)) {
+        } else if (!this._options.keepNullNodes && (val == null)) {
           // skip null and undefined nodes
           lastChild = this._dummy()
         } else if (isArray(val) || isSet(val)) {
@@ -245,7 +245,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       throw new Error("Attribute name and value not specified. " + this._debugInfo())
     }
 
-    if (this._options.keepNullAttributes && (value === null)) {
+    if (this._options.keepNullAttributes && (value == null)) {
       // keep null attributes
       value = ""
     } else if (value == null) {

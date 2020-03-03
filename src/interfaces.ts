@@ -24,13 +24,13 @@ export interface XMLBuilderCreateOptions {
    */
   standalone?: boolean
   /**
-   * Whether nodes with `null` values will be kept or ignored. Defaults to 
-   * `false`.
+   * Whether nodes with `null` or `undefined` values will be kept or ignored.
+   * Defaults to `false`.
    */
   keepNullNodes?: boolean
   /**
-   * Whether attributes with `null` values will be kept or ignored. Defaults to 
-   * `false`.
+   * Whether attributes with `null` or `undefined` values will be kept or
+   * ignored. Defaults to `false`.
    */
   keepNullAttributes?: boolean
   /** 
