@@ -4,3 +4,4 @@ coverage/
 .vs/
 .nyc_output/
 *.log
+_site/
