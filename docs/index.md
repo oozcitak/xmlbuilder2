@@ -7,6 +7,8 @@ toc: false
 comments: false
 ---
 
+![xmlbuilder2 logo]({% link images/social-media-banner.png %} "xmlbuilder2 logo")
+
 An XML builder for [node.js](https://nodejs.org/).
 
 ### Installation:
