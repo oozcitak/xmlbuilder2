@@ -7,7 +7,7 @@ toc: false
 comments: false
 ---
 `xmlbuilder2` can create an XML document by parsing a number of different formats. Parsers are transparently used by the [`create`]({{ site.baseurl }}{% link pages/builder-functions.md %}#create) and
-`fragment`({{ site.baseurl }}{% link pages/builder-functions.md %}#fragment) functions exported by the module.
+[`fragment`]({{ site.baseurl }}{% link pages/builder-functions.md %}#fragment) functions exported by the module.
 
 ### JS Objects
 
