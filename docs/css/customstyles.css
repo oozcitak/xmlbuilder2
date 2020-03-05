@@ -313,6 +313,14 @@ a.accordion-toggle, a.accordion-collapsed {
     list-style: none;
 }
 
+.nav hr {
+  width: 100%;
+  padding: 0;
+  background-color: transparent;
+  border-top: 1px solid #bbbbbb;
+  margin:0px;
+}
+
 .nav ul {
     padding: 0;
     /*margin: 0 0 0 18px;*/

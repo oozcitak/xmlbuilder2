@@ -1,0 +1,150 @@
+# This is your sidebar TOC. The sidebar code loops through sections here and provides the appropriate formatting.
+
+entries:
+- product: xmlbuilder2
+- title: API
+  levels: one
+  folders:
+  - title: Articles
+    output: web
+    folderitems:
+    - title: Builder Options
+      url: /builder-options.html
+      output: web
+    - title: Object Conversion
+      url: /object-conversion.html
+      output: web
+    - title: Namespaces
+      url: /namespaces.html
+      output: web
+    - title: Parsing
+      url: /parsing.html
+      output: web
+    - title: Serialization
+      url: /serialization.html
+      output: web
+    - title: DOM Interfaces
+      url: /dom-interfaces.html
+      output: web
+    - title: Using with External Libraries
+      url: /using-with-external-libraries.html
+      output: web
+    - title: Upgrading from xmlbuilder
+      url: /upgrading-from-xmlbuilder.html
+      output: web
+  - title: API
+    output: web
+    folderitems:
+    - title: create
+      url: /builder-functions.html#create
+      output: web
+    - title: fragment
+      url: /builder-functions.html#fragment
+      output: web
+    - title: convert
+      url: /builder-functions.html#convert
+      output: web
+    - title: builder
+      url: /builder-functions.html#builder
+      output: web
+    - separator: true
+      output: web
+    - title: att
+      url: /node-functions.html#att
+      output: web
+    - title: com
+      url: /node-functions.html#com
+      output: web
+    - title: dat
+      url: /node-functions.html#dat
+      output: web
+    - title: dec
+      url: /node-functions.html#dec
+      output: web
+    - title: dtd
+      url: /node-functions.html#dtd
+      output: web
+    - title: ele
+      url: /node-functions.html#ele
+      output: web
+    - title: import
+      url: /node-functions.html#import
+      output: web
+    - title: ins
+      url: /node-functions.html#ins
+      output: web
+    - title: remove
+      url: /node-functions.html#remove
+      output: web
+    - title: removeAtt
+      url: /node-functions.html#removeAtt
+      output: web
+    - title: txt
+      url: /node-functions.html#txt
+      output: web
+    - separator: true
+      output: web
+    - title: doc
+      url: /node-functions.html#doc
+      output: web
+    - title: first
+      url: /node-functions.html#first
+      output: web
+    - title: last
+      url: /node-functions.html#last
+      output: web
+    - title: prev
+      url: /node-functions.html#prev
+      output: web
+    - title: root
+      url: /node-functions.html#root
+      output: web
+    - title: up
+      url: /node-functions.html#up
+      output: web
+    - separator: true
+      output: web
+    - title: each
+      url: /node-functions.html#each
+      output: web
+    - title: map
+      url: /node-functions.html#map
+      output: web
+    - title: reduce
+      url: /node-functions.html#reduce
+      output: web
+    - title: find
+      url: /node-functions.html#find
+      output: web
+    - title: filter
+      url: /node-functions.html#filter
+      output: web
+    - title: every
+      url: /node-functions.html#every
+      output: web
+    - title: some
+      url: /node-functions.html#some
+      output: web
+    - title: toArray
+      url: /node-functions.html#toArray
+      output: web
+    - separator: true
+      output: web
+    - title: end
+      url: /node-functions.html#end
+      output: web
+    - title: toObject
+      url: /node-functions.html#toObject
+      output: web
+    - title: toString
+      url: /node-functions.html#toString
+      output: web
+  - title: Callback API
+    output: web
+    folderitems:
+    - title: createBC
+      url: /builder-functions-with-callbacks.html#createCB
+      output: web
+    - title: fragmentBC
+      url: /builder-functions-with-callbacks.html#fragmentCB
+      output: web
