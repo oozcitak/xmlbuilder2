@@ -17,7 +17,7 @@ tree using the following functions which are defined on XML nodes.
 
 Creates or updates an attribute node and adds it into its parent element node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>att</strong>(<code>namespace</code>: string, <code>name</code>: string, <code>value</code>: string)</code></summary>
 <br/>
 
@@ -43,7 +43,7 @@ console.log(root.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>att</strong>(<code>name</code>: string, <code>value</code>: string)</code></summary>
 <br/>
 
@@ -67,7 +67,7 @@ console.log(root.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>att</strong>(<code>obj</code>: object)</code></summary>
 <br/>
 
@@ -96,7 +96,7 @@ ___
 Creates a new comment node, appends it to the list of child nodes and returns
 the parent element node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>com</strong>(<code>content</code>: string)</code></summary>
 <br/>
 
@@ -124,7 +124,7 @@ ___
 Creates a new CDATA node and appends it to the list of child nodes and returns
 the parent element node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>dat</strong>(<code>content</code>: string)</code></summary>
 <br/>
 
@@ -151,7 +151,7 @@ ___
 
 Creates or updates the XML declaration and returns the current node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>dec</strong>(<code>options</code>: object)</code></summary>
 <br/>
 
@@ -181,7 +181,7 @@ Creates or updates the DocType node of the document. If the
 document already contains a DocType node it will be replaced by the new
 node. Otherwise it will be inserted before the document element node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>dtd</strong>(<code>options</code>: object)</code></summary>
 <br/>
 
@@ -217,7 +217,7 @@ _Note:_ The `ele` function returns the newly created element node. If multiple
 element nodes are created with a single `ele` call, it returns the last top
 level element node created.
 
-<details>
+<details markdown="1">
 <summary><code><strong>ele</strong>(<code>namespace</code>: string, <code>name</code>: string, <code>attributes</code>?: object)</code></summary>
 <br/>
 
@@ -245,7 +245,7 @@ console.log(child.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>ele</strong>(<code>name</code>: string, <code>attributes</code>?: object)</code></summary>
 <br/>
 
@@ -270,7 +270,7 @@ console.log(child.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>ele</strong>(<code>contents</code>: string | object)</code></summary>
 <br/>
 
@@ -334,7 +334,7 @@ _Note:_ If the imported node is a document, its document element node will be
 imported. If the imported node is a document fragment, its child nodes will be
 imported. 
 
-<details>
+<details markdown="1">
 <summary><code><strong>import</strong>(<code>node</code>: XMLBuilderNode)</code></summary>
 <br/>
 
@@ -365,7 +365,7 @@ ___
 Creates a new processing instruction node, appends it to the list of child nodes
 and returns the parent element node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>ins</strong>(<code>target</code>: string, <code>content</code>: string)</code></summary>
 <br/>
 
@@ -390,7 +390,7 @@ console.log(root.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>ins</strong>(<code>obj</code>: object)</code></summary>
 <br/>
 
@@ -416,7 +416,7 @@ console.log(root.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>ins</strong>(<code>arr</code>: string[])</code></summary>
 <br/>
 
@@ -448,7 +448,7 @@ ___
 
 Removes a node from the XML document and returns its parent element node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>remove</strong>()</code></summary>
 <br/>
 
@@ -471,7 +471,7 @@ ___
 
 Removes an attribute.
 
-<details>
+<details markdown="1">
 <summary><code><strong>removeAtt</strong>(<code>namespace</code>: string, <code>name</code>: string | string[])</code></summary>
 <br/>
 
@@ -497,7 +497,7 @@ console.log(root.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>removeAtt</strong>(<code>name</code>: string | string[])</code></summary>
 <br/>
 
@@ -527,7 +527,7 @@ ___
 Creates a new text node and appends it to the list of child nodes and returns
 the parent element node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>txt</strong>(<code>content</code>: string)</code></summary>
 <br/>
 
@@ -553,7 +553,7 @@ console.log(root.end({ prettyPrint: true }));
 
 Returns the document node. `doc` can be called from anywhere in the document.
 
-<details>
+<details markdown="1">
 <summary><code><strong>doc</strong>()</code></summary>
 <br/>
 
@@ -572,7 +572,7 @@ ___
 
 Returns the first child node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>first</strong>()</code></summary>
 <br/>
 
@@ -593,7 +593,7 @@ ___
 
 Returns the last child node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>last</strong>()</code></summary>
 <br/>
 
@@ -614,7 +614,7 @@ ___
 
 Returns the next sibling node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>next</strong>()</code></summary>
 <br/>
 
@@ -636,7 +636,7 @@ ___
 
 Returns the previous sibling node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>prev</strong>()</code></summary>
 <br/>
 
@@ -659,7 +659,7 @@ ___
 Returns the root element node. Root element node is the document element node of
 the XML document. `root` can be called from anywhere in the document.
 
-<details>
+<details markdown="1">
 <summary><code><strong>root</strong>()</code></summary>
 <br/>
 
@@ -678,7 +678,7 @@ ___
 
 Returns the parent element node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>up</strong>()</code></summary>
 <br/>
 
@@ -699,7 +699,7 @@ const root = child.up();
 Applies a callback function to child nodes of the current node.  Returns the 
 current node.
 
-<details>
+<details markdown="1">
 <summary><code><strong>each</strong>(<code>callback</code>: (node: XMLBuilder, index: number) => void, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
@@ -728,7 +728,7 @@ ___
 
 Produces an array of values by transforming each child node with the given callback function.
 
-<details>
+<details markdown="1">
 <summary><code><strong>map</strong>(<code>callback</code>: (node: XMLBuilder, index: number) => any, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
@@ -756,7 +756,7 @@ ___
 
 Reduces child nodes into a single value by applying the given callback function.
 
-<details>
+<details markdown="1">
 <summary><code><strong>reduce</strong>(<code>callback</code>: (value: any, node: XMLBuilder, index: number) => any, <code>initialValue</code>: any, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
@@ -787,7 +787,7 @@ Returns the first child node satisfying the given predicate, or `undefined` if t
 
 _Note:_ `find` returns as soon as a node satisfies the predicate, without necessarily visiting all child nodes.
 
-<details>
+<details markdown="1">
 <summary><code><strong>find</strong>(<code>predicate</code>: (node: XMLBuilder, index: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
@@ -815,7 +815,7 @@ ___
 
 Produces an array of child nodes which pass the given predicate test.
 
-<details>
+<details markdown="1">
 <summary><code><strong>filter</strong>(<code>predicate</code>: (node: XMLBuilder, index: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
@@ -843,7 +843,7 @@ ___
 
 Returns `true` if all child nodes pass the given predicate test.
 
-<details>
+<details markdown="1">
 <summary><code><strong>every</strong>(<code>predicate</code>: (node: XMLBuilder, index: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
@@ -871,7 +871,7 @@ Returns `true` if any of the child nodes pass the given predicate test.
 
 _Note:_ `some` returns as soon as a node satisfies the predicate, without necessarily visiting all child nodes
 
-<details>
+<details markdown="1">
 <summary><code><strong>some</strong>(<code>predicate</code>: (node: XMLBuilder, index: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
@@ -898,7 +898,7 @@ ___
 
 Produces an array of child nodes.
 
-<details>
+<details markdown="1">
 <summary><code><strong>toArray</strong>(<code>self</code>?: boolean, <code>recursive</code>?: boolean)</code></summary>
 <br/>
 
@@ -932,7 +932,7 @@ where `toString` and `toObject` functions convert only the node they are called 
 Converts the entire XML document into its string or object representation. `end`
 can be called from anywhere in the document.
 
-<details>
+<details markdown="1">
 <summary><code><strong>end</strong>(<code>options</code>?: object)</code></summary>
 <br/>
 
@@ -968,7 +968,7 @@ ___
 
 Converts the node into its object representation.
 
-<details>
+<details markdown="1">
 <summary><code><strong>toObject</strong>(<code>options</code>?: object)</code></summary>
 <br/>
 
@@ -1003,7 +1003,7 @@ ___
 
 Converts the node into its string representation.
 
-<details>
+<details markdown="1">
 <summary><code><strong>toString</strong>(<code>options</code>?: object)</code></summary>
 <br/>
 

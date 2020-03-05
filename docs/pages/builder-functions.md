@@ -15,7 +15,7 @@ const { create, fragment, convert, builder } = require('xmlbuilder2');
 ### create
 The `create` function creates and returns a new XML document. When called without arguments, `create` creates an empty XML document (one without any child nodes). `create` accepts an optional parameters object for customizing its behavior. These parameters are explained in [this page]({{ site.baseurl }}{% link pages/builder-options.md %}). `create` also accepts an optional argument defining an XML document to be parsed as detailed in [this page]({{ site.baseurl }}{% link pages/parsing.md %}).
 
-<details>
+<details markdown="1">
 <summary><code><strong>create</strong>(<code>options</code>: object, <code>contents</code>: string | object)</code></summary>
 <br/>
 
@@ -39,7 +39,7 @@ console.log(doc.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>create</strong>(<code>options</code>: object)</code></summary>
 <br/>
 
@@ -59,7 +59,7 @@ console.log(doc.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>create</strong>(<code>contents</code>: string | object)</code></summary>
 <br/>
 
@@ -84,7 +84,7 @@ console.log(doc.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>create</strong>()</code></summary>
 <br/>
 
@@ -107,7 +107,7 @@ ___
 ### fragment
 The `fragment` function creates and returns a document fragment node. `fragment` accepts the same types of arguments as with the `document` function.
 
-<details>
+<details markdown="1">
 <summary><code><strong>fragment</strong>(<code>options</code>: object, <code>contents</code>: string | object)</code></summary>
 <br/>
 
@@ -130,7 +130,7 @@ console.log(frag.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>fragment</strong>(<code>options</code>: object)</code></summary>
 <br/>
 
@@ -151,7 +151,7 @@ console.log(frag.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>fragment</strong>(<code>contents</code>: string | object)</code></summary>
 <br/>
 
@@ -173,7 +173,7 @@ console.log(frag.end({ prettyPrint: true }));
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>fragment</strong>()</code></summary>
 <br/>
 
@@ -201,7 +201,7 @@ and [serialization settings]({{ site.baseurl }}{% link pages/serialization.md %}
 for the options arguments. The input of the `convert` function should be a string containing an XML 
 document in either XML or JSON format or a JS object representing XML nodes.
 
-<details>
+<details markdown="1">
 <summary><code><strong>convert</strong>(<code>builderOptions</code>: object, <code>contents</code>: string | object, <code>convertOptions</code>: object)</code></summary>
 <br/>
 
@@ -226,7 +226,7 @@ console.log(obj);
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>convert</strong>(<code>contents</code>: string | object, <code>convertOptions</code>: object)</code></summary>
 <br/>
 
@@ -250,7 +250,7 @@ console.log(obj);
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>convert</strong>(<code>builderOptions</code>: object, <code>contents</code>: string | object)</code></summary>
 <br/>
 
@@ -273,7 +273,7 @@ console.log(xml);
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>convert</strong>(<code>contents</code>: string | object)</code></summary>
 <br/>
 
@@ -300,7 +300,7 @@ ___
 ### builder
 The `builder` function wraps an existing DOM node and returns a builder object.
 
-<details>
+<details markdown="1">
 <summary><code><strong>builder</strong>(<code>options</code>: object, <code>node</code>: Node)</code></summary>
 <br/>
 
@@ -328,7 +328,7 @@ console.log(xml);
 
 </details>
 
-<details>
+<details markdown="1">
 <summary><code><strong>builder</strong>(<code>node</code>: Node)</code></summary>
 <br/>
 

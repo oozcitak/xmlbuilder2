@@ -17,7 +17,7 @@ These functions return a callback document builder object (an instance of the cl
 ### createCB
 The `createCB` function serializes an XML document in chunks with the provided callback functions.
 
-<details>
+<details markdown="1">
 <summary><code><strong>createCB</strong>(<code>options</code>: object)</code></summary>
 <br/>
 
@@ -55,7 +55,7 @@ ___
 ### fragmentCB
 The `fragmentCB` function serializes an XML document fragment in chunks with the provided callback functions.
 
-<details>
+<details markdown="1">
 <summary><code><strong>fragmentCB</strong>(<code>options</code>: object)</code></summary>
 <br/>
 
