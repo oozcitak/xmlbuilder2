@@ -3,7 +3,11 @@ layout: default
 ---
 
 <div class="post-header">
-   <h1 class="post-title-main">{{ page.title }}</h1>
+   <h1 class="post-title-main">{{ page.title }}
+
+   <a style="float: right; margin: 0px;" target="_blank" rel="noopener" href="https://github.com/{{site.github_editme_path}}{{page.path}}" class="btn btn-default githubEditButton" role="button"><i class="fa fa-github fa-lg"></i> View on GitHub</a>
+
+   </h1>
 </div>
 
 {% if page.simple_map == true %}
@@ -41,8 +45,6 @@ layout: default
 
     {% if site.github_editme_path %}
 
-    <a target="_blank" rel="noopener" href="https://github.com/{{site.github_editme_path}}{{page.path}}" class="btn btn-default githubEditButton" role="button"><i class="fa fa-github fa-lg"></i> Edit me</a>
-
     {% endif %}
 
    {{content}}
@@ -62,3 +64,5 @@ layout: default
 {% include commento.html %}
 
 </div>
+
+{% include footer.html %}
