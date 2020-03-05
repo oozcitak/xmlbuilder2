@@ -252,14 +252,14 @@ Following table compares `xmlbuilder2` with its predecessor.
 
 Feature | `xmlbuilder` | `xmlbuilder2` | Notes
 ----|----|----|----
-XML 1.1 | :heavy_plus_sign: | :x: | 
-DOM compatibility | :heavy_plus_sign: | :heavy_check_mark: | `xmlbuilder` implements a subset of the DOM specification where `xmlbuilder2` is built on a full DOM implementation.
-XML namespaces | :x: | :heavy_check_mark: | 
-Document fragment nodes | :x: | :heavy_check_mark: | 
-Parsing JS objects | :heavy_check_mark: | :heavy_check_mark: | 
-Parsing XML strings | :x: | :heavy_check_mark: | 
-Serializing into JS objects | :x: | :heavy_check_mark: | 
-Serializing into XML strings | :heavy_check_mark: | :heavy_check_mark: | 
-Performance | :heavy_check_mark: | :heavy_check_mark: | `xmlbuilder2` is 40-65% slower for some operations due to various validity checks of its full DOM implementation.
-Creating an XML document in chunks | :heavy_check_mark: | :heavy_check_mark: | 
-Custom serializers | :heavy_check_mark: | :x: | 
+XML 1.1 | <i class="fa fa-check fa-green"></i> | <i class="fa fa-times fa-red"> | 
+DOM compatibility | <i class="fa fa-check fa-green"></i> | <i class="fa fa-check fa-green"></i> | `xmlbuilder` implements a subset of the DOM specification where `xmlbuilder2` is built on a full DOM implementation.
+XML namespaces | <i class="fa fa-times fa-red"> | <i class="fa fa-check fa-green"></i> | 
+Document fragment nodes | <i class="fa fa-times fa-red"> | <i class="fa fa-check fa-green"></i> | 
+Parsing JS objects | <i class="fa fa-check fa-green"></i> | <i class="fa fa-check fa-green"></i> | 
+Parsing XML strings | <i class="fa fa-times fa-red"> | <i class="fa fa-check fa-green"></i> | 
+Serializing into JS objects | <i class="fa fa-times fa-red"> | <i class="fa fa-check fa-green"></i> | 
+Serializing into XML strings | <i class="fa fa-check fa-green"></i> | <i class="fa fa-check fa-green"></i> | 
+Performance | <i class="fa fa-check fa-green"></i> | <i class="fa fa-check fa-green"></i> | `xmlbuilder2` is 40-65% slower for some operations due to various validity checks of its full DOM implementation.
+Creating an XML document in chunks | <i class="fa fa-check fa-green"></i> | <i class="fa fa-check fa-green"></i> | 
+Custom serializers | <i class="fa fa-check fa-green"></i> | <i class="fa fa-times fa-red"></i> | 

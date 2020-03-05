@@ -6,9 +6,9 @@ permalink: serialization.html
 toc: false
 comments: false
 ---
-`xmlbuilder2` can serialize an XML document into a number of different formats by using the [`end`]({{ site.baseurl }}{% link pages/node-functions.md %}#end),
-[`toObject`]({{ site.baseurl }}{% link pages/node-functions.md %}#toObject) and
-[`toString`]({{ site.baseurl }}{% link pages/node-functions.md %}#toString) functions. Examples on this page work on the XML document representation below stored in the variable `doc`:
+`xmlbuilder2` can serialize an XML document into a number of different formats by using the [`end`]({{ site.baseurl }}{% link pages/conversion-functions.md %}#end),
+[`toObject`]({{ site.baseurl }}{% link pages/conversion-functions.md %}#toObject) and
+[`toString`]({{ site.baseurl }}{% link pages/conversion-functions.md %}#toString) functions. Examples on this page work on the XML document representation below stored in the variable `doc`:
 
 ```js
 const { create } = require('xmlbuilder2');
