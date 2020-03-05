@@ -1018,10 +1018,6 @@ a code {
     color: #248EC2;
 }
 
-code + a > code {
-    margin-left: -7px;
-}
-
 table th code {
     color: white;
 }

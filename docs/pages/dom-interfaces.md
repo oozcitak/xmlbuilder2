@@ -6,7 +6,7 @@ permalink: dom-interfaces.html
 toc: false
 comments: false
 ---
-`xmlbuilder2` works on top of a DOM implementation. Each node created by `xmlbuilder2` is a DOM node. If required, DOM interfaces can be accessed with the `node` property of the builder object. For example:
+Each node created by `xmlbuilder2` is a DOM node. If required, DOM interfaces can be accessed with the `node` property of the builder object. For example:
 
 ```js
 const { create } = require('xmlbuilder2');

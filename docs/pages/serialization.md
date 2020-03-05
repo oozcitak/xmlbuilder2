@@ -32,7 +32,7 @@ const doc = create(xmlString);
 
 ### JS Objects
 
-Above document representation stored in the variable `doc` can be serialized into a JS object by calling the `end` function with the `format` argument set to `"object"`:
+Above document representation stored in the variable `doc` can be serialized into a JS object by calling the [`end`]({{ site.baseurl }}{% link pages/conversion-functions.md %}#end) function with the `format` argument set to `"object"`:
 ```js
 const obj = doc.end({ format: "object" });
 ```

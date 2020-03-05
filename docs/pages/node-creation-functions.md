@@ -7,8 +7,8 @@ toc: false
 comments: false
 ---
 
-Once a document or document fragment node is created with `create` or
-`fragment` functions, further nodes can be created and inserted into the XML
+Once a document or document fragment node is created with [`create`]({{ site.baseurl }}{% link pages/builder-functions.md %}#create) or
+`fragment`({{ site.baseurl }}{% link pages/builder-functions.md %}#fragment) functions, further nodes can be created and inserted into the XML
 tree using the following functions which are defined on XML nodes.
 
 ###  att

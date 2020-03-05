@@ -31,9 +31,9 @@ const root = create().ele("root");
 select("//root", doc.node);
 ```
 
-#### `create` and `begin` functions are replaced by `create`
+#### `create` and `begin` functions are replaced by [`create`]({{ site.baseurl }}{% link pages/builder-functions.md %}#create)
 
-`xmlbuilder` exports two functions for creating a new XML document: `create` and `begin`. `create` creates a document with a root element node and returns this node and `begin` creates and returns an empty XML document. In `xmlbuilder2` there is a single `create` function which creates an empty XML document and returns the document node.
+`xmlbuilder` exports two functions for creating a new XML document: `create` and `begin`. `create` creates a document with a root element node and returns this node and `begin` creates and returns an empty XML document. In `xmlbuilder2` there is a single [`create`]({{ site.baseurl }}{% link pages/builder-functions.md %}#create) function which creates an empty XML document and returns the document node.
 
 ```js
 const xmlbuilder = require("xmlbuilder");
@@ -46,11 +46,11 @@ const root = create().ele("root");
 
 #### `begin` with callback is renamed to `createCB`
 
-`xmlbuilder` can create an XML document in chunks by passing a callback function to its `begin` function. This functionality also exists in `xmlbuilder2` with the `createCB` and `fragmentCB` functions.
+`xmlbuilder` can create an XML document in chunks by passing a callback function to its `begin` function. This functionality also exists in `xmlbuilder2` with the [`createCB`]({{ site.baseurl }}{% link pages/builder-functions-with-callbacks.md %}#createCB) and [`fragmentCB`]({{ site.baseurl }}{% link pages/builder-functions-with-callbacks.md %}#fragmentCB) functions.
 
 #### `ele` function does not accept a string argument for a default text node
 
-In `xmlbuilder`, the `ele` function can create a default text node if a string is passed as its third argument. In `xmlbuilder2`, text nodes are always explicity created with the `txt` function.
+In `xmlbuilder`, the `ele` function can create a default text node if a string is passed as its third argument. In `xmlbuilder2`, text nodes are always explicitly created with the [`txt`]({{ site.baseurl }}{% link pages/node-creation-functions.md %}#txt) function.
 
 ```js
 const xmlbuilder = require("xmlbuilder");
@@ -116,7 +116,7 @@ const root = create({ convert: { text: "#text", comment: "#comment" } })
 
 #### output format setting `pretty` is changed to `prettyPrint`
 
-The `pretty` setting in `end` function is renamed to `prettyPrint` in `xmlbuilder2`.
+The `pretty` setting in [`end`]({{ site.baseurl }}{% link pages/conversion-functions.md %}#end) function is renamed to `prettyPrint` in `xmlbuilder2`.
 
 ```js
 const xmlbuilder = require("xmlbuilder");
@@ -189,7 +189,7 @@ doc.end({ format: "json"}); // `{ "root": { "@att": "val", "foo": { "bar": "foob
 
 #### Support for document fragment nodes
 
-`xmlbuilder2` can create document fragment nodes with the `fragment` function.
+`xmlbuilder2` can create document fragment nodes with the [`fragment`]({{ site.baseurl }}{% link pages/builder-functions.md %}#fragment) function.
 
 ```js
 const { fragment } = require('xmlbuilder2');
@@ -212,7 +212,7 @@ const frag = fragment(jsonStr);
 
 #### One step conversion
 
-`xmlbuilder2` can convert an XML document between different formats with the `convert` function.
+`xmlbuilder2` can convert an XML document between different formats with the [`convert`]({{ site.baseurl }}{% link pages/builder-functions.md %}#convert) function.
 
 ```js
 const { convert } = require('xmlbuilder2');
@@ -234,7 +234,7 @@ console.log(obj);
 
 #### Support for XML namespaces
 
-XML namespaces are fully supported in `xmlbuilder2`. `ele` and `att` functions accepts an optional argument for specifying an XML namespace.
+XML namespaces are fully supported in `xmlbuilder2`. [`ele`]({{ site.baseurl }}{% link pages/node-creation-functions.md %}#ele) and [`att`]({{ site.baseurl }}{% link pages/node-creation-functions.md %}#att) functions accepts an optional argument for specifying an XML namespace.
 
 ```js
 const { create } = require('xmlbuilder2');
@@ -244,7 +244,7 @@ const root = create().ele('http://example.com/ns1', 'root');
 
 #### Collection functions
 
-`xmlbuilder2` introduces the collection functions `each`, `map`, `reduce`, `find`, `filter`, `every`, `some` and `toArray`. These functions can work on immediate child nodes or descendant nodes.
+`xmlbuilder2` introduces the collection functions [`each`]({{ site.baseurl }}{% link pages/collection-functions.md %}#each), [`map`]({{ site.baseurl }}{% link pages/collection-functions.md %}#map), [`reduce`]({{ site.baseurl }}{% link pages/collection-functions.md %}#reduce), [`find`]({{ site.baseurl }}{% link pages/collection-functions.md %}#find), [`filter`]({{ site.baseurl }}{% link pages/collection-functions.md %}#filter), [`every`]({{ site.baseurl }}{% link pages/collection-functions.md %}#every), [`some`]({{ site.baseurl }}{% link pages/collection-functions.md %}#some) and [`toArray`]({{ site.baseurl }}{% link pages/collection-functions.md %}#toArray). These functions can work on immediate child nodes or descendant nodes.
 
 ### Comparison with `xmlbuilder`
 
