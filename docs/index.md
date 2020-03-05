@@ -81,7 +81,7 @@ console.log(doc.end({ prettyPrint: true }));
 ```
 which would result in the XML document at the top of this page. See
 [parsing](parsing.html) and 
-[serialization](serialization.html) pages in the wiki.
+[serialization](serialization.html) pages.
 
 ___
 
@@ -104,6 +104,4 @@ console.log(obj);
   }
 }
 ```
-See the
-[convert](builder-functions.html#convert) 
-function in the wiki.
+See the [convert](builder-functions.html#convert) function.
