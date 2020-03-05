@@ -142,9 +142,9 @@ entries:
   - title: Callback API
     output: web
     folderitems:
-    - title: createBC
+    - title: createCB
       url: /builder-functions-with-callbacks.html#createCB
       output: web
-    - title: fragmentBC
+    - title: fragmentCB
       url: /builder-functions-with-callbacks.html#fragmentCB
       output: web
