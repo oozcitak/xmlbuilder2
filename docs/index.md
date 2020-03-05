@@ -7,7 +7,7 @@ toc: false
 comments: false
 ---
 
-![xmlbuilder2 logo]({% link images/social-media-banner.png %} "xmlbuilder2 logo")
+![xmlbuilder2 logo]({{ site.baseurl }}{% link images/social-media-banner.png %} "xmlbuilder2 logo")
 
 An XML builder for [node.js](https://nodejs.org/).
 
