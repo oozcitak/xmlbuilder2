@@ -3,7 +3,7 @@
 topnav:
 - title: Topnav
   items:
-    - title: GitHub
+    - title: '<i class="fa fa-github"></i> GitHub'
       external_url: https://github.com/oozcitak/xmlbuilder2
-    - title: npm
+    - title: '<i class="fa fa-npm"></i> npm'
       external_url: https://www.npmjs.com/package/xmlbuilder2
