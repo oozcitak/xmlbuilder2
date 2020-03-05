@@ -162,5 +162,5 @@ This will result in:
 
 ### Documentation:
 
-See the [wiki](https://github.com/oozcitak/xmlbuilder2/wiki) for details.
+See: https://oozcitak.github.io/xmlbuilder2/
 
