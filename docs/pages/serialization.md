@@ -147,7 +147,7 @@ new Map([
 
 In addition to `format` there are a number of settings for customizing the output of serializers.
 
-* `format` - Output format. Either `"object"`, `"text"`, `"json"` or `"map"`. Defaults to `"text"`.
+* `format` - Output format. Either `"object"`, `"xml"`, `"json"` or `"map"`. Defaults to `"xml"`.
 * `headless` - Suppresses the XML declaration from the output. Defaults to `false`.
 * `prettyPrint` - Pretty-prints the XML tree. Defaults to `false`.
 * `indent` - Determines the indentation string for pretty printing. Defaults to two space characters.
