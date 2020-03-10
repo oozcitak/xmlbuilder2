@@ -180,6 +180,10 @@ table tr td {
     hyphens: auto;
 }
 
+code {
+  background-color: rgba(27,31,35,.05);
+  color: black;
+}
 
 p.external a {
     text-align:right;
