@@ -75,6 +75,9 @@ export interface XMLBuilderOptions {
      * XLink namespace
      */
     xlink: "http://www.w3.org/1999/xlink"
+    /**
+     * User supplied namespace alias
+     */
     [key: string]: string | null 
   }
   /**
