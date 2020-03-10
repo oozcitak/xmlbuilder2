@@ -14,8 +14,10 @@ This page documents the various options that can be used to customize the behavi
 * `version` - a version number string. Defaults to `"1.0"` if omitted.
 * `encoding` - encoding declaration, e.g. `"UTF-8"`. No encoding declaration will be produced if omitted.
 * `standalone` - standalone document declaration: `true` or `false`. No standalone document declaration will be produced if omitted.
-
-_Note:_ XML declaration can be specified later with the `dec` function.
+{% capture dec_tip %}
+  XML declaration can be specified later with the [`dec`]({{ site.baseurl }}{% link pages/node-creation-functions.md %}#dec) function.
+{% endcapture %}
+{% include tip.html content=dec_tip %}
 
 ### Settings related to value conversions
 
