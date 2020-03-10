@@ -185,6 +185,14 @@ code {
   color: black;
 }
 
+summary {
+  cursor: pointer;
+}
+
+summary:focus{
+  outline: none;
+}
+
 p.external a {
     text-align:right;
     font-size:12px;
