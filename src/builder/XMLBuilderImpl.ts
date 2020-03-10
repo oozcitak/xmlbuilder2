@@ -13,6 +13,7 @@ import {
 import { Document, Node, Element } from "@oozcitak/dom/lib/dom/interfaces"
 import { createParser, throwIfParserError } from "./dom"
 import { Guard } from "@oozcitak/dom/lib/util"
+import { namespace_extractQName } from "@oozcitak/dom/lib/algorithm"
 
 /**
  * Represents a wrapper that extends XML nodes to implement easy to use and
@@ -176,6 +177,12 @@ export class XMLBuilderImpl implements XMLBuilder {
       }, this)
     } else {
       [namespace, name] = this._extractNamespace(namespace, name, true)
+
+      // inherit namespace from parent
+      if (namespace === undefined && this._options.inheritNS) {
+        const [prefix] = namespace_extractQName(name)
+        namespace = this.node.lookupNamespaceURI(prefix)
+      }
 
       // create a child element node
       const childNode = (namespace !== undefined ?

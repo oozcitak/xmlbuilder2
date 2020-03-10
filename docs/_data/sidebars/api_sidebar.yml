@@ -9,28 +9,28 @@ entries:
     output: web
     folderitems:
     - title: Builder Options
-      url: /builder-options.html
+      url: /builder-options.html#top
       output: web
     - title: Object Conversion
-      url: /object-conversion.html
+      url: /object-conversion.html#top
       output: web
     - title: Namespaces
-      url: /namespaces.html
+      url: /namespaces.html#top
       output: web
     - title: Parsing
-      url: /parsing.html
+      url: /parsing.html#top
       output: web
     - title: Serialization
-      url: /serialization.html
+      url: /serialization.html#top
       output: web
     - title: DOM Interfaces
-      url: /dom-interfaces.html
+      url: /dom-interfaces.html#top
       output: web
     - title: Using with External Libraries
-      url: /using-with-external-libraries.html
+      url: /using-with-external-libraries.html#top
       output: web
     - title: Upgrading from xmlbuilder
-      url: /upgrading-from-xmlbuilder.html
+      url: /upgrading-from-xmlbuilder.html#top
       output: web
   - title: API
     output: web
@@ -138,6 +138,14 @@ entries:
       output: web
     - title: toString
       url: /conversion-functions.html#toString
+      output: web
+    - separator: true
+      output: web
+    - title: set
+      url: /other-functions.html#set
+      output: web
+    - title: node
+      url: /other-functions.html#node
       output: web
   - title: Callback API
     output: web

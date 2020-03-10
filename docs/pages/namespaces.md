@@ -153,3 +153,41 @@ const { create } = require('xmlbuilder2');
 const ele = create().ele({ 'root@@xml': { '@att@@xml': 'val' }})
 console.log(ele.toString()); // '<xml:root xml:att="val"/>'
 ```
+
+### Namespace Inheritance
+
+Child element nodes can be made to inherit their parent element's namespace with the `inheritNS` option. For example:
+```js
+const { create } = require('xmlbuilder2');
+
+const ele = create({ inheritNS: true })
+  .ele('http:/example.com', 'root')
+    .ele('node')
+  .up();
+console.log(ele.toString()); // '<root xmlns="http:/example.com"><node/></root>'
+```
+
+Consider the same example without the `inheritNS` option:
+```js
+const { create } = require('xmlbuilder2');
+
+const ele = create()
+  .ele('http:/example.com', 'root')
+    .ele('node')
+  .up();
+console.log(ele.toString()); // '<root xmlns="http:/example.com"><node xmlns=""/></root>'
+```
+
+`inheritNS` can be changed on the fly:
+```js
+const { create } = require('xmlbuilder2');
+
+const ele = create()
+  .ele('http:/example.com', 'root')
+    .set({ inheritNS: true })
+    .ele('node').up()
+    .set({ inheritNS: false })
+    .ele('node').up()
+  .up();
+console.log(ele.toString()); // '<root xmlns="http:/example.com"><node/><node xmlns=""/></root>'
+```

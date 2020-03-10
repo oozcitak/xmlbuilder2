@@ -1,0 +1,45 @@
+---
+title: Other Functions
+keywords: functions
+sidebar: api_sidebar
+permalink: other-functions.html
+toc: false
+comments: false
+---
+
+# set
+
+Changes builder options. The following example sets the `inheritNS` option to `true` while creating the first `node` element then changes back to `false` while creating the second `node` element.
+
+```javascript
+const { create } = require('xmlbuilder2');
+
+const ele = create()
+  .ele('http:/example.com', 'root')
+    .set({ inheritNS: true })
+    .ele('node').up()
+    .set({ inheritNS: false })
+    .ele('node').up()
+  .up();
+console.log(ele.end({ prettyPrint: true }));
+```
+
+```xml
+<root xmlns="http:/example.com">
+  <node/>
+  <node xmlns=""/>
+</root>
+```
+
+# node (property)
+
+{% include warning.html content="`node` is a _property_; not a function." %}
+
+Returns the DOM node wrapped by `xmlbuilder2`. For example:
+
+```javascript
+const { create } = require('xmlbuilder2');
+
+const ele = create().ele('http:/example.com', 'root');
+console.log(ele.node.namespaceURI); // 'http:/example.com'
+```

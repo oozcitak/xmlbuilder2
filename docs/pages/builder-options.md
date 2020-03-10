@@ -28,7 +28,11 @@ _Note:_ XML declaration can be specified later with the `dec` function.
   * `text` - When prepended to a JS object key, converts its value to a text node. Defaults to `"#"`.
   * `cdata` - When prepended to a JS object key, converts its value to a CDATA section node. Defaults to `"$"`.
   * `comment` - When prepended to a JS object key, converts its value to a comment node. Defaults to `"!"`.
-* `defaultNamespace` - contains default namespaces to apply to all elements and attributes (see: [`example`]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-defaults))
+
+### Settings related to XML namespaces
+
+* `defaultNamespace` - contains default namespaces to apply to all elements and attributes (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-defaults))
   * `ele` - default namespace for element nodes
   * `att` - default namespace for attributes
-* `namespaceAlias` - contains namespace aliases where object keys are namespace aliases and object values are namespaces (see: [`example`]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-aliases))
+* `namespaceAlias` - contains namespace aliases where object keys are namespace aliases and object values are namespaces (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-aliases))
+* `inheritNS` - whether child element nodes inherit their parent element's namespace. Defaults to `false`. (see: [example]({{ site.baseurl }}{% link pages/other-functions.md %}#set))
