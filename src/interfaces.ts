@@ -10,54 +10,6 @@ export interface DocumentWithSettings extends Document {
 /**
  * Defines the options used while creating an XML document.
  */
-export interface XMLBuilderCreateOptions {
-  /**
-   * A version number string, always `"1.0"`.
-   */
-  version?: "1.0"
-  /**
-   * Encoding declaration, e.g. `"UTF-8"`. No default.
-   */
-  encoding?: string
-  /**
-   * Standalone document declaration: `true` or `false`. No default.
-   */
-  standalone?: boolean
-  /**
-   * Whether nodes with `null` or `undefined` values will be kept or ignored.
-   * Defaults to `false`.
-   */
-  keepNullNodes?: boolean
-  /**
-   * Whether attributes with `null` or `undefined` values will be kept or
-   * ignored. Defaults to `false`.
-   */
-  keepNullAttributes?: boolean
-  /** 
-   * Whether converter strings will be ignored when converting JS 
-   * objects to nodes. Defaults to `false`.
-   */
-  ignoreConverters?: boolean
-  /** 
-   * Defines string keys used while converting JS objects to nodes.
-   */
-  convert?: Partial<ConvertOptions>
-  /**
-   * Defines default namespaces to apply to all elements and attributes.
-   */
-  defaultNamespace?: {
-    ele?: null | string,
-    att?: null | string
-  }
-  /**
-   * Defines namespace aliases.
-   */
-  namespaceAlias?: { [key: string]: string | null }
-}
-
-/**
- * Defines the options used while creating an XML document.
- */
 export interface XMLBuilderOptions {
   /**
    * A version number string, e.g. `"1.0"`
@@ -98,16 +50,81 @@ export interface XMLBuilderOptions {
   /**
    * Defines namespace aliases.
    */
-  namespaceAlias: { [key: string]: string | null }
+  namespaceAlias: {
+    /**
+     * HTML namespace
+     */
+    html: "http://www.w3.org/1999/xhtml",
+    /**
+     * XML namespace
+     */
+    xml: "http://www.w3.org/XML/1998/namespace",
+    /**
+     * XMLNS namespace
+     */
+    xmlns: "http://www.w3.org/2000/xmlns/",
+    /**
+     * MathML namespace
+     */
+    mathml: "http://www.w3.org/1998/Math/MathML",
+    /**
+     * SVG namespace
+     */
+    svg: "http://www.w3.org/2000/svg",
+    /**
+     * XLink namespace
+     */
+    xlink: "http://www.w3.org/1999/xlink"
+    [key: string]: string | null 
+  }
+  /**
+   * Whether child element nodes will inherit their parent element's namespace.
+   * Defaults to `false`.
+   */
+  inheritNS: boolean
+}
+
+/**
+ * Defines the options used while creating an XML document.
+ */
+export interface XMLBuilderCreateOptions extends RecursivePartial<XMLBuilderOptions> { }
+
+/**
+ * Defines default values for builder options.
+ */
+export const DefaultBuilderOptions: XMLBuilderOptions = {
+  version: "1.0",
+  encoding: undefined,
+  standalone: undefined,
+  keepNullNodes: false,
+  keepNullAttributes: false,
+  ignoreConverters: false,
+  convert: {
+    att: "@",
+    ins: "?",
+    text: "#",
+    cdata: "$",
+    comment: "!"
+  },
+  defaultNamespace: {
+    ele: undefined,
+    att: undefined
+  },
+  namespaceAlias: {
+    html: "http://www.w3.org/1999/xhtml",
+    xml: "http://www.w3.org/XML/1998/namespace",
+    xmlns: "http://www.w3.org/2000/xmlns/",
+    mathml: "http://www.w3.org/1998/Math/MathML",
+    svg: "http://www.w3.org/2000/svg",
+    xlink: "http://www.w3.org/1999/xlink"
+  },
+  inheritNS: false
 }
 
 /**
  * Contains keys of `XMLBuilderOptions`.
  */
-export const XMLBuilderOptionKeys = new Set([
-  "version", "encoding", "standalone", "keepNullNodes", "keepNullAttributes",
-  "ignoreConverters", "convert", "defaultNamespace", "namespaceAlias"
-])
+export const XMLBuilderOptionKeys = new Set(Object.keys(DefaultBuilderOptions))
 
 /**
  * Defines the identifier strings of the DocType node.
@@ -240,35 +257,6 @@ export interface ConvertOptions {
    * ````
    */
   comment: string
-}
-
-/**
- * Defines default values for builder options.
- */
-export const DefaultBuilderOptions: Partial<XMLBuilderOptions> = {
-  version: "1.0",
-  keepNullNodes: false,
-  keepNullAttributes: false,
-  ignoreConverters: false,
-  convert: {
-    att: "@",
-    ins: "?",
-    text: "#",
-    cdata: "$",
-    comment: "!"
-  },
-  defaultNamespace: {
-    ele: undefined,
-    att: undefined
-  },
-  namespaceAlias: {
-    html: "http://www.w3.org/1999/xhtml",
-    xml: "http://www.w3.org/XML/1998/namespace",
-    xmlns: "http://www.w3.org/2000/xmlns/",
-    mathml: "http://www.w3.org/1998/Math/MathML",
-    svg: "http://www.w3.org/2000/svg",
-    xlink: "http://www.w3.org/1999/xlink"
-  }
 }
 
 /**
@@ -1081,4 +1069,11 @@ export const DefaultXMLBuilderCBOptions: Partial<XMLBuilderCBOptions> = {
     svg: "http://www.w3.org/2000/svg",
     xlink: "http://www.w3.org/1999/xlink"
   }
+}
+
+type RecursivePartial<T> = {
+  [P in keyof T]?:
+  T[P] extends (infer U)[] ? RecursivePartial<U>[] :
+  T[P] extends object ? RecursivePartial<T[P]> :
+  T[P]
 }
