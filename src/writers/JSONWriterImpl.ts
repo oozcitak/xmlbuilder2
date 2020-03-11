@@ -3,7 +3,7 @@ import {
 } from "../interfaces"
 import { ObjectWriterImpl } from "./ObjectWriterImpl"
 import {
-  applyDefaults, isArray, isObject, isMap, objectLength, forEachObject,
+  applyDefaults, isArray, isObject, objectLength, forEachObject,
   forEachArray
 } from "@oozcitak/util"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"

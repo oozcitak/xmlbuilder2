@@ -1,7 +1,7 @@
 import { StringWriterOptions, XMLBuilderOptions } from "../interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { PreSerializer } from "./PreSerializer"
+import { BaseSerializer } from "./BaseSerializer"
 import { Guard } from "@oozcitak/dom/lib/util"
 
 /**
@@ -25,12 +25,12 @@ type StringWriterRefs = {
 /**
  * Serializes XML nodes into strings.
  */
-export class StringWriterImpl {
+export class StringWriterImpl extends BaseSerializer {
 
   private _builderOptions: XMLBuilderOptions
+
   private _options!: Required<StringWriterOptions>
   private _refs!: StringWriterRefs
-  private _pre!: PreSerializer
   private _indentation: { [key: number]: string } = {}
   private _lengthToLastNewline = 0
 
@@ -40,6 +40,7 @@ export class StringWriterImpl {
    * @param builderOptions - XML builder options
    */
   constructor(builderOptions: XMLBuilderOptions) {
+    super()
     this._builderOptions = builderOptions
   }
 
@@ -66,21 +67,7 @@ export class StringWriterImpl {
 
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
 
-    this._pre = new PreSerializer()
-
-    this._pre.setCallbacks({
-      docType: this._docType.bind(this),
-      openTagBegin: this._openTagBegin.bind(this),
-      openTagEnd: this._openTagEnd.bind(this),
-      closeTag: this._closeTag.bind(this),
-      attribute: this._attribute.bind(this),
-      comment: this._comment.bind(this),
-      text: this._text.bind(this),
-      instruction: this._instruction.bind(this),
-      cdata: this._cdata.bind(this)
-    })
-
-    // XML declaration
+    // Serialize XML declaration since base serializer does not serialize it
     if (node.nodeType === NodeType.Document && !this._options.headless) {
       this._beginLine()
       this._refs.markup = "<?xml"
@@ -95,7 +82,7 @@ export class StringWriterImpl {
       this._endLine()
     }
 
-    this._pre.serialize(node, this._options.wellFormed)
+    this.serializeNode(node, this._options.wellFormed)
 
     // remove trailing newline
     if (this._options.prettyPrint &&
@@ -106,10 +93,8 @@ export class StringWriterImpl {
     return this._refs.markup
   }
 
-  /**
-   * Produces the serialization of a document type node.
-   */
-  private _docType(name: string, publicId: string, systemId: string): void {
+  /** @inheritdoc */
+  docType(name: string, publicId: string, systemId: string): void {
     this._beginLine()
 
     if (publicId && systemId) {
@@ -125,25 +110,21 @@ export class StringWriterImpl {
     this._endLine()
   }
 
-  /**
-   * Produces the serialization of the beginning of the opening tag of an element node.
-   */
-  private _openTagBegin(name: string): void {
+  /** @inheritdoc */
+  openTagBegin(name: string): void {
     this._beginLine()
     this._refs.markup += "<" + name
   }
 
-  /**
-   * Produces the serialization of the ending of the opening tag of an element node.
-   */
-  private _openTagEnd(name: string, selfClosing: boolean, voidElement: boolean): void {
+  /** @inheritdoc */
+  openTagEnd(name: string, selfClosing: boolean, voidElement: boolean): void {
     // do not indent text only elements or elements with empty text nodes
     this._refs.suppressPretty = false
     this._refs.emptyNode = false
     if (this._options.prettyPrint && !selfClosing && !voidElement && !this._options.indentTextOnlyNodes) {
       let textOnlyNode = true
       let emptyNode = true
-      let childNode = this._pre.currentNode.firstChild
+      let childNode = this.currentNode.firstChild
       let cdataCount = 0
       let textCount = 0
       while (childNode) {
@@ -176,10 +157,8 @@ export class StringWriterImpl {
     this._endLine()
   }
 
-  /**
-   * Produces the serialization of the closing tag of an element node.
-   */
-  private _closeTag(name: string): void {
+  /** @inheritdoc */
+  closeTag(name: string): void {
     if (!this._refs.emptyNode) {
       this._beginLine()
       this._refs.markup += "</" + name + ">"
@@ -191,10 +170,8 @@ export class StringWriterImpl {
     this._endLine()
   }
 
-  /**
-   * Produces the serialization of an attribute node.
-   */
-  private _attribute(name: string, value: string): void {
+  /** @inheritdoc */
+  attribute(name: string, value: string): void {
     const str = name + "=\"" + value + "\""
     if (this._options.prettyPrint && this._options.width > 0 &&
       this._refs.markup.length - this._lengthToLastNewline + 1 + str.length > this._options.width) {
@@ -206,10 +183,8 @@ export class StringWriterImpl {
     }
   }
 
-  /**
-   * Produces the serialization of a text node.
-   */
-  private _text(data: string): void {
+  /** @inheritdoc */
+  text(data: string): void {
     if (data !== '') {
       this._beginLine()
       this._refs.markup += data
@@ -217,10 +192,8 @@ export class StringWriterImpl {
     }
   }
 
-  /**
-   * Produces the serialization of a cdata section node.
-   */
-  private _cdata(data: string): void {
+  /** @inheritdoc */
+  cdata(data: string): void {
     if (data !== '') {
       this._beginLine()
       this._refs.markup += "<![CDATA[" + data + "]]>"
@@ -228,19 +201,15 @@ export class StringWriterImpl {
     }
   }
 
-  /**
-   * Produces the serialization of a comment node.
-   */
-  private _comment(data: string): void {
+  /** @inheritdoc */
+  comment(data: string): void {
     this._beginLine()
     this._refs.markup += "<!--" + data + "-->"
     this._endLine()
   }
 
-  /**
-   * Produces the serialization of a processing instruction node.
-   */
-  private _instruction(target: string, data: string): void {
+  /** @inheritdoc */
+  instruction(target: string, data: string): void {
     this._beginLine()
     this._refs.markup += "<?" + target + " " + data + "?>"
     this._endLine()
@@ -252,7 +221,7 @@ export class StringWriterImpl {
    */
   private _beginLine(): void {
     if (this._options.prettyPrint && !this._refs.suppressPretty) {
-      this._refs.markup += this._indent(this._options.offset + this._pre.level)
+      this._refs.markup += this._indent(this._options.offset + this.level)
     }
   }
 

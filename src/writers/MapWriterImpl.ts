@@ -5,15 +5,6 @@ import { applyDefaults, isArray, isObject, isMap, isPlainObject } from "@oozcita
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { ObjectWriterImpl } from "./ObjectWriterImpl"
 
-type AttrNode = { "@": { [key: string]: string } }
-type TextNode = { "#": string | string[] }
-type CommentNode = { "!": string | string[] }
-type InstructionNode = { "?": string | string[] }
-type CDATANode = { "$": string | string[] }
-type NodeList = (ElementNode | AttrNode | TextNode | CommentNode |
-  InstructionNode | CDATANode)[]
-type ElementNode = { [key: string]: NodeList | NodeList[] }
-
 /**
  * Serializes XML nodes into ES6 maps and arrays.
  */

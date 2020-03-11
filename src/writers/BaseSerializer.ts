@@ -1,5 +1,5 @@
 import {
-  Node, Element, Document, Comment, Text, DocumentFragment,
+  Node, Element, Document, Comment, Text, DocumentFragment, CharacterData,
   DocumentType, ProcessingInstruction, CDATASection, NodeType
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { LocalNameSet } from "@oozcitak/dom/lib/serializer/LocalNameSet"
@@ -11,52 +11,123 @@ import { xml_isName, xml_isLegalChar, xml_isPubidChar } from "@oozcitak/dom/lib/
 /**
  * Pre-serializes XML nodes.
  */
-export class PreSerializer {
+export class BaseSerializer {
 
   private static _VoidElementNames = new Set(['area', 'base', 'basefont',
     'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen',
     'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'])
 
-  private _docType?: ((name: string, publicId: string, systemId: string) => void)
-  private _comment?: ((data: string) => void)
-  private _text?: ((data: string) => void)
-  private _instruction?: ((target: string, data: string) => void)
-  private _cdata?: ((data: string) => void)
-  private _openTagBegin?: ((name: string) => void)
-  private _openTagEnd?: ((name: string, selfClosing: boolean, voidElement: boolean) => void)
-  private _closeTag?: ((name: string) => void)
-  private _attribute?: ((name: string, value: string) => void)
-  private _beginElement?: ((name: string) => void)
-  private _endElement?: ((name: string) => void)
+  /**
+   * Used by derived classes to serialize a DocType node.
+   * 
+   * @param name - node name
+   * @param publicId - public identifier
+   * @param systemId - system identifier
+   */
+  docType(name: string, publicId: string, systemId: string) { }
 
   /**
-   * Returns the current depth of the XML tree.
+   * Used by derived classes to serialize a comment node.
+   * 
+   * @param data - node data
+   */
+  comment(data: string) { }
+
+  /**
+   * Used by derived classes to serialize a text node.
+   * 
+   * @param data - node data
+   */
+  text(data: string) { }
+
+  /**
+   * Used by derived classes to serialize a processing instruction node.
+   * 
+   * @param target - instruction target
+   * @param data - node data
+   */
+  instruction(target: string, data: string) { }
+
+  /**
+   * Used by derived classes to serialize a CData section node.
+   * 
+   * @param data - node data
+   */
+  cdata(data: string) { }
+
+  /**
+   * Used by derived classes to serialize the beginning of the opening tag of an
+   * element node.
+   * 
+   * @param name - node name
+   */
+  openTagBegin(name: string) { }
+
+  /**
+   * Used by derived classes to serialize the ending of the opening tag of an
+   * element node.
+   * 
+   * @param name - node name
+   * @param selfClosing - whether the element node is self closing
+   * @param voidElement - whether the element node is a HTML void element
+   */
+  openTagEnd(name: string, selfClosing: boolean, voidElement: boolean) { }
+
+  /**
+   * Used by derived classes to serialize the closing tag of an element node.
+   * 
+   * @param name - node name
+   */
+  closeTag(name: string) { }
+
+  /**
+   * Used by derived classes to serialize an attribute od namespace declaration.
+   * 
+   * @param name - node name
+   * @param value - node value
+   */
+  attribute(name: string, value: string) { }
+  
+  /**
+   * Used by derived classes to perform any pre-processing steps before starting
+   * serializing an element node.
+   * 
+   * @param name - node name
+   */  
+  beginElement(name: string) { }
+
+  /**
+   * Used by derived classes to perform any post-processing steps after 
+   * completing serializing an element node.
+   * 
+   * @param name - node name
+   */  
+  endElement(name: string) { }
+
+  /**
+   * Gets the current depth of the XML tree.
    */
   level: number = 0
 
   /**
-   * Returns the current XML node.
+   * Gets the current XML node.
    */
   currentNode!: Node
 
   /**
-   * Sets serialization callbacks.
-   * 
-   * @param functions - serializer functions
+   * Ignores comment nodes.
    */
-  setCallbacks(functions: Partial<SerializerFunctions>) {
-    this._docType = functions.docType
-    this._comment = functions.comment
-    this._text = functions.text
-    this._instruction = functions.instruction
-    this._cdata = functions.cdata
-    this._openTagBegin = functions.openTagBegin
-    this._openTagEnd = functions.openTagEnd
-    this._closeTag = functions.closeTag
-    this._attribute = functions.attribute
-    this._beginElement = functions.beginElement
-    this._endElement = functions.endElement
-  }
+  ignoreComments?: boolean
+
+  /**
+   * Treats CDATA section nodes as text nodes.
+   */
+  treatCDataAsText?: boolean
+
+  /**
+   * Trims whitespace at the start and end of text nodes.
+   */
+  trimTextNodes?: boolean
 
   /**
    * Produces an XML serialization of the given node. The pre-serializer inserts
@@ -66,7 +137,7 @@ export class PreSerializer {
    * @param node - node to serialize
    * @param requireWellFormed - whether to check conformance
    */
-  serialize(node: Node, requireWellFormed: boolean): void {
+  serializeNode(node: Node, requireWellFormed: boolean): void {
     const hasNamespaces = (node._nodeDocument !== undefined && node._nodeDocument._hasNamespaces)
 
     this.level = 0
@@ -289,10 +360,8 @@ export class PreSerializer {
       }
 
       /** 11.4. Append the value of qualified name to markup. */
-      /* istanbul ignore else */
-      if (this._beginElement) this._beginElement(qualifiedName)
-      /* istanbul ignore else */
-      if (this._openTagBegin) this._openTagBegin(qualifiedName)
+      this.beginElement(qualifiedName)
+      this.openTagBegin(qualifiedName)
     } else {
       /** 
        * 12. Otherwise, inherited ns is not equal to ns (the node's own 
@@ -361,10 +430,8 @@ export class PreSerializer {
         /**
          * 12.4.3. Append the value of qualified name to markup.
          */
-        /* istanbul ignore else */
-        if (this._beginElement) this._beginElement(qualifiedName)
-        /* istanbul ignore else */
-        if (this._openTagBegin) this._openTagBegin(qualifiedName)
+        this.beginElement(qualifiedName)
+        this.openTagBegin(qualifiedName)
 
         /** 12.5. Otherwise, if prefix is not null, then: */
       } else if (prefix !== null) {
@@ -393,10 +460,8 @@ export class PreSerializer {
          */
         map.set(prefix, ns)
         qualifiedName += prefix + ':' + node.localName
-        /* istanbul ignore else */
-        if (this._beginElement) this._beginElement(qualifiedName)
-        /* istanbul ignore else */
-        if (this._openTagBegin) this._openTagBegin(qualifiedName)
+        this.beginElement(qualifiedName)
+        this.openTagBegin(qualifiedName)
 
         /**
          * 12.5.5. Append the following to markup, in the order listed:
@@ -412,8 +477,7 @@ export class PreSerializer {
          * the require well-formed flag as input;
          * 12.5.5.6. """ (U+0022 QUOTATION MARK).
          */
-        /* istanbul ignore else */
-        if (this._attribute) this._attribute('xmlns:' + prefix, 
+        this.attribute('xmlns:' + prefix, 
           this._serializeAttributeValue(ns, requireWellFormed))
 
         /**
@@ -455,10 +519,8 @@ export class PreSerializer {
         /**
          * 12.6.4. Append the value of qualified name to markup.
          */
-        /* istanbul ignore else */
-        if (this._beginElement) this._beginElement(qualifiedName)
-        /* istanbul ignore else */
-        if (this._openTagBegin) this._openTagBegin(qualifiedName)
+        this.beginElement(qualifiedName)
+        this.openTagBegin(qualifiedName)
 
         /**
          * 12.6.5. Append the following to markup, in the order listed:
@@ -473,8 +535,7 @@ export class PreSerializer {
          * and the require well-formed flag as input;
          * 12.6.5.5. """ (U+0022 QUOTATION MARK).
          */
-        /* istanbul ignore else */
-        if (this._attribute) this._attribute('xmlns', 
+        this.attribute('xmlns', 
           this._serializeAttributeValue(ns, requireWellFormed))
 
         /**
@@ -486,10 +547,8 @@ export class PreSerializer {
       } else {
         qualifiedName += node.localName
         inheritedNS = ns
-        /* istanbul ignore else */
-        if (this._beginElement) this._beginElement(qualifiedName)
-        /* istanbul ignore else */
-        if (this._openTagBegin) this._openTagBegin(qualifiedName)
+        this.beginElement(qualifiedName)
+        this.openTagBegin(qualifiedName)
       }
     }
 
@@ -518,21 +577,16 @@ export class PreSerializer {
      */
     const isHTML = (ns === infraNamespace.HTML)
     if (isHTML && node.childNodes.length === 0 &&
-      PreSerializer._VoidElementNames.has(node.localName)) {
-      /* istanbul ignore else */
-      if (this._openTagEnd) this._openTagEnd(qualifiedName, true, true)
-      /* istanbul ignore else */
-      if (this._endElement) this._endElement(qualifiedName)
+      BaseSerializer._VoidElementNames.has(node.localName)) {
+      this.openTagEnd(qualifiedName, true, true)
+      this.endElement(qualifiedName)
       skipEndTag = true
     } else if (!isHTML && node.childNodes.length === 0) {
-      /* istanbul ignore else */
-      if (this._openTagEnd) this._openTagEnd(qualifiedName, true, false)
-      /* istanbul ignore else */
-      if (this._endElement) this._endElement(qualifiedName)
+      this.openTagEnd(qualifiedName, true, false)
+      this.endElement(qualifiedName)
       skipEndTag = true
     } else {
-      /* istanbul ignore else */
-      if (this._openTagEnd) this._openTagEnd(qualifiedName, false, false)
+      this.openTagEnd(qualifiedName, false, false)
     }
 
     /**
@@ -573,10 +627,8 @@ export class PreSerializer {
      * 20.3. ">" (U+003E GREATER-THAN SIGN).
      * 21. Return the value of markup.
      */
-    /* istanbul ignore else */
-    if (this._closeTag) this._closeTag(qualifiedName)
-    /* istanbul ignore else */
-    if (this._endElement) this._endElement(qualifiedName)
+    this.closeTag(qualifiedName)
+    this.endElement(qualifiedName)
   }
 
   /**
@@ -646,10 +698,8 @@ export class PreSerializer {
     const qualifiedName = node.localName
 
     /** 11.4. Append the value of qualified name to markup. */
-    /* istanbul ignore else */
-    if (this._beginElement) this._beginElement(qualifiedName)
-    /* istanbul ignore else */
-    if (this._openTagBegin) this._openTagBegin(qualifiedName)
+    this.beginElement(qualifiedName)
+    this.openTagBegin(qualifiedName)
 
     /**
      * 13. Append to markup the result of the XML serialization of node's 
@@ -674,14 +724,11 @@ export class PreSerializer {
      * 16. Append ">" (U+003E GREATER-THAN SIGN) to markup.
      */
     if (!node.hasChildNodes()) {
-      /* istanbul ignore else */
-      if (this._openTagEnd) this._openTagEnd(qualifiedName, true, false)
-      /* istanbul ignore else */
-      if (this._endElement) this._endElement(qualifiedName)
+      this.openTagEnd(qualifiedName, true, false)
+      this.endElement(qualifiedName)
       skipEndTag = true
     } else {
-      /* istanbul ignore else */
-      if (this._openTagEnd) this._openTagEnd(qualifiedName, false, false)
+      this.openTagEnd(qualifiedName, false, false)
     }
 
     /**
@@ -718,10 +765,8 @@ export class PreSerializer {
      * 20.3. ">" (U+003E GREATER-THAN SIGN).
      * 21. Return the value of markup.
      */
-    /* istanbul ignore else */
-    if (this._closeTag) this._closeTag(qualifiedName)
-    /* istanbul ignore else */
-    if (this._endElement) this._endElement(qualifiedName)
+    this.closeTag(qualifiedName)
+    this.endElement(qualifiedName)
   }
 
   /**
@@ -810,6 +855,8 @@ export class PreSerializer {
    */
   private _serializeComment(node: Comment, requireWellFormed: boolean): void {
 
+    if (this.ignoreComments) return
+
     /**
      * If the require well-formed flag is set (its value is true), and node's 
      * data contains characters that are not matched by the XML Char production 
@@ -825,8 +872,7 @@ export class PreSerializer {
     /**
      * Otherwise, return the concatenation of "<!--", node's data, and "-->".
      */
-    /* istanbul ignore else */
-    if (this._comment) this._comment(node.data)
+    this.comment(node.data)
   }
 
   /**
@@ -836,7 +882,7 @@ export class PreSerializer {
    * @param requireWellFormed - whether to check conformance
    * @param level - current depth of the XML tree
    */
-  private _serializeText(node: Text, requireWellFormed: boolean): void {
+  private _serializeText(node: CharacterData, requireWellFormed: boolean): void {
 
     /**
      * 1. If the require well-formed flag is set (its value is true), and 
@@ -868,8 +914,11 @@ export class PreSerializer {
         markup += c
     }
 
-    /* istanbul ignore else */
-    if (this._text) this._text(markup)
+    if (this.trimTextNodes) {
+      markup = markup.trim()
+    }
+
+    this.text(markup)
   }
 
   /**
@@ -980,8 +1029,7 @@ export class PreSerializer {
      * 10. Append ">" (U+003E GREATER-THAN SIGN) to markup.
      * 11. Return the value of markup.
      */
-    /* istanbul ignore else */
-    if (this._docType) this._docType(node.name, node.publicId, node.systemId)
+    this.docType(node.name, node.publicId, node.systemId)
   }
 
   /**
@@ -1024,8 +1072,7 @@ export class PreSerializer {
      * 3.5. "?>" (U+003F QUESTION MARK, U+003E GREATER-THAN SIGN).
      * 4. Return the value of markup.
      */
-    /* istanbul ignore else */
-    if (this._instruction) this._instruction(node.target, node.data)
+    this.instruction(node.target, node.data)
   }
 
   /**
@@ -1036,12 +1083,15 @@ export class PreSerializer {
    */
   private _serializeCData(node: CDATASection, requireWellFormed: boolean): void {
 
+    if (this.treatCDataAsText) {
+      this._serializeText(node, requireWellFormed)
+    }
+
     if (requireWellFormed && (node.data.indexOf("]]>") !== -1)) {
       throw new Error("CDATA contains invalid characters (well-formed required).")
     }
 
-    /* istanbul ignore else */
-    if (this._cdata) this._cdata(node.data)
+    this.cdata(node.data)
   }
 
   /**
@@ -1079,8 +1129,7 @@ export class PreSerializer {
     for (const attr of node.attributes) {
       // Optimize common case
       if (!requireWellFormed && attr.namespaceURI === null) {
-        /* istanbul ignore else */
-        if (this._attribute) this._attribute(attr.localName, 
+        this.attribute(attr.localName, 
           this._serializeAttributeValue(attr.value, requireWellFormed))
         continue
       }
@@ -1219,8 +1268,7 @@ export class PreSerializer {
            * attribute namespace and the require well-formed flag as input;
            * 3.5.3.2.6. """ (U+0022 QUOTATION MARK).
           */
-          /* istanbul ignore else */
-          if (this._attribute) this._attribute('xmlns:' + candidatePrefix, 
+          this.attribute('xmlns:' + candidatePrefix, 
             this._serializeAttributeValue(attributeNamespace, requireWellFormed))
         }
       }
@@ -1258,8 +1306,7 @@ export class PreSerializer {
        * 3.9.4. """ (U+0022 QUOTATION MARK).
        */
       attrName += attr.localName
-      /* istanbul ignore else */
-      if (this._attribute) this._attribute(attrName, 
+      this.attribute(attrName, 
         this._serializeAttributeValue(attr.value, requireWellFormed))
     }
 
@@ -1296,8 +1343,7 @@ export class PreSerializer {
   for (const attr of node.attributes) {
     // Optimize common case
     if (!requireWellFormed) {
-      /* istanbul ignore else */
-      if (this._attribute) this._attribute(attr.localName,
+      this.attribute(attr.localName,
         this._serializeAttributeValue(attr.value, requireWellFormed))
       continue
     }
@@ -1350,8 +1396,7 @@ export class PreSerializer {
      * attribute and the require well-formed flag as input;
      * 3.9.4. """ (U+0022 QUOTATION MARK).
      */
-    /* istanbul ignore else */
-    if (this._attribute) this._attribute(attr.localName,
+    this.attribute(attr.localName,
       this._serializeAttributeValue(attr.value, requireWellFormed))
     }
 

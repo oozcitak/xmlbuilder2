@@ -3,7 +3,7 @@ import {
 } from "../interfaces"
 import { applyDefaults, isArray, isString } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { PreSerializer } from "./PreSerializer"
+import { BaseSerializer } from "./BaseSerializer"
 
 type AttrNode = { "@": { [key: string]: string } }
 type TextNode = { "#": string | string[] }
@@ -17,9 +17,13 @@ type ElementNode = { [key: string]: NodeList | NodeList[] }
 /**
  * Serializes XML nodes into objects and arrays.
  */
-export class ObjectWriterImpl {
+export class ObjectWriterImpl extends BaseSerializer {
 
   private _builderOptions: XMLBuilderOptions
+
+  private _currentList!: NodeList
+  private _currentIndex!: number
+  private _listRegister!: NodeList[]
 
   /**
    * Initializes a new instance of `ObjectWriterImpl`.
@@ -27,6 +31,7 @@ export class ObjectWriterImpl {
    * @param builderOptions - XML builder options
    */
   constructor(builderOptions: XMLBuilderOptions) {
+    super()
     this._builderOptions = builderOptions
   }
 
@@ -41,44 +46,11 @@ export class ObjectWriterImpl {
       format: "object",
       wellFormed: false,
       group: true
-    }) as Required<ObjectWriterOptions> 
+    }) as Required<ObjectWriterOptions>
 
-    let currentList: NodeList = []
-    let currentIndex = 0
-    let listRegister: NodeList[] = [currentList]
-
-    const pre = new PreSerializer()
-
-    pre.setCallbacks({
-      beginElement: (name) => {
-        const childItems = this._addElement(currentList, name)
-        currentIndex++
-        if (listRegister.length > currentIndex) {
-          listRegister[currentIndex] = childItems
-        } else {
-          listRegister.push(childItems)
-        }
-        currentList = childItems
-      },
-      endElement: () => {
-        currentList = listRegister[--currentIndex]
-      },
-      attribute: (name, value) => {
-        this._addAttr(currentList, name, value)
-      },
-      comment: (data) => {
-        this._addComment(currentList, data)
-      },
-      text: (data) => {
-        this._addText(currentList, data)
-      },
-      instruction: (target, data) => {
-        this._addInstruction(currentList, target + " " + data)
-      },
-      cdata: (data) => {
-        this._addCDATA(currentList, data)
-      }
-    })
+    this._currentList = []
+    this._currentIndex = 0
+    this._listRegister = [this._currentList]
 
     /**
      * First pass, serialize nodes
@@ -99,8 +71,8 @@ export class ObjectWriterImpl {
      *   ]
      * ]
      */
-    pre.serialize(node, options.wellFormed)
-    
+    this.serializeNode(node, options.wellFormed)
+
     /**
      * Second pass, process node lists. Above example becomes:
      * {
@@ -121,11 +93,11 @@ export class ObjectWriterImpl {
      *   }
      * }
      */
-    return this._process(currentList, options)
+    return this._process(this._currentList, options)
   }
 
   private _process(items: NodeList, options: Required<ObjectWriterOptions>): XMLSerializedValue {
-    if (items.length === 0) return { }
+    if (items.length === 0) return {}
 
     // determine if there are non-unique element names
     const namesSeen: { [key: string]: boolean } = {}
@@ -244,22 +216,22 @@ export class ObjectWriterImpl {
             }
             break
           case "#":
-            textId = this._processSpecItem((item as TextNode)["#"], 
+            textId = this._processSpecItem((item as TextNode)["#"],
               obj as any, options.group, defTextKey,
-              textCount, textId)              
+              textCount, textId)
             break
           case "!":
-            commentId = this._processSpecItem((item as CommentNode)["!"], 
+            commentId = this._processSpecItem((item as CommentNode)["!"],
               obj as any, options.group, defCommentKey,
-              commentCount, commentId)            
+              commentCount, commentId)
             break
           case "?":
-            instructionId = this._processSpecItem((item as InstructionNode)["?"], 
+            instructionId = this._processSpecItem((item as InstructionNode)["?"],
               obj as any, options.group, defInstructionKey,
               instructionCount, instructionId)
             break
           case "$":
-            cdataId = this._processSpecItem((item as CDATANode)["$"], 
+            cdataId = this._processSpecItem((item as CDATANode)["$"],
               obj as any, options.group, defCdataKey,
               cdataCount, cdataId)
             break
@@ -285,8 +257,8 @@ export class ObjectWriterImpl {
     }
   }
 
-  private _processSpecItem(item: string | string[], 
-    obj: { [key: string]: string | string[] }, group: boolean, defKey: string, 
+  private _processSpecItem(item: string | string[],
+    obj: { [key: string]: string | string[] }, group: boolean, defKey: string,
     count: number, id: number): number {
     if (!group && isArray(item) && count + item.length > 2) {
       for (const subItem of item) {
@@ -300,94 +272,13 @@ export class ObjectWriterImpl {
     return id
   }
 
-  private _addAttr(items: NodeList, name: string, value: string): void {
-    if (items.length === 0) {
-      items.push({ "@": { [name]: value } })
-    } else {
-      const lastItem = items[items.length - 1]
-        /* istanbul ignore else */
-        if (this._isAttrNode(lastItem)) {
-        lastItem["@"][name] = value
-      } else {
-        items.push({ "@": { [name]: value } })
-      }
-    }
-  }
-
-  private _addText(items: NodeList, value: string): void {
-    if (items.length === 0) {
-      items.push({ "#": value })
-    } else {
-      const lastItem = items[items.length - 1]
-      if (this._isTextNode(lastItem)) {
-        if (isArray(lastItem["#"])) {
-          lastItem["#"].push(value)
-        } else {
-          lastItem["#"] = [lastItem["#"], value]
-        }
-      } else {
-        items.push({ "#": value })
-      }
-    }
-  }
-
-  private _addComment(items: NodeList, value: string): void {
-    if (items.length === 0) {
-      items.push({ "!": value })
-    } else {
-      const lastItem = items[items.length - 1]
-      if (this._isCommentNode(lastItem)) {
-        if (isArray(lastItem["!"])) {
-          lastItem["!"].push(value)
-        } else {
-          lastItem["!"] = [lastItem["!"], value]
-        }
-      } else {
-        items.push({ "!": value })
-      }
-    }
-  }
-
-  private _addInstruction(items: NodeList, value: string): void {
-    if (items.length === 0) {
-      items.push({ "?": value })
-    } else {
-      const lastItem = items[items.length - 1]
-      if (this._isInstructionNode(lastItem)) {
-        if (isArray(lastItem["?"])) {
-          lastItem["?"].push(value)
-        } else {
-          lastItem["?"] = [lastItem["?"], value]
-        }
-      } else {
-        items.push({ "?": value })
-      }
-    }
-  }
-
-  private _addCDATA(items: NodeList, value: string): void {
-    if (items.length === 0) {
-      items.push({ "$": value })
-    } else {
-      const lastItem = items[items.length - 1]
-      if (this._isCDATANode(lastItem)) {
-        if (isArray(lastItem["$"])) {
-          lastItem["$"].push(value)
-        } else {
-          lastItem["$"] = [lastItem["$"], value]
-        }
-      } else {
-        items.push({ "$": value })
-      }
-    }
-  }
-
-  private _addElement(items: NodeList, name: string): NodeList {
+  /** @inheritdoc */
+  beginElement(name: string) {
     const childItems: NodeList = []
-    if (items.length === 0) {
-      items.push({ [name]: childItems })
+    if (this._currentList.length === 0) {
+      this._currentList.push({ [name]: childItems })
     } else {
-      const lastItem = items[items.length - 1]
+      const lastItem = this._currentList[this._currentList.length - 1]
       if (this._isElementNode(lastItem, name)) {
         if (lastItem[name].length !== 0 && isArray(lastItem[name][0])) {
           const listOfLists = lastItem[name] as NodeList[]
@@ -396,10 +287,110 @@ export class ObjectWriterImpl {
           lastItem[name] = [lastItem[name] as NodeList, childItems]
         }
       } else {
-        items.push({ [name]: childItems })
+        this._currentList.push({ [name]: childItems })
       }
     }
-    return childItems
+
+    this._currentIndex++
+    if (this._listRegister.length > this._currentIndex) {
+      this._listRegister[this._currentIndex] = childItems
+    } else {
+      this._listRegister.push(childItems)
+    }
+    this._currentList = childItems
+  }
+
+  /** @inheritdoc */
+  endElement() {
+    this._currentList = this._listRegister[--this._currentIndex]
+  }
+
+  /** @inheritdoc */
+  attribute(name: string, value: string) {
+    if (this._currentList.length === 0) {
+      this._currentList.push({ "@": { [name]: value } })
+    } else {
+      const lastItem = this._currentList[this._currentList.length - 1]
+      /* istanbul ignore else */
+      if (this._isAttrNode(lastItem)) {
+        lastItem["@"][name] = value
+      } else {
+        this._currentList.push({ "@": { [name]: value } })
+      }
+    }
+  }
+
+  /** @inheritdoc */
+  comment(data: string) {
+    if (this._currentList.length === 0) {
+      this._currentList.push({ "!": data })
+    } else {
+      const lastItem = this._currentList[this._currentList.length - 1]
+      if (this._isCommentNode(lastItem)) {
+        if (isArray(lastItem["!"])) {
+          lastItem["!"].push(data)
+        } else {
+          lastItem["!"] = [lastItem["!"], data]
+        }
+      } else {
+        this._currentList.push({ "!": data })
+      }
+    }
+  }
+
+  /** @inheritdoc */
+  text(data: string) {
+    if (this._currentList.length === 0) {
+      this._currentList.push({ "#": data })
+    } else {
+      const lastItem = this._currentList[this._currentList.length - 1]
+      if (this._isTextNode(lastItem)) {
+        if (isArray(lastItem["#"])) {
+          lastItem["#"].push(data)
+        } else {
+          lastItem["#"] = [lastItem["#"], data]
+        }
+      } else {
+        this._currentList.push({ "#": data })
+      }
+    }
+  }
+
+  /** @inheritdoc */
+  instruction(target: string, data: string) {
+    const value = (data === "" ? target : target + " " + data)
+    if (this._currentList.length === 0) {
+      this._currentList.push({ "?": value })
+    } else {
+      const lastItem = this._currentList[this._currentList.length - 1]
+      if (this._isInstructionNode(lastItem)) {
+        if (isArray(lastItem["?"])) {
+          lastItem["?"].push(value)
+        } else {
+          lastItem["?"] = [lastItem["?"], value]
+        }
+      } else {
+        this._currentList.push({ "?": value })
+      }
+    }
+  }
+
+  /** @inheritdoc */
+  cdata(data: string) {
+    if (this._currentList.length === 0) {
+      this._currentList.push({ "$": data })
+    } else {
+      const lastItem = this._currentList[this._currentList.length - 1]
+      if (this._isCDATANode(lastItem)) {
+        if (isArray(lastItem["$"])) {
+          lastItem["$"].push(data)
+        } else {
+          lastItem["$"] = [lastItem["$"], data]
+        }
+      } else {
+        this._currentList.push({ "$": data })
+      }
+    }
   }
 
   private _isAttrNode(x: any): x is AttrNode {
