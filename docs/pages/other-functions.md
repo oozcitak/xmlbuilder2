@@ -9,7 +9,8 @@ comments: false
 
 ### set
 
-Changes builder options.
+Changes builder options. See [builder options]({{ site.baseurl }}{% link pages/builder-options.md %})
+for the options argument.
 
 <details markdown="1">
 <summary><code><strong>set</strong>(<code>options</code>: object)</code></summary>
