@@ -7,11 +7,19 @@ toc: false
 comments: false
 ---
 
-# set
+### set
 
-Changes builder options. The following example sets the `inheritNS` option to `true` while creating the first `node` element then changes back to `false` while creating the second `node` element.
+Changes builder options.
 
-```javascript
+<details markdown="1">
+<summary><code><strong>set</strong>(<code>options</code>: object)</code></summary>
+<br/>
+
+* `options` - builder options
+
+The following example sets the `inheritNS` option to `true` while creating the first `node` element then changes back to `false` while creating the second `node` element.
+
+```js
 const { create } = require('xmlbuilder2');
 
 const ele = create()
@@ -23,23 +31,31 @@ const ele = create()
   .up();
 console.log(ele.end({ prettyPrint: true }));
 ```
-
 ```xml
 <root xmlns="http:/example.com">
   <node/>
   <node xmlns=""/>
 </root>
 ```
+</details>
 
-# node (property)
+
+### node (property)
+
+Returns the DOM node wrapped by `xmlbuilder2`.
 
 {% include warning.html content="`node` is a _property_; not a function." %}
 
-Returns the DOM node wrapped by `xmlbuilder2`. For example:
+<details markdown="1">
+<summary><code><strong>node</strong></code></summary>
+<br/>
 
-```javascript
+For example:
+
+```js
 const { create } = require('xmlbuilder2');
 
 const ele = create().ele('http:/example.com', 'root');
 console.log(ele.node.namespaceURI); // 'http:/example.com'
 ```
+</details>
