@@ -11,8 +11,14 @@ Following functions exported by `xmlbuilder2` are imported with:
 ```js
 const { createCB, fragmentCB } = require('xmlbuilder2');
 ```
+These functions can be used to create an XML document in chunks, without keeping the 
+entire document tree in memory, so that large documents can be created without running out
+of available memory.
 
-These functions return a callback document builder object (an instance of the class [`XMLBuilderCB`](https://github.com/oozcitak/xmlbuilder2/blob/master/src/callback/XMLBuilderCBImpl.ts)) which is a different object from the builder object returned by `create` (an instance of the class [`XMLBuilder`](https://github.com/oozcitak/xmlbuilder2/blob/master/src/builder/XMLBuilderImpl.ts)). Although `XMLBuilderCB` methods have similar method signatures, they are not XML node wrappers but the same  object instance whose state is altered with each call. Use these functions if you need to create an XML document in chunks and you are only interested in the final XML document string. If you need to process intermediate nodes, use the [`create`]({{ site.baseurl }}{% link pages/builder-functions.md %}#create) function.
+{% capture cb_tip %}
+  `createCB` and `fragmentCB` functions return a callback document builder object (an instance of the class [`XMLBuilderCB`](https://github.com/oozcitak/xmlbuilder2/blob/master/src/callback/XMLBuilderCBImpl.ts)) which is a different object from the builder object returned by `create` (an instance of the class [`XMLBuilder`](https://github.com/oozcitak/xmlbuilder2/blob/master/src/builder/XMLBuilderImpl.ts)). Although `XMLBuilderCB` methods have similar method signatures, they are not XML node wrappers but the same  object instance whose state is altered with each call. Use these functions if you need to create an XML document in chunks and you are only interested in the final XML document string. If you need to process intermediate nodes, use the [`create`]({{ site.baseurl }}{% link pages/builder-functions.md %}#create) function.
+{% endcapture %}
+{% include warning.html content=cb_tip %}
 
 ### createCB
 The `createCB` function serializes an XML document in chunks with the provided callback functions.
