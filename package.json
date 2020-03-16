@@ -27,7 +27,7 @@
   "types": "./lib/index.d.ts",
   "dependencies": {
     "@oozcitak/util": "8.3.1",
-    "@oozcitak/dom": "1.15.2",
+    "@oozcitak/dom": "1.15.4",
     "@oozcitak/infra": "1.0.5"
   },
   "devDependencies": {
