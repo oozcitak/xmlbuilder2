@@ -19,9 +19,6 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
     'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'])
 
   protected _builderOptions: XMLBuilderOptions
-  protected _recordParentNamespaces?: boolean
-  protected _startPrefixIndex = 1
-  protected _prefix = "ns"
 
   /**
    * Initializes a new instance of `BaseWriter`.
@@ -182,25 +179,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
       let namespace: string | null = null
       const prefixMap = new NamespacePrefixMap()
       prefixMap.set("xml", infraNamespace.XML)
-      const prefixIndex: PrefixIndex = { value: this._startPrefixIndex }
-
-      if (this._recordParentNamespaces) {
-        // starting from the element, walk up the tree to collect a list of ancestors 
-        const ancestors: Element[] = []
-        let ancestor = node.parentNode
-        while (ancestor !== null && ancestor.nodeType === NodeType.Element) {
-          ancestors.splice(0, 0, ancestor as Element)
-          ancestor = ancestor.parentNode
-        }
-        // for each of this ancestor elements starting with the document root, but 
-        // not including the element itself 
-        for (const ancestor of ancestors) {
-          let localDefaultNamespace = this._recordNamespaceInformation(ancestor, prefixMap, {})
-          if (localDefaultNamespace !== null && localDefaultNamespace !== infraNamespace.XML) {
-            namespace = localDefaultNamespace || null
-          }
-        }
-      }
+      const prefixIndex: PrefixIndex = { value: 1 }
 
       /**
        * 5. Return the result of running the XML serialization algorithm on node 
@@ -1576,7 +1555,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
      * 3. Add to map the generated prefix given the new namespace namespace.
      * 4. Return the value of generated prefix.
      */
-    const generatedPrefix = this._prefix + prefixIndex.value.toString()
+    const generatedPrefix = "ns" + prefixIndex.value.toString()
     prefixIndex.value++
     prefixMap.set(generatedPrefix, newNamespace)
     return generatedPrefix
