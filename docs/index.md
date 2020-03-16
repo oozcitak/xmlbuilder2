@@ -45,7 +45,10 @@ console.log(doc.end({ prettyPrint: true }));
 ```
 `create` function is exported by the module, and it creates and returns a blank XML document node, `ele` function creates and returns an element node and `up` function returns its parent element node. You can think of `up` as the closing tag of its element node. `doc` function returns the document node of the XML document. Finally, the `end` function converts the XML document into its string representation. `end` can convert into other formats as explained [here](serialization.html).
 
-_Note:_ You may have noticed that the `up` calls for the `"baz"` and `"root"` elements were omitted in the above example. This is possible because the `doc` function can be called from anywhere in the document tree. The same is true for the `root` function; it returns the root element node and be called from anywhere in the document.
+{% capture cb_note %}
+  You may have noticed that the `up` calls for the `"baz"` and `"root"` elements were omitted in the above example. This is possible because the `doc` function can be called from anywhere in the document tree. The same is true for the `root` function; it returns the root element node and be called from anywhere in the document.
+{% endcapture %}
+{% include note.html content=cb_note %}
 
 ___
 

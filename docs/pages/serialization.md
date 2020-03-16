@@ -155,5 +155,6 @@ In addition to `format` there are a number of settings for customizing the outpu
 * `offset` - Defines a fixed number of indentations to add to every line. Defaults to `0`.
 * `width` - Determines the maximum column width. Defaults to `0`.
 * `allowEmptyTags` - Produces closing tags for empty element nodes. With this option set to `true`, closing tags will be produced for element nodes without child nodes, e.g. `<node></node>`. Otherwise, empty element nodes will be self-closed, e.g. `<node/>`. Defaults to `false`.
-* `indentTextOnlyNodes` - Indents contents of text-only element nodes. Defaults to `false` which keeps a text node on the same line with its containing element node, e.g. `<node>some text</node>`. Otherwise, it will be printed on a new line. _Note:_ Element nodes with mixed content are always indented regardless of this setting.
+* `indentTextOnlyNodes` - Indents contents of text-only element nodes. Defaults to `false` which keeps a text node on the same line with its containing element node, e.g. `<node>some text</node>`. Otherwise, it will be printed on a new line.
+{% include note.html content="Element nodes with mixed content are always indented regardless of this setting." %}
 * `spaceBeforeSlash` - Inserts a space character before the slash character of self-closing tags. With this options set to `true`, a space character will be inserted before the slash character of self-closing tags, e.g. `<node />`. Defaults to `false`.

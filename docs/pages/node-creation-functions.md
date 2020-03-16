@@ -211,9 +211,12 @@ ___
 
 Creates a new element node and appends it to the list of child nodes.
 
-_Note:_ The `ele` function returns the newly created element node. If multiple
-element nodes are created with a single `ele` call, it returns the last top
-level element node created.
+{% capture cb_note %}
+  The `ele` function returns the newly created element node. If multiple
+  element nodes are created with a single `ele` call, it returns the last top
+  level element node created.
+{% endcapture %}
+{% include note.html content=cb_note %}
 
 <details markdown="1">
 <summary><code><strong>ele</strong>(<code>namespace</code>: string, <code>name</code>: string, <code>attributes</code>?: object)</code></summary>
@@ -325,12 +328,18 @@ ___
 Imports a node as a child node of this node. Descendant nodes and
 attributes will also be imported. Returns the current element node.
 
-_Note:_ The node will be cloned before being imported and this clone will be 
-inserted into the document; not the original node.
+{% capture cb_note %}
+  The node will be cloned before being imported and this clone will be 
+  inserted into the document; not the original node.
+{% endcapture %}
+{% include note.html content=cb_note %}
 
-_Note:_ If the imported node is a document, its document element node will be
-imported. If the imported node is a document fragment, its child nodes will be
-imported. 
+{% capture cb_note %}
+  If the imported node is a document, its document element node will be
+  imported. If the imported node is a document fragment, its child nodes will be
+  imported. 
+{% endcapture %}
+{% include note.html content=cb_note %}
 
 <details markdown="1">
 <summary><code><strong>import</strong>(<code>node</code>: XMLBuilderNode)</code></summary>

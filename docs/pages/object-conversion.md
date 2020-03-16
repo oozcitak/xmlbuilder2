@@ -115,7 +115,10 @@ becomes:
 ```xml
 <monologue>Talk to me Goose!</monologue>
 ````
-_Note:_ Since JS objects cannot contain duplicate keys, multiple text nodes can be created by adding some unique text after each object key or grouping node contents in an array.
+{% capture cb_note %}
+  Since JS objects cannot contain duplicate keys, multiple text nodes can be 
+  created by adding some unique text after each object key or grouping node
+  contents in an array. Example:
 ```js
 obj1 = { monologue: {
   '#1': 'Talk to me Goose!',
@@ -127,13 +130,16 @@ obj2 = { monologue: {
     'Talk to me...'
   ]
 } }
-
 ```
 both become:
 ```xml
 <monologue>Talk to me Goose!Talk to me...</monologue>
-````
-_Note:_ `"#"` also allows mixed content. Example:
+```
+{% endcapture %}
+{% include note.html content=cb_note markdown=1 %}
+
+{% capture cb_note %}
+  `"#"` also allows mixed content. Example:
 ```js
 obj1 = { monologue: {
   '#1': 'Talk to me Goose!',
@@ -156,6 +162,8 @@ both become:
   Talk to me...
 </monologue>
 ```
+{% endcapture %}
+{% include note.html content=cb_note markdown=1 %}
 ___
 
 #### cdata
