@@ -9,7 +9,8 @@ describe('StringWriter', () => {
       person: {
         name: "John",
         '@age': 35,
-        '?': 'pi val',
+        '?1': 'pi val',
+        '?2': 'pi',
         '!': 'Good guy',
         '$': 'well formed!',
         address: {
@@ -34,6 +35,7 @@ describe('StringWriter', () => {
         <person age="35">
           <name>John</name>
           <?pi val?>
+          <?pi?>
           <!--Good guy-->
           <![CDATA[well formed!]]>
           <address>

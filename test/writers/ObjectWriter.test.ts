@@ -8,7 +8,8 @@ describe('ObjectWriter', () => {
       person: {
         name: "John",
         '@age': 35,
-        '?': 'pi mypi',
+        '?1': 'pi mypi',
+        '?2': 'pi',
         '!': 'Good guy',
         '$': 'well formed!',
         address: {
@@ -35,7 +36,10 @@ describe('ObjectWriter', () => {
           person: {
             @age: 35,
             name: John,
-            ?: pi mypi,
+            ?: [
+              pi mypi,
+              pi
+            ],
             !: Good guy,
             $: well formed!,
             address: {
