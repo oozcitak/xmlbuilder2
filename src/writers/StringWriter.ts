@@ -1,48 +1,18 @@
-import { StringWriterOptions, XMLBuilderOptions } from "../interfaces"
+import { StringWriterOptions } from "../interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { BaseSerializer } from "./BaseSerializer"
+import { BaseWriter } from "./BaseWriter"
 import { Guard } from "@oozcitak/dom/lib/util"
-
-/**
- * Represents reference parameters passed to string writer functions.
- */
-type StringWriterRefs = {
-  /**
-   * Suppresses pretty-printing
-   */
-  suppressPretty: boolean
-  /**
-   * The text child nodes of the current element node has no data.
-   */
-  emptyNode: boolean
-  /**
-   * The string representing the serialized document.
-   */
-  markup: string
-}
 
 /**
  * Serializes XML nodes into strings.
  */
-export class StringWriterImpl extends BaseSerializer {
+export class StringWriter extends BaseWriter<StringWriterOptions> {
 
-  private _builderOptions: XMLBuilderOptions
-
-  private _options!: Required<StringWriterOptions>
+  protected _options!: Required<StringWriterOptions>
   private _refs!: StringWriterRefs
   private _indentation: { [key: number]: string } = {}
   private _lengthToLastNewline = 0
-
-  /**
-   * Initializes a new instance of `StringWriterImpl`.
-   * 
-   * @param builderOptions - XML builder options
-   */
-  constructor(builderOptions: XMLBuilderOptions) {
-    super()
-    this._builderOptions = builderOptions
-  }
 
   /**
    * Produces an XML serialization of the given node.
@@ -121,7 +91,7 @@ export class StringWriterImpl extends BaseSerializer {
     // do not indent text only elements or elements with empty text nodes
     this._refs.suppressPretty = false
     this._refs.emptyNode = false
-    if (this._options.prettyPrint && !selfClosing && !voidElement && !this._options.indentTextOnlyNodes) {
+    if (this._options.prettyPrint && !selfClosing && !voidElement) {
       let textOnlyNode = true
       let emptyNode = true
       let childNode = this.currentNode.firstChild
@@ -144,11 +114,11 @@ export class StringWriterImpl extends BaseSerializer {
 
         childNode = childNode.nextSibling
       }
-      this._refs.suppressPretty = textOnlyNode && ((cdataCount <= 1 && textCount === 0) || cdataCount === 0)
+      this._refs.suppressPretty = !this._options.indentTextOnlyNodes && textOnlyNode && ((cdataCount <= 1 && textCount === 0) || cdataCount === 0)
       this._refs.emptyNode = emptyNode
     }
 
-    if ((voidElement || selfClosing) && this._options.allowEmptyTags) {
+    if ((voidElement || selfClosing || this._refs.emptyNode) && this._options.allowEmptyTags) {
       this._refs.markup += "></" + name + ">"
     } else {
       this._refs.markup += voidElement ? " />" :
@@ -211,7 +181,7 @@ export class StringWriterImpl extends BaseSerializer {
   /** @inheritdoc */
   instruction(target: string, data: string): void {
     this._beginLine()
-    this._refs.markup += "<?" + target + " " + data + "?>"
+    this._refs.markup += "<?" + (data === "" ? target : target + " " + data) + "?>"
     this._endLine()
   }
 
@@ -253,4 +223,22 @@ export class StringWriterImpl extends BaseSerializer {
     }
   }
 
+}
+
+/**
+ * Represents reference parameters passed to string writer functions.
+ */
+type StringWriterRefs = {
+  /**
+   * Suppresses pretty-printing
+   */
+  suppressPretty: boolean
+  /**
+   * The text child nodes of the current element node has no data.
+   */
+  emptyNode: boolean
+  /**
+   * The string representing the serialized document.
+   */
+  markup: string
 }

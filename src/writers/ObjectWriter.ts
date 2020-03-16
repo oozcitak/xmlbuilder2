@@ -1,39 +1,16 @@
-import {
-  XMLSerializedValue, ObjectWriterOptions, XMLBuilderOptions
-} from "../interfaces"
+import { XMLSerializedValue, ObjectWriterOptions } from "../interfaces"
 import { applyDefaults, isArray, isString } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
-import { BaseSerializer } from "./BaseSerializer"
-
-type AttrNode = { "@": { [key: string]: string } }
-type TextNode = { "#": string | string[] }
-type CommentNode = { "!": string | string[] }
-type InstructionNode = { "?": string | string[] }
-type CDATANode = { "$": string | string[] }
-type NodeList = (ElementNode | AttrNode | TextNode | CommentNode |
-  InstructionNode | CDATANode)[]
-type ElementNode = { [key: string]: NodeList | NodeList[] }
+import { BaseWriter } from "./BaseWriter"
 
 /**
  * Serializes XML nodes into objects and arrays.
  */
-export class ObjectWriterImpl extends BaseSerializer {
-
-  private _builderOptions: XMLBuilderOptions
+export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
 
   private _currentList!: NodeList
   private _currentIndex!: number
   private _listRegister!: NodeList[]
-
-  /**
-   * Initializes a new instance of `ObjectWriterImpl`.
-   * 
-   * @param builderOptions - XML builder options
-   */
-  constructor(builderOptions: XMLBuilderOptions) {
-    super()
-    this._builderOptions = builderOptions
-  }
 
   /**
    * Produces an XML serialization of the given node.
@@ -446,3 +423,12 @@ export class ObjectWriterImpl extends BaseSerializer {
   }
 
 }
+
+type AttrNode = { "@": { [key: string]: string } }
+type TextNode = { "#": string | string[] }
+type CommentNode = { "!": string | string[] }
+type InstructionNode = { "?": string | string[] }
+type CDATANode = { "$": string | string[] }
+type NodeList = (ElementNode | AttrNode | TextNode | CommentNode |
+  InstructionNode | CDATANode)[]
+type ElementNode = { [key: string]: NodeList | NodeList[] }

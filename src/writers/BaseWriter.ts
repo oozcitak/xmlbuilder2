@@ -1,3 +1,4 @@
+import { BaseWriterOptions, XMLBuilderOptions, XMLSerializedValue } from "../interfaces"
 import {
   Node, Element, Document, Comment, Text, DocumentFragment, CharacterData,
   DocumentType, ProcessingInstruction, CDATASection, NodeType
@@ -11,11 +12,33 @@ import { xml_isName, xml_isLegalChar, xml_isPubidChar } from "@oozcitak/dom/lib/
 /**
  * Pre-serializes XML nodes.
  */
-export class BaseSerializer {
+export abstract class BaseWriter<T extends BaseWriterOptions> {
 
   private static _VoidElementNames = new Set(['area', 'base', 'basefont',
     'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen',
     'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'])
+
+  protected _builderOptions: XMLBuilderOptions
+  protected _recordParentNamespaces?: boolean
+  protected _startPrefixIndex = 1
+  protected _prefix = "ns"
+
+  /**
+   * Initializes a new instance of `BaseWriter`.
+   * 
+   * @param builderOptions - XML builder options
+   */
+  constructor(builderOptions: XMLBuilderOptions) {
+    this._builderOptions = builderOptions
+  }
+
+  /**
+   * Produces an XML serialization of the given node.
+   * 
+   * @param node - node to serialize
+   * @param writerOptions - serialization options
+   */
+  abstract serialize(node: Node, writerOptions?: T): XMLSerializedValue
 
   /**
    * Used by derived classes to serialize a DocType node.
@@ -81,27 +104,39 @@ export class BaseSerializer {
   closeTag(name: string) { }
 
   /**
-   * Used by derived classes to serialize an attribute od namespace declaration.
+   * Used by derived classes to serialize attributes or namespace declarations.
+   * 
+   * @param attributes - attribute array
+   */
+  attributes(attributes: [string | null, string | null, string, string][]) {
+    for (const attr of attributes) {
+      this.attribute(attr[1] === null ? attr[2] : attr[1] + ':' + attr[2], attr[3])
+    }
+  }
+
+  /**
+   * Used by derived classes to serialize an attribute or namespace declaration.
    * 
    * @param name - node name
    * @param value - node value
    */
   attribute(name: string, value: string) { }
-  
+
   /**
    * Used by derived classes to perform any pre-processing steps before starting
    * serializing an element node.
    * 
    * @param name - node name
-   */  
-  beginElement(name: string) { }
+   * @param namespace - node namespace
+   */
+  beginElement(name: string, namespace: string | null): string { return name }
 
   /**
    * Used by derived classes to perform any post-processing steps after 
    * completing serializing an element node.
    * 
    * @param name - node name
-   */  
+   */
   endElement(name: string) { }
 
   /**
@@ -113,21 +148,6 @@ export class BaseSerializer {
    * Gets the current XML node.
    */
   currentNode!: Node
-
-  /**
-   * Ignores comment nodes.
-   */
-  ignoreComments?: boolean
-
-  /**
-   * Treats CDATA section nodes as text nodes.
-   */
-  treatCDataAsText?: boolean
-
-  /**
-   * Trims whitespace at the start and end of text nodes.
-   */
-  trimTextNodes?: boolean
 
   /**
    * Produces an XML serialization of the given node. The pre-serializer inserts
@@ -160,10 +180,28 @@ export class BaseSerializer {
        * serialize a node's namespaceURI (or the namespaceURI of one of node's 
        * attributes). See the generate a prefix algorithm.
        */
-      const namespace: string | null = null
+      let namespace: string | null = null
       const prefixMap = new NamespacePrefixMap()
       prefixMap.set("xml", infraNamespace.XML)
-      const prefixIndex: PrefixIndex = { value: 1 }
+      const prefixIndex: PrefixIndex = { value: this._startPrefixIndex }
+
+      if (this._recordParentNamespaces) {
+        // starting from the element, walk up the tree to collect a list of ancestors 
+        const ancestors: Element[] = []
+        let ancestor = node.parentNode
+        while (ancestor !== null && ancestor.nodeType === NodeType.Element) {
+          ancestors.splice(0, 0, ancestor as Element)
+          ancestor = ancestor.parentNode
+        }
+        // for each of this ancestor elements starting with the document root, but 
+        // not including the element itself 
+        for (const ancestor of ancestors) {
+          let localDefaultNamespace = this._recordNamespaceInformation(ancestor, prefixMap, {})
+          if (localDefaultNamespace !== null && localDefaultNamespace !== infraNamespace.XML) {
+            namespace = localDefaultNamespace || null
+          }
+        }
+      }
 
       /**
        * 5. Return the result of running the XML serialization algorithm on node 
@@ -286,6 +324,8 @@ export class BaseSerializer {
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
     requireWellFormed: boolean): void {
 
+    const attributes: [string | null, string | null, string, string][] = []
+
     /**
      * From: https://w3c.github.io/DOM-Parsing/#xml-serializing-an-element-node
      * 
@@ -360,7 +400,7 @@ export class BaseSerializer {
       }
 
       /** 11.4. Append the value of qualified name to markup. */
-      this.beginElement(qualifiedName)
+      qualifiedName = this.beginElement(qualifiedName, ns)
       this.openTagBegin(qualifiedName)
     } else {
       /** 
@@ -430,7 +470,7 @@ export class BaseSerializer {
         /**
          * 12.4.3. Append the value of qualified name to markup.
          */
-        this.beginElement(qualifiedName)
+        qualifiedName = this.beginElement(qualifiedName, ns)
         this.openTagBegin(qualifiedName)
 
         /** 12.5. Otherwise, if prefix is not null, then: */
@@ -460,7 +500,7 @@ export class BaseSerializer {
          */
         map.set(prefix, ns)
         qualifiedName += prefix + ':' + node.localName
-        this.beginElement(qualifiedName)
+        qualifiedName = this.beginElement(qualifiedName, ns)
         this.openTagBegin(qualifiedName)
 
         /**
@@ -477,8 +517,8 @@ export class BaseSerializer {
          * the require well-formed flag as input;
          * 12.5.5.6. """ (U+0022 QUOTATION MARK).
          */
-        this.attribute('xmlns:' + prefix, 
-          this._serializeAttributeValue(ns, requireWellFormed))
+        attributes.push([null, 'xmlns', prefix,
+          this._serializeAttributeValue(ns, requireWellFormed)])
 
         /**
          * 12.5.5.7. If local default namespace is not null (there exists a
@@ -519,7 +559,7 @@ export class BaseSerializer {
         /**
          * 12.6.4. Append the value of qualified name to markup.
          */
-        this.beginElement(qualifiedName)
+        qualifiedName = this.beginElement(qualifiedName, ns)
         this.openTagBegin(qualifiedName)
 
         /**
@@ -535,8 +575,8 @@ export class BaseSerializer {
          * and the require well-formed flag as input;
          * 12.6.5.5. """ (U+0022 QUOTATION MARK).
          */
-        this.attribute('xmlns', 
-          this._serializeAttributeValue(ns, requireWellFormed))
+        attributes.push([null, null, 'xmlns',
+          this._serializeAttributeValue(ns, requireWellFormed)])
 
         /**
          * 12.7. Otherwise, the node has a local default namespace that matches 
@@ -547,7 +587,7 @@ export class BaseSerializer {
       } else {
         qualifiedName += node.localName
         inheritedNS = ns
-        this.beginElement(qualifiedName)
+        qualifiedName = this.beginElement(qualifiedName, ns)
         this.openTagBegin(qualifiedName)
       }
     }
@@ -557,8 +597,9 @@ export class BaseSerializer {
      * attributes given map, prefix index, local prefixes map, ignore namespace
      * definition attribute flag, and require well-formed flag.
      */
-    this._serializeAttributesNS(node, map, prefixIndex, localPrefixesMap,
-      ignoreNamespaceDefinitionAttribute, requireWellFormed)
+    attributes.push(...this._serializeAttributesNS(node, map, prefixIndex,
+      localPrefixesMap, ignoreNamespaceDefinitionAttribute, requireWellFormed))
+    this.attributes(attributes)
 
     /**
      * 14. If ns is the HTML namespace, and the node's list of children is 
@@ -577,7 +618,7 @@ export class BaseSerializer {
      */
     const isHTML = (ns === infraNamespace.HTML)
     if (isHTML && node.childNodes.length === 0 &&
-      BaseSerializer._VoidElementNames.has(node.localName)) {
+      BaseWriter._VoidElementNames.has(node.localName)) {
       this.openTagEnd(qualifiedName, true, true)
       this.endElement(qualifiedName)
       skipEndTag = true
@@ -698,7 +739,7 @@ export class BaseSerializer {
     const qualifiedName = node.localName
 
     /** 11.4. Append the value of qualified name to markup. */
-    this.beginElement(qualifiedName)
+    this.beginElement(qualifiedName, null)
     this.openTagBegin(qualifiedName)
 
     /**
@@ -706,7 +747,8 @@ export class BaseSerializer {
      * attributes given map, prefix index, local prefixes map, ignore namespace
      * definition attribute flag, and require well-formed flag.
      */
-    this._serializeAttributes(node, requireWellFormed)
+    const attributes = this._serializeAttributes(node, requireWellFormed)
+    this.attributes(attributes)
 
     /**
      * 14. If ns is the HTML namespace, and the node's list of children is 
@@ -855,8 +897,6 @@ export class BaseSerializer {
    */
   private _serializeComment(node: Comment, requireWellFormed: boolean): void {
 
-    if (this.ignoreComments) return
-
     /**
      * If the require well-formed flag is set (its value is true), and node's 
      * data contains characters that are not matched by the XML Char production 
@@ -912,10 +952,6 @@ export class BaseSerializer {
         markup += "&gt;"
       else
         markup += c
-    }
-
-    if (this.trimTextNodes) {
-      markup = markup.trim()
     }
 
     this.text(markup)
@@ -1082,11 +1118,6 @@ export class BaseSerializer {
    * @param requireWellFormed - whether to check conformance
    */
   private _serializeCData(node: CDATASection, requireWellFormed: boolean): void {
-
-    if (this.treatCDataAsText) {
-      this._serializeText(node, requireWellFormed)
-    }
-
     if (requireWellFormed && (node.data.indexOf("]]>") !== -1)) {
       throw new Error("CDATA contains invalid characters (well-formed required).")
     }
@@ -1108,7 +1139,7 @@ export class BaseSerializer {
   private _serializeAttributesNS(node: Element, map: NamespacePrefixMap,
     prefixIndex: PrefixIndex, localPrefixesMap: { [key: string]: string },
     ignoreNamespaceDefinitionAttribute: boolean,
-    requireWellFormed: boolean): void {
+    requireWellFormed: boolean): [string | null, string | null, string, string][] {
 
     /**
      * 1. Let result be the empty string.
@@ -1120,6 +1151,7 @@ export class BaseSerializer {
      * This can occur when two otherwise identical attributes on the same 
      * element differ only by their prefix values.
      */
+    const result: [string | null, string | null, string, string][] = []
     const localNameSet = requireWellFormed ? new LocalNameSet() : undefined
 
     /** 
@@ -1129,8 +1161,8 @@ export class BaseSerializer {
     for (const attr of node.attributes) {
       // Optimize common case
       if (!requireWellFormed && attr.namespaceURI === null) {
-        this.attribute(attr.localName, 
-          this._serializeAttributeValue(attr.value, requireWellFormed))
+        result.push([null, null, attr.localName,
+          this._serializeAttributeValue(attr.value, requireWellFormed)])
         continue
       }
 
@@ -1268,8 +1300,8 @@ export class BaseSerializer {
            * attribute namespace and the require well-formed flag as input;
            * 3.5.3.2.6. """ (U+0022 QUOTATION MARK).
           */
-          this.attribute('xmlns:' + candidatePrefix, 
-            this._serializeAttributeValue(attributeNamespace, requireWellFormed))
+          result.push([null, "xmlns", candidatePrefix,
+            this._serializeAttributeValue(attributeNamespace, requireWellFormed)])
         }
       }
 
@@ -1280,7 +1312,7 @@ export class BaseSerializer {
        */
       let attrName = ''
       if (candidatePrefix !== null) {
-        attrName = candidatePrefix + ':'
+        attrName = candidatePrefix
       }
 
       /**
@@ -1305,14 +1337,14 @@ export class BaseSerializer {
        * attribute and the require well-formed flag as input;
        * 3.9.4. """ (U+0022 QUOTATION MARK).
        */
-      attrName += attr.localName
-      this.attribute(attrName, 
-        this._serializeAttributeValue(attr.value, requireWellFormed))
+      result.push([attributeNamespace, candidatePrefix, attr.localName,
+        this._serializeAttributeValue(attr.value, requireWellFormed)])
     }
 
     /**
      * 4. Return the value of result.
      */
+    return result
   }
 
   /**
@@ -1321,88 +1353,91 @@ export class BaseSerializer {
    * @param node - node to serialize
    * @param requireWellFormed - whether to check conformance
   */
- private _serializeAttributes(node: Element, requireWellFormed: boolean): void {
-
-  /**
-   * 1. Let result be the empty string.
-   * 2. Let localname set be a new empty namespace localname set. This 
-   * localname set will contain tuples of unique attribute namespaceURI and 
-   * localName pairs, and is populated as each attr is processed. This set is 
-   * used to [optionally] enforce the well-formed constraint that an element
-   * cannot have two attributes with the same namespaceURI and localName. 
-   * This can occur when two otherwise identical attributes on the same 
-   * element differ only by their prefix values.
-   */
-  const localNameSet: { [key: string]: boolean } | undefined =
-    requireWellFormed ? {} : undefined
-
-  /** 
-   * 3. Loop: For each attribute attr in element's attributes, in the order 
-   * they are specified in the element's attribute list: 
-   */
-  for (const attr of node.attributes) {
-    // Optimize common case
-    if (!requireWellFormed) {
-      this.attribute(attr.localName,
-        this._serializeAttributeValue(attr.value, requireWellFormed))
-      continue
-    }
+  private _serializeAttributes(node: Element, requireWellFormed: boolean):
+    [string | null, string | null, string, string][] {
 
     /**
-     * 3.1. If the require well-formed flag is set (its value is true), and the 
-     * localname set contains a tuple whose values match those of a new tuple 
-     * consisting of attr's namespaceURI attribute and localName attribute, 
-     * then throw an exception; the serialization of this attr would fail to
-     * produce a well-formed element serialization.
+     * 1. Let result be the empty string.
+     * 2. Let localname set be a new empty namespace localname set. This 
+     * localname set will contain tuples of unique attribute namespaceURI and 
+     * localName pairs, and is populated as each attr is processed. This set is 
+     * used to [optionally] enforce the well-formed constraint that an element
+     * cannot have two attributes with the same namespaceURI and localName. 
+     * This can occur when two otherwise identical attributes on the same 
+     * element differ only by their prefix values.
      */
-    if (requireWellFormed && localNameSet && (attr.localName in localNameSet)) {
-      throw new Error("Element contains duplicate attributes (well-formed required).")
-    }
+    const result: [string | null, string | null, string, string][] = []
+    const localNameSet: { [key: string]: boolean } | undefined =
+      requireWellFormed ? {} : undefined
 
-    /**
-     * 3.2. Create a new tuple consisting of attr's namespaceURI attribute and 
-     * localName attribute, and add it to the localname set.
-     * 3.3. Let attribute namespace be the value of attr's namespaceURI value.
-     * 3.4. Let candidate prefix be null.
+    /** 
+     * 3. Loop: For each attribute attr in element's attributes, in the order 
+     * they are specified in the element's attribute list: 
      */
-    /* istanbul ignore else */
-    if (requireWellFormed && localNameSet) localNameSet[attr.localName] = true
+    for (const attr of node.attributes) {
+      // Optimize common case
+      if (!requireWellFormed) {
+        result.push([null, null, attr.localName,
+          this._serializeAttributeValue(attr.value, requireWellFormed)])
+        continue
+      }
 
-    /** 3.5. If attribute namespace is not null, then run these sub-steps: */
-    /**
-     * 3.6. Append a " " (U+0020 SPACE) to result.
-     * 3.7. If candidate prefix is not null, then append to result the 
-     * concatenation of candidate prefix with ":" (U+003A COLON).
-     */
+      /**
+       * 3.1. If the require well-formed flag is set (its value is true), and the 
+       * localname set contains a tuple whose values match those of a new tuple 
+       * consisting of attr's namespaceURI attribute and localName attribute, 
+       * then throw an exception; the serialization of this attr would fail to
+       * produce a well-formed element serialization.
+       */
+      if (requireWellFormed && localNameSet && (attr.localName in localNameSet)) {
+        throw new Error("Element contains duplicate attributes (well-formed required).")
+      }
 
-    /**
-     * 3.8. If the require well-formed flag is set (its value is true), and 
-     * this attr's localName attribute contains the character 
-     * ":" (U+003A COLON) or does not match the XML Name production or 
-     * equals "xmlns" and attribute namespace is null, then throw an 
-     * exception; the serialization of this attr would not be a 
-     * well-formed attribute.
-     */
-    if (requireWellFormed && (attr.localName.indexOf(":") !== -1 ||
-      !xml_isName(attr.localName))) {
-      throw new Error("Attribute local name contains invalid characters (well-formed required).")
-    }
+      /**
+       * 3.2. Create a new tuple consisting of attr's namespaceURI attribute and 
+       * localName attribute, and add it to the localname set.
+       * 3.3. Let attribute namespace be the value of attr's namespaceURI value.
+       * 3.4. Let candidate prefix be null.
+       */
+      /* istanbul ignore else */
+      if (requireWellFormed && localNameSet) localNameSet[attr.localName] = true
 
-    /**
-     * 3.9. Append the following strings to result, in the order listed:
-     * 3.9.1. The value of attr's localName;
-     * 3.9.2. "="" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
-     * 3.9.3. The result of serializing an attribute value given attr's value
-     * attribute and the require well-formed flag as input;
-     * 3.9.4. """ (U+0022 QUOTATION MARK).
-     */
-    this.attribute(attr.localName,
-      this._serializeAttributeValue(attr.value, requireWellFormed))
+      /** 3.5. If attribute namespace is not null, then run these sub-steps: */
+      /**
+       * 3.6. Append a " " (U+0020 SPACE) to result.
+       * 3.7. If candidate prefix is not null, then append to result the 
+       * concatenation of candidate prefix with ":" (U+003A COLON).
+       */
+
+      /**
+       * 3.8. If the require well-formed flag is set (its value is true), and 
+       * this attr's localName attribute contains the character 
+       * ":" (U+003A COLON) or does not match the XML Name production or 
+       * equals "xmlns" and attribute namespace is null, then throw an 
+       * exception; the serialization of this attr would not be a 
+       * well-formed attribute.
+       */
+      if (requireWellFormed && (attr.localName.indexOf(":") !== -1 ||
+        !xml_isName(attr.localName))) {
+        throw new Error("Attribute local name contains invalid characters (well-formed required).")
+      }
+
+      /**
+       * 3.9. Append the following strings to result, in the order listed:
+       * 3.9.1. The value of attr's localName;
+       * 3.9.2. "="" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
+       * 3.9.3. The result of serializing an attribute value given attr's value
+       * attribute and the require well-formed flag as input;
+       * 3.9.4. """ (U+0022 QUOTATION MARK).
+       */
+      result.push([null, null, attr.localName,
+        this._serializeAttributeValue(attr.value, requireWellFormed)])
     }
 
     /**
      * 4. Return the value of result.
      */
+    return result
   }
 
   /**
@@ -1542,7 +1577,7 @@ export class BaseSerializer {
      * 3. Add to map the generated prefix given the new namespace namespace.
      * 4. Return the value of generated prefix.
      */
-    let generatedPrefix = "ns" + prefixIndex.value
+    const generatedPrefix = this._prefix + prefixIndex.value.toString()
     prefixIndex.value++
     prefixMap.set(generatedPrefix, newNamespace)
     return generatedPrefix
@@ -1601,56 +1636,6 @@ export class BaseSerializer {
     return result
   }
 
-}
-
-/**
- * Represents the serializer functions.
- */
-type SerializerFunctions = {
-  /**
-   * Serializes a document type declaration.
-   */
-  docType: ((name: string, publicId: string, systemId: string) => void)
-  /**
-   * Serializes a comment node.
-   */
-  comment: ((data: string) => void)
-  /**
-   * Serializes a text node.
-   */
-  text: ((data: string) => void)
-  /**
-   * Serializes a processing instruction node.
-   */
-  instruction: ((target: string, data: string) => void)
-  /**
-   * Serializes a CDATA section node.
-   */
-  cdata: ((data: string) => void)
-  /**
-   * Serializes the beginning of an open element tag.
-   */
-  openTagBegin: ((name: string) => void)
-  /**
-   * Serializes the ending of an open element tag.
-   */
-  openTagEnd: ((name: string, selfClosing: boolean, voidElement: boolean) => void)
-  /**
-   * Serializes a close open element tag.
-   */
-  closeTag: ((name: string) => void)
-  /**
-   * Serializes an attribute or a namespace declaration.
-   */
-  attribute: ((name: string, value: string) => void)
-  /**
-   * Called before starting serializing an element node.
-   */
-  beginElement: ((name: string) => void)
-  /**
-   * Called after completing serializing an element node.
-   */
-  endElement: ((name: string) => void)
 }
 
 /**

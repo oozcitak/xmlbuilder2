@@ -1,25 +1,15 @@
 import {
-  XMLSerializedValue, MapWriterOptions, XMLBuilderOptions, ObjectWriterOptions
+  XMLSerializedValue, MapWriterOptions, ObjectWriterOptions
 } from "../interfaces"
-import { applyDefaults, isArray, isObject, isMap, isPlainObject } from "@oozcitak/util"
+import { applyDefaults, isArray, isObject } from "@oozcitak/util"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
-import { ObjectWriterImpl } from "./ObjectWriterImpl"
+import { ObjectWriter } from "./ObjectWriter"
+import { BaseWriter } from "./BaseWriter"
 
 /**
  * Serializes XML nodes into ES6 maps and arrays.
  */
-export class MapWriterImpl {
-
-  private _builderOptions: XMLBuilderOptions
-
-  /**
-   * Initializes a new instance of `ObjectWriterImpl`.
-   * 
-   * @param builderOptions - XML builder options
-   */
-  constructor(builderOptions: XMLBuilderOptions) {
-    this._builderOptions = builderOptions
-  }
+export class MapWriter extends BaseWriter<MapWriterOptions> {
 
   /**
    * Produces an XML serialization of the given node.
@@ -39,7 +29,7 @@ export class MapWriterImpl {
       format: "object",
       wellFormed: false
     })
-    const objectWriter = new ObjectWriterImpl(this._builderOptions)
+    const objectWriter = new ObjectWriter(this._builderOptions)
     const val = objectWriter.serialize(node, objectWriterOptions)
 
     // recursively convert object into Map

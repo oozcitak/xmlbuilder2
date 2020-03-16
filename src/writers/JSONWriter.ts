@@ -1,28 +1,18 @@
 import {
-  JSONWriterOptions, XMLBuilderOptions, XMLSerializedValue, ObjectWriterOptions
+  JSONWriterOptions, XMLSerializedValue, ObjectWriterOptions
 } from "../interfaces"
-import { ObjectWriterImpl } from "./ObjectWriterImpl"
+import { ObjectWriter } from "./ObjectWriter"
 import {
   applyDefaults, isArray, isObject, objectLength, forEachObject,
   forEachArray
 } from "@oozcitak/util"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
+import { BaseWriter } from "./BaseWriter"
 
 /**
  * Serializes XML nodes into a JSON string.
  */
-export class JSONWriterImpl {
-
-  private _builderOptions: XMLBuilderOptions
-
-  /**
-   * Initializes a new instance of `JSONWriterImpl`.
-   * 
-   * @param builderOptions - XML builder options
-   */
-  constructor(builderOptions: XMLBuilderOptions) {
-    this._builderOptions = builderOptions
-  }
+export class JSONWriter extends BaseWriter<JSONWriterOptions> {
 
   /**
    * Produces an XML serialization of the given node.
@@ -45,7 +35,7 @@ export class JSONWriterImpl {
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(options, {
       format: "object"
     })
-    const objectWriter = new ObjectWriterImpl(this._builderOptions)
+    const objectWriter = new ObjectWriter(this._builderOptions)
     const val = objectWriter.serialize(node, objectWriterOptions)
 
     // recursively convert object into JSON string
