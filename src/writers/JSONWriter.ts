@@ -60,7 +60,7 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions> {
       const len = obj.length
       let i = 0
       for (const val of obj) {
-        markup += this._endLine(options, level + 1) + 
+        markup += this._endLine(options, level + 1) +
           this._beginLine(options, level + 1) +
           this._convertObject(val, options, level + 1)
         if (i < len - 1) { markup += ',' }

@@ -7,9 +7,7 @@ import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
-import {
-  StringWriterImpl, MapWriterImpl, ObjectWriterImpl, JSONWriterImpl
-} from "../writers"
+import { StringWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
 import { Document, Node, Element } from "@oozcitak/dom/lib/dom/interfaces"
 import { createParser, throwIfParserError } from "./dom"
 import { Guard } from "@oozcitak/dom/lib/util"
@@ -365,7 +363,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   dtd(options?: DTDOptions): XMLBuilder {
-    const name =  ((options && options.name) || (this._doc.documentElement ? this._doc.documentElement.tagName: "ROOT")) + ""
+    const name = ((options && options.name) || (this._doc.documentElement ? this._doc.documentElement.tagName : "ROOT")) + ""
     const pubID = ((options && options.pubID) || "") + ""
     const sysID = ((options && options.sysID) || "") + ""
 
@@ -666,16 +664,16 @@ export class XMLBuilderImpl implements XMLBuilder {
    */
   private _serialize(writerOptions: WriterOptions): XMLSerializedValue {
     if (writerOptions.format === "xml") {
-      const writer = new StringWriterImpl(this._options)
+      const writer = new StringWriter(this._options)
       return writer.serialize(this.node, writerOptions)
     } else if (writerOptions.format === "map") {
-      const writer = new MapWriterImpl(this._options)
+      const writer = new MapWriter(this._options)
       return writer.serialize(this.node, writerOptions)
     } else if (writerOptions.format === "object") {
-      const writer = new ObjectWriterImpl(this._options)
+      const writer = new ObjectWriter(this._options)
       return writer.serialize(this.node, writerOptions)
     } else if (writerOptions.format === "json") {
-      const writer = new JSONWriterImpl(this._options)
+      const writer = new JSONWriter(this._options)
       return writer.serialize(this.node, writerOptions)
     } else {
       throw new Error("Invalid writer format: " + writerOptions.format + ". " + this._debugInfo())

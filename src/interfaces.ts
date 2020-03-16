@@ -78,7 +78,7 @@ export interface XMLBuilderOptions {
     /**
      * User supplied namespace alias
      */
-    [key: string]: string | null 
+    [key: string]: string | null
   }
   /**
    * Whether child element nodes will inherit their parent element's namespace.
@@ -265,7 +265,7 @@ export interface ConvertOptions {
 /**
  * Defines the options passed to the writer.
  */
-type BaseWriterOptions = {
+export type BaseWriterOptions = {
   /**
    * Output format. Defaults to `"xml"`.
    * - `"xml"` - Serializes the document as a string in XML format.

@@ -1,4 +1,4 @@
-export { MapWriterImpl } from './MapWriterImpl'
-export { StringWriterImpl } from './StringWriterImpl'
-export { ObjectWriterImpl } from './ObjectWriterImpl'
-export { JSONWriterImpl } from './JSONWriterImpl'
+export { MapWriter } from './MapWriter'
+export { StringWriter } from './StringWriter'
+export { ObjectWriter } from './ObjectWriter'
+export { JSONWriter } from './JSONWriter'

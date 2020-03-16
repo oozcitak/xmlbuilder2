@@ -127,9 +127,8 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
    * serializing an element node.
    * 
    * @param name - node name
-   * @param namespace - node namespace
    */
-  beginElement(name: string, namespace: string | null): string { return name }
+  beginElement(name: string) { }
 
   /**
    * Used by derived classes to perform any post-processing steps after 
@@ -400,7 +399,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
       }
 
       /** 11.4. Append the value of qualified name to markup. */
-      qualifiedName = this.beginElement(qualifiedName, ns)
+      this.beginElement(qualifiedName)
       this.openTagBegin(qualifiedName)
     } else {
       /** 
@@ -470,7 +469,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
         /**
          * 12.4.3. Append the value of qualified name to markup.
          */
-        qualifiedName = this.beginElement(qualifiedName, ns)
+        this.beginElement(qualifiedName)
         this.openTagBegin(qualifiedName)
 
         /** 12.5. Otherwise, if prefix is not null, then: */
@@ -500,7 +499,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
          */
         map.set(prefix, ns)
         qualifiedName += prefix + ':' + node.localName
-        qualifiedName = this.beginElement(qualifiedName, ns)
+        this.beginElement(qualifiedName)
         this.openTagBegin(qualifiedName)
 
         /**
@@ -559,7 +558,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
         /**
          * 12.6.4. Append the value of qualified name to markup.
          */
-        qualifiedName = this.beginElement(qualifiedName, ns)
+        this.beginElement(qualifiedName)
         this.openTagBegin(qualifiedName)
 
         /**
@@ -587,7 +586,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
       } else {
         qualifiedName += node.localName
         inheritedNS = ns
-        qualifiedName = this.beginElement(qualifiedName, ns)
+        this.beginElement(qualifiedName)
         this.openTagBegin(qualifiedName)
       }
     }
@@ -739,7 +738,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
     const qualifiedName = node.localName
 
     /** 11.4. Append the value of qualified name to markup. */
-    this.beginElement(qualifiedName, null)
+    this.beginElement(qualifiedName)
     this.openTagBegin(qualifiedName)
 
     /**
