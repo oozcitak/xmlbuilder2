@@ -856,6 +856,16 @@ export interface XMLBuilderCB {
   ele(name: string, attributes?: AttributesObject): XMLBuilderCB
 
   /**
+   * Creates new element nodes from the given JS object and appends it to the
+   * list of child nodes.
+   * 
+   * @param obj - a JS object representing nodes to insert
+   * 
+   * @returns the last top level element node created
+   */
+  ele(obj: ExpandObject): XMLBuilderCB
+
+  /**
    * Creates or updates an element attribute.
    * 
    * @param namespace - namespace of the attribute

@@ -1,8 +1,9 @@
 import {
   XMLBuilderCB, AttributesObject, PIObject, DTDOptions, XMLBuilder,
-  XMLBuilderCBOptions, XMLBuilderCreateOptions, DefaultXMLBuilderCBOptions
+  XMLBuilderCBOptions, XMLBuilderCreateOptions, DefaultXMLBuilderCBOptions,
+  ExpandObject
 } from "../interfaces"
-import { applyDefaults } from "@oozcitak/util"
+import { applyDefaults, isString, isObject } from "@oozcitak/util"
 import { fragment, create } from ".."
 import {
   xml_isName, xml_isLegalChar, xml_isPubidChar
@@ -13,6 +14,7 @@ import {
   Comment, Text, ProcessingInstruction, CDATASection, DocumentType, Element
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { LocalNameSet } from "@oozcitak/dom/lib/serializer/LocalNameSet"
+import { Guard } from "@oozcitak/dom/lib/util"
 
 /**
  * Stores the last generated prefix. An object is used instead of a number so
@@ -85,8 +87,49 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
   }
 
   /** @inheritdoc */
-  ele(p1: string | null, p2?: AttributesObject | string,
+  ele(p1: string | null | ExpandObject, p2?: AttributesObject | string,
     p3?: AttributesObject): XMLBuilderCB {
+
+    // parse if JS object or XML or JSON string
+    if (isObject(p1) || (isString(p1) && (/^\s*</.test(p1) || /^\s*[\{\[]/.test(p1)))) {
+      let currentLevel = -1
+      fragment(p1).each((child, index, level) => {
+        if (currentLevel > level) {
+          while (currentLevel-- > level) {
+            this.up()
+          }
+        }
+        currentLevel = level
+
+        const node = child.node
+        if (Guard.isElementNode(node)) {
+          const name = node.prefix ? node.prefix + ":" + node.localName : node.localName
+          if (node.namespaceURI !== null) {
+            this.ele(node.namespaceURI, name)
+          } else {
+            this.ele(name)
+          }
+          for (const attr of node.attributes) {
+            const name = attr.prefix ? attr.prefix + ":" + attr.localName : attr.localName
+            if (attr.namespaceURI !== null) {
+              this.att(attr.namespaceURI, name, attr.value)
+            } else {
+              this.att(name, attr.value)
+            }
+          }
+        } else if (Guard.isExclusiveTextNode(node)) {
+          this.txt(node.data)
+        } else if (Guard.isCommentNode(node)) {
+          this.com(node.data)
+        } else if (Guard.isCDATASectionNode(node)) {
+          this.dat(node.data)
+        } else if (Guard.isProcessingInstructionNode(node)) {
+          this.ins(node.target, node.data)
+        }
+      }, false, true)
+
+      return this
+    }
 
     this._serializeOpenTag(true)
 
@@ -219,7 +262,11 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       return this
     }
 
-    this._push(this._beginLine() + "<?" + node.target + " " + node.data + "?>")
+    if (node.data) {
+      this._push(this._beginLine() + "<?" + node.target + " " + node.data + "?>")
+    } else {
+      this._push(this._beginLine() + "<?" + node.target + "?>")
+    }
     return this
   }
 
