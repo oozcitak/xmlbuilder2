@@ -203,4 +203,28 @@ describe('collection', () => {
     root.each(function(this: number) { expect(this).toBe(42) }, false, false, 42)
   })
 
+  test('each() index and level', () => {
+    const root = $$.create().ele('node1')
+      .ele('node11')
+        .ele('node111')
+          .ele('node1111').up()
+        .up()
+      .up()
+      .ele('node12')
+        .ele('node121').up()
+      .up()
+      .ele('node13').up()
+    const names: string[] = []
+    const indices: number[] = []
+    const levels: number[] = []
+    root.each((child, index, level) => {
+      names.push(child.node.nodeName)
+      indices.push(index)
+      levels.push(level)
+    }, true, true)
+    expect(names.join(" ")).toBe("node1 node11 node111 node1111 node12 node121 node13")
+    expect(indices.join(" ")).toBe("0 0 0 0 1 0 2")
+    expect(levels.join(" ")).toBe("0 1 2 3 1 2 1")
+  })
+
 })

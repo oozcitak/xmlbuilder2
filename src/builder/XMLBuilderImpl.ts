@@ -11,7 +11,7 @@ import { StringWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
 import { Document, Node, Element } from "@oozcitak/dom/lib/dom/interfaces"
 import { createParser, throwIfParserError } from "./dom"
 import { Guard } from "@oozcitak/dom/lib/util"
-import { namespace_extractQName } from "@oozcitak/dom/lib/algorithm"
+import { namespace_extractQName, tree_index } from "@oozcitak/dom/lib/algorithm"
 
 /**
  * Represents a wrapper that extends XML nodes to implement easy to use and
@@ -476,61 +476,59 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  each(callback: ((node: XMLBuilder, index: number) => void), self = false,
+  each(callback: ((node: XMLBuilder, index: number, level: number) => void), self = false,
     recursive = false, thisArg?: any): XMLBuilder {
-    let node = this._getFirstDescendantNode(this._domNode, self, recursive)
-    let index = 0
-    while (node) {
-      callback.call(thisArg, new XMLBuilderImpl(node), index++)
-      node = this._getNextDescendantNode(this._domNode, node, recursive)
+    let result = this._getFirstDescendantNode(this._domNode, self, recursive)
+    while (result[0]) {
+      callback.call(thisArg, new XMLBuilderImpl(result[0]),  result[1], result[2])
+      result = this._getNextDescendantNode(this._domNode, result[0], recursive, result[1], result[2])
     }
 
     return this
   }
 
   /** @inheritdoc */
-  map<T>(callback: ((node: XMLBuilder, index: number) => T), self = false,
+  map<T>(callback: ((node: XMLBuilder, index: number, level: number) => T), self = false,
     recursive = false, thisArg?: any): T[] {
     let result: T[] = []
-    this.each((node, index) =>
-      result.push(callback.call(thisArg, node, index)),
+    this.each((node, index, level) =>
+      result.push(callback.call(thisArg, node, index, level)),
       self, recursive
     )
     return result
   }
 
   /** @inheritdoc */
-  reduce<T>(callback: ((value: T, node: XMLBuilder, index: number) => T),
+  reduce<T>(callback: ((value: T, node: XMLBuilder, index: number, level: number) => T),
     initialValue: T, self = false, recursive = false, thisArg?: any): T {
     let value = initialValue
-    this.each((node, index) =>
-      value = callback.call(thisArg, value, node, index),
+    this.each((node, index, level) =>
+      value = callback.call(thisArg, value, node, index, level),
       self, recursive
     )
     return value
   }
 
   /** @inheritdoc */
-  find(predicate: ((node: XMLBuilder, index: number) => boolean), self = false,
+  find(predicate: ((node: XMLBuilder, index: number, level: number) => boolean), self = false,
     recursive = false, thisArg?: any): XMLBuilder | undefined {
-    let node = this._getFirstDescendantNode(this._domNode, self, recursive)
-    let index = 0
-    while (node) {
-      const builder = new XMLBuilderImpl(node)
-      if (predicate.call(thisArg, builder, index++)) {
+    let result = this._getFirstDescendantNode(this._domNode, self, recursive)
+    while (result[0]) {
+      const builder = new XMLBuilderImpl(result[0])
+      if (predicate.call(thisArg, builder,  result[1], result[2])) {
         return builder
       }
-      node = this._getNextDescendantNode(this._domNode, node, recursive)
+      result = this._getNextDescendantNode(this._domNode, result[0], recursive, result[1], result[2])
     }
     return undefined
   }
 
   /** @inheritdoc */
-  filter(predicate: ((node: XMLBuilder, index: number) => boolean), self = false,
+  filter(predicate: ((node: XMLBuilder, index: number, level: number) => boolean), self = false,
     recursive = false, thisArg?: any): XMLBuilder[] {
     let result: XMLBuilder[] = []
-    this.each((node, index) => {
-      if (predicate.call(thisArg, node, index)) {
+    this.each((node, index, level) => {
+      if (predicate.call(thisArg, node, index, level)) {
         result.push(node)
       }
     }, self, recursive)
@@ -538,31 +536,29 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  every(predicate: ((node: XMLBuilder, index: number) => boolean), self = false,
+  every(predicate: ((node: XMLBuilder, index: number, level: number) => boolean), self = false,
     recursive = false, thisArg?: any): boolean {
-    let node = this._getFirstDescendantNode(this._domNode, self, recursive)
-    let index = 0
-    while (node) {
-      const builder = new XMLBuilderImpl(node)
-      if (!predicate.call(thisArg, builder, index++)) {
+    let result = this._getFirstDescendantNode(this._domNode, self, recursive)
+    while (result[0]) {
+      const builder = new XMLBuilderImpl(result[0])
+      if (!predicate.call(thisArg, builder, result[1], result[2])) {
         return false
       }
-      node = this._getNextDescendantNode(this._domNode, node, recursive)
+      result = this._getNextDescendantNode(this._domNode, result[0], recursive, result[1], result[2])
     }
     return true
   }
 
   /** @inheritdoc */
-  some(predicate: ((node: XMLBuilder, index: number) => boolean), self = false,
+  some(predicate: ((node: XMLBuilder, index: number, level: number) => boolean), self = false,
     recursive = false, thisArg?: any): boolean {
-    let node = this._getFirstDescendantNode(this._domNode, self, recursive)
-    let index = 0
-    while (node) {
-      const builder = new XMLBuilderImpl(node)
-      if (predicate.call(thisArg, builder, index++)) {
+    let result = this._getFirstDescendantNode(this._domNode, self, recursive)
+    while (result[0]) {
+      const builder = new XMLBuilderImpl(result[0])
+      if (predicate.call(thisArg, builder, result[1], result[2])) {
         return true
       }
-      node = this._getNextDescendantNode(this._domNode, node, recursive)
+      result = this._getNextDescendantNode(this._domNode, result[0], recursive, result[1], result[2])
     }
     return false
   }
@@ -570,7 +566,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   toArray(self = false, recursive = false): XMLBuilder[] {
     let result: XMLBuilder[] = []
-    this.each((node, ) => result.push(node), self, recursive)
+    this.each(node => result.push(node), self, recursive)
     return result
   }
 
@@ -606,55 +602,60 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /**
    * Gets the next descendant of the given node of the tree rooted at `root`
-   * in depth-first pre-order.
+   * in depth-first pre-order. Returns a three-tuple with
+   * [descendant, descendant_index, descendant_level].
    * 
    * @param root - root node of the tree
    * @param self - whether to visit the current node along with child nodes
    * @param recursive - whether to visit all descendant nodes in tree-order or
    * only the immediate child nodes
    */
-  private _getFirstDescendantNode(root: Node, self: boolean, recursive: boolean): Node | null {
+  private _getFirstDescendantNode(root: Node, self: boolean, recursive: boolean): [Node | null, number, number] {
     if (self)
-      return this._domNode
+      return [this._domNode, 0, 0]
     else if (recursive)
-      return this._getNextDescendantNode(root, root, recursive)
+      return this._getNextDescendantNode(root, root, recursive, 0, 0)
     else
-      return this._domNode.firstChild
+      return [this._domNode.firstChild, 0, 1]
   }
 
   /**
    * Gets the next descendant of the given node of the tree rooted at `root`
-   * in depth-first pre-order.
+   * in depth-first pre-order. Returns a three-tuple with
+   * [descendant, descendant_index, descendant_level].
    * 
    * @param root - root node of the tree
    * @param node - current node
    * @param recursive - whether to visit all descendant nodes in tree-order or
    * only the immediate child nodes
+   * @param index - child node index
+   * @param level - current depth of the XML tree
    */
-  private _getNextDescendantNode(root: Node, node: Node, recursive: boolean): Node | null {
+  private _getNextDescendantNode(root: Node, node: Node, recursive: boolean, index: number, level: number): [Node | null, number, number] {
     if (recursive) {
       // traverse child nodes
-      if (node.firstChild) return node.firstChild
+      if (node.firstChild) return [node.firstChild, 0, level + 1]
 
-      if (node === root) return null
+      if (node === root) return [null, -1, -1]
 
       // traverse siblings
-      if (node.nextSibling) return node.nextSibling
+      if (node.nextSibling) return [node.nextSibling, index + 1, level]
 
       // traverse parent's next sibling
       let parent = node.parentNode
       while (parent && parent !== root) {
-        if (parent.nextSibling) return parent.nextSibling
+        if (parent.nextSibling) return [parent.nextSibling, tree_index(parent.nextSibling), level - 1]
         parent = parent.parentNode
+        level--
       }
     } else {
       if (root === node)
-        return node.firstChild
+        return [node.firstChild, 0, level + 1]
       else
-        return node.nextSibling
+        return [node.nextSibling, index + 1, level]
     }
 
-    return null
+    return [null, -1, -1]
   }
 
   /**
