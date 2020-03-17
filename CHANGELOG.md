@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [1.5.0] - 2020-03-17
+
+- Added JS object and XML string parser to callback API functions.
+- Fixed collection functions to return child node indices not descendant node indices.
+- Added tree depth to collection function callbacks.
+
 ## [1.4.3] - 2020-03-03
 
 - `keepNullNodes` and `keepNullAttributes` flags now properly keep `null` 
@@ -51,13 +57,14 @@ Without these flags, `null` **and** `undefined` will be silently skipped.
 
 - Initial release
 
-[1.4.3]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.2...v1.4.3
-[1.4.2]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.1...v1.4.2
-[1.4.1]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.0...v1.4.1
-[1.4.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.3.0...v1.4.0
-[1.3.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.2.1...v1.3.0
-[1.2.1]: https://github.com/oozcitak/xmlbuilder2/compare/v1.2.0...v1.2.1
-[1.2.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.1.2...v1.2.0
-[1.1.2]: https://github.com/oozcitak/xmlbuilder2/compare/v1.1.1...v1.1.2
-[1.1.1]: https://github.com/oozcitak/xmlbuilder2/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.0.0...v1.1.0
+[1.1.1]: https://github.com/oozcitak/xmlbuilder2/compare/v1.1.0...v1.1.1
+[1.1.2]: https://github.com/oozcitak/xmlbuilder2/compare/v1.1.1...v1.1.2
+[1.2.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.1.2...v1.2.0
+[1.2.1]: https://github.com/oozcitak/xmlbuilder2/compare/v1.2.0...v1.2.1
+[1.3.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.2.1...v1.3.0
+[1.4.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.3.0...v1.4.0
+[1.4.1]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.0...v1.4.1
+[1.4.2]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.1...v1.4.2
+[1.4.3]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.2...v1.4.3
+[1.5.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.3...v1.5.0
