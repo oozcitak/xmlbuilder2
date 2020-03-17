@@ -120,4 +120,9 @@ describe('object', () => {
     `, done)
   })
 
+  test('error if no nodes created', (done) => {
+    const xmlStream = $$.createCB()
+    $$.expectCBError(xmlStream, () => xmlStream.ele({}).end(), done)
+  })
+  
 })

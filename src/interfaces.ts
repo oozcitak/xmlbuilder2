@@ -992,49 +992,67 @@ export type XMLBuilderCBOptions = {
   /**
    * A callback function which is called when an error occurs.
    */
-  error?: ((err: Error) => void)
+  error: ((err: Error) => void)
+
+  /**
+   * Whether nodes with `null` values will be kept or ignored
+   */
+  keepNullNodes: boolean
+  /**
+   * Whether attributes with `null` values will be kept or ignored
+   */
+  keepNullAttributes: boolean
+  /** 
+   * Whether converter strings will be ignored when converting JS 
+   * objects to nodes
+   */
+  ignoreConverters: boolean
+  /** 
+   * Defines string keys used while converting JS objects to nodes.
+   */
+  convert: ConvertOptions
 
   /**
    * Defines default namespaces to apply to all elements and attributes.
    */
-  defaultNamespace?: {
+  defaultNamespace: {
     ele?: null | string,
     att?: null | string
   }
   /**
    * Defines namespace aliases.
    */
-  namespaceAlias?: { [key: string]: string | null }
+  namespaceAlias: { [key: string]: string | null }
 
   /**
    * Ensures that the document adheres to the syntax rules specified by the
    * XML specification. If this flag is set and the document is not well-formed
    * errors will be thrown. Defaults to `false`.
    */
-  wellFormed?: boolean
+  wellFormed: boolean
   /**
    * Pretty-prints the XML tree. Defaults to `false`.
    */
-  prettyPrint?: boolean
+  prettyPrint: boolean
   /**
    * Determines the indentation string for pretty printing. Defaults to two
    * space characters.
    */
-  indent?: string
+  indent: string
   /**
    * Determines the newline string for pretty printing. Defaults to `"\n"`.
    */
-  newline?: string
+  newline: string
   /**
    * Defines a fixed number of indentations to add to every line. Defaults to 
    * `0`.
    */
-  offset?: number
+  offset: number
   /**
    * Wraps attributes to the next line if the column width exceeds the given
    * value. Defaults to `0` which disables attribute wrapping.
    */
-  width?: number
+  width: number
   /**
    * Produces closing tags for empty element nodes. Defaults to `false`. With
    * this option set to `true`, closing tags will be produced for element nodes
@@ -1047,7 +1065,7 @@ export type XMLBuilderCBOptions = {
    * <node/>
    * ```
    */
-  allowEmptyTags?: boolean
+  allowEmptyTags: boolean
   /**
    * Inserts a space character before the slash character of self-closing tags. 
    * Defaults to `false`. With this options set to `true`, a space character 
@@ -1056,7 +1074,17 @@ export type XMLBuilderCBOptions = {
    * <node />
    * ```
    */
-  spaceBeforeSlash?: boolean
+  spaceBeforeSlash: boolean
+}
+
+/**
+ * Defines the options passed to the callback builder.
+ */
+export interface XMLBuilderCBCreateOptions extends RecursivePartial<XMLBuilderCBOptions> { 
+  /** @inheritdoc */
+  data: ((chunk: string, level: number) => void)
+  /** @inheritdoc */
+  end: (() => void)
 }
 
 /**
@@ -1072,6 +1100,16 @@ export const DefaultXMLBuilderCBOptions: Partial<XMLBuilderCBOptions> = {
   width: 0,
   allowEmptyTags: false,
   spaceBeforeSlash: false,
+  keepNullNodes: false,
+  keepNullAttributes: false,
+  ignoreConverters: false,
+  convert: {
+    att: "@",
+    ins: "?",
+    text: "#",
+    cdata: "$",
+    comment: "!"
+  },
   defaultNamespace: {
     ele: undefined,
     att: undefined

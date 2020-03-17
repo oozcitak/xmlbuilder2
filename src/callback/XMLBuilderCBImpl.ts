@@ -1,7 +1,7 @@
 import {
   XMLBuilderCB, AttributesObject, PIObject, DTDOptions, XMLBuilder,
   XMLBuilderCBOptions, XMLBuilderCreateOptions, DefaultXMLBuilderCBOptions,
-  ExpandObject
+  ExpandObject, XMLBuilderCBCreateOptions, XMLBuilderOptions
 } from "../interfaces"
 import { applyDefaults, isString, isObject } from "@oozcitak/util"
 import { fragment, create } from ".."
@@ -11,7 +11,7 @@ import {
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { NamespacePrefixMap } from "@oozcitak/dom/lib/serializer/NamespacePrefixMap"
 import {
-  Comment, Text, ProcessingInstruction, CDATASection, DocumentType, Element
+  Comment, Text, ProcessingInstruction, CDATASection, DocumentType, Element, Node
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { LocalNameSet } from "@oozcitak/dom/lib/serializer/LocalNameSet"
 import { Guard } from "@oozcitak/dom/lib/util"
@@ -63,7 +63,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
    * 
    * @returns XML stream
    */
-  public constructor(options: XMLBuilderCBOptions, fragment = false) {
+  public constructor(options: XMLBuilderCBCreateOptions, fragment = false) {
     this._fragment = fragment
 
     // provide default options
@@ -92,42 +92,17 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
 
     // parse if JS object or XML or JSON string
     if (isObject(p1) || (isString(p1) && (/^\s*</.test(p1) || /^\s*[\{\[]/.test(p1)))) {
-      let currentLevel = -1
-      fragment(p1).each((child, index, level) => {
-        if (currentLevel > level) {
-          while (currentLevel-- > level) {
-            this.up()
-          }
-        }
-        currentLevel = level
+      const frag = fragment().set(this._options as unknown as Partial<XMLBuilderOptions>)
+      try {
+        frag.ele(p1 as any)
+      } catch (err) {
+        this._onError.call(this, err)
+        return this
+      }
 
-        const node = child.node
-        if (Guard.isElementNode(node)) {
-          const name = node.prefix ? node.prefix + ":" + node.localName : node.localName
-          if (node.namespaceURI !== null) {
-            this.ele(node.namespaceURI, name)
-          } else {
-            this.ele(name)
-          }
-          for (const attr of node.attributes) {
-            const name = attr.prefix ? attr.prefix + ":" + attr.localName : attr.localName
-            if (attr.namespaceURI !== null) {
-              this.att(attr.namespaceURI, name, attr.value)
-            } else {
-              this.att(name, attr.value)
-            }
-          }
-        } else if (Guard.isExclusiveTextNode(node)) {
-          this.txt(node.data)
-        } else if (Guard.isCommentNode(node)) {
-          this.com(node.data)
-        } else if (Guard.isCDATASectionNode(node)) {
-          this.dat(node.data)
-        } else if (Guard.isProcessingInstructionNode(node)) {
-          this.ins(node.target, node.data)
-        }
-      }, false, true)
-
+      for (const node of frag.node.childNodes) {
+        this._fromNode(node)
+      }
       return this
     }
 
@@ -582,6 +557,42 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       return ""
     } else {
       return this._options.indent.repeat(level)
+    }
+  }
+
+  /**
+   * Reads and serializes an XML tree.
+   * 
+   * @param node - root node
+   */
+  private _fromNode(node: Node) {
+    if (Guard.isElementNode(node)) {
+      const name = node.prefix ? node.prefix + ":" + node.localName : node.localName
+      if (node.namespaceURI !== null) {
+        this.ele(node.namespaceURI, name)
+      } else {
+        this.ele(name)
+      }
+      for (const attr of node.attributes) {
+        const name = attr.prefix ? attr.prefix + ":" + attr.localName : attr.localName
+        if (attr.namespaceURI !== null) {
+          this.att(attr.namespaceURI, name, attr.value)
+        } else {
+          this.att(name, attr.value)
+        }
+      }
+      for (const child of node.childNodes) {
+        this._fromNode(child)
+      }
+      this.up()
+    } else if (Guard.isExclusiveTextNode(node) && node.data) {
+      this.txt(node.data)
+    } else if (Guard.isCommentNode(node)) {
+      this.com(node.data)
+    } else if (Guard.isCDATASectionNode(node)) {
+      this.dat(node.data)
+    } else if (Guard.isProcessingInstructionNode(node)) {
+      this.ins(node.target, node.data)
     }
   }
 

@@ -113,4 +113,92 @@ describe('XMLStream options', () => {
       </test>`, done)
   })
 
+  test('skip null and undefined att values', (done) => {
+    const xmlStream = $$.createCB({ prettyPrint: true })
+    xmlStream.ele({
+      root: {
+        node1: {
+          '@att': 'val',
+          '@att1': 'val1',
+          '@att2': null,
+          '@att3': undefined
+        }
+      }
+    }).end()
+
+    $$.expectCBResult(xmlStream, $$.t`
+      <root>
+        <node1 att="val" att1="val1"/>
+      </root>`, done)
+  })
+
+  test('keep null att value with keepNullAttributes flag', (done) => {
+    const xmlStream = $$.createCB({ prettyPrint: true, keepNullAttributes: true })
+    xmlStream.ele({
+      root: {
+        node1: {
+          '@att': 'val',
+          '@att1': 'val1',
+          '@att2': null,
+          '@att3': undefined
+        }
+      }
+    }).end()
+
+    $$.expectCBResult(xmlStream, $$.t`
+      <root>
+        <node1 att="val" att1="val1" att2="" att3=""/>
+      </root>`, done)
+  })
+
+  test('skip null and undefined node value', (done) => {
+    const xmlStream = $$.createCB({ prettyPrint: true })
+    xmlStream.ele({
+      root: {
+        node1: '',
+        node2: {},
+        node3: null,
+        node4: undefined
+      }
+    }).end()
+
+    $$.expectCBResult(xmlStream, $$.t`
+      <root>
+        <node1/>
+        <node2/>
+      </root>`, done)
+  })
+
+  test('keep null node value with keepNullNodes flag', (done) => {
+    const xmlStream = $$.createCB({ prettyPrint: true, keepNullNodes: true })
+    xmlStream.ele({
+      root: {
+        node1: '',
+        node2: {},
+        node3: null,
+        node4: undefined
+      }
+    }).end()
+
+    $$.expectCBResult(xmlStream, $$.t`
+      <root>
+        <node1/>
+        <node2/>
+        <node3/>
+        <node4/>
+      </root>`, done)
+  })
+
+  test('custom converter', (done) => {
+    const obj = {
+      'root': {
+        '_att': 'val',
+        '#': '42'
+      }
+    }
+    const xmlStream = $$.createCB({ convert: { att: '_' } })
+    xmlStream.ele(obj).end()
+    $$.expectCBResult(xmlStream, '<root att="val">42</root>', done)
+  })
+
 })

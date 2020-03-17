@@ -2,7 +2,7 @@ import {
   XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions,
   XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions,
   DocumentWithSettings, XMLBuilderOptionKeys, XMLBuilderCB,
-  XMLBuilderCBOptions
+  XMLBuilderCBCreateOptions
 } from './interfaces'
 import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
@@ -320,7 +320,7 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
  * 
  * @returns callback builder
  */
-export function createCB(options: XMLBuilderCBOptions): XMLBuilderCB {
+export function createCB(options: XMLBuilderCBCreateOptions): XMLBuilderCB {
   return new XMLBuilderCBImpl(options)
 }
 
@@ -331,7 +331,7 @@ export function createCB(options: XMLBuilderCBOptions): XMLBuilderCB {
  * 
  * @returns callback builder
  */
-export function fragmentCB(options: XMLBuilderCBOptions): XMLBuilderCB {
+export function fragmentCB(options: XMLBuilderCBCreateOptions): XMLBuilderCB {
   return new XMLBuilderCBImpl(options, true)
 }
 

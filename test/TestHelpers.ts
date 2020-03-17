@@ -3,7 +3,7 @@ import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { isObject, isArray, isMap, forEachObject, objectLength, forEachArray } from "@oozcitak/util"
 import { builder, create, fragment, convert, createCB, fragmentCB } from "../src"
-import { XMLBuilderCB, XMLBuilderCBOptions } from "../src/interfaces"
+import { XMLBuilderCB, XMLBuilderCBOptions, XMLBuilderCBCreateOptions } from "../src/interfaces"
 
 export default class TestHelpers {
   static builder = builder
@@ -16,13 +16,13 @@ export default class TestHelpers {
     return s.serializeToString(node)
   }
 
-  static createCB(options?: Partial<XMLBuilderCBOptions>): XMLBuilderCB {
+  static createCB(options?: Partial<XMLBuilderCBCreateOptions>): XMLBuilderCB {
     options = options || {}
-    options.data = options.data || (function (this: XMLBuilderCB, chunk) {
+    options.data = options.data || (function (this: XMLBuilderCB, chunk: string) {
       (this as any).result += chunk
     })
     options.end = options.end || (() => { })
-    options.error = options.error || (function (this: XMLBuilderCB, err) {
+    options.error = options.error || (function (this: XMLBuilderCB, err: Error) {
       str.error = err
     })
     const str = createCB(options as XMLBuilderCBOptions) as any
@@ -31,13 +31,13 @@ export default class TestHelpers {
     return str
   }
 
-  static fragmentCB(options?: Partial<XMLBuilderCBOptions>): XMLBuilderCB {
+  static fragmentCB(options?: Partial<XMLBuilderCBCreateOptions>): XMLBuilderCB {
     options = options || {}
-    options.data = options.data || (function (this: XMLBuilderCB, chunk) {
+    options.data = options.data || (function (this: XMLBuilderCB, chunk: string) {
       (this as any).result += chunk
     })
     options.end = options.end || (() => { })
-    options.error = options.error || (function (this: XMLBuilderCB, err) {
+    options.error = options.error || (function (this: XMLBuilderCB, err: Error) {
       str.error = err
     })
     const str = fragmentCB(options as XMLBuilderCBOptions) as any
