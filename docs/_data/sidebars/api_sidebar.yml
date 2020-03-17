@@ -156,3 +156,29 @@ entries:
     - title: fragmentCB
       url: /builder-functions-with-callbacks.html#fragmentCB
       output: web
+    - separator: true
+      output: web
+    - title: att
+      url: /node-creation-functions-with-callbacks.html#att
+      output: web
+    - title: com
+      url: /node-creation-functions-with-callbacks.html#com
+      output: web
+    - title: dat
+      url: /node-creation-functions-with-callbacks.html#dat
+      output: web
+    - title: dec
+      url: /node-creation-functions-with-callbacks.html#dec
+      output: web
+    - title: dtd
+      url: /node-creation-functions-with-callbacks.html#dtd
+      output: web
+    - title: ele
+      url: /node-creation-functions-with-callbacks.html#ele
+      output: web
+    - title: ins
+      url: /node-creation-functions-with-callbacks.html#ins
+      output: web
+    - title: txt
+      url: /node-creation-functions-with-callbacks.html#txt
+      output: web
