@@ -1,7 +1,7 @@
 import $$ from '../TestHelpers'
 import { Element } from "@oozcitak/dom/lib/dom/interfaces"
 
-describe('StringWriter', () => {
+describe('XMLWriter', () => {
 
   test('basic', () => {
     const obj = {

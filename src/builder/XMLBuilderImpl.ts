@@ -7,7 +7,7 @@ import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
-import { StringWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
+import { XMLWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
 import { Document, Node, Element } from "@oozcitak/dom/lib/dom/interfaces"
 import { createParser, throwIfParserError } from "./dom"
 import { Guard } from "@oozcitak/dom/lib/util"
@@ -665,7 +665,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    */
   private _serialize(writerOptions: WriterOptions): XMLSerializedValue {
     if (writerOptions.format === "xml") {
-      const writer = new StringWriter(this._options)
+      const writer = new XMLWriter(this._options)
       return writer.serialize(this.node, writerOptions)
     } else if (writerOptions.format === "map") {
       const writer = new MapWriter(this._options)

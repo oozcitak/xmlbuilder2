@@ -313,7 +313,7 @@ export type ObjectWriterOptions = BaseWriterOptions & {
 /**
  * Defines the options passed to the object writer.
  */
-export type StringWriterOptions = BaseWriterOptions & {
+export type XMLWriterOptions = BaseWriterOptions & {
   /** @inheritdoc */
   format?: "xml"
   /**
@@ -417,7 +417,7 @@ export type JSONWriterOptions = BaseWriterOptions & {
 /**
  * Defines the options passed to the writer.
  */
-export type WriterOptions = StringWriterOptions | ObjectWriterOptions |
+export type WriterOptions = XMLWriterOptions | ObjectWriterOptions |
   JSONWriterOptions | MapWriterOptions
 
 /**
@@ -813,7 +813,7 @@ export interface XMLBuilder {
    * 
    * @param options - serialization options
    */
-  toString(writerOptions?: JSONWriterOptions | StringWriterOptions): string
+  toString(writerOptions?: JSONWriterOptions | XMLWriterOptions): string
 
   /**
    * Converts the node into its object representation.

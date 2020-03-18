@@ -1,4 +1,4 @@
-import { StringWriterOptions } from "../interfaces"
+import { XMLWriterOptions } from "../interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { BaseWriter } from "./BaseWriter"
@@ -7,9 +7,9 @@ import { Guard } from "@oozcitak/dom/lib/util"
 /**
  * Serializes XML nodes into strings.
  */
-export class StringWriter extends BaseWriter<StringWriterOptions> {
+export class XMLWriter extends BaseWriter<XMLWriterOptions> {
 
-  protected _options!: Required<StringWriterOptions>
+  protected _options!: Required<XMLWriterOptions>
   private _refs!: StringWriterRefs
   private _indentation: { [key: number]: string } = {}
   private _lengthToLastNewline = 0
@@ -20,7 +20,7 @@ export class StringWriter extends BaseWriter<StringWriterOptions> {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: Node, writerOptions?: StringWriterOptions): string {
+  serialize(node: Node, writerOptions?: XMLWriterOptions): string {
     // provide default options
     this._options = applyDefaults(writerOptions, {
       wellFormed: false,
@@ -33,7 +33,7 @@ export class StringWriter extends BaseWriter<StringWriterOptions> {
       allowEmptyTags: false,
       indentTextOnlyNodes: false,
       spaceBeforeSlash: false
-    }) as Required<StringWriterOptions>
+    }) as Required<XMLWriterOptions>
 
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
 

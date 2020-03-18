@@ -1,4 +1,4 @@
 export { MapWriter } from './MapWriter'
-export { StringWriter } from './StringWriter'
+export { XMLWriter } from './XMLWriter'
 export { ObjectWriter } from './ObjectWriter'
 export { JSONWriter } from './JSONWriter'
