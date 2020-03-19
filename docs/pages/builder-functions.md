@@ -27,14 +27,14 @@ Creates a new XML document by parsing the `contents` argument with the given `op
 ```js
 const { create } = require('xmlbuilder2');
 
-const doc = create({ encoding: "UTF-8" }, '<ሥር><ኤለመንት/></ሥር>');
+const doc = create({ encoding: "UTF-8" }, '<root><node/></root>');
 console.log(doc.end({ prettyPrint: true }));
 ```
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<ሥር>
-  <ኤለመንት/>
-</ሥር>
+<root>
+  <node/>
+</root>
 ```
 
 </details>
@@ -50,7 +50,7 @@ Creates an empty XML document with the given `options` and returns the document 
 ```js
 const { create } = require('xmlbuilder2');
 
-const doc = create({ encoding: "UTF-8" });
+const doc = create({ encoding: 'UTF-8' });
 console.log(doc.end({ prettyPrint: true }));
 ```
 ```xml
@@ -119,13 +119,12 @@ Creates a new document fragment by parsing the `contents` argument with the give
 ```js
 const { fragment } = require('xmlbuilder2');
 
-const frag = fragment({ encoding: "UTF-8" }, '<ሥር><ኤለመንት/></ሥር>');
-console.log(frag.end({ prettyPrint: true }));
+const frag = fragment({ encoding: 'UTF-8' }, '<node/><node>text</node>');
+console.log(frag.toString({ prettyPrint: true }));
 ```
 ```xml
-<ሥር>
-  <ኤለመንት/>
-</ሥር>
+<node/>
+<node>text</node>
 ```
 
 </details>
@@ -141,12 +140,12 @@ Creates an empty document fragment with the given `options` and returns the docu
 ```js
 const { fragment } = require('xmlbuilder2');
 
-const frag = fragment({ encoding: "UTF-8" });
-frag.ele('ኤለመንት');
-console.log(frag.end({ prettyPrint: true }));
+const frag = fragment({ encoding: 'UTF-8' });
+frag.ele('node');
+console.log(frag.toString({ prettyPrint: true }));
 ```
 ```xml
-<ኤለመንት/>
+<node/>
 ```
 
 </details>
@@ -163,7 +162,7 @@ Creates a new document fragment by parsing the `contents` argument with the defa
 const { fragment } = require('xmlbuilder2');
 
 const frag = fragment('<foo>foo</foo><foo>foobar</foo><bar/>');
-console.log(frag.end({ prettyPrint: true }));
+console.log(frag.toString({ prettyPrint: true }));
 ```
 ```xml
 <foo>foo</foo>
@@ -184,7 +183,7 @@ const { fragment } = require('xmlbuilder2');
 
 const frag = fragment();
 frag.ele('node');
-console.log(frag.end({ prettyPrint: true }));
+console.log(frag.toString({ prettyPrint: true }));
 ```
 ```xml
 <node/>
@@ -215,7 +214,7 @@ Converts an XML document by parsing the `contents` argument with the given
 ```js
 const { convert } = require('xmlbuilder2');
 
-const obj = convert({ encoding: "UTF-8" }, '<root><node/></root>', { format: "object" });
+const obj = convert({ encoding: 'UTF-8' }, '<root><node/></root>', { format: 'object' });
 console.log(obj);
 ```
 ```js
@@ -239,7 +238,7 @@ builder options and returns the result formatted with the given `convertOptions`
 ```js
 const { convert } = require('xmlbuilder2');
 
-const obj = convert('<root><node/></root>', { format: "object" });
+const obj = convert('<root><node/></root>', { format: 'object' });
 console.log(obj);
 ```
 ```js
@@ -256,7 +255,7 @@ console.log(obj);
 
 Converts an XML document into the default output format by parsing the `contents` 
 argument with the given `builderOptions` and returns the result.
-The default output format is `"xml"` which returns an XML document string.
+The default output format is `'xml'` which returns an XML document string.
 
 * `builderOptions` - builder options
 * `contents` - a string containing an XML document in either XML or JSON format or a JS object representing nodes to insert
@@ -264,7 +263,7 @@ The default output format is `"xml"` which returns an XML document string.
 ```js
 const { convert } = require('xmlbuilder2');
 
-const xml = convert({ encoding: "UTF-8" }, { root: { node: { } });
+const xml = convert({ encoding: 'UTF-8' }, { root: { node: { } });
 console.log(xml);
 ```
 ```xml
@@ -279,7 +278,7 @@ console.log(xml);
 
 Converts an XML document into the default output format by parsing the `contents` 
 argument with the default builder options and returns the result.
-The default output format is `"xml"` which returns an XML document string.
+The default output format is `'xml'` which returns an XML document string.
 
 * `contents` - a string containing an XML document in either XML or JSON format or a JS object representing nodes to insert
 
@@ -312,10 +311,10 @@ Wraps an existing DOM node with the given `options` and returns a builder object
 ```js
 const { builder } = require('xmlbuilder2');
 
-const node = document.createElement("node");
+const node = document.createElement('node');
 
-const xml = builder({ version: "1.0" }, node)
-  .ele("child")
+const xml = builder({ version: '1.0' }, node)
+  .ele('child')
   .end({ prettyPrint: true });
 
 console.log(xml);
@@ -339,10 +338,10 @@ Wraps an existing DOM node with the default options and returns a builder object
 ```js
 const { builder } = require('xmlbuilder2');
 
-const node = document.createElement("node");
+const node = document.createElement('node');
 
 const xml = builder(node)
-  .ele("child")
+  .ele('child')
   .end({ prettyPrint: true });
 
 console.log(xml);

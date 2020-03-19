@@ -34,7 +34,7 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root").att("http://example.com/ns1", "att", "val").end();
+xmlBuilder.ele('root').att('http://example.com/ns1', 'att', 'val').end();
 ```
 ```xml
 <root xmlns:ns1="http://example.com/ns1" ns1:att="val"/>
@@ -61,7 +61,7 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root").att("att", "val").end();
+xmlBuilder.ele('root').att('att', 'val').end();
 ```
 ```xml
 <root att="val"/>
@@ -86,7 +86,7 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root").att({ "att1": "val1", "att2": "val2" }).end();
+xmlBuilder.ele('root').att({ 'att1': 'val1', 'att2': 'val2' }).end();
 ```
 ```xml
 <root att1="val1" att2="val2"/>
@@ -115,7 +115,7 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root").com("val").end();
+xmlBuilder.ele('root').com('val').end();
 ```
 ```xml
 <root>
@@ -146,7 +146,7 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root").dat("val").end();
+xmlBuilder.ele('root').dat('val').end();
 ```
 ```xml
 <root>
@@ -167,8 +167,8 @@ Creates and serializes the XML declaration.
 <br/>
 
 * `options` - declaration options
-  * `version` - a version number string. Defaults to `"1.0"` if omitted.
-  * `encoding` - Encoding declaration, e.g. `"UTF-8"`. No encoding declaration will be produced if omitted.
+  * `version` - a version number string. Defaults to `'1.0'` if omitted.
+  * `encoding` - Encoding declaration, e.g. `'UTF-8'`. No encoding declaration will be produced if omitted.
   * `standalone` - standalone document declaration: `true` or `false`. No standalone document declaration will be produced if omitted.
 
 ```js
@@ -180,8 +180,8 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.dec({ "encoding": "UTF-8", standalone: true })
-  .ele("root").end();
+xmlBuilder.dec({ 'encoding': 'UTF-8', standalone: true })
+  .ele('root').end();
 ```
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -217,11 +217,11 @@ const xmlBuilder = createCB({
 });
 
 xmlBuilder.dtd({ 
-    name: "HTML",
-    pubID: "-//W3C//DTD HTML 4.01//EN",
-    sysID: "http://www.w3.org/TR/html4/strict.dtd"}
+    name: 'HTML',
+    pubID: '-//W3C//DTD HTML 4.01//EN',
+    sysID: 'http://www.w3.org/TR/html4/strict.dtd'}
   )
-  .ele("HTML").end();
+  .ele('HTML').end();
 ```
 ```xml
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -256,8 +256,8 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root")
-  .ele("http://example.com/ns1", "child", { "att": "val" }).up()
+xmlBuilder.ele('root')
+  .ele('http://example.com/ns1', 'child', { 'att': 'val' }).up()
   .end();
 ```
 ```xml
@@ -286,8 +286,8 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root")
-  .ele("child", { "att": "val" }).up()
+xmlBuilder.ele('root')
+  .ele('child', { 'att': 'val' }).up()
   .end();
 ```
 ```xml
@@ -317,12 +317,12 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root")
+xmlBuilder.ele('root')
   .ele({
     foo: {
-       bar: "foobar"
+       bar: 'foobar'
     },
-    baz: ""
+    baz: ''
   }).end();
 ```
 ```xml
@@ -347,8 +347,8 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root")
-  .ele("<foo><bar>foobar</bar></foo>")
+xmlBuilder.ele('root')
+  .ele('<foo><bar>foobar</bar></foo>')
   .end();
 ```
 ```xml
@@ -386,7 +386,7 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root").ins('bar', 'version="13.0"').end();
+xmlBuilder.ele('root').ins('bar', 'version="13.0"').end();
 ```
 ```xml
 <root>
@@ -413,7 +413,7 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root").ins({ bar: 'version="13.0"', baz: 'public=true' }).end();
+xmlBuilder.ele('root').ins({ bar: 'version="13.0"', baz: 'public=true' }).end();
 ```
 ```xml
 <root>
@@ -441,7 +441,7 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root").ins(['bar version="13.0"', 'bar public=true']).end();
+xmlBuilder.ele('root').ins(['bar version="13.0"', 'bar public=true']).end();
 ```
 ```xml
 <root>
@@ -473,7 +473,7 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root").txt("val").end();
+xmlBuilder.ele('root').txt('val').end();
 ```
 ```xml
 <root>

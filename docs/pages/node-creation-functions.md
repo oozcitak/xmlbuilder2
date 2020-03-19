@@ -31,7 +31,7 @@ will be created.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root").att("http://example.com/ns1", "att", "val");
+const root = create().ele('root').att('http://example.com/ns1', 'att', 'val');
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -55,7 +55,7 @@ will be updated, otherwise a new attribute will be created.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root").att("att", "val");
+const root = create().ele('root').att('att', 'val');
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -77,7 +77,7 @@ returns the parent element node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root").att({ "att1": "val1", "att2": "val2" });
+const root = create().ele('root').att({ 'att1': 'val1', 'att2': 'val2' });
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -103,7 +103,7 @@ the parent element node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root").com("val");
+const root = create().ele('root').com('val');
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -131,7 +131,7 @@ the parent element node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root").dat("val");
+const root = create().ele('root').dat('val');
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -154,14 +154,14 @@ Creates or updates the XML declaration and returns the current node.
 <br/>
 
 * `options` - declaration options
-  * `version` - a version number string. Defaults to `"1.0"` if omitted.
-  * `encoding` - Encoding declaration, e.g. `"UTF-8"`. No encoding declaration will be produced if omitted.
+  * `version` - a version number string. Defaults to `'1.0'` if omitted.
+  * `encoding` - Encoding declaration, e.g. `'UTF-8'`. No encoding declaration will be produced if omitted.
   * `standalone` - standalone document declaration: `true` or `false`. No standalone document declaration will be produced if omitted.
 
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root").dec({ "encoding": "UTF-8", standalone: true });
+const root = create().ele('root').dec({ 'encoding': 'UTF-8', standalone: true });
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -192,9 +192,9 @@ Creates a new DocType node and inserts it into the document.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("HTML").dtd({ 
-  pubID: "-//W3C//DTD HTML 4.01//EN",
-  sysID: "http://www.w3.org/TR/html4/strict.dtd"} );
+const root = create().ele('HTML').dtd({ 
+  pubID: '-//W3C//DTD HTML 4.01//EN',
+  sysID: 'http://www.w3.org/TR/html4/strict.dtd'} );
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -232,8 +232,8 @@ attributes and returns it.
 ```js
 const { create } = require('xmlbuilder2');
 
-const child = create().ele("root").ele("http://example.com/ns1", "child", {
-  "att": "val"
+const child = create().ele('root').ele('http://example.com/ns1', 'child', {
+  'att': 'val'
 });
 console.log(child.end({ prettyPrint: true }));
 ```
@@ -259,7 +259,7 @@ it.
 ```js
 const { create } = require('xmlbuilder2');
 
-const child = create().ele("root").ele("child", { "att": "val" });
+const child = create().ele('root').ele('child', { 'att': 'val' });
 console.log(child.end({ prettyPrint: true }));
 ```
 ```xml
@@ -285,11 +285,11 @@ page for details.
 ```js
 const { create } = require('xmlbuilder2');
 
-const baz = create().ele("root").ele({
+const baz = create().ele('root').ele({
   foo: {
-     bar: "foobar"
+     bar: 'foobar'
   },
-  baz: ""
+  baz: ''
 });
 console.log(baz.end({ prettyPrint: true }));
 ```
@@ -306,8 +306,8 @@ console.log(baz.end({ prettyPrint: true }));
 If the `contents` argument contains an XML or JSON string, `ele` parses
 the string and creates new nodes under the current node.
 ```js
-const doc = create().ele("root")
-  .ele("<foo><bar>foobar</bar></foo>")
+const doc = create().ele('root')
+  .ele('<foo><bar>foobar</bar></foo>')
   .doc();
 console.log(doc.end({ prettyPrint: true }));
 ```
@@ -348,10 +348,10 @@ attributes will also be imported. Returns the current element node.
 * `node` - the node to import
 
 ```js
-import { create, fragment } from "xmlbuilder2";
+const { create, fragment } = require('xmlbuilder2');
 
-const root = create().ele("root");
-const frag = fragment().ele("node1").up().ele("node2").up();
+const root = create().ele('root');
+const frag = fragment().ele('node1').up().ele('node2').up();
 root.import(frag);
 console.log(root.end({ prettyPrint: true }));
 ```
@@ -385,7 +385,7 @@ and returns the parent element node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root").ins('bar', 'version="13.0"');
+const root = create().ele('root').ins('bar', 'version="13.0"');
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -409,7 +409,7 @@ and returns the parent element node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root")
+const root = create().ele('root')
   .ins({ bar: 'version="13.0"', baz: 'public=true' });
 console.log(root.end({ prettyPrint: true }));
 ```
@@ -435,7 +435,7 @@ and returns the parent element node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root")
+const root = create().ele('root')
   .ins(['bar version="13.0"', 'bar public=true']);
 console.log(root.end({ prettyPrint: true }));
 ```
@@ -462,7 +462,7 @@ Removes a node from the XML document and returns its parent element node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root").ele("foo").remove();
+const root = create().ele('root').ele('foo').remove();
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -491,10 +491,10 @@ Returns the parent element node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root")
-  .att("http://example.com/ns1", "att", "val");
-  .att({ "att1": "val1", "att2": "val2", "att3": "val3" })
-  .removeAtt("http://example.com/ns1", "att");
+const root = create().ele('root')
+  .att('http://example.com/ns1', 'att', 'val');
+  .att({ 'att1': 'val1', 'att2': 'val2', 'att3': 'val3' })
+  .removeAtt('http://example.com/ns1', 'att');
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -515,9 +515,9 @@ Removes an attribute or a list of attributes and returns the parent element node
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root")
-  .att({ "att1": "val1", "att2": "val2", "att3": "val3" })
-  .removeAtt(["att1", "att3"]);
+const root = create().ele('root')
+  .att({ 'att1': 'val1', 'att2': 'val2', 'att3': 'val3' })
+  .removeAtt(['att1', 'att3']);
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml
@@ -543,7 +543,7 @@ the parent element node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root").txt("val");
+const root = create().ele('root').txt('val');
 console.log(root.end({ prettyPrint: true }));
 ```
 ```xml

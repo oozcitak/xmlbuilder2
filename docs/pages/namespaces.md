@@ -99,14 +99,14 @@ which would result in the following:
 ```js
 const { create } = require('xmlbuilder2');
 
-const svgDoc = create({ defaultNamespace: { ele: "http://www.w3.org/2000/svg", att: null } });
-// all svg elements below will be created in the "http://www.w3.org/2000/svg" namespace
+const svgDoc = create({ defaultNamespace: { ele: 'http://www.w3.org/2000/svg', att: null } });
+// all svg elements below will be created in the 'http://www.w3.org/2000/svg' namespace
 // all attributes will be created with the null namespace
-svgDoc.ele("svg").att("viewBox", "0 0 100 100")
-  .ele("circle").att({ cx: 50, cy: 50, r: 48, fill: "none", stroke: "#000" }).up()
-  .ele("path").att("d", "M50,2a48,48 0 1 1 0,96a24 24 0 1 1 0-48a24 24 0 1 0 0-48").up()
-  .ele("circle").att({ cx: 50, cy: 26, r: 6 }).up()
-  .ele("circle").att({ cx: 50, cy: 74, r: 6, fill: "#FFF" }).up();
+svgDoc.ele('svg').att('viewBox', '0 0 100 100')
+  .ele('circle').att({ cx: 50, cy: 50, r: 48, fill: 'none', stroke: '#000' }).up()
+  .ele('path').att('d', 'M50,2a48,48 0 1 1 0,96a24 24 0 1 1 0-48a24 24 0 1 0 0-48').up()
+  .ele('circle').att({ cx: 50, cy: 26, r: 6 }).up()
+  .ele('circle').att({ cx: 50, cy: 74, r: 6, fill: '#FFF' }).up();
 console.log(svgDoc.end({ prettyPrint: true }));
 ```
 which would result in the following:
@@ -122,36 +122,36 @@ which would result in the following:
 
 ### Namespace Aliases
 
-Namespace aliases can be used instead of actual namespaces by prepending them with the `"@"` character. The following well-known namespaces are built-in and can be used without being declared:
+Namespace aliases can be used instead of actual namespaces by prepending them with the `'@'` character. The following well-known namespaces are built-in and can be used without being declared:
 ```
-html: "http://www.w3.org/1999/xhtml"
-xml: "http://www.w3.org/XML/1998/namespace"
-xmlns: "http://www.w3.org/2000/xmlns/"
-mathml: "http://www.w3.org/1998/Math/MathML"
-svg: "http://www.w3.org/2000/svg"
-xlink: "http://www.w3.org/1999/xlink"
+html: 'http://www.w3.org/1999/xhtml'
+xml: 'http://www.w3.org/XML/1998/namespace'
+xmlns: 'http://www.w3.org/2000/xmlns/'
+mathml: 'http://www.w3.org/1998/Math/MathML'
+svg: 'http://www.w3.org/2000/svg'
+xlink: 'http://www.w3.org/1999/xlink'
 ```
 For example:
 ```js
 const { create } = require('xmlbuilder2');
 
 const ele = create().ele('@xml', 'root').att('@xml', 'att', 'val');
-console.log(ele.toString()); // '<xml:root xml:att="val"/>'
+console.log(ele.toString()); // '<xml:root xml:att='val'/>'
 ```
 Custom aliases can be declared while calling the `create` function:
 ```js
 const { create } = require('xmlbuilder2');
 
-const ele = create({ namespaceAlias: { ns: "ns1" } }).ele('@ns', 'p:root').att('@ns', 'p:att', 'val')
-console.log(ele.toString()); // '<p:root xmlns:p="ns1" p:att="val"/>'
+const ele = create({ namespaceAlias: { ns: 'ns1' } }).ele('@ns', 'p:root').att('@ns', 'p:att', 'val')
+console.log(ele.toString()); // '<p:root xmlns:p='ns1' p:att='val'/>'
 ```
 
-Namespace aliases can also be used while converting JS objects. In that case, element name and alias should be separated by `"@@"`:
+Namespace aliases can also be used while converting JS objects. In that case, element name and alias should be separated by `'@@'`:
 ```js
 const { create } = require('xmlbuilder2');
 
 const ele = create().ele({ 'root@@xml': { '@att@@xml': 'val' }})
-console.log(ele.toString()); // '<xml:root xml:att="val"/>'
+console.log(ele.toString()); // '<xml:root xml:att='val'/>'
 ```
 
 ### Namespace Inheritance
@@ -164,7 +164,7 @@ const ele = create({ inheritNS: true })
   .ele('http:/example.com', 'root')
     .ele('node')
   .up();
-console.log(ele.toString()); // '<root xmlns="http:/example.com"><node/></root>'
+console.log(ele.toString()); // '<root xmlns='http:/example.com'><node/></root>'
 ```
 
 Consider the same example without the `inheritNS` option:
@@ -175,7 +175,7 @@ const ele = create()
   .ele('http:/example.com', 'root')
     .ele('node')
   .up();
-console.log(ele.toString()); // '<root xmlns="http:/example.com"><node xmlns=""/></root>'
+console.log(ele.toString()); // '<root xmlns='http:/example.com'><node xmlns=''/></root>'
 ```
 
 `inheritNS` can be changed on the fly:
@@ -189,5 +189,5 @@ const ele = create()
     .set({ inheritNS: false })
     .ele('node').up()
   .up();
-console.log(ele.toString()); // '<root xmlns="http:/example.com"><node/><node xmlns=""/></root>'
+console.log(ele.toString()); // '<root xmlns='http:/example.com'><node/><node xmlns=''/></root>'
 ```

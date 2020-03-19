@@ -43,9 +43,9 @@ const xmlBuilder = createCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("root")
-  .ele("foo").up()
-  .ele("bar").att("fizz", "buzz").up()
+xmlBuilder.ele('root')
+  .ele('foo').up()
+  .ele('bar').att('fizz', 'buzz').up()
   .end();
 ```
 ```xml
@@ -82,9 +82,9 @@ const xmlBuilder = fragmentCB({
   prettyPrint: true
 });
 
-xmlBuilder.ele("foo").up()
-  .ele("foo").att("fizz", "buzz").up()
-  .ele("foo").up()
+xmlBuilder.ele('foo').up()
+  .ele('foo').att('fizz', 'buzz').up()
+  .ele('foo').up()
   .end();
 ```
 ```xml
@@ -114,11 +114,11 @@ The function will receive the error object as its argument.
 * `keepNullAttributes` - whether attributes with `null` and `undefined` values will be kept or ignored: `true` or `false`. Defaults to `false`, which silently ignores attributes with `null` and `undefined` values. When set to `true`, `null` will be treated as an empty string.
 * `ignoreConverters` - whether converter strings will be ignored when converting JS objects: `true` or `false`. Defaults to `false`.
 * `convert` - an object defining converter strings. Default converter strings are described below.
-  * `att` -  When prepended to a JS object key, converts its key-value pair to an attribute. Defaults to `"@"`.
-  * `ins` - When prepended to a JS object key, converts its value to a processing instruction node. Defaults to `"?"`.
-  * `text` - When prepended to a JS object key, converts its value to a text node. Defaults to `"#"`.
-  * `cdata` - When prepended to a JS object key, converts its value to a CDATA section node. Defaults to `"$"`.
-  * `comment` - When prepended to a JS object key, converts its value to a comment node. Defaults to `"!"`.
+  * `att` -  When prepended to a JS object key, converts its key-value pair to an attribute. Defaults to `'@'`.
+  * `ins` - When prepended to a JS object key, converts its value to a processing instruction node. Defaults to `'?'`.
+  * `text` - When prepended to a JS object key, converts its value to a text node. Defaults to `'#'`.
+  * `cdata` - When prepended to a JS object key, converts its value to a CDATA section node. Defaults to `'$'`.
+  * `comment` - When prepended to a JS object key, converts its value to a comment node. Defaults to `'!'`.
 
 #### Settings related to XML namespaces
 
@@ -129,11 +129,11 @@ The function will receive the error object as its argument.
 
 #### Serialization settings
 
-* `format` - Output format. Either `"xml"` or `"json"`.
+* `format` - Output format. Either `'xml'` or `'json'`.
 * `wellFormed` - Ensures that the document adheres to the syntax rules specified by the XML specification. If this flag is set and the document is not well-formed errors will be thrown. Defaults to `false`.
 * `prettyPrint` - Pretty-prints the XML tree. Defaults to `false`.
 * `indent` - Determines the indentation string for pretty printing. Defaults to two space characters.
-* `newline` - Determines the newline string for pretty printing. Defaults to `"\n"`.
+* `newline` - Determines the newline string for pretty printing. Defaults to `'\n'`.
 * `offset` - Defines a fixed number of indentations to add to every line. Defaults to `0`.
 * `width` - Determines the maximum column width. Defaults to `0`.
 * `allowEmptyTags` - Produces closing tags for empty element nodes. With this option set to `true`, closing tags will be produced for element nodes without child nodes, e.g. `<node></node>`. Otherwise, empty element nodes will be self-closed, e.g. `<node/>`. Defaults to `false`.

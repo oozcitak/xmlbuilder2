@@ -9,10 +9,10 @@ comments: false
 `xmlbuilder2` can convert JS objects into XML nodes. Each key/value pair of a JS object is converted into an element node, where object key becomes the node name and object value becomes the node contents.
 
 ```js
-import { create } from "xmlbuilder";
+const { create } = require('xmlbuilder');
 
 const obj = {
-  root: "text"
+  root: 'text'
 };
 const doc = create().ele(obj);
 console.log(doc.end({ prettyPrint: true }));
@@ -23,12 +23,12 @@ console.log(doc.end({ prettyPrint: true }));
 ```
 If the object value is another JS object, it will be recursively converted into nodes.
 ```js
-import { create } from "xmlbuilder";
+const { create } = require('xmlbuilder');
 
 const obj = {
   root: {
     foo: {
-      bar: "foobar"
+      bar: 'foobar'
     }
   }
 };
@@ -45,14 +45,14 @@ console.log(doc.end({ prettyPrint: true }));
 ```
 If the object value is an array, each array item will be converted into a child node. In that case, name of the child nodes will be the object key.
 ```js
-import { create } from "xmlbuilder";
+const { create } = require('xmlbuilder');
 
 const obj = {
   root: {
     child: [
-      "one",
-      "two",
-      "three"
+      'one',
+      'two',
+      'three'
     ]
   }
 };
@@ -76,7 +76,7 @@ Converter strings can be customized with the `convert` option while initializing
 
 #### att
 
-Converts its key-value pair to an element attribute. Defaults to `"@"`. Multiple attributes can also be grouped under the attribute key.
+Converts its key-value pair to an element attribute. Defaults to `'@'`. Multiple attributes can also be grouped under the attribute key.
 ```js
 obj1 = { pilot: { '@callsign': 'Maverick', '@rank': 'Lieutenant' } }
 obj2 = { pilot: { '@': { 'callsign': 'Maverick', 'rank': 'Lieutenant' } } }
@@ -89,10 +89,10 @@ ___
 
 #### ins
 
-Converts its value to a processing instruction node. Defaults to `"?"`. Instruction target and value should be separated with a single space character.
+Converts its value to a processing instruction node. Defaults to `'?'`. Instruction target and value should be separated with a single space character.
 ```js
 obj = { 
-  '?': 'background classified ref="NAM#123456"',
+  '?': 'background classified ref='NAM#123456'',
   pilot: 'Pete Mitchell'
 }
 ```
@@ -105,7 +105,7 @@ ___
 
 #### text
 
-Converts its value to a text node if it is a string, otherwise expands its value under its parent element node. Defaults to `"#"`.
+Converts its value to a text node if it is a string, otherwise expands its value under its parent element node. Defaults to `'#'`.
 ```js
 obj = { monologue: {
   '#': 'Talk to me Goose!',
@@ -139,7 +139,7 @@ both become:
 {% include note.html content=cb_note markdown=1 %}
 
 {% capture cb_note %}
-  `"#"` also allows mixed content. Example:
+  `'#'` also allows mixed content. Example:
 ```js
 obj1 = { monologue: {
   '#1': 'Talk to me Goose!',
@@ -167,7 +167,7 @@ both become:
 ___
 
 #### cdata
-Converts its value to a CDATA section node. Defaults to `"$"`.
+Converts its value to a CDATA section node. Defaults to `'$'`.
 ```js
 obj = { 
   '$': '<a href="https://topgun.fandom.com/wiki/MiG-28"/>',
@@ -182,7 +182,7 @@ becomes:
 ___
 
 #### comment
-Converts its value to a comment node. Defaults to `"!"`.
+Converts its value to a comment node. Defaults to `'!'`.
 ```js
 obj = {
   '!': 'Fictional; MiGs use odd numbers for fighters.',

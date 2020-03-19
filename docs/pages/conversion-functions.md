@@ -32,11 +32,11 @@ can be called from anywhere in the document.
 const { create } = require('xmlbuilder2');
 
 const doc = create()
-  .ele("root", { "att", "val" })
-    .ele("foo")
-      .ele("bar").txt("foobar")
+  .ele('root', { 'att', 'val' })
+    .ele('foo')
+      .ele('bar').txt('foobar')
     .up()
-    .ele("baz")
+    .ele('baz')
     .doc();
 console.log(doc.end({ prettyPrint: true }));
 ```
@@ -68,11 +68,11 @@ Converts the node into its object representation.
 const { create } = require('xmlbuilder2');
 
 const doc = create()
-  .ele("root", { "att", "val" })
-    .ele("foo")
-      .ele("bar").txt("foobar")
+  .ele('root', { 'att', 'val' })
+    .ele('foo')
+      .ele('bar').txt('foobar')
     .up()
-    .ele("baz")
+    .ele('baz')
     .doc();
 const foo = doc.first().first();
 console.log(foo.toObject());
@@ -80,7 +80,7 @@ console.log(foo.toObject());
 ```js
 { 
   foo: {
-    bar: "foobar"
+    bar: 'foobar'
   }
 }
 ```
@@ -103,11 +103,11 @@ Converts the node into its string representation.
 const { create } = require('xmlbuilder2');
 
 const doc = create()
-  .ele("root", { "att", "val" })
-    .ele("foo")
-      .ele("bar").txt("foobar")
+  .ele('root', { 'att', 'val' })
+    .ele('foo')
+      .ele('bar').txt('foobar')
     .up()
-    .ele("baz")
+    .ele('baz')
     .doc();
 const foo = doc.first().first();
 console.log(foo.toString({ prettyPrint: true }));

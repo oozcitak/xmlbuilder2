@@ -26,13 +26,13 @@ current node.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root");
-root.ele("a").up()
-    .ele("b").up()
-    .ele("c").up();
+const root = create().ele('root');
+root.ele('a').up()
+    .ele('b').up()
+    .ele('c').up();
 const names = [];
 root.each(n => names.push(n.node.nodeName));
-console.log(names); // ["a", "b", "c"]
+console.log(names); // ['a', 'b', 'c']
 ```
 
 </details>
@@ -55,12 +55,12 @@ Produces an array of values by transforming each child node with the given callb
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root");
-root.ele("a").up()
-    .ele("b").up()
-    .ele("c").up();
+const root = create().ele('root');
+root.ele('a').up()
+    .ele('b').up()
+    .ele('c').up();
 const names = root.map(n => n.node.nodeName);
-console.log(names); // ["a", "b", "c"]
+console.log(names); // ['a', 'b', 'c']
 ```
 
 </details>
@@ -84,12 +84,12 @@ Reduces child nodes into a single value by applying the given callback function.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root");
-root.ele("a").up()
-    .ele("b").up()
-    .ele("c").up();
-const names = root.reduce((val, n) => val + n.node.nodeName, "");
-console.log(names); // "abc"
+const root = create().ele('root');
+root.ele('a').up()
+    .ele('b').up()
+    .ele('c').up();
+const names = root.reduce((val, n) => val + n.node.nodeName, '');
+console.log(names); // 'abc'
 ```
 
 </details>
@@ -117,12 +117,12 @@ Returns the first child node satisfying the given predicate, or `undefined` if t
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root");
-root.ele("a").up()
-    .ele("b").up()
-    .ele("c").up();
-const bNode = root.find(n => n.node.nodeName === "b");
-console.log(bNode.node.nodeName); // "b"
+const root = create().ele('root');
+root.ele('a').up()
+    .ele('b').up()
+    .ele('c').up();
+const bNode = root.find(n => n.node.nodeName === 'b');
+console.log(bNode.node.nodeName); // 'b'
 ```
 
 </details>
@@ -145,12 +145,12 @@ Produces an array of child nodes which pass the given predicate test.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root");
-root.ele("node1").up()
-    .txt("text")
-    .ele("node2").up()
-    .txt("more text");
-const textNodes = root.filter(n => n.node.nodeType === 3); // contains "text" and "more text" nodes
+const root = create().ele('root');
+root.ele('node1').up()
+    .txt('text')
+    .ele('node2').up()
+    .txt('more text');
+const textNodes = root.filter(n => n.node.nodeType === 3); // contains 'text' and 'more text' nodes
 ```
 
 </details>
@@ -173,10 +173,10 @@ Returns `true` if all child nodes pass the given predicate test.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root");
-root.ele("node1").up()
-    .ele("node2").up()
-root.every(n => n.node.nodeName.startsWith("n")); // true
+const root = create().ele('root');
+root.ele('node1').up()
+    .ele('node2').up()
+root.every(n => n.node.nodeName.startsWith('n')); // true
 ```
 
 </details>
@@ -204,11 +204,11 @@ Returns `true` if any of the child nodes pass the given predicate test.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root");
-root.ele("node1").up()
-    .ele("child").up()
-    .ele("node2").up()
-root.some(n => n.node.nodeName.startsWith("n")); // true
+const root = create().ele('root');
+root.ele('node1').up()
+    .ele('child').up()
+    .ele('node2').up()
+root.some(n => n.node.nodeName.startsWith('n')); // true
 ```
 
 </details>
@@ -229,10 +229,10 @@ Produces an array of child nodes.
 ```js
 const { create } = require('xmlbuilder2');
 
-const root = create().ele("root");
-root.ele("a").up()
-    .ele("b").up()
-    .ele("c").up()
+const root = create().ele('root');
+root.ele('a').up()
+    .ele('b').up()
+    .ele('c').up()
 const nodes = root.toArray(); // contains nodes a, b and c
 ```
 
