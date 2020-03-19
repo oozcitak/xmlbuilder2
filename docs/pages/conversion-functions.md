@@ -24,7 +24,6 @@ can be called from anywhere in the document.
 
 <details markdown="1">
 <summary><code><strong>end</strong>(<code>options</code>?: object)</code></summary>
-<br/>
 
 * `options` - serialization options (optional)
 
@@ -60,7 +59,6 @@ Converts the node into its object representation.
 
 <details markdown="1">
 <summary><code><strong>toObject</strong>(<code>options</code>?: object)</code></summary>
-<br/>
 
 * `options` - serialization options (optional)
 
@@ -95,7 +93,6 @@ Converts the node into its string representation.
 
 <details markdown="1">
 <summary><code><strong>toString</strong>(<code>options</code>?: object)</code></summary>
-<br/>
 
 * `options` - serialization options (optional)
 

@@ -15,7 +15,6 @@ Returns the document node. `doc` can be called from anywhere in the document.
 
 <details markdown="1">
 <summary><code><strong>doc</strong>()</code></summary>
-<br/>
 
 ```js
 const { create } = require('xmlbuilder2');
@@ -34,7 +33,6 @@ Returns the first child node.
 
 <details markdown="1">
 <summary><code><strong>first</strong>()</code></summary>
-<br/>
 
 ```js
 const { create } = require('xmlbuilder2');
@@ -55,7 +53,6 @@ Returns the last child node.
 
 <details markdown="1">
 <summary><code><strong>last</strong>()</code></summary>
-<br/>
 
 ```js
 const { create } = require('xmlbuilder2');
@@ -76,7 +73,6 @@ Returns the next sibling node.
 
 <details markdown="1">
 <summary><code><strong>next</strong>()</code></summary>
-<br/>
 
 ```js
 const { create } = require('xmlbuilder2');
@@ -98,7 +94,6 @@ Returns the previous sibling node.
 
 <details markdown="1">
 <summary><code><strong>prev</strong>()</code></summary>
-<br/>
 
 ```js
 const { create } = require('xmlbuilder2');
@@ -121,7 +116,6 @@ the XML document. `root` can be called from anywhere in the document.
 
 <details markdown="1">
 <summary><code><strong>root</strong>()</code></summary>
-<br/>
 
 ```js
 const { create } = require('xmlbuilder2');
@@ -140,7 +134,6 @@ Returns the parent element node.
 
 <details markdown="1">
 <summary><code><strong>up</strong>()</code></summary>
-<br/>
 
 ```js
 const { create } = require('xmlbuilder2');
