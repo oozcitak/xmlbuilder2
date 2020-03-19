@@ -14,6 +14,7 @@ for the options argument.
 
 <details markdown="1">
 <summary><code><strong>set</strong>(<code>options</code>: object)</code></summary>
+<br/>
 
 * `options` - builder options
 
@@ -48,6 +49,7 @@ Returns the DOM node wrapped by `xmlbuilder2`.
 
 <details markdown="1">
 <summary><code><strong>node</strong></code></summary>
+<br/>
 
 For example:
 

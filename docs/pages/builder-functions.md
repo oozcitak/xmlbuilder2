@@ -17,6 +17,7 @@ The `create` function creates and returns a new XML document. When called withou
 
 <details markdown="1">
 <summary><code><strong>create</strong>(<code>options</code>: object, <code>contents</code>: string | object)</code></summary>
+<br/>
 
 Creates a new XML document by parsing the `contents` argument with the given `options` and returns the document node.
 
@@ -40,6 +41,7 @@ console.log(doc.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>create</strong>(<code>options</code>: object)</code></summary>
+<br/>
 
 Creates an empty XML document with the given `options` and returns the document node.
 
@@ -59,6 +61,7 @@ console.log(doc.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>create</strong>(<code>contents</code>: string | object)</code></summary>
+<br/>
 
 Creates a new XML document by parsing the `contents` argument with the default options and returns the document node.
 
@@ -83,6 +86,7 @@ console.log(doc.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>create</strong>()</code></summary>
+<br/>
 
 Creates an empty XML document with the default options and returns the document node.
 
@@ -105,6 +109,7 @@ The `fragment` function creates and returns a document fragment node. `fragment`
 
 <details markdown="1">
 <summary><code><strong>fragment</strong>(<code>options</code>: object, <code>contents</code>: string | object)</code></summary>
+<br/>
 
 Creates a new document fragment by parsing the `contents` argument with the given `options` and returns the document fragment node.
 
@@ -126,6 +131,7 @@ console.log(frag.toString({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>fragment</strong>(<code>options</code>: object)</code></summary>
+<br/>
 
 Creates an empty document fragment with the given `options` and returns the document fragment node.
 
@@ -146,6 +152,7 @@ console.log(frag.toString({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>fragment</strong>(<code>contents</code>: string | object)</code></summary>
+<br/>
 
 Creates a new document fragment by parsing the `contents` argument with the default options and returns the document fragment node.
 
@@ -167,6 +174,7 @@ console.log(frag.toString({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>fragment</strong>()</code></summary>
+<br/>
 
 Creates an empty document fragment with the default options and returns the document fragment node.
 
@@ -194,6 +202,7 @@ document in either XML or JSON format or a JS object representing XML nodes.
 
 <details markdown="1">
 <summary><code><strong>convert</strong>(<code>builderOptions</code>: object, <code>contents</code>: string | object, <code>convertOptions</code>: object)</code></summary>
+<br/>
 
 Converts an XML document by parsing the `contents` argument with the given 
 `builderOptions` and returns the result formatted with the given `convertOptions`.
@@ -218,6 +227,7 @@ console.log(obj);
 
 <details markdown="1">
 <summary><code><strong>convert</strong>(<code>contents</code>: string | object, <code>convertOptions</code>: object)</code></summary>
+<br/>
 
 Converts an XML document by parsing the `contents` argument with the default 
 builder options and returns the result formatted with the given `convertOptions`.
@@ -241,6 +251,7 @@ console.log(obj);
 
 <details markdown="1">
 <summary><code><strong>convert</strong>(<code>builderOptions</code>: object, <code>contents</code>: string | object)</code></summary>
+<br/>
 
 Converts an XML document into the default output format by parsing the `contents` 
 argument with the given `builderOptions` and returns the result.
@@ -263,6 +274,7 @@ console.log(xml);
 
 <details markdown="1">
 <summary><code><strong>convert</strong>(<code>contents</code>: string | object)</code></summary>
+<br/>
 
 Converts an XML document into the default output format by parsing the `contents` 
 argument with the default builder options and returns the result.
@@ -289,6 +301,7 @@ The `builder` function wraps an existing DOM node and returns a builder object.
 
 <details markdown="1">
 <summary><code><strong>builder</strong>(<code>options</code>: object, <code>node</code>: Node)</code></summary>
+<br/>
 
 Wraps an existing DOM node with the given `options` and returns a builder object.
 
@@ -316,6 +329,7 @@ console.log(xml);
 
 <details markdown="1">
 <summary><code><strong>builder</strong>(<code>node</code>: Node)</code></summary>
+<br/>
 
 Wraps an existing DOM node with the default options and returns a builder object.
 

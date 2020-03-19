@@ -16,6 +16,7 @@ current node.
 
 <details markdown="1">
 <summary><code><strong>each</strong>(<code>callback</code>: (node: XMLBuilder, index: number, level: number) => void, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
+<br/>
 
 * `callback` - a callback function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument
 * `self` - whether to visit the current node along with child nodes (optional)
@@ -44,6 +45,7 @@ Produces an array of values by transforming each child node with the given callb
 
 <details markdown="1">
 <summary><code><strong>map</strong>(<code>callback</code>: (node: XMLBuilder, index: number, level: number) => any, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
+<br/>
 
 * `callback` - a callback function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument
 * `self` - whether to visit the current node along with child nodes (optional)
@@ -71,6 +73,7 @@ Reduces child nodes into a single value by applying the given callback function.
 
 <details markdown="1">
 <summary><code><strong>reduce</strong>(<code>callback</code>: (value: any, node: XMLBuilder, index: number, level: number) => any, <code>initialValue</code>: any, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
+<br/>
 
 * `callback` - a callback function which receives the current value as its first argument, each child node as its second argument, child node index as its third argument and child node level as its fourth argument
 * `initialValue` - initial value
@@ -104,6 +107,7 @@ Returns the first child node satisfying the given predicate, or `undefined` if t
 
 <details markdown="1">
 <summary><code><strong>find</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
+<br/>
 
 * `predicate` - a predicate function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating if the current node is the node sought
 * `self` - whether to visit the current node along with child nodes (optional)
@@ -131,6 +135,7 @@ Produces an array of child nodes which pass the given predicate test.
 
 <details markdown="1">
 <summary><code><strong>filter</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
+<br/>
 
 * `predicate` - a predicate function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating if the current node is the node sought
 * `self` - whether to visit the current node along with child nodes (optional)
@@ -158,6 +163,7 @@ Returns `true` if all child nodes pass the given predicate test.
 
 <details markdown="1">
 <summary><code><strong>every</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
+<br/>
 
 * `predicate` - a predicate function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating if the current node is the node sought
 * `self` - whether to visit the current node along with child nodes (optional)
@@ -188,6 +194,7 @@ Returns `true` if any of the child nodes pass the given predicate test.
 
 <details markdown="1">
 <summary><code><strong>some</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
+<br/>
 
 * `predicate` - a predicate function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating if the current node is the node sought
 * `self` - whether to visit the current node along with child nodes (optional)
@@ -214,6 +221,7 @@ Produces an array of child nodes.
 
 <details markdown="1">
 <summary><code><strong>toArray</strong>(<code>self</code>?: boolean, <code>recursive</code>?: boolean)</code></summary>
+<br/>
 
 * `self` - whether to visit the current node along with child nodes (optional)
 * `recursive` - whether to visit all descendant nodes in tree-order or only the immediate child nodes (optional)

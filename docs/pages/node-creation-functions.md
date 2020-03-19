@@ -17,6 +17,7 @@ Creates or updates an attribute node and adds it into its parent element node.
 
 <details markdown="1">
 <summary><code><strong>att</strong>(<code>namespace</code>: string, <code>name</code>: string, <code>value</code>: string)</code></summary>
+<br/>
 
 Creates or updates an element attribute with the given namespace URI, name and 
 value and returns its parent element node. If an attribute with the same namespace
@@ -42,6 +43,7 @@ console.log(root.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>att</strong>(<code>name</code>: string, <code>value</code>: string)</code></summary>
+<br/>
 
 Creates or updates an element attribute with the given name and value returns 
 its parent element node. If an attribute with the same name exists, its value
@@ -65,6 +67,7 @@ console.log(root.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>att</strong>(<code>obj</code>: object)</code></summary>
+<br/>
 
 Creates element attributes from each key/value pair of the given object and 
 returns the parent element node.
@@ -93,6 +96,7 @@ the parent element node.
 
 <details markdown="1">
 <summary><code><strong>com</strong>(<code>content</code>: string)</code></summary>
+<br/>
 
 * `content` - node content
 
@@ -120,6 +124,7 @@ the parent element node.
 
 <details markdown="1">
 <summary><code><strong>dat</strong>(<code>content</code>: string)</code></summary>
+<br/>
 
 * `content` - node content
 
@@ -146,6 +151,7 @@ Creates or updates the XML declaration and returns the current node.
 
 <details markdown="1">
 <summary><code><strong>dec</strong>(<code>options</code>: object)</code></summary>
+<br/>
 
 * `options` - declaration options
   * `version` - a version number string. Defaults to `'1.0'` if omitted.
@@ -175,6 +181,7 @@ node. Otherwise it will be inserted before the document element node.
 
 <details markdown="1">
 <summary><code><strong>dtd</strong>(<code>options</code>: object)</code></summary>
+<br/>
 
 Creates a new DocType node and inserts it into the document.
 
@@ -213,6 +220,7 @@ Creates a new element node and appends it to the list of child nodes.
 
 <details markdown="1">
 <summary><code><strong>ele</strong>(<code>namespace</code>: string, <code>name</code>: string, <code>attributes</code>?: object)</code></summary>
+<br/>
 
 Creates a new element node with the given namespace URI, tag name and 
 attributes and returns it.
@@ -240,6 +248,7 @@ console.log(child.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>ele</strong>(<code>name</code>: string, <code>attributes</code>?: object)</code></summary>
+<br/>
 
 Creates a new element node with the given tag name and attributes and returns 
 it.
@@ -264,6 +273,7 @@ console.log(child.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>ele</strong>(<code>contents</code>: string | object)</code></summary>
+<br/>
 
 Creates a new element node by converting the given JS object into XML nodes and
 returns the last top level element node created. See the
@@ -333,6 +343,7 @@ attributes will also be imported. Returns the current element node.
 
 <details markdown="1">
 <summary><code><strong>import</strong>(<code>node</code>: XMLBuilderNode)</code></summary>
+<br/>
 
 * `node` - the node to import
 
@@ -363,6 +374,7 @@ and returns the parent element node.
 
 <details markdown="1">
 <summary><code><strong>ins</strong>(<code>target</code>: string, <code>content</code>: string)</code></summary>
+<br/>
 
 Creates a new processing instruction node with the given target and content, appends it to the list of child nodes
 and returns the parent element node.
@@ -387,6 +399,7 @@ console.log(root.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>ins</strong>(<code>obj</code>: object)</code></summary>
+<br/>
 
 Creates new processing instructions from the key/value pairs of the given object, appends them to the list of child nodes
 and returns the parent element node.
@@ -412,6 +425,7 @@ console.log(root.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>ins</strong>(<code>arr</code>: string[])</code></summary>
+<br/>
 
 Creates new processing instructions from the given string array, appends them to the list of child nodes
 and returns the parent element node.
@@ -443,6 +457,7 @@ Removes a node from the XML document and returns its parent element node.
 
 <details markdown="1">
 <summary><code><strong>remove</strong>()</code></summary>
+<br/>
 
 ```js
 const { create } = require('xmlbuilder2');
@@ -465,6 +480,7 @@ Removes an attribute.
 
 <details markdown="1">
 <summary><code><strong>removeAtt</strong>(<code>namespace</code>: string, <code>name</code>: string | string[])</code></summary>
+<br/>
 
 Removes an attribute or a list of attributes optionally with the given namespace.
 Returns the parent element node.
@@ -490,6 +506,7 @@ console.log(root.end({ prettyPrint: true }));
 
 <details markdown="1">
 <summary><code><strong>removeAtt</strong>(<code>name</code>: string | string[])</code></summary>
+<br/>
 
 Removes an attribute or a list of attributes and returns the parent element node.
 
@@ -519,6 +536,7 @@ the parent element node.
 
 <details markdown="1">
 <summary><code><strong>txt</strong>(<code>content</code>: string)</code></summary>
+<br/>
 
 * `content` - node content
 

@@ -16,6 +16,7 @@ Creates and serializes an attribute node.
 
 <details markdown="1">
 <summary><code><strong>att</strong>(<code>namespace</code>: string, <code>name</code>: string, <code>value</code>: string)</code></summary>
+<br/>
 
 Creates and serializes an element attribute with the given namespace URI, name and 
 value.
@@ -43,6 +44,7 @@ xmlBuilder.ele('root').att('http://example.com/ns1', 'att', 'val').end();
 
 <details markdown="1">
 <summary><code><strong>att</strong>(<code>name</code>: string, <code>value</code>: string)</code></summary>
+<br/>
 
 Creates and serializes an element attribute with the given name and 
 value.
@@ -69,6 +71,7 @@ xmlBuilder.ele('root').att('att', 'val').end();
 
 <details markdown="1">
 <summary><code><strong>att</strong>(<code>obj</code>: object)</code></summary>
+<br/>
 
 Creates element attributes from each key/value pair of the given object.
 
@@ -99,6 +102,7 @@ Creates and serializes a new comment node.
 
 <details markdown="1">
 <summary><code><strong>com</strong>(<code>content</code>: string)</code></summary>
+<br/>
 
 * `content` - node content
 
@@ -129,6 +133,7 @@ Creates and serializes a new CDATA node.
 
 <details markdown="1">
 <summary><code><strong>dat</strong>(<code>content</code>: string)</code></summary>
+<br/>
 
 * `content` - node content
 
@@ -159,6 +164,7 @@ Creates and serializes the XML declaration.
 
 <details markdown="1">
 <summary><code><strong>dec</strong>(<code>options</code>: object)</code></summary>
+<br/>
 
 * `options` - declaration options
   * `version` - a version number string. Defaults to `'1.0'` if omitted.
@@ -192,6 +198,7 @@ Creates and serializes the DocType node.
 
 <details markdown="1">
 <summary><code><strong>dtd</strong>(<code>options</code>: object)</code></summary>
+<br/>
 
 Creates a new DocType node and inserts it into the document.
 
@@ -231,6 +238,7 @@ Creates and serializes a new element node.
 
 <details markdown="1">
 <summary><code><strong>ele</strong>(<code>namespace</code>: string, <code>name</code>: string, <code>attributes</code>?: object)</code></summary>
+<br/>
 
 Creates a new element node with the given namespace URI, tag name and 
 attributes.
@@ -262,6 +270,7 @@ xmlBuilder.ele('root')
 
 <details markdown="1">
 <summary><code><strong>ele</strong>(<code>name</code>: string, <code>attributes</code>?: object)</code></summary>
+<br/>
 
 Creates a new element node with the given tag name and attributes.
 
@@ -291,6 +300,7 @@ xmlBuilder.ele('root')
 
 <details markdown="1">
 <summary><code><strong>ele</strong>(<code>contents</code>: string | object)</code></summary>
+<br/>
 
 Creates a new element node by converting the given JS object into XML nodes. See the
 [object conversion]({{ site.baseurl }}{% link pages/object-conversion.md %})
@@ -360,6 +370,7 @@ Creates and serializes a new processing instruction node.
 
 <details markdown="1">
 <summary><code><strong>ins</strong>(<code>target</code>: string, <code>content</code>: string)</code></summary>
+<br/>
 
 Creates a new processing instruction node with the given target and content.
 
@@ -387,6 +398,7 @@ xmlBuilder.ele('root').ins('bar', 'version="13.0"').end();
 
 <details markdown="1">
 <summary><code><strong>ins</strong>(<code>obj</code>: object)</code></summary>
+<br/>
 
 Creates new processing instructions from the key/value pairs of the given object.
 
@@ -414,6 +426,7 @@ xmlBuilder.ele('root').ins({ bar: 'version="13.0"', baz: 'public=true' }).end();
 
 <details markdown="1">
 <summary><code><strong>ins</strong>(<code>arr</code>: string[])</code></summary>
+<br/>
 
 Creates new processing instructions from the given string array.
 
@@ -447,6 +460,7 @@ Creates and serializes a new text node.
 
 <details markdown="1">
 <summary><code><strong>txt</strong>(<code>content</code>: string)</code></summary>
+<br/>
 
 * `content` - node content
 
