@@ -8,9 +8,6 @@ entries:
   - title: Articles
     output: web
     folderitems:
-    - title: Builder Options
-      url: /builder-options.html#top
-      output: web
     - title: Object Conversion
       url: /object-conversion.html#top
       output: web

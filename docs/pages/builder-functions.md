@@ -13,7 +13,7 @@ const { create, fragment, convert, builder } = require('xmlbuilder2');
 ```
 
 ### create
-The `create` function creates and returns a new XML document. When called without arguments, `create` creates an empty XML document (one without any child nodes). `create` accepts an optional parameters object for customizing its behavior. These parameters are explained in [this page]({{ site.baseurl }}{% link pages/builder-options.md %}). `create` also accepts an optional argument defining an XML document to be parsed as detailed in [this page]({{ site.baseurl }}{% link pages/parsing.md %}).
+The `create` function creates and returns a new XML document. When called without arguments, `create` creates an empty XML document (one without any child nodes). `create` accepts an optional parameters object for customizing its behavior. These parameters are explained in [below]({{ site.baseurl }}{% link pages/builder-functions.md %}#builder-options). `create` also accepts an optional argument defining an XML document to be parsed as detailed in [this page]({{ site.baseurl }}{% link pages/parsing.md %}).
 
 <details markdown="1">
 <summary><code><strong>create</strong>(<code>options</code>: object, <code>contents</code>: string | object)</code></summary>
@@ -195,7 +195,7 @@ ___
 
 ### convert
 The `convert` function converts an XML document into a given format. See
-[builder options]({{ site.baseurl }}{% link pages/builder-options.md %})
+[below]({{ site.baseurl }}{% link pages/builder-functions.md %}#builder-options)
 and [serialization settings]({{ site.baseurl }}{% link pages/serialization.md %}#serialization-settings)
 for the options arguments. The input of the `convert` function should be a string containing an XML 
 document in either XML or JSON format or a JS object representing XML nodes.
@@ -353,3 +353,38 @@ console.log(xml);
 ```
 
 </details>
+
+
+___
+
+### Builder options
+
+#### Settings related to XML declaration
+
+* `version` - a version number string. Defaults to `'1.0'` if omitted.
+* `encoding` - encoding declaration, e.g. `'UTF-8'`. No encoding declaration will be produced if omitted.
+* `standalone` - standalone document declaration: `true` or `false`. No standalone document declaration will be produced if omitted.
+{% capture dec_tip %}
+  XML declaration can be specified later with the [`dec`]({{ site.baseurl }}{% link pages/node-creation-functions.md %}#dec) function.
+{% endcapture %}
+{% include tip.html content=dec_tip %}
+
+#### Settings related to value conversions
+
+* `keepNullNodes` - whether nodes with `null` and `undefined` values will be kept or ignored: `true` or `false`. Defaults to `false`, which silently ignores nodes with `null` and `undefined` values. When set to `true`, `null` will be treated as an empty string.
+* `keepNullAttributes` - whether attributes with `null` and `undefined` values will be kept or ignored: `true` or `false`. Defaults to `false`, which silently ignores attributes with `null` and `undefined` values. When set to `true`, `null` will be treated as an empty string.
+* `ignoreConverters` - whether converter strings will be ignored when converting JS objects: `true` or `false`. Defaults to `false`.
+* `convert` - an object defining converter strings. Default converter strings are described below.
+  * `att` -  When prepended to a JS object key, converts its key-value pair to an attribute. Defaults to `'@'`.
+  * `ins` - When prepended to a JS object key, converts its value to a processing instruction node. Defaults to `'?'`.
+  * `text` - When prepended to a JS object key, converts its value to a text node. Defaults to `'#'`.
+  * `cdata` - When prepended to a JS object key, converts its value to a CDATA section node. Defaults to `'$'`.
+  * `comment` - When prepended to a JS object key, converts its value to a comment node. Defaults to `'!'`.
+
+#### Settings related to XML namespaces
+
+* `defaultNamespace` - contains default namespaces to apply to all elements and attributes (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-defaults))
+  * `ele` - default namespace for element nodes
+  * `att` - default namespace for attributes
+* `namespaceAlias` - contains namespace aliases where object keys are namespace aliases and object values are namespaces (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-aliases))
+* `inheritNS` - whether child element nodes inherit their parent element's namespace. Defaults to `false`. (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-inheritance))

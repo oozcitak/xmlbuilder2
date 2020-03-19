@@ -9,7 +9,7 @@ comments: false
 
 ### set
 
-Changes builder options. See [builder options]({{ site.baseurl }}{% link pages/builder-options.md %})
+Changes builder options. See [builder options]({{ site.baseurl }}{% link pages/builder-functions.md %}#builder-options)
 for the options argument.
 
 <details markdown="1">

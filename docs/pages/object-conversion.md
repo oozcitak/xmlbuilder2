@@ -72,7 +72,7 @@ Although this allows element and text nodes to be easily created, a special synt
 
 ### Converter Strings
 
-Converter strings can be customized with the `convert` option while initializing the builder; see [builder options](builder-options.html).
+Converter strings can be customized with the `convert` option while initializing the builder; see [builder options]({{ site.baseurl }}{% link pages/builder-functions.md %}#builder-options).
 
 #### att
 
