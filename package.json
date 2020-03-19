@@ -32,7 +32,6 @@
   },
   "devDependencies": {
     "@types/benchmark": "*",
-    "@types/chalk": "*",
     "@types/dedent": "*",
     "@types/jest": "*",
     "@types/libxmljs": "*",
