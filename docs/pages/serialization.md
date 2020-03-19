@@ -147,8 +147,8 @@ new Map([
 
 In addition to `format` there are a number of settings for customizing the output of serializers.
 
-* `wellFormed` - Ensures that the document adheres to the syntax rules specified by the XML specification. If this flag is set and the document is not well-formed errors will be thrown. Defaults to `false`.
 * `format` - Output format. Either `"object"`, `"xml"`, `"json"` or `"map"`. Defaults to `"xml"`.
+* `wellFormed` - Ensures that the document adheres to the syntax rules specified by the XML specification. If this flag is set and the document is not well-formed errors will be thrown. Defaults to `false`.
 * `headless` - Suppresses the XML declaration from the output. Defaults to `false`.
 * `prettyPrint` - Pretty-prints the XML tree. Defaults to `false`.
 * `indent` - Determines the indentation string for pretty printing. Defaults to two space characters.

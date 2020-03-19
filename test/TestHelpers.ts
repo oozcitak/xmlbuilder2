@@ -51,6 +51,10 @@ export default class TestHelpers {
     done()
   }
 
+  static getCBResult(str: XMLBuilderCB) {
+    return (str as any).result
+  }
+
   static expectCBError(str: XMLBuilderCB, testFunc: () => any, done: any) {
     testFunc()
     expect((str as any).error).toBeInstanceOf(Error)

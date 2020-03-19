@@ -311,7 +311,7 @@ export type ObjectWriterOptions = BaseWriterOptions & {
 }
 
 /**
- * Defines the options passed to the object writer.
+ * Defines the options passed to the XML writer.
  */
 export type XMLWriterOptions = BaseWriterOptions & {
   /** @inheritdoc */
@@ -980,7 +980,7 @@ export interface XMLBuilderCB {
 /**
  * Defines the options passed to the callback builder.
  */
-export type XMLBuilderCBOptions = {
+export type XMLBuilderCBOptions = CBWriterOptions & {
   /**
    * A callback function which is called when a chunk of XML is serialized.
    */
@@ -1023,13 +1023,32 @@ export type XMLBuilderCBOptions = {
    * Defines namespace aliases.
    */
   namespaceAlias: { [key: string]: string | null }
+}
 
+/**
+ * Defines the base options passed to the callback builder's serializer.
+ */
+export type BaseCBWriterOptions = {
+  /**
+   * Output format. Defaults to `"xml"`.
+   * - `"xml"` - Serializes the document as a string in XML format.
+   * - `"json"` - Serializes the document as a JSON string.
+   */
+  format?: "xml" | "json"  
   /**
    * Ensures that the document adheres to the syntax rules specified by the
    * XML specification. If this flag is set and the document is not well-formed
    * errors will be thrown. Defaults to `false`.
    */
   wellFormed: boolean
+}
+
+/**
+ * Defines the options passed to the callback builder's XML writer.
+ */
+export type XMLCBWriterOptions  = BaseCBWriterOptions & {
+  /** @inheritdoc */
+  format?: "xml"
   /**
    * Pretty-prints the XML tree. Defaults to `false`.
    */
@@ -1078,9 +1097,40 @@ export type XMLBuilderCBOptions = {
 }
 
 /**
+ * Defines the options passed to the callback builder's JSON writer.
+ */
+export type JSONCBWriterOptions  = BaseCBWriterOptions & {
+  /** @inheritdoc */
+  format?: "json"
+  /**
+   * Pretty-prints the XML tree. Defaults to `false`.
+   */
+  prettyPrint: boolean
+  /**
+   * Determines the indentation string for pretty printing. Defaults to two
+   * space characters.
+   */
+  indent: string
+  /**
+   * Determines the newline string for pretty printing. Defaults to `"\n"`.
+   */
+  newline: string
+  /**
+   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * `0`.
+   */
+  offset: number
+}
+
+/**
+ * Defines the options passed to the callback builder's writer.
+ */
+export type CBWriterOptions = XMLCBWriterOptions | JSONCBWriterOptions
+
+/**
  * Defines the options passed to the callback builder.
  */
-export interface XMLBuilderCBCreateOptions extends RecursivePartial<XMLBuilderCBOptions> { 
+export type XMLBuilderCBCreateOptions = RecursivePartial<XMLBuilderCBOptions>  & { 
   /** @inheritdoc */
   data: ((chunk: string, level: number) => void)
   /** @inheritdoc */
@@ -1092,6 +1142,7 @@ export interface XMLBuilderCBCreateOptions extends RecursivePartial<XMLBuilderCB
  */
 export const DefaultXMLBuilderCBOptions: Partial<XMLBuilderCBOptions> = {
   error: (() => { }),
+  format: "xml",
   wellFormed: false,
   prettyPrint: false,
   indent: "  ",

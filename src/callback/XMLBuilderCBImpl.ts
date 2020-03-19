@@ -1,7 +1,7 @@
 import {
   XMLBuilderCB, AttributesObject, PIObject, DTDOptions, XMLBuilder,
   XMLBuilderCBOptions, XMLBuilderCreateOptions, DefaultXMLBuilderCBOptions,
-  ExpandObject, XMLBuilderCBCreateOptions, XMLBuilderOptions
+  ExpandObject, XMLBuilderCBCreateOptions, XMLBuilderOptions, BaseCBWriterOptions
 } from "../interfaces"
 import { applyDefaults, isString, isObject } from "@oozcitak/util"
 import { fragment, create } from ".."
@@ -15,6 +15,9 @@ import {
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { LocalNameSet } from "@oozcitak/dom/lib/serializer/LocalNameSet"
 import { Guard } from "@oozcitak/dom/lib/util"
+import { BaseCBWriter } from "../writers/BaseCBWriter"
+import { XMLCBWriter } from "../writers/XMLCBWriter"
+import { JSONCBWriter } from "../writers/JSONCBWriter"
 
 /**
  * Stores the last generated prefix. An object is used instead of a number so
@@ -33,17 +36,15 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
 
   private _options: Required<XMLBuilderCBOptions>
   private _builderOptions: XMLBuilderCreateOptions
+  private _writer: BaseCBWriter<BaseCBWriterOptions>
   private _fragment: boolean
 
-  private _hasData = false
   private _hasDeclaration = false
   private _docTypeName = ""
   private _hasDocumentElement = false
   private _currentElement?: XMLBuilder
   private _currentElementSerialized = false
   private _openTags: Array<[string, string | null, NamespacePrefixMap, boolean]> = []
-
-  private _level = 0
 
   private _namespace: string | null
   private _prefixMap: NamespacePrefixMap
@@ -75,6 +76,8 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       defaultNamespace: this._options.defaultNamespace,
       namespaceAlias: this._options.namespaceAlias
     }
+
+    this._writer = this._options.format === "xml" ? new XMLCBWriter(this._options) : new JSONCBWriter(this._options)
 
     this._onData = options.data
     this._onEnd = options.end
@@ -108,7 +111,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
 
     this._serializeOpenTag(true)
 
-    if (!this._fragment && this._hasDocumentElement && this._level === 0) {
+    if (!this._fragment && this._hasDocumentElement && this._writer.level === 0) {
       this._onError.call(this, new Error("Document cannot have multiple document element nodes."))
       return this
     }
@@ -169,7 +172,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       return this
     }
 
-    this._push(this._beginLine() + "<!--" + node.data + "-->")
+    this._push(this._writer.comment(node.data))
     return this
   }
 
@@ -209,7 +212,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
         result += c
     }
 
-    this._push(this._beginLine() + result)
+    this._push(this._writer.text(result))
     return this
   }
 
@@ -237,11 +240,8 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       return this
     }
 
-    if (node.data) {
-      this._push(this._beginLine() + "<?" + node.target + " " + node.data + "?>")
-    } else {
-      this._push(this._beginLine() + "<?" + node.target + "?>")
-    }
+    this._push(this._writer.instruction(node.target, node.data))
+
     return this
   }
 
@@ -257,7 +257,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       return this
     }
 
-    this._push(this._beginLine() + "<![CDATA[" + node.data + "]]>")
+    this._push(this._writer.cdata(node.data))
     return this
   }
 
@@ -273,18 +273,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       return this
     }
 
-    let markup = ""
-    markup = this._beginLine() + "<?xml"
-    markup += " version=\"" + (options.version || "1.0") + "\""
-    if (options.encoding !== undefined) {
-      markup += " encoding=\"" + options.encoding + "\""
-    }
-    if (options.standalone !== undefined) {
-      markup += " standalone=\"" + (options.standalone ? "yes" : "no") + "\""
-    }
-    markup += "?>"
-
-    this._push(markup)
+    this._push(this._writer.declaration(options.version || "1.0", options.encoding, options.standalone))
     this._hasDeclaration = true
 
     return this
@@ -327,19 +316,8 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       return this
     }
 
-    let markup = ""
-    if (node.publicId && node.systemId) {
-      markup = "<!DOCTYPE " + options.name + " PUBLIC \"" + node.publicId + "\" \"" + node.systemId + "\">"
-    } else if (node.publicId) {
-      markup = "<!DOCTYPE " + options.name + " PUBLIC \"" + node.publicId + "\">"
-    } else if (node.systemId) {
-      markup = "<!DOCTYPE " + options.name + " SYSTEM \"" + node.systemId + "\">"
-    } else {
-      markup = "<!DOCTYPE " + options.name + ">"
-    }
-
     this._docTypeName = options.name
-    this._push(this._beginLine() + markup)
+    this._push(this._writer.docType(options.name, node.publicId, node.systemId))
     return this
   }
 
@@ -377,8 +355,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       return
     }
 
-    let markup = "<"
-    let qualifiedName = ''
+    let qualifiedName = ""
     let ignoreNamespaceDefinitionAttribute = false
     let map = this._prefixMap.copy()
     let localPrefixesMap: { [key: string]: string } = {}
@@ -392,12 +369,13 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       }
 
       if (ns === infraNamespace.XML) {
-        qualifiedName = 'xml:' + node.localName
+        qualifiedName = "xml:" + node.localName
       } else {
         qualifiedName = node.localName
       }
 
-      markup += qualifiedName
+      this._writer.beginElement(qualifiedName)
+        this._push(this._writer.openTagBegin(qualifiedName))
     } else {
       let prefix = node.prefix
       let candidatePrefix = map.get(prefix, ns)
@@ -416,7 +394,8 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
           inheritedNS = localDefaultNamespace || null
         }
 
-        markup += qualifiedName
+        this._writer.beginElement(qualifiedName)
+        this._push(this._writer.openTagBegin(qualifiedName))
       } else if (prefix !== null) {
         if (prefix in localPrefixesMap) {
           prefix = this._generatePrefix(ns, map, this._prefixIndex)
@@ -424,10 +403,12 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
 
         map.set(prefix, ns)
         qualifiedName += prefix + ':' + node.localName
-        markup += qualifiedName
 
-        markup += this._serializeAttribute("xmlns:" + prefix,
-          ns, this._options.wellFormed, markup.length)
+        this._writer.beginElement(qualifiedName)
+        this._push(this._writer.openTagBegin(qualifiedName))
+
+        this._push(this._writer.attribute("xmlns:" + prefix,
+          this._serializeAttributeValue(ns, this._options.wellFormed)))
 
         if (localDefaultNamespace !== null) {
           inheritedNS = localDefaultNamespace || null
@@ -439,35 +420,34 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
         qualifiedName += node.localName
         inheritedNS = ns
 
-        markup += qualifiedName + this._serializeAttribute("xmlns", ns,
-          this._options.wellFormed, markup.length)
+        this._writer.beginElement(qualifiedName)
+        this._push(this._writer.openTagBegin(qualifiedName))
 
+        this._push(this._writer.attribute("xmlns",
+          this._serializeAttributeValue(ns, this._options.wellFormed)))
       } else {
         qualifiedName += node.localName
         inheritedNS = ns
-        markup += qualifiedName
+
+        this._writer.beginElement(qualifiedName)
+        this._push(this._writer.openTagBegin(qualifiedName))
       }
     }
 
-    markup += this._serializeAttributesNS(node, map, this._prefixIndex, localPrefixesMap,
+    this._serializeAttributes(node, map, this._prefixIndex, localPrefixesMap,
       ignoreNamespaceDefinitionAttribute, this._options.wellFormed)
 
     const isHTML = (ns === infraNamespace.HTML)
     if (isHTML && !hasChildren &&
       XMLBuilderCBImpl._VoidElementNames.has(node.localName)) {
-      markup += " /"
+      this._push(this._writer.openTagEnd(qualifiedName, true, true))
+      this._writer.endElement(qualifiedName)
     } else if (!isHTML && !hasChildren) {
-      if (this._options.allowEmptyTags) {
-        markup += "></" + qualifiedName
-      } else if (this._options.spaceBeforeSlash) {
-        markup += " /"
-      } else {
-        markup += "/"
-      }
+      this._push(this._writer.openTagEnd(qualifiedName, true, false))
+      this._writer.endElement(qualifiedName)
+    } else {
+      this._push(this._writer.openTagEnd(qualifiedName, false, false))
     }
-    markup += ">"
-
-    this._push(this._beginLine() + markup)
 
     this._currentElementSerialized = true
     /**
@@ -489,14 +469,14 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
     /**
      * Calls following this will either serialize child nodes or close this tag.
      */
-    this._level++
+    this._writer.level++
   }
 
   /**
    * Serializes the closing tag of an element node.
    */
   private _serializeCloseTag(): void {
-    this._level--
+    this._writer.level--
     const lastEle = this._openTags.pop()
     /* istanbul ignore next */
     if (lastEle === undefined) {
@@ -512,8 +492,8 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
     this._prefixMap = map
     if (!hasChildren) return
 
-    let markup = "</" + qualifiedName + ">"
-    this._push(this._beginLine() + markup)
+    this._push(this._writer.closeTag(qualifiedName))
+    this._writer.endElement(qualifiedName)
   }
 
   /**
@@ -528,35 +508,8 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
     } else if (this._ended) {
       this._onError.call(this, new Error("Cannot push to ended stream."))
     } else if (data.length !== 0) {
-      this._hasData = true
-      this._onData(data, this._level)
-      const a = 5
-    }
-  }
-
-  /**
-   * Produces characters to be prepended to a line of string in pretty-print
-   * mode.
-   */
-  private _beginLine(): string {
-    if (this._options.prettyPrint) {
-      return (this._hasData ? this._options.newline : "") +
-        this._indent(this._options.offset + this._level)
-    } else {
-      return ""
-    }
-  }
-
-  /**
-   * Produces an indentation string.
-   * 
-   * @param level - depth of the tree
-   */
-  private _indent(level: number): string {
-    if (level <= 0) {
-      return ""
-    } else {
-      return this._options.indent.repeat(level)
+      this._writer.hasData = true
+      this._onData(data, this._writer.level)
     }
   }
 
@@ -607,25 +560,24 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
    * attributes
    * @param requireWellFormed - whether to check conformance
    */
-  private _serializeAttributesNS(node: Element, map: NamespacePrefixMap,
+  private _serializeAttributes(node: Element, map: NamespacePrefixMap,
     prefixIndex: PrefixIndex, localPrefixesMap: { [key: string]: string },
     ignoreNamespaceDefinitionAttribute: boolean,
-    requireWellFormed: boolean): string {
+    requireWellFormed: boolean): void {
 
-    let result = ""
     const localNameSet = requireWellFormed ? new LocalNameSet() : undefined
 
     for (const attr of node.attributes) {
       // Optimize common case
       if (!requireWellFormed && attr.namespaceURI === null) {
-        result += this._serializeAttribute(attr.localName, attr.value,
-          requireWellFormed, result.length)
+        this._push(this._writer.attribute(attr.localName, 
+          this._serializeAttributeValue(attr.value, this._options.wellFormed)))
         continue
       }
 
       if (requireWellFormed && localNameSet && localNameSet.has(attr.namespaceURI, attr.localName)) {
         this._onError.call(this, new Error("Element contains duplicate attributes (well-formed required)."))
-        return ""
+        return
       }
 
       if (requireWellFormed && localNameSet) localNameSet.set(attr.namespaceURI, attr.localName)
@@ -645,12 +597,12 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
 
           if (requireWellFormed && attr.value === infraNamespace.XMLNS) {
             this._onError.call(this, new Error("XMLNS namespace is reserved (well-formed required)."))
-            return ""
+            return
           }
 
           if (requireWellFormed && attr.value === '') {
             this._onError.call(this, new Error("Namespace prefix declarations cannot be used to undeclare a namespace (well-formed required)."))
-            return ""
+            return
           }
 
           if (attr.prefix === 'xmlns') candidatePrefix = 'xmlns'
@@ -675,8 +627,8 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
             candidatePrefix = this._generatePrefix(attributeNamespace, map, prefixIndex)
           }
 
-          result += this._serializeAttribute("xmlns:" + candidatePrefix,
-            attributeNamespace, requireWellFormed, result.length)
+          this._push(this._writer.attribute("xmlns:" + candidatePrefix, 
+            this._serializeAttributeValue(attributeNamespace, this._options.wellFormed)))
         }
       }
 
@@ -684,35 +636,12 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
         !xml_isName(attr.localName) ||
         (attr.localName === "xmlns" && attributeNamespace === null))) {
         this._onError.call(this, new Error("Attribute local name contains invalid characters (well-formed required)."))
-        return ""
+        return
       }
 
-      result += this._serializeAttribute(
-        (candidatePrefix !== null ? candidatePrefix + ":" : "") + attr.localName,
-        attr.value, requireWellFormed, result.length)
-    }
-
-    return result
-  }
-
-  /**
-   * Produces an XML serialization of an attribute.
-   * 
-   * @param value - attribute value
-   * @param requireWellFormed - whether to check conformance
-   */
-
-  private _serializeAttribute(name: string, value: string | null,
-    requireWellFormed: boolean, strLen: number): string {
-
-    const str = name + "=\"" +
-      this._serializeAttributeValue(value, requireWellFormed) + "\""
-
-    if (this._options.prettyPrint && this._options.width > 0 &&
-      strLen + 1 + str.length > this._options.width) {
-      return this._beginLine() + this._indent(1) + str
-    } else {
-      return " " + str
+      this._push(this._writer.attribute(
+        (candidatePrefix !== null ? candidatePrefix + ":" : "") + attr.localName, 
+        this._serializeAttributeValue(attr.value, this._options.wellFormed)))
     }
   }
 
