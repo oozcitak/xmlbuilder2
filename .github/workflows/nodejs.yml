@@ -32,3 +32,5 @@ jobs:
         CI: true
     - name: Upload coverage to Codecov  
       uses: codecov/codecov-action@v1
+    - name: bonkers
+      uses: nox
