@@ -31,3 +31,4 @@ jobs:
       env:
         CI: true
     - run: bash <(curl -s https://codecov.io/bash)
+      if: matrix.os == 'ubuntu-latest'
