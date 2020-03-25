@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [1.8.0] - 2020-03-25
+
+- Added `EventEmitter` interface to callback builder object.
+
 ## [1.7.0] - 2020-03-19
 
 - Added JSON output format to callback API.
@@ -78,3 +82,4 @@ Without these flags, `null` **and** `undefined` will be silently skipped.
 [1.5.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.4.3...v1.5.0
 [1.6.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.5.0...v1.6.0
 [1.7.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.6.0...v1.7.0
+[1.8.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.7.0...v1.8.0
