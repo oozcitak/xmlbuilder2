@@ -1,29 +1,26 @@
 import $$ from '../TestHelpers'
-import fs from 'fs'
+import { createWriteStream, readFile } from 'fs'
 import { resolve } from 'path'
-import { promisify } from 'util'
-
-const open = promisify(fs.open)
-const write = promisify(fs.write)
-const close = promisify(fs.close)
-const readFile = promisify(fs.readFile)
+import { createCB, fragmentCB } from '../../src'
 
 describe('examples in the callback function reference wiki page', () => {
 
   test('documentCB()', async (done) => {
     const filename = resolve(__dirname, 'functions-documentCB.test.out')
-    const outFile = await open(filename, 'w')
+    const outFile = createWriteStream(filename)
     
-    const xmlStream = $$.createCB({ 
-      data: async (chunk) => await write(outFile, chunk),
-      end: async () => {
-        await close(outFile)
-        const result = await readFile(filename, { encoding: 'utf8' })
+    const xmlStream = createCB({
+      'data': (chunk: string) => outFile.write(chunk),
+      'end': () => outFile.end()
+    })
+
+    outFile.on('close', () => {
+      readFile(filename, 'utf8', (err, result) => {
         expect(result).toBe('<root><foo/><bar fizz="buzz"/></root>')
         done()
-      }
+      })
     })
-    
+   
     xmlStream.ele("root")
       .ele("foo").up()
       .ele("bar").att("fizz", "buzz").up()
@@ -32,21 +29,44 @@ describe('examples in the callback function reference wiki page', () => {
 
   test('fragmentCB()', async (done) => {
     const filename = resolve(__dirname, 'functions-fragmentCB.test.out')
-    const outFile = await open(filename, 'w')
+    const outFile = createWriteStream(filename)
     
-    const xmlStream = $$.fragmentCB({ 
-      data: async (chunk) => await write(outFile, chunk),
-      end: async () => {
-        await close(outFile)
-        const result = await readFile(filename, { encoding: 'utf8' })
+    const xmlStream = fragmentCB({
+      'data': (chunk: string) => outFile.write(chunk),
+      'end': () => outFile.end()
+    })
+
+    outFile.on('close', () => {
+      readFile(filename, 'utf8', (err, result) => {
         expect(result).toBe('<foo/><foo fizz="buzz"/><foo/>')
         done()
-      }
+      })
     })
     
     xmlStream.ele("foo").up()
       .ele("foo").att("fizz", "buzz").up()
       .ele("foo").up()
+      .end()
+  })
+
+  test('EventEmitter', async (done) => {
+    const filename = resolve(__dirname, 'functions-EventEmitter.test.out')
+    const outFile = createWriteStream(filename)
+    
+    const xmlStream = createCB()
+    xmlStream.on('data', (chunk) => outFile.write(chunk))
+    xmlStream.on('end', () => outFile.end())
+
+    outFile.on('close', () => {
+      readFile(filename, 'utf8', (err, result) => {
+        expect(result).toBe('<root><foo/><bar fizz="buzz"/></root>')
+        done()
+      })
+    })
+   
+    xmlStream.ele("root")
+      .ele("foo").up()
+      .ele("bar").att("fizz", "buzz").up()
       .end()
   })
 

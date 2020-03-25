@@ -16,7 +16,7 @@ export default class TestHelpers {
     return s.serializeToString(node)
   }
 
-  static createCB(options?: Partial<XMLBuilderCBCreateOptions>): XMLBuilderCB {
+  static createCB(options?: XMLBuilderCBCreateOptions): XMLBuilderCB {
     options = options || {}
     options.data = options.data || (function (this: XMLBuilderCB, chunk: string) {
       (this as any).result += chunk
@@ -31,7 +31,7 @@ export default class TestHelpers {
     return str
   }
 
-  static fragmentCB(options?: Partial<XMLBuilderCBCreateOptions>): XMLBuilderCB {
+  static fragmentCB(options?: XMLBuilderCBCreateOptions): XMLBuilderCB {
     options = options || {}
     options.data = options.data || (function (this: XMLBuilderCB, chunk: string) {
       (this as any).result += chunk

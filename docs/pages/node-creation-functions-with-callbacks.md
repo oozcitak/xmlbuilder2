@@ -482,3 +482,36 @@ xmlBuilder.ele('root').txt('val').end();
 ```
 
 </details>
+
+___
+
+###  on
+
+Adds a listener function for an event.
+
+<details markdown="1">
+<summary><code><strong>on</strong>(<code>event</code>: string, <code>listener</code>: function)</code></summary>
+<br/>
+
+* `event` - event name, either `"data"`, `"end"` or `"error"`
+* `listener` - a listener function. For the `"data"` event, the listener function
+receives the serialized XML chunk as its first argument and the depth of the XML
+tree as its second argument. For the `"end"` event, the listener callback receives
+no arguments. For the `"error"` event, the listener callback receives the error
+object as its single argument.
+
+```js
+const { createCB } = require('xmlbuilder2');
+
+const xmlBuilder = createCB({ prettyPrint: true });
+xmlBuilder.on('data', (chunk) => console.log(chunk);
+
+xmlBuilder.ele('root').txt('val').end();
+```
+```xml
+<root>
+  val
+</root>
+```
+
+</details>

@@ -32,14 +32,14 @@ The `createCB` function serializes an XML document in chunks with the provided c
 
 ```js
 const { createCB } = require('xmlbuilder2');
-const { promises } = require('fs)';
+const { createWriteStream } = require('fs');
 
 const filename = 'path/to/output/file';
-const outFile = await promises.open(filename, 'w');
+const outFile = createWriteStream(filename);
 
-const xmlBuilder = createCB({ 
-  data: async (chunk) => await outFile.write(chunk),
-  end: async () => await outFile.close(),
+const xmlBuilder = createCB({
+  'data': (chunk) => outFile.write(chunk),
+  'end': () => outFile.end(),
   prettyPrint: true
 });
 
@@ -53,6 +53,25 @@ xmlBuilder.ele('root')
   <foo/>
   <bar fizz="buzz"/>
 </root>
+```
+
+The callback document builder is a proper node.js [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter), so the following approach is also possible:
+
+```js
+const { createCB } = require('xmlbuilder2');
+const { createWriteStream } = require('fs');
+
+const filename = 'path/to/output/file';
+const outFile = createWriteStream(filename);
+
+const xmlBuilder = createCB({ prettyPrint: true });
+xmlBuilder.on('data', (chunk) => outFile.write(chunk));
+xmlBuilder.on('end', () => outFile.end());
+
+xmlBuilder.ele('root')
+  .ele('foo').up()
+  .ele('bar').att('fizz', 'buzz').up()
+  .end();
 ```
 
 </details>
@@ -71,14 +90,14 @@ The `fragmentCB` function serializes an XML document fragment in chunks with the
 
 ```js
 const { fragmentCB } = require('xmlbuilder2');
-const { promises } = require('fs)';
+const { createWriteStream } = require('fs');
 
 const filename = 'path/to/output/file';
-const outFile = await promises.open(filename, 'w');
+const outFile = createWriteStream(filename);
 
-const xmlBuilder = fragmentCB({ 
-  data: async (chunk) => await outFile.write(chunk),
-  end: async () => await outFile.close(),
+const xmlBuilder = createCB({
+  'data': (chunk) => outFile.write(chunk),
+  'end': () => outFile.end(),
   prettyPrint: true
 });
 

@@ -835,6 +835,28 @@ export interface XMLBuilder {
  */
 export interface XMLBuilderCB {
   /**
+   * Handles the data event which is emitted when a chunk of data is produced.
+   * 
+   * @param event - event name
+   * @param listener - an event listener callback
+   */
+  on(event: "data", listener: (chunk: string, level: number) => void): this
+  /**
+   * Handles the end event which is emitted when the XML document is completed.
+   * 
+   * @param event - event name
+   * @param listener - an event listener callback
+   */
+  on(event: "end", listener: () => void): this
+  /**
+   * Handles the error event which is emitted when an error occurs.
+   * 
+   * @param event - event name
+   * @param listener - an event listener callback
+   */
+  on(event: "error", listener: (err: Error) => void): this
+
+  /**
    * Creates a new element node and appends it to the list of child nodes.
    * 
    * @param namespace - element namespace
@@ -843,7 +865,7 @@ export interface XMLBuilderCB {
    * 
    * @returns the builder
    */
-  ele(namespace: string | null, name: string, attributes?: AttributesObject): XMLBuilderCB
+  ele(namespace: string | null, name: string, attributes?: AttributesObject): this
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
@@ -853,7 +875,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  ele(name: string, attributes?: AttributesObject): XMLBuilderCB
+  ele(name: string, attributes?: AttributesObject): this
 
   /**
    * Creates new element nodes from the given JS object and appends it to the
@@ -863,7 +885,7 @@ export interface XMLBuilderCB {
    * 
    * @returns the last top level element node created
    */
-  ele(obj: ExpandObject): XMLBuilderCB
+  ele(obj: ExpandObject): this
 
   /**
    * Creates or updates an element attribute.
@@ -874,7 +896,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  att(namespace: string | null, name: string, value: string): XMLBuilderCB
+  att(namespace: string | null, name: string, value: string): this
 
   /**
    * Creates or updates an element attribute.
@@ -884,7 +906,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  att(name: string, value: string): XMLBuilderCB
+  att(name: string, value: string): this
 
   /**
    * Creates or updates an element attribute.
@@ -893,7 +915,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  att(obj: AttributesObject): XMLBuilderCB
+  att(obj: AttributesObject): this
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
@@ -902,7 +924,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  txt(content: string): XMLBuilderCB
+  txt(content: string): this
 
   /**
    * Creates a new comment node and appends it to the list of child nodes.
@@ -911,7 +933,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  com(content: string): XMLBuilderCB
+  com(content: string): this
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.
@@ -920,7 +942,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  dat(content: string): XMLBuilderCB
+  dat(content: string): this
 
   /**
    * Creates a new processing instruction node and appends it to the list of 
@@ -931,7 +953,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  ins(target: string, content?: string): XMLBuilderCB
+  ins(target: string, content?: string): this
 
   /**
    * Creates new processing instruction nodes by expanding the given object and
@@ -942,7 +964,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  ins(target: PIObject): XMLBuilderCB
+  ins(target: PIObject): this
 
   /**
    * Creates the XML declaration.
@@ -951,7 +973,7 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  dec(options?: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilderCB
+  dec(options?: { version?: "1.0", encoding?: string, standalone?: boolean }): this
 
   /**
    * Creates a new DocType node and inserts it into the document.
@@ -960,21 +982,21 @@ export interface XMLBuilderCB {
    * 
    * @returns callback builder
    */
-  dtd(options: DTDOptions & { name: string }): XMLBuilderCB
+  dtd(options: DTDOptions & { name: string }): this
 
   /**
    * Closes the current element node.
    * 
    * @returns callback builder
    */
-  up(): XMLBuilderCB
+  up(): this
 
   /**
    * Completes serializing the XML document.
    * 
    * @returns callback builder
    */
-  end(): XMLBuilderCB
+  end(): this
 }
 
 /**
@@ -1130,18 +1152,12 @@ export type CBWriterOptions = XMLCBWriterOptions | JSONCBWriterOptions
 /**
  * Defines the options passed to the callback builder.
  */
-export type XMLBuilderCBCreateOptions = RecursivePartial<XMLBuilderCBOptions>  & { 
-  /** @inheritdoc */
-  data: ((chunk: string, level: number) => void)
-  /** @inheritdoc */
-  end: (() => void)
-}
+export type XMLBuilderCBCreateOptions = RecursivePartial<XMLBuilderCBOptions>
 
 /**
  * Defines default values for builder options.
  */
 export const DefaultXMLBuilderCBOptions: Partial<XMLBuilderCBOptions> = {
-  error: (() => { }),
   format: "xml",
   wellFormed: false,
   prettyPrint: false,

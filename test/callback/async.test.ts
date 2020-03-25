@@ -1,33 +1,61 @@
 import $$ from '../TestHelpers'
-import fs from 'fs'
+import { createWriteStream, readFile } from 'fs'
 import { resolve } from 'path'
-import { promisify } from 'util'
-
-const open = promisify(fs.open)
-const write = promisify(fs.write)
-const close = promisify(fs.close)
-const readFile = promisify(fs.readFile)
 
 describe('Use callback API with fs async', () => {
 
-  test('basic', async (done) => {
+  test('basic', (done) => {
+    const xmlStr = `<root><foo/><bar fizz="buzz"/></root>`
+
     const filename = resolve(__dirname, 'async-basic.test.out')
-    const outFile = await open(filename, 'w')
-    
-    const xml = $$.createCB({ 
-      data: async (chunk) => await write(outFile, chunk),
-      end: async () => {
-        await close(outFile)
-        const result = await readFile(filename, { encoding: 'utf8' })
-        expect(result).toBe(`<root><foo/><bar fizz="buzz"/></root>`)
-        done()
-      }
+    const outFile = createWriteStream(filename)
+
+    const xmlStream = $$.createCB({
+      'data': (chunk: string) => outFile.write(chunk),
+      'end': () => outFile.end()
     })
 
-    xml.ele("root")
+    outFile.on('close', () => {
+      readFile(filename, 'utf8', (err, result) => {
+        expect(result).toBe(xmlStr)
+        done()
+      })
+    })
+
+    xmlStream.ele("root")
       .ele("foo").up()
       .ele("bar").att("fizz", "buzz").up()
       .end()
+  })
+
+  test('many', (done) => {
+    const count = 1000
+    let xmlStr = "<root>"
+    for (let i = 1; i < count; i++) {
+      xmlStr += "<node" + i.toString() + " att" + i.toString() + "=\"val" + i.toString() + "\"/>"
+    }
+    xmlStr += "</root>"
+
+    const filename = resolve(__dirname, 'async-many.test.out')
+    const outFile = createWriteStream(filename)
+
+    const xmlStream = $$.createCB({
+      'data': (chunk: string) => outFile.write(chunk),
+      'end': () => outFile.end()
+    })
+
+    outFile.on('close', () => {
+      readFile(filename, 'utf8', (err, result) => {
+        expect(result).toBe(xmlStr)
+        done()
+      })
+    })
+
+    xmlStream.ele("root")
+    for (let i = 1; i < count; i++) {
+      xmlStream.ele("node" + i.toString()).att("att" + i.toString(), "val" + i.toString()).up()
+    }
+    xmlStream.end()
   })
 
 })

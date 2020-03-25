@@ -18,6 +18,7 @@ import { Guard } from "@oozcitak/dom/lib/util"
 import { BaseCBWriter } from "../writers/BaseCBWriter"
 import { XMLCBWriter } from "../writers/XMLCBWriter"
 import { JSONCBWriter } from "../writers/JSONCBWriter"
+import { EventEmitter } from "events"
 
 /**
  * Stores the last generated prefix. An object is used instead of a number so
@@ -28,7 +29,7 @@ type PrefixIndex = { value: number }
 /**
  * Represents a readable XML document stream.
  */
-export class XMLBuilderCBImpl implements XMLBuilderCB {
+export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
   private static _VoidElementNames = new Set(['area', 'base', 'basefont',
     'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen',
@@ -52,10 +53,6 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
 
   private _ended = false
 
-  private _onData: ((chunk: string, level: number) => void)
-  private _onEnd: (() => void)
-  private _onError: ((err: Error) => void)
-
   /**
    * Initializes a new instance of `XMLStream`.
    * 
@@ -64,11 +61,13 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
    * 
    * @returns XML stream
    */
-  public constructor(options: XMLBuilderCBCreateOptions, fragment = false) {
+  public constructor(options?: XMLBuilderCBCreateOptions, fragment = false) {
+    super()
+
     this._fragment = fragment
 
     // provide default options
-    this._options = applyDefaults(options,
+    this._options = applyDefaults(options || {},
       DefaultXMLBuilderCBOptions
     ) as Required<XMLBuilderCBOptions>
 
@@ -79,9 +78,15 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
 
     this._writer = this._options.format === "xml" ? new XMLCBWriter(this._options) : new JSONCBWriter(this._options)
 
-    this._onData = options.data
-    this._onEnd = options.end
-    this._onError = this._options.error
+    if (this._options.data !== undefined ){
+      this.on("data", this._options.data)
+    }
+    if (this._options.end !== undefined ){
+      this.on("end", this._options.end)
+    }
+    if (this._options.error !== undefined ){
+      this.on("error", this._options.error)
+    }
 
     this._namespace = null
     this._prefixMap = new NamespacePrefixMap()
@@ -91,7 +96,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
 
   /** @inheritdoc */
   ele(p1: string | null | ExpandObject, p2?: AttributesObject | string,
-    p3?: AttributesObject): XMLBuilderCB {
+    p3?: AttributesObject): this {
 
     // parse if JS object or XML or JSON string
     if (isObject(p1) || (isString(p1) && (/^\s*</.test(p1) || /^\s*[\{\[]/.test(p1)))) {
@@ -99,7 +104,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       try {
         frag.ele(p1 as any)
       } catch (err) {
-        this._onError.call(this, err)
+        this.emit("error", err)
         return this
       }
 
@@ -112,20 +117,20 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
     this._serializeOpenTag(true)
 
     if (!this._fragment && this._hasDocumentElement && this._writer.level === 0) {
-      this._onError.call(this, new Error("Document cannot have multiple document element nodes."))
+      this.emit("error", new Error("Document cannot have multiple document element nodes."))
       return this
     }
 
     try {
       this._currentElement = fragment(this._builderOptions).ele(p1 as any, p2 as any, p3 as any)
     } catch (err) {
-      this._onError.call(this, err)
+      this.emit("error", err)
       return this
     }
 
     if (!this._fragment && !this._hasDocumentElement && this._docTypeName !== ""
       && (this._currentElement.node as Element)._qualifiedName !== this._docTypeName) {
-      this._onError.call(this, new Error("Document element name does not match DocType declaration name."))
+      this.emit("error", new Error("Document element name does not match DocType declaration name."))
       return this
     }
 
@@ -138,22 +143,22 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
   }
 
   /** @inheritdoc */
-  att(p1: AttributesObject | string | null, p2?: string, p3?: string): XMLBuilderCB {
+  att(p1: AttributesObject | string | null, p2?: string, p3?: string): this {
     if (this._currentElement === undefined) {
-      this._onError.call(this, new Error("Cannot insert an attribute node as child of a document node."))
+      this.emit("error", new Error("Cannot insert an attribute node as child of a document node."))
       return this
     }
     try {
       this._currentElement.att(p1 as any, p2 as any, p3 as any)
     } catch (err) {
-      this._onError.call(this, err)
+      this.emit("error", err)
       return this
     }
     return this
   }
 
   /** @inheritdoc */
-  com(content: string): XMLBuilderCB {
+  com(content: string): this {
     this._serializeOpenTag(true)
 
     let node: Comment
@@ -161,14 +166,14 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       node = fragment(this._builderOptions).com(content).first().node as Comment
     } catch (err) {
       /* istanbul ignore next */
-      this._onError.call(this, err)
+      this.emit("error", err)
       /* istanbul ignore next */
       return this
     }
 
     if (this._options.wellFormed && (!xml_isLegalChar(node.data) ||
       node.data.indexOf("--") !== -1 || node.data.endsWith("-"))) {
-      this._onError.call(this, new Error("Comment data contains invalid characters (well-formed required)."))
+      this.emit("error", new Error("Comment data contains invalid characters (well-formed required)."))
       return this
     }
 
@@ -177,9 +182,9 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
   }
 
   /** @inheritdoc */
-  txt(content: string): XMLBuilderCB {
+  txt(content: string): this {
     if (!this._fragment && this._currentElement === undefined) {
-      this._onError.call(this, new Error("Cannot insert a text node as child of a document node."))
+      this.emit("error", new Error("Cannot insert a text node as child of a document node."))
       return this
     }
     this._serializeOpenTag(true)
@@ -189,13 +194,13 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       node = fragment(this._builderOptions).txt(content).first().node as Text
     } catch (err) {
       /* istanbul ignore next */
-      this._onError.call(this, err)
+      this.emit("error", err)
       /* istanbul ignore next */
       return this
     }
 
     if (this._options.wellFormed && !xml_isLegalChar(node.data)) {
-      this._onError.call(this, new Error("Text data contains invalid characters (well-formed required)."))
+      this.emit("error", new Error("Text data contains invalid characters (well-formed required)."))
       return this
     }
 
@@ -217,7 +222,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
   }
 
   /** @inheritdoc */
-  ins(target: string | PIObject, content: string = ''): XMLBuilderCB {
+  ins(target: string | PIObject, content: string = ''): this {
     this._serializeOpenTag(true)
 
     let node: ProcessingInstruction
@@ -225,18 +230,18 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       node = fragment(this._builderOptions).ins(target as any, content).first().node as ProcessingInstruction
     } catch (err) {
       /* istanbul ignore next */
-      this._onError.call(this, err)
+      this.emit("error", err)
       /* istanbul ignore next */
       return this
     }
 
     if (this._options.wellFormed && (node.target.indexOf(":") !== -1 || (/^xml$/i).test(node.target))) {
-      this._onError.call(this, new Error("Processing instruction target contains invalid characters (well-formed required)."))
+      this.emit("error", new Error("Processing instruction target contains invalid characters (well-formed required)."))
       return this
     }
 
     if (this._options.wellFormed && !xml_isLegalChar(node.data)) {
-      this._onError.call(this, Error("Processing instruction data contains invalid characters (well-formed required)."))
+      this.emit("error", Error("Processing instruction data contains invalid characters (well-formed required)."))
       return this
     }
 
@@ -246,14 +251,14 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
   }
 
   /** @inheritdoc */
-  dat(content: string): XMLBuilderCB {
+  dat(content: string): this {
     this._serializeOpenTag(true)
 
     let node: CDATASection
     try {
       node = fragment(this._builderOptions).dat(content).first().node as CDATASection
     } catch (err) {
-      this._onError.call(this, err)
+      this.emit("error", err)
       return this
     }
 
@@ -262,14 +267,14 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
   }
 
   /** @inheritdoc */
-  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean } = { version: "1.0" }): XMLBuilderCB {
+  dec(options: { version?: "1.0", encoding?: string, standalone?: boolean } = { version: "1.0" }): this {
     if (this._fragment) {
-      this._onError.call(this, Error("Cannot insert an XML declaration into a document fragment."))
+      this.emit("error", Error("Cannot insert an XML declaration into a document fragment."))
       return this
     }
 
     if (this._hasDeclaration) {
-      this._onError.call(this, Error("XML declaration is already inserted."))
+      this.emit("error", Error("XML declaration is already inserted."))
       return this
     }
 
@@ -280,19 +285,19 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
   }
 
   /** @inheritdoc */
-  dtd(options: DTDOptions & { name: string }): XMLBuilderCB {
+  dtd(options: DTDOptions & { name: string }): this {
     if (this._fragment) {
-      this._onError.call(this, Error("Cannot insert a DocType declaration into a document fragment."))
+      this.emit("error", Error("Cannot insert a DocType declaration into a document fragment."))
       return this
     }
 
     if (this._docTypeName !== "") {
-      this._onError.call(this, new Error("DocType declaration is already inserted."))
+      this.emit("error", new Error("DocType declaration is already inserted."))
       return this
     }
 
     if (this._hasDocumentElement) {
-      this._onError.call(this, new Error("Cannot insert DocType declaration after document element."))
+      this.emit("error", new Error("Cannot insert DocType declaration after document element."))
       return this
     }
 
@@ -300,19 +305,19 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
     try {
       node = create().dtd(options).first().node as DocumentType
     } catch (err) {
-      this._onError.call(this, err)
+      this.emit("error", err)
       return this
     }
 
     if (this._options.wellFormed && !xml_isPubidChar(node.publicId)) {
-      this._onError.call(this, new Error("DocType public identifier does not match PubidChar construct (well-formed required)."))
+      this.emit("error", new Error("DocType public identifier does not match PubidChar construct (well-formed required)."))
       return this
     }
 
     if (this._options.wellFormed &&
       (!xml_isLegalChar(node.systemId) ||
         (node.systemId.indexOf('"') !== -1 && node.systemId.indexOf("'") !== -1))) {
-      this._onError.call(this, new Error("DocType system identifier contains invalid characters (well-formed required)."))
+      this.emit("error", new Error("DocType system identifier contains invalid characters (well-formed required)."))
       return this
     }
 
@@ -322,14 +327,14 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
   }
 
   /** @inheritdoc */
-  up(): XMLBuilderCB {
+  up(): this {
     this._serializeOpenTag(false)
     this._serializeCloseTag()
     return this
   }
 
   /** @inheritdoc */
-  end(): XMLBuilderCB {
+  end(): this {
     this._serializeOpenTag(false)
     while (this._openTags.length > 0) {
       this._serializeCloseTag()
@@ -351,7 +356,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
 
     if (this._options.wellFormed && (node.localName.indexOf(":") !== -1 ||
       !xml_isName(node.localName))) {
-      this._onError.call(this, new Error("Node local name contains invalid characters (well-formed required)."))
+      this.emit("error", new Error("Node local name contains invalid characters (well-formed required)."))
       return
     }
 
@@ -381,7 +386,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       let candidatePrefix = map.get(prefix, ns)
       if (prefix === "xmlns") {
         if (this._options.wellFormed) {
-          this._onError.call(this, new Error("An element cannot have the 'xmlns' prefix (well-formed required)."))
+          this.emit("error", new Error("An element cannot have the 'xmlns' prefix (well-formed required)."))
           return
         }
 
@@ -480,7 +485,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
     const lastEle = this._openTags.pop()
     /* istanbul ignore next */
     if (lastEle === undefined) {
-      this._onError.call(this, new Error("Last element is undefined."))
+      this.emit("error", new Error("Last element is undefined."))
       return
     }
 
@@ -504,12 +509,12 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
   private _push(data: string | null): void {
     if (data === null) {
       this._ended = true
-      this._onEnd()
+      this.emit("end")
     } else if (this._ended) {
-      this._onError.call(this, new Error("Cannot push to ended stream."))
+      this.emit("error", new Error("Cannot push to ended stream."))
     } else if (data.length !== 0) {
       this._writer.hasData = true
-      this._onData(data, this._writer.level)
+      this.emit("data", data, this._writer.level)
     }
   }
 
@@ -576,7 +581,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       }
 
       if (requireWellFormed && localNameSet && localNameSet.has(attr.namespaceURI, attr.localName)) {
-        this._onError.call(this, new Error("Element contains duplicate attributes (well-formed required)."))
+        this.emit("error", new Error("Element contains duplicate attributes (well-formed required)."))
         return
       }
 
@@ -596,12 +601,12 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
             continue
 
           if (requireWellFormed && attr.value === infraNamespace.XMLNS) {
-            this._onError.call(this, new Error("XMLNS namespace is reserved (well-formed required)."))
+            this.emit("error", new Error("XMLNS namespace is reserved (well-formed required)."))
             return
           }
 
           if (requireWellFormed && attr.value === '') {
-            this._onError.call(this, new Error("Namespace prefix declarations cannot be used to undeclare a namespace (well-formed required)."))
+            this.emit("error", new Error("Namespace prefix declarations cannot be used to undeclare a namespace (well-formed required)."))
             return
           }
 
@@ -635,7 +640,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
       if (requireWellFormed && (attr.localName.indexOf(":") !== -1 ||
         !xml_isName(attr.localName) ||
         (attr.localName === "xmlns" && attributeNamespace === null))) {
-        this._onError.call(this, new Error("Attribute local name contains invalid characters (well-formed required)."))
+        this.emit("error", new Error("Attribute local name contains invalid characters (well-formed required)."))
         return
       }
 
@@ -653,7 +658,7 @@ export class XMLBuilderCBImpl implements XMLBuilderCB {
    */
   private _serializeAttributeValue(value: string | null, requireWellFormed: boolean): string {
     if (requireWellFormed && value !== null && !xml_isLegalChar(value)) {
-      this._onError.call(this, new Error("Invalid characters in attribute value."))
+      this.emit("error", new Error("Invalid characters in attribute value."))
       return ""
     }
 

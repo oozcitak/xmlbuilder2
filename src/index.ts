@@ -320,7 +320,7 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
  * 
  * @returns callback builder
  */
-export function createCB(options: XMLBuilderCBCreateOptions): XMLBuilderCB {
+export function createCB(options?: XMLBuilderCBCreateOptions): XMLBuilderCB {
   return new XMLBuilderCBImpl(options)
 }
 
@@ -331,7 +331,7 @@ export function createCB(options: XMLBuilderCBCreateOptions): XMLBuilderCB {
  * 
  * @returns callback builder
  */
-export function fragmentCB(options: XMLBuilderCBCreateOptions): XMLBuilderCB {
+export function fragmentCB(options?: XMLBuilderCBCreateOptions): XMLBuilderCB {
   return new XMLBuilderCBImpl(options, true)
 }
 

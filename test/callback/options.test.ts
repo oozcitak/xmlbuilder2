@@ -5,12 +5,15 @@ describe('XMLStream options', () => {
 
   test('options defaults', () => {
     const xmlStream = new XMLBuilderCBImpl({
-      data: ((chunk, level) => { }),
-      end: (() => { })
+      data: (() => { }),
+      end: (() => { }),
+      error: (() => { })
     }) as any
 
     const options = xmlStream._options
 
+    expect(typeof options.data).toBe('function')
+    expect(typeof options.end).toBe('function')
     expect(typeof options.error).toBe('function')
     expect(options.wellFormed).toBe(false)
     expect(options.prettyPrint).toBe(false)
