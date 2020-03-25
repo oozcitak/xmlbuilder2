@@ -504,7 +504,7 @@ object as its single argument.
 const { createCB } = require('xmlbuilder2');
 
 const xmlBuilder = createCB({ prettyPrint: true });
-xmlBuilder.on('data', (chunk) => console.log(chunk);
+xmlBuilder.on('data', (chunk) => console.log(chunk));
 
 xmlBuilder.ele('root').txt('val').end();
 ```
