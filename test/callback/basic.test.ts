@@ -122,7 +122,7 @@ describe('basic callback API tests', () => {
 
   test('test level', (done) => {
     const xmlStream = $$.createCB({
-      data: (chunk, level) => {
+      data: (chunk: string, level: number) => {
         if (chunk === "<root>") {
           expect(level).toBe(0)
         } else if (chunk === "<child>") {
