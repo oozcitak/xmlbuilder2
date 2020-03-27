@@ -9,25 +9,25 @@ entries:
     output: web
     folderitems:
     - title: Object Conversion
-      url: /object-conversion.html#top
+      url: /object-conversion.html
       output: web
     - title: Namespaces
-      url: /namespaces.html#top
+      url: /namespaces.html
       output: web
     - title: Parsing
-      url: /parsing.html#top
+      url: /parsing.html
       output: web
     - title: Serialization
-      url: /serialization.html#top
+      url: /serialization.html
       output: web
     - title: DOM Interfaces
-      url: /dom-interfaces.html#top
+      url: /dom-interfaces.html
       output: web
     - title: Using with External Libraries
-      url: /using-with-external-libraries.html#top
+      url: /using-with-external-libraries.html
       output: web
     - title: Upgrading from xmlbuilder
-      url: /upgrading-from-xmlbuilder.html#top
+      url: /upgrading-from-xmlbuilder.html
       output: web
   - title: API
     output: web
