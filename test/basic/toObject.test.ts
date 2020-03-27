@@ -6,7 +6,7 @@ describe('toObject() with map', () => {
     const root = $$.create().ele('root', { "att": "val", "att2": "val2" })
       .ele('node1').up()
       .ele('node2').root()
-    const obj = root.toObject({ format: "map" })
+    const obj = root.toObject({ format: "map", group: true })
     expect($$.printMap(obj)).toBe($$.t`
       M{
         root: M{
@@ -81,7 +81,7 @@ describe('toObject() with object', () => {
     const root = $$.create().ele('root', { "att": "val", "att2": "val2" })
       .ele('node1').up()
       .ele('node2').root()
-    const obj = root.toObject({ format: "object" })
+    const obj = root.toObject({ format: "object", group: true })
     expect($$.printMap(obj)).toBe($$.t`
       {
         root: {

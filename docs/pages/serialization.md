@@ -145,10 +145,13 @@ new Map([
 
 ### Serialization Settings
 
-In addition to `format` there are a number of settings for customizing the output of serializers.
+These settings are common to all serializers.
 
 * `format` - Output format. Either `"object"`, `"xml"`, `"json"` or `"map"`. Defaults to `"xml"`.
 * `wellFormed` - Ensures that the document adheres to the syntax rules specified by the XML specification. If this flag is set and the document is not well-formed errors will be thrown. Defaults to `false`.
+
+#### XML String Serializer
+
 * `headless` - Suppresses the XML declaration from the output. Defaults to `false`.
 * `prettyPrint` - Pretty-prints the XML tree. Defaults to `false`.
 * `indent` - Determines the indentation string for pretty printing. Defaults to two space characters.
@@ -159,3 +162,40 @@ In addition to `format` there are a number of settings for customizing the outpu
 * `indentTextOnlyNodes` - Indents contents of text-only element nodes. Defaults to `false` which keeps a text node on the same line with its containing element node, e.g. `<node>some text</node>`. Otherwise, it will be printed on a new line.
 {% include note.html content="Element nodes with mixed content are always indented regardless of this setting." %}
 * `spaceBeforeSlash` - Inserts a space character before the slash character of self-closing tags. With this options set to `true`, a space character will be inserted before the slash character of self-closing tags, e.g. `<node />`. Defaults to `false`.
+
+#### JS Object and Map Serializers
+
+* `group` - Groups consecutive nodes of same type under a single object. Defaults to `false`.
+
+with group set to `true`:
+```js
+const { create } = require('xmlbuilder2');
+
+const doc = create().ele('root').att({ foo: 'bar', fizz: 'buzz' });
+console.log(doc.end({ format: "object", group: true }));
+```
+```js
+{
+  root: { '@': { foo: 'bar', fizz: 'buzz' }}
+}
+```
+with group set to `false`:
+```js
+const { create } = require('xmlbuilder2');
+
+const doc = create().ele('root').att({ foo: 'bar', fizz: 'buzz' });
+console.log(doc.end({ format: "object", group: false }));
+```
+```js
+{
+  root: { '@foo': 'bar', '@fizz': 'buzz' }
+}
+```
+
+#### JSON Serializer
+
+* `prettyPrint` - Pretty-prints the XML tree. Defaults to `false`.
+* `indent` - Determines the indentation string for pretty printing. Defaults to two space characters.
+* `newline` - Determines the newline string for pretty printing. Defaults to `"\n"`.
+* `offset` - Defines a fixed number of indentations to add to every line. Defaults to `0`.
+* `group` - Groups consecutive nodes of same type under a single object. Defaults to `false`. See [JS object serializer]({{ site.baseurl }}{% link pages/serialization.md %}#js-object-and-map-serializers) for usage example.

@@ -27,7 +27,7 @@ describe('ObjectWriter', () => {
     }
 
     const result = $$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
-      .ele('root').ele(obj).end({ format: "object" })
+      .ele('root').ele(obj).end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -66,7 +66,7 @@ describe('ObjectWriter', () => {
       .att("att2", "val2")
       .att("att3", "val3")
       .ele("node").att("att", "val").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -88,7 +88,7 @@ describe('ObjectWriter', () => {
       .txt("text2")
       .txt("text3")
       .ele("node").txt("text").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -110,7 +110,7 @@ describe('ObjectWriter', () => {
       .com("text2")
       .com("text3")
       .ele("node").com("text").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -132,7 +132,7 @@ describe('ObjectWriter', () => {
       .dat("text2")
       .dat("text3")
       .ele("node").dat("text").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -154,7 +154,7 @@ describe('ObjectWriter', () => {
       .ins("target2", "text2")
       .ins("target3", "text3")
       .ele("node").ins("target", "text").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -252,10 +252,8 @@ describe('ObjectWriter', () => {
             { @name: yyy },
             { @name: zzz }
           ],
-          #2: [
-            text2,
-            text3
-          ]
+          #2: text2,
+          #3: text3
         }
       }
       `)
@@ -321,7 +319,7 @@ describe('ObjectWriter', () => {
       .ele("node").att("att", "val").up()
       .txt("text")
       .ele("node").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -351,7 +349,7 @@ describe('ObjectWriter', () => {
       .ele("node").txt("text").up()
       .txt("text")
       .ele("node").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -381,7 +379,7 @@ describe('ObjectWriter', () => {
       .ele("node").com("text").up()
       .txt("text")
       .ele("node").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -411,7 +409,7 @@ describe('ObjectWriter', () => {
       .ele("node").dat("text").up()
       .txt("text")
       .ele("node").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -441,7 +439,7 @@ describe('ObjectWriter', () => {
       .ele("node").ins("target", "text").up()
       .txt("text")
       .ele("node").up()
-      .end({ format: "object" })
+      .end({ format: "object", group: true })
 
     expect($$.printMap(result)).toBe($$.t`
       {
@@ -613,5 +611,22 @@ describe('ObjectWriter', () => {
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
     expect(() => ele.end({ format: "object" })).toThrow()
   })
-  
+
+  test('auto group', () => {
+    const root = $$.create().ele('root')
+      .ele('node').up()
+      .txt('text')
+      .ele('node').up()
+      .up()
+    expect(root.end({ format: "object", group: false })).toEqual({
+      root: {
+        '#': [
+          { node: {} },
+          { '#' : 'text' },
+          { node: {} }
+        ]
+      }
+    })
+  })
+
 })

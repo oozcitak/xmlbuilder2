@@ -28,7 +28,7 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions> {
       indent: '  ',
       newline: '\n',
       offset: 0,
-      group: true
+      group: false
     }) as Required<JSONWriterOptions>
 
     // convert to object

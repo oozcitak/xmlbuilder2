@@ -21,7 +21,7 @@ export class MapWriter extends BaseWriter<MapWriterOptions> {
     const options: MapWriterOptions = applyDefaults(writerOptions, {
       format: "map",
       wellFormed: false,
-      group: true
+      group: false
     })
 
     // convert to object

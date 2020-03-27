@@ -22,7 +22,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
     const options = applyDefaults(writerOptions, {
       format: "object",
       wellFormed: false,
-      group: true
+      group: false
     }) as Required<ObjectWriterOptions>
 
     this._currentList = []
@@ -120,7 +120,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
     if (textCount === 1 && items.length === 1 && isString((items[0] as TextNode)["#"])) {
       // special case of an element node with a single text node
       return (items[0] as TextNode)["#"]
-    } else if (options.group && hasNonUniqueNames) {
+    } else if (hasNonUniqueNames) {
       // list contains element nodes with non-unique names
       // return an array with mixed content notation
       const result: XMLSerializedValue = []
