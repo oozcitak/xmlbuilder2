@@ -1,5 +1,6 @@
 import {
-  XMLSerializedValue, MapWriterOptions, ObjectWriterOptions
+  MapWriterOptions, ObjectWriterOptions, XMLSerializedAsMap, 
+  XMLSerializedAsMapArray
 } from "../interfaces"
 import { applyDefaults, isArray, isObject } from "@oozcitak/util"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
@@ -9,7 +10,7 @@ import { BaseWriter } from "./BaseWriter"
 /**
  * Serializes XML nodes into ES6 maps and arrays.
  */
-export class MapWriter extends BaseWriter<MapWriterOptions> {
+export class MapWriter extends BaseWriter<MapWriterOptions, XMLSerializedAsMap | XMLSerializedAsMapArray> {
 
   /**
    * Produces an XML serialization of the given node.
@@ -17,7 +18,7 @@ export class MapWriter extends BaseWriter<MapWriterOptions> {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: Node, writerOptions?: MapWriterOptions): XMLSerializedValue {
+  serialize(node: Node, writerOptions?: MapWriterOptions): XMLSerializedAsMap | XMLSerializedAsMapArray {
     const options: MapWriterOptions = applyDefaults(writerOptions, {
       format: "map",
       wellFormed: false,
@@ -36,12 +37,17 @@ export class MapWriter extends BaseWriter<MapWriterOptions> {
     return this._convertObject(val)
   }
 
-  _convertObject(obj: XMLSerializedValue): XMLSerializedValue {
+  /**
+   * Recursively converts a JS object into an ES5 map.
+   * 
+   * @param obj - a JS object
+   */
+  _convertObject(obj: any): any {
     if (isArray(obj)) {
       for (let i = 0; i < obj.length; i++) {
         obj[i] = this._convertObject(obj[i])
       }
-      return obj
+      return obj as any
     } else if (isObject(obj)) {
       const map = new Map()
       for (const key in obj) {

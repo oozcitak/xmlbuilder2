@@ -12,7 +12,7 @@ import { xml_isName, xml_isLegalChar, xml_isPubidChar } from "@oozcitak/dom/lib/
 /**
  * Pre-serializes XML nodes.
  */
-export abstract class BaseWriter<T extends BaseWriterOptions> {
+export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSerializedValue> {
 
   private static _VoidElementNames = new Set(['area', 'base', 'basefont',
     'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen',
@@ -35,7 +35,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions> {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  abstract serialize(node: Node, writerOptions?: T): XMLSerializedValue
+  abstract serialize(node: Node, writerOptions?: T): U
 
   /**
    * Used by derived classes to serialize a DocType node.

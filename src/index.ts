@@ -1,8 +1,10 @@
 import {
   XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions,
-  XMLSerializedValue, XMLBuilderOptions, DefaultBuilderOptions,
-  DocumentWithSettings, XMLBuilderOptionKeys, XMLBuilderCB,
-  XMLBuilderCBCreateOptions
+  XMLBuilderOptions, DefaultBuilderOptions, DocumentWithSettings,
+  XMLBuilderOptionKeys, XMLBuilderCB, XMLWriterOptions,
+  JSONWriterOptions, ObjectWriterOptions, XMLSerializedAsObject,
+  XMLSerializedAsObjectArray, MapWriterOptions, XMLSerializedAsMap,
+  XMLSerializedAsMapArray, XMLBuilderCBCreateOptions, XMLSerializedValue
 } from './interfaces'
 import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
@@ -243,19 +245,19 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
 }
 
 /**
- * Parses an XML document with the default options and converts it to the default
- * output format.
+ * Parses an XML document with the default options and converts it to an XML
+ * document string with the default writer options.
  * 
  * @param contents - a string containing an XML document in either XML or JSON
  * format or a JS object representing nodes to insert
  * 
  * @returns document node
  */
-export function convert(contents: string | ExpandObject): XMLSerializedValue
+export function convert(contents: string | ExpandObject): string
 
 /**
- * Parses an XML document with the given options and converts it to the default
- * output format.
+ * Parses an XML document with the given options and converts it to an XML
+ * document string with the default writer options.
  * 
  * @param builderOptions - builder options
  * @param contents - a string containing an XML document in either XML or JSON
@@ -264,11 +266,11 @@ export function convert(contents: string | ExpandObject): XMLSerializedValue
  * @returns document node
  */
 export function convert(builderOptions: XMLBuilderCreateOptions,
-  contents: string | ExpandObject): XMLSerializedValue
+  contents: string | ExpandObject): string
 
 /**
- * Parses an XML document with the default options and converts it to the given
- * format.
+ * Parses an XML document with the default options and converts it an XML 
+ * document string.
  * 
  * @param contents - a string containing an XML document in either XML or JSON
  * format or a JS object representing nodes to insert
@@ -277,11 +279,49 @@ export function convert(builderOptions: XMLBuilderCreateOptions,
  * @returns document node
  */
 export function convert(contents: string | ExpandObject,
-  convertOptions: WriterOptions): XMLSerializedValue
+  convertOptions: XMLWriterOptions): string
 
 /**
- * Parses an XML document with the given options and converts it to the given
- * format.
+ * Parses an XML document with the default options and converts it a JSON string.
+ * 
+ * @param contents - a string containing an XML document in either XML or JSON
+ * format or a JS object representing nodes to insert
+ * @param convertOptions - convert options
+ * 
+ * @returns document node
+ */
+export function convert(contents: string | ExpandObject,
+  convertOptions: JSONWriterOptions): string
+
+/**
+ * Parses an XML document with the default options and converts it to its object
+ * representation.
+ * 
+ * @param contents - a string containing an XML document in either XML or JSON
+ * format or a JS object representing nodes to insert
+ * @param convertOptions - convert options
+ * 
+ * @returns document node
+ */
+export function convert(contents: string | ExpandObject,
+  convertOptions: ObjectWriterOptions): XMLSerializedAsObject | XMLSerializedAsObjectArray
+
+/**
+ * Parses an XML document with the default options and converts it to its object
+ * representation using ES6 maps.
+ * 
+ * @param contents - a string containing an XML document in either XML or JSON
+ * format or a JS object representing nodes to insert
+ * @param convertOptions - convert options
+ * 
+ * @returns document node
+ */
+export function convert(contents: string | ExpandObject,
+  convertOptions: MapWriterOptions): XMLSerializedAsMap | XMLSerializedAsMapArray
+
+/**
+ * Parses an XML document with the given options and converts it to an XML
+ * document string.
  * 
  * @param builderOptions - builder options
  * @param contents - a string containing an XML document in either XML or JSON
@@ -291,7 +331,49 @@ export function convert(contents: string | ExpandObject,
  * @returns document node
  */
 export function convert(builderOptions: XMLBuilderCreateOptions,
-  contents: string | ExpandObject, convertOptions: WriterOptions): XMLSerializedValue
+  contents: string | ExpandObject, convertOptions: XMLWriterOptions): string
+
+/**
+ * Parses an XML document with the given options and converts it to a JSON
+ * string.
+ * 
+ * @param builderOptions - builder options
+ * @param contents - a string containing an XML document in either XML or JSON
+ * format or a JS object representing nodes to insert
+ * @param convertOptions - convert options
+ * 
+ * @returns document node
+ */
+export function convert(builderOptions: XMLBuilderCreateOptions,
+  contents: string | ExpandObject, convertOptions: JSONWriterOptions): string
+
+/**
+ * Parses an XML document with the given options and converts it to its object
+ * representation.
+ * 
+ * @param builderOptions - builder options
+ * @param contents - a string containing an XML document in either XML or JSON
+ * format or a JS object representing nodes to insert
+ * @param convertOptions - convert options
+ * 
+ * @returns document node
+ */
+export function convert(builderOptions: XMLBuilderCreateOptions,
+  contents: string | ExpandObject, convertOptions: ObjectWriterOptions): XMLSerializedAsObject | XMLSerializedAsObjectArray
+
+/**
+ * Parses an XML document with the given options and converts it to its object
+ * representation using ES6 maps.
+ * 
+ * @param builderOptions - builder options
+ * @param contents - a string containing an XML document in either XML or JSON
+ * format or a JS object representing nodes to insert
+ * @param convertOptions - convert options
+ * 
+ * @returns document node
+ */
+export function convert(builderOptions: XMLBuilderCreateOptions,
+  contents: string | ExpandObject, convertOptions: MapWriterOptions): XMLSerializedAsMap | XMLSerializedAsMapArray
 
 /** @inheritdoc */
 export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
@@ -310,7 +392,7 @@ export function convert(p1: XMLBuilderCreateOptions | string | ExpandObject,
     convertOptions = p2 as WriterOptions || undefined
   }
 
-  return create(builderOptions, contents).end(convertOptions)
+  return create(builderOptions, contents).end(convertOptions as any)
 }
 
 /**

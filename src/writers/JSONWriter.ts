@@ -1,5 +1,6 @@
 import {
-  JSONWriterOptions, XMLSerializedValue, ObjectWriterOptions
+  JSONWriterOptions, ObjectWriterOptions, XMLSerializedAsObject, 
+  XMLSerializedAsObjectArray
 } from "../interfaces"
 import { ObjectWriter } from "./ObjectWriter"
 import {
@@ -12,7 +13,7 @@ import { BaseWriter } from "./BaseWriter"
 /**
  * Serializes XML nodes into a JSON string.
  */
-export class JSONWriter extends BaseWriter<JSONWriterOptions> {
+export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
 
   /**
    * Produces an XML serialization of the given node.
@@ -49,7 +50,7 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions> {
    * @param options - serialization options
    * @param level - depth of the XML tree
    */
-  private _convertObject(obj: XMLSerializedValue,
+  private _convertObject(obj: string | XMLSerializedAsObject | XMLSerializedAsObjectArray,
     options: Required<JSONWriterOptions>, level: number = 0): string {
 
     let markup = ''

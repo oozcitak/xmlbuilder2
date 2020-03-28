@@ -7,7 +7,7 @@ import { Guard } from "@oozcitak/dom/lib/util"
 /**
  * Serializes XML nodes into strings.
  */
-export class XMLWriter extends BaseWriter<XMLWriterOptions> {
+export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
 
   protected _options!: Required<XMLWriterOptions>
   private _refs!: StringWriterRefs

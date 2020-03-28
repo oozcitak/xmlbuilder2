@@ -1,4 +1,6 @@
-import { XMLSerializedValue, ObjectWriterOptions } from "../interfaces"
+import {
+  ObjectWriterOptions, XMLSerializedAsObject, XMLSerializedAsObjectArray
+} from "../interfaces"
 import { applyDefaults, isArray, isString } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { BaseWriter } from "./BaseWriter"
@@ -6,7 +8,7 @@ import { BaseWriter } from "./BaseWriter"
 /**
  * Serializes XML nodes into objects and arrays.
  */
-export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
+export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedAsObject | XMLSerializedAsObjectArray> {
 
   private _currentList!: NodeList
   private _currentIndex!: number
@@ -18,7 +20,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
    * @param node - node to serialize
    * @param writerOptions - serialization options
    */
-  serialize(node: Node, writerOptions?: ObjectWriterOptions): XMLSerializedValue {
+  serialize(node: Node, writerOptions?: ObjectWriterOptions): XMLSerializedAsObject | XMLSerializedAsObjectArray {
     const options = applyDefaults(writerOptions, {
       format: "object",
       wellFormed: false,
@@ -70,10 +72,10 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
      *   }
      * }
      */
-    return this._process(this._currentList, options)
+    return this._process(this._currentList, options) as any
   }
 
-  private _process(items: NodeList, options: Required<ObjectWriterOptions>): XMLSerializedValue {
+  private _process(items: NodeList, options: Required<ObjectWriterOptions>): string | XMLSerializedAsObject | XMLSerializedAsObjectArray {
     if (items.length === 0) return {}
 
     // determine if there are non-unique element names
@@ -123,8 +125,8 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
     } else if (hasNonUniqueNames) {
       // list contains element nodes with non-unique names
       // return an array with mixed content notation
-      const result: XMLSerializedValue = []
-      const obj: XMLSerializedValue = { [defTextKey]: result }
+      const result: XMLSerializedAsObject | XMLSerializedAsObjectArray = []
+      const obj: XMLSerializedAsObject | XMLSerializedAsObjectArray = { [defTextKey]: result }
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
         const key = Object.keys(item)[0]
@@ -155,10 +157,10 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
             const ele = item as ElementNode
             if (ele[key].length !== 0 && isArray(ele[key][0])) {
               // group of element nodes
-              const eleGroup: XMLSerializedValue = []
+              const eleGroup: XMLSerializedAsObjectArray = []
               const listOfLists = ele[key] as NodeList[]
               for (let i = 0; i < listOfLists.length; i++) {
-                eleGroup.push(this._process(listOfLists[i], options))
+                eleGroup.push(this._process(listOfLists[i], options) as any)
               }
               result.push({ [key]: eleGroup })
             } else {
@@ -176,7 +178,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
       let commentId: number = 1
       let instructionId: number = 1
       let cdataId: number = 1
-      const obj: XMLSerializedValue = {}
+      const obj: XMLSerializedAsObject = {}
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
         const key = Object.keys(item)[0]
@@ -217,10 +219,10 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions> {
             const ele = item as ElementNode
             if (ele[key].length !== 0 && isArray(ele[key][0])) {
               // group of element nodes
-              const eleGroup: XMLSerializedValue = []
+              const eleGroup: XMLSerializedAsObjectArray = []
               const listOfLists = ele[key] as NodeList[]
               for (let i = 0; i < listOfLists.length; i++) {
-                eleGroup.push(this._process(listOfLists[i], options))
+                eleGroup.push(this._process(listOfLists[i], options) as any)
               }
               obj[key] = eleGroup
             } else {

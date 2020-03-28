@@ -421,13 +421,14 @@ export type WriterOptions = XMLWriterOptions | ObjectWriterOptions |
   JSONWriterOptions | MapWriterOptions
 
 /**
- * Defines a recursive type that can represent objects, arrays and maps of
+ * Defines recursive types that can represent objects, arrays and maps of
  * serialized nodes.
  */
-export type XMLSerializedValue = string | XMLSerializedMap | XMLSerializedArray | XMLSerializedObject
-type XMLSerializedObject = { [key: string]: XMLSerializedValue }
-interface XMLSerializedMap extends Map<string, XMLSerializedValue> { }
-interface XMLSerializedArray extends Array<XMLSerializedValue> { }
+export type XMLSerializedValue = string | XMLSerializedAsObject | XMLSerializedAsObjectArray | XMLSerializedAsMap | XMLSerializedAsMapArray
+export type XMLSerializedAsObject = { [key: string]: string | XMLSerializedAsObject | XMLSerializedAsObjectArray }
+export type XMLSerializedAsObjectArray = Array<string | XMLSerializedAsObject>
+export type XMLSerializedAsMap = Map<string, string | XMLSerializedAsMap | XMLSerializedAsMapArray>
+export type XMLSerializedAsMapArray = Array<string | XMLSerializedAsMap>
 
 /**
  * Represents the type of a variable that can be expanded by the `ele` function 
@@ -809,25 +810,66 @@ export interface XMLBuilder {
   toArray(self?: boolean, recursive?: boolean): XMLBuilder[]
 
   /**
-   * Converts the node into its string representation.
+   * Converts the node into an XML string.
    * 
    * @param options - serialization options
    */
-  toString(writerOptions?: JSONWriterOptions | XMLWriterOptions): string
+  toString(writerOptions?: XMLWriterOptions): string
+
+  /**
+   * Converts the node into a JSON string.
+   * 
+   * @param options - serialization options
+   */
+  toString(writerOptions: JSONWriterOptions): string
 
   /**
    * Converts the node into its object representation.
    * 
    * @param options - serialization options
    */
-  toObject(writerOptions?: MapWriterOptions | ObjectWriterOptions): XMLSerializedValue
+  toObject(writerOptions?: ObjectWriterOptions): XMLSerializedAsObject | XMLSerializedAsObjectArray
 
-  /**
-   * Converts the entire XML document into its string or object representation.
+    /**
+   * Converts the node into its object representation using ES6 maps.
    * 
    * @param options - serialization options
    */
-  end(writerOptions?: WriterOptions): XMLSerializedValue
+  toObject(writerOptions: MapWriterOptions): XMLSerializedAsMap | XMLSerializedAsMapArray
+
+  /**
+   * Converts the entire XML document into an XML document string with the
+   * default writer options.
+   */
+  end(): string
+
+  /**
+   * Converts the entire XML document into an XML document string.
+   * 
+   * @param options - serialization options
+   */
+  end(writerOptions: XMLWriterOptions): string
+
+  /**
+   * Converts the entire XML document into a JSON string.
+   * 
+   * @param options - serialization options
+   */
+  end(writerOptions: JSONWriterOptions): string
+
+  /**
+   * Converts the entire XML document into its object representation.
+   * 
+   * @param options - serialization options
+   */
+  end(writerOptions: ObjectWriterOptions): XMLSerializedAsObject | XMLSerializedAsObjectArray
+
+  /**
+   * Converts the entire XML document into its object representation using ES6 maps.
+   * 
+   * @param options - serialization options
+   */
+  end(writerOptions: MapWriterOptions): XMLSerializedAsMap | XMLSerializedAsMapArray
 }
 
 /**
@@ -835,26 +877,53 @@ export interface XMLBuilder {
  */
 export interface XMLBuilderCB {
   /**
-   * Handles the data event which is emitted when a chunk of data is produced.
+   * Adds a listener for the data event which is emitted when a chunk of data 
+   * is produced.
    * 
    * @param event - event name
    * @param listener - an event listener callback
    */
   on(event: "data", listener: (chunk: string, level: number) => void): this
   /**
-   * Handles the end event which is emitted when the XML document is completed.
+   * Adds a listener for the end event which is emitted when the XML document is
+   * completed.
    * 
    * @param event - event name
    * @param listener - an event listener callback
    */
   on(event: "end", listener: () => void): this
   /**
-   * Handles the error event which is emitted when an error occurs.
+   * Adds a listener for the error event which is emitted when an error occurs.
    * 
    * @param event - event name
    * @param listener - an event listener callback
    */
   on(event: "error", listener: (err: Error) => void): this
+
+  /**
+   * Removes a listener for the data event which is emitted when a chunk of data 
+   * is produced.
+   * 
+   * @param event - event name
+   * @param listener - an event listener callback
+   */
+  off(event: "data", listener: (chunk: string, level: number) => void): this
+  /**
+   * Removes a listener for the end event which is emitted when the XML document
+   * is completed.
+   * 
+   * @param event - event name
+   * @param listener - an event listener callback
+   */
+  off(event: "end", listener: () => void): this
+  /**
+   * Removes a listener for the error event which is emitted when an error
+   * occurs.
+   * 
+   * @param event - event name
+   * @param listener - an event listener callback
+   */
+  off(event: "error", listener: (err: Error) => void): this
 
   /**
    * Creates a new element node and appends it to the list of child nodes.

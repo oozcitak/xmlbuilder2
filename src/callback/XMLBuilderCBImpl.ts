@@ -78,6 +78,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
     this._writer = this._options.format === "xml" ? new XMLCBWriter(this._options) : new JSONCBWriter(this._options)
 
+    // automatically create listeners for callbacks passed via options
     if (this._options.data !== undefined ){
       this.on("data", this._options.data)
     }

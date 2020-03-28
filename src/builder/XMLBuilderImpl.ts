@@ -1,7 +1,8 @@
 import {
   XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, DTDOptions,
-  DefaultBuilderOptions, PIObject, DocumentWithSettings
+  DefaultBuilderOptions, PIObject, DocumentWithSettings, XMLWriterOptions, 
+  JSONWriterOptions, ObjectWriterOptions, MapWriterOptions
 } from "../interfaces"
 import {
   applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
@@ -480,7 +481,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     recursive = false, thisArg?: any): XMLBuilder {
     let result = this._getFirstDescendantNode(this._domNode, self, recursive)
     while (result[0]) {
-      callback.call(thisArg, new XMLBuilderImpl(result[0]),  result[1], result[2])
+      callback.call(thisArg, new XMLBuilderImpl(result[0]), result[1], result[2])
       result = this._getNextDescendantNode(this._domNode, result[0], recursive, result[1], result[2])
     }
 
@@ -515,7 +516,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     let result = this._getFirstDescendantNode(this._domNode, self, recursive)
     while (result[0]) {
       const builder = new XMLBuilderImpl(result[0])
-      if (predicate.call(thisArg, builder,  result[1], result[2])) {
+      if (predicate.call(thisArg, builder, result[1], result[2])) {
         return builder
       }
       result = this._getNextDescendantNode(this._domNode, result[0], recursive, result[1], result[2])
@@ -571,7 +572,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  toString(writerOptions?: WriterOptions): string {
+  toString(writerOptions?: XMLWriterOptions | JSONWriterOptions): string {
     writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
       writerOptions.format = "xml"
@@ -581,7 +582,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  toObject(writerOptions?: WriterOptions): XMLSerializedValue {
+  toObject(writerOptions?: ObjectWriterOptions | MapWriterOptions): any {
     writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
       writerOptions.format = "object"
@@ -591,7 +592,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  end(writerOptions?: WriterOptions): XMLSerializedValue {
+  end(writerOptions?: WriterOptions): any {
     writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
       writerOptions.format = "xml"
