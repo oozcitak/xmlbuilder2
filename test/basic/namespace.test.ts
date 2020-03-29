@@ -143,4 +143,16 @@ describe('namespaces', () => {
     expect(() => doc.ele({ 'root@@ns1': {} })).toThrow()
   })
 
+  test('default namespace does not apply if was declared in an ancestor', () => {
+    const doc = $$.create()
+      .ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:x', 'uri1')
+        .ele('uri1', 'table').att('http://www.w3.org/2000/xmlns/', 'xmlns', 'uri1')
+      .doc().node as any
+    expect($$.serialize(doc)).toBe(
+      '<root xmlns:x="uri1">' +
+      '<table xmlns="uri1"/>' +
+      '</root>'
+    )
+  })
+
 })

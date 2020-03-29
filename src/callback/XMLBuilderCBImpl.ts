@@ -384,7 +384,10 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       this._push(this._writer.openTagBegin(qualifiedName))
     } else {
       let prefix = node.prefix
-      let candidatePrefix = map.get(prefix, ns)
+      let candidatePrefix: string | null = null
+      if (prefix !== null || ns !== localDefaultNamespace) {
+        candidatePrefix = map.get(prefix, ns)
+      }
       if (prefix === "xmlns") {
         if (this._options.wellFormed) {
           this.emit("error", new Error("An element cannot have the 'xmlns' prefix (well-formed required)."))

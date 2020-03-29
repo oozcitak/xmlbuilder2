@@ -392,7 +392,16 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
        * null if no namespace key ns exists in map.
        */
       let prefix = node.prefix
-      let candidatePrefix = map.get(prefix, ns)
+      /**
+       * We don't need to run "retrieving a preferred prefix string" algorithm if
+       * the element has no prefix and its namespace matches to the default
+       * namespace.
+       * See: https://github.com/web-platform-tests/wpt/pull/16703
+       */
+      let candidatePrefix: string | null = null
+      if (prefix !== null || ns !== localDefaultNamespace) {
+        candidatePrefix = map.get(prefix, ns)
+      }
       /** 
        * 12.3. If the value of prefix matches "xmlns", then run the following 
        * steps: 
