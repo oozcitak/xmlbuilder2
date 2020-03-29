@@ -79,13 +79,13 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
     this._writer = this._options.format === "xml" ? new XMLCBWriter(this._options) : new JSONCBWriter(this._options)
 
     // automatically create listeners for callbacks passed via options
-    if (this._options.data !== undefined ){
+    if (this._options.data !== undefined) {
       this.on("data", this._options.data)
     }
-    if (this._options.end !== undefined ){
+    if (this._options.end !== undefined) {
       this.on("end", this._options.end)
     }
-    if (this._options.error !== undefined ){
+    if (this._options.error !== undefined) {
       this.on("error", this._options.error)
     }
 
@@ -381,7 +381,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       }
 
       this._writer.beginElement(qualifiedName)
-        this._push(this._writer.openTagBegin(qualifiedName))
+      this._push(this._writer.openTagBegin(qualifiedName))
     } else {
       let prefix = node.prefix
       let candidatePrefix = map.get(prefix, ns)
@@ -575,8 +575,8 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
     for (const attr of node.attributes) {
       // Optimize common case
-      if (!requireWellFormed && attr.namespaceURI === null) {
-        this._push(this._writer.attribute(attr.localName, 
+      if (!requireWellFormed && !ignoreNamespaceDefinitionAttribute && attr.namespaceURI === null) {
+        this._push(this._writer.attribute(attr.localName,
           this._serializeAttributeValue(attr.value, this._options.wellFormed)))
         continue
       }
@@ -633,7 +633,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
             candidatePrefix = this._generatePrefix(attributeNamespace, map, prefixIndex)
           }
 
-          this._push(this._writer.attribute("xmlns:" + candidatePrefix, 
+          this._push(this._writer.attribute("xmlns:" + candidatePrefix,
             this._serializeAttributeValue(attributeNamespace, this._options.wellFormed)))
         }
       }
@@ -646,7 +646,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       }
 
       this._push(this._writer.attribute(
-        (candidatePrefix !== null ? candidatePrefix + ":" : "") + attr.localName, 
+        (candidatePrefix !== null ? candidatePrefix + ":" : "") + attr.localName,
         this._serializeAttributeValue(attr.value, this._options.wellFormed)))
     }
   }

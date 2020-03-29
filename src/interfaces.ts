@@ -80,11 +80,6 @@ export interface XMLBuilderOptions {
      */
     [key: string]: string | null
   }
-  /**
-   * Whether child element nodes will inherit their parent element's namespace.
-   * Defaults to `false`.
-   */
-  inheritNS: boolean
 }
 
 /**
@@ -120,8 +115,7 @@ export const DefaultBuilderOptions: XMLBuilderOptions = {
     mathml: "http://www.w3.org/1998/Math/MathML",
     svg: "http://www.w3.org/2000/svg",
     xlink: "http://www.w3.org/1999/xlink"
-  },
-  inheritNS: false
+  }
 }
 
 /**

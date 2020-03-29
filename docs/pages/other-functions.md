@@ -17,27 +17,6 @@ for the options argument.
 <br/>
 
 * `options` - builder options
-
-The following example sets the `inheritNS` option to `true` while creating the first `node` element then changes back to `false` while creating the second `node` element.
-
-```js
-const { create } = require('xmlbuilder2');
-
-const ele = create()
-  .ele('http:/example.com', 'root')
-    .set({ inheritNS: true })
-    .ele('node').up()
-    .set({ inheritNS: false })
-    .ele('node').up()
-  .up();
-console.log(ele.end({ prettyPrint: true }));
-```
-```xml
-<root xmlns="http:/example.com">
-  <node/>
-  <node xmlns=""/>
-</root>
-```
 </details>
 
 

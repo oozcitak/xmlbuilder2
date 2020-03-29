@@ -178,13 +178,13 @@ export class XMLBuilderImpl implements XMLBuilder {
       [namespace, name] = this._extractNamespace(namespace, name, true)
 
       // inherit namespace from parent
-      if (namespace === undefined && this._options.inheritNS) {
+      if (namespace === undefined) {
         const [prefix] = namespace_extractQName(name)
         namespace = this.node.lookupNamespaceURI(prefix)
       }
 
       // create a child element node
-      const childNode = (namespace !== undefined ?
+      const childNode = (namespace !== undefined && namespace !== null?
         this._doc.createElementNS(namespace, name) :
         this._doc.createElement(name)
       )

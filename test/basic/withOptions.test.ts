@@ -24,38 +24,4 @@ describe('withOptions()', () => {
     expect(() => $$.create({ convert: { comment: "" } })).toThrow()
   })
 
-  test('with inheritNS', () => {
-    const doc = $$.create({ inheritNS: true })
-      .ele("http://example.com", "parent")
-      .ele("child").doc()
-
-    expect(doc.end({ headless: true })).toBe($$.t`
-      <parent xmlns="http://example.com"><child/></parent>
-    `)
-  })
-
-  test('without inheritNS', () => {
-    const doc = $$.create({ inheritNS: false })
-      .ele("http://example.com", "parent")
-      .ele("child").doc()
-
-    expect(doc.end({ headless: true })).toBe($$.t`
-      <parent xmlns="http://example.com"><child xmlns=""/></parent>
-    `)
-  })
-
-  test('change inheritNS with set ', () => {
-    const doc = $$.create()
-      .ele("http://example.com", "parent")
-      .set({ inheritNS: true })
-      .ele("child").up()
-      .set({ inheritNS: false })
-      .ele("child").up().
-      doc()
-
-    expect(doc.end({ headless: true })).toBe($$.t`
-      <parent xmlns="http://example.com"><child/><child xmlns=""/></parent>
-    `)
-  })
-
 })

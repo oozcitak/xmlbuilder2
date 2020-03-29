@@ -387,4 +387,3 @@ ___
   * `ele` - default namespace for element nodes
   * `att` - default namespace for attributes
 * `namespaceAlias` - contains namespace aliases where object keys are namespace aliases and object values are namespaces (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-aliases))
-* `inheritNS` - whether child element nodes inherit their parent element's namespace. Defaults to `false`. (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-inheritance))

@@ -4,7 +4,7 @@ describe('Replicate issue', () => {
 
   // https://github.com/oozcitak/xmlbuilder2/issues/6
   test('#6 - When using namespace, empty XMLNs shows up in various child node elements', () => {
-    const doc = $$.create({ inheritNS: true })
+    const doc = $$.create()
       .ele("http://example.com", "parent")
       .ele("child").doc()
 

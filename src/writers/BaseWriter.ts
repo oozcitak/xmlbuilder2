@@ -517,7 +517,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
         (localDefaultNamespace !== null && localDefaultNamespace !== ns)) {
         /** 
          * _Note:_ At this point, the namespace for this node still needs to be
-         * serialized, but there's no prefix (or candidate prefix) availble; the
+         * serialized, but there's no prefix (or candidate prefix) available; the
          * following uses the default namespace declaration to define the 
          * namespace--optionally replacing an existing default declaration 
          * if present.
@@ -1138,7 +1138,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      */
     for (const attr of node.attributes) {
       // Optimize common case
-      if (!requireWellFormed && attr.namespaceURI === null) {
+      if (!requireWellFormed && !ignoreNamespaceDefinitionAttribute && attr.namespaceURI === null) {
         result.push([null, null, attr.localName,
           this._serializeAttributeValue(attr.value, requireWellFormed)])
         continue

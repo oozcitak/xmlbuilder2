@@ -117,8 +117,8 @@ describe('XMLWriter with namespaces', () => {
       .doc()
     expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
       <xml:root>
-        <foo/>
-        <bar/>
+        <xml:foo/>
+        <xml:bar/>
       </xml:root>
       `)
   })
