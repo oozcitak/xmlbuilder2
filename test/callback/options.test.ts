@@ -1,5 +1,5 @@
 import $$ from '../TestHelpers'
-import { XMLBuilderCBImpl } from '../../src/callback'
+import { XMLBuilderCBImpl } from '../../src/builder'
 
 describe('XMLStream options', () => {
 

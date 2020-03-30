@@ -12,7 +12,7 @@ import { Guard } from '@oozcitak/dom/lib/util'
 import { XMLBuilderImpl } from './builder'
 import { createDocument, createParser, throwIfParserError } from './builder/dom'
 import { isArray } from 'util'
-import { XMLBuilderCBImpl } from './callback'
+import { XMLBuilderCBImpl } from './builder'
 
 /**
  * Wraps a DOM node for use with XML builder with default options.
