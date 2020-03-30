@@ -1,7 +1,7 @@
 import {
   XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, DTDOptions,
-  DefaultBuilderOptions, PIObject, DocumentWithSettings, XMLWriterOptions, 
+  DefaultBuilderOptions, PIObject, DocumentWithSettings, XMLWriterOptions,
   JSONWriterOptions, ObjectWriterOptions, MapWriterOptions
 } from "../interfaces"
 import {
@@ -9,11 +9,13 @@ import {
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
 import { XMLWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
-import { Document, Node, Element } from "@oozcitak/dom/lib/dom/interfaces"
-import { createParser, throwIfParserError } from "./dom"
+import { Document, Node, Element, Attr } from "@oozcitak/dom/lib/dom/interfaces"
 import { Guard } from "@oozcitak/dom/lib/util"
-import { namespace_extractQName, tree_index } from "@oozcitak/dom/lib/algorithm"
-
+import {
+  namespace_extractQName, tree_index, create_element
+} from "@oozcitak/dom/lib/algorithm"
+import { createParser, throwIfParserError } from "./dom"
+import { namespace as infraNamespace } from "@oozcitak/infra"
 /**
  * Represents a wrapper that extends XML nodes to implement easy to use and
  * chainable document builder methods.
@@ -184,7 +186,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       }
 
       // create a child element node
-      const childNode = (namespace !== undefined && namespace !== null?
+      const childNode = (namespace !== undefined && namespace !== null ?
         this._doc.createElementNS(namespace, name) :
         this._doc.createElement(name)
       )
@@ -259,8 +261,47 @@ export class XMLBuilderImpl implements XMLBuilder {
       return this
     }
 
-    const ele = this.node as Element
+    if (!Guard.isElementNode(this.node)) {
+      throw new Error("An attribute can only be assigned to an element node.")
+    }
+    let ele = this.node as Element
     [namespace, name] = this._extractNamespace(namespace, name, false)
+    const [prefix, localName] = namespace_extractQName(name)
+    const [elePrefix, eleLocalName] = namespace_extractQName(ele.prefix ? ele.prefix + ':' + ele.localName : ele.localName)
+
+    // check if this is a namespace declaration attribute
+    // assign a new element namespace if it wasn't previously assigned
+    let eleNamespace: string | null = null
+    if (prefix === "xmlns") {
+      namespace = infraNamespace.XMLNS
+      if (ele.namespaceURI === null && elePrefix === localName) {
+        eleNamespace = value
+      }
+    } else if (prefix === null && localName === "xmlns" && elePrefix === null) {
+      namespace = infraNamespace.XMLNS
+      eleNamespace = value
+    }
+
+    // re-create the element node if its namespace changed
+    // we can't simply change the namespaceURI since its read-only
+    if (eleNamespace !== null) {
+      const newEle = create_element(this._doc, eleLocalName,
+        eleNamespace, elePrefix)
+      for (const attr of ele.attributes) {
+        newEle.setAttributeNodeNS(attr.cloneNode() as Attr)
+      }
+      for (const childNode of ele.childNodes) {
+        newEle.appendChild(childNode.cloneNode())
+      }
+      const parent = ele.parentNode
+      /* istanbul ignore next */
+      if (parent === null) {
+        throw new Error("Parent node is null." + this._debugInfo())
+      }
+      parent.replaceChild(newEle, ele)
+      this._domNode = newEle
+      ele = newEle
+    }
 
     if (namespace !== undefined) {
       ele.setAttributeNS(namespace, name, value)

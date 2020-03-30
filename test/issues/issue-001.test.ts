@@ -12,7 +12,7 @@ describe('Replicate issue', () => {
           .doc()
     const root = doc.root()
     const foo = root.first()
-    expect(foo.toString()).toBe('<foo a="A1" x="1"/>')
+    expect(foo.toString()).toBe('<foo xmlns="http://example.com" a="A1" x="1"/>')
     expect(root.toString()).toBe('<SomeRootTag xmlns="http://example.com" x="0"><foo a="A1" x="1"/></SomeRootTag>')
     expect(doc.end({ headless: true })).toBe($$.t`
       <SomeRootTag xmlns="http://example.com" x="0"><foo a="A1" x="1"/></SomeRootTag>

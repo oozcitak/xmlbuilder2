@@ -20,7 +20,9 @@ describe('Replicate issue', () => {
     })
       
     const result = select("//myns:child1", doc.node as any) as any
-    expect(result.length).toBe(0)
+    expect(result.length).toBe(2)
+    expect(result[0].tagName).toBe("myns:child1")
+    expect(result[1].tagName).toBe("myns:child1")
   })
 
   test('#8 - correct usage', () => {

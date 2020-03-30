@@ -57,7 +57,7 @@ describe('namespaces', () => {
 
     $$.expectCBResult(xmlStream, $$.t`
       <r xmlns:x0="ns" xmlns:x2="ns">
-        <b xmlns:x1="ns" xmlns:ns1="ns" ns1:name="v"/>
+        <b xmlns:x1="ns" x1:name="v"/>
       </r>`, done)
   })
 
@@ -76,7 +76,7 @@ describe('namespaces', () => {
       </r>`, done)
   })
 
-  test('prefix of an attribute is replaced with another existing prefix mapped to the same namespace URI', (done) => {
+  test('prefix of an attribute is replaced with another existing prefix mapped to the same namespace URI - 1', (done) => {
     const xmlStream = $$.createCB({ prettyPrint: true })
     
     xmlStream.ele('r')
@@ -85,7 +85,7 @@ describe('namespaces', () => {
       .end()
 
     $$.expectCBResult(xmlStream, $$.t`
-      <r xmlns:xx="uri" xmlns:p="uri" p:name="v"/> `, done)
+      <r xmlns:xx="uri" xx:name="v"/> `, done)
   })
 
   test('prefix of an attribute is replaced with another existing prefix mapped to the same namespace URI - 2', (done) => {
@@ -98,7 +98,7 @@ describe('namespaces', () => {
 
     $$.expectCBResult(xmlStream, $$.t`
       <r xmlns:xx="uri">
-        <b xmlns:p="uri" p:name="value"/>
+        <b xx:name="value"/>
       </r> `, done)
   })
 
@@ -264,7 +264,7 @@ describe('namespaces', () => {
 
     $$.expectCBResult(xmlStream, $$.t`
       <r xmlns:x0="uri" xmlns:x2="uri">
-        <b xmlns:x1="uri" xmlns:ns1="uri" ns1:name="v"/>
+        <b xmlns:x1="uri" x1:name="v"/>
       </r>`, done)    
   })
 
@@ -278,7 +278,7 @@ describe('namespaces', () => {
 
     $$.expectCBResult(xmlStream, $$.t`
       <el1 xmlns:p="u1" xmlns:q="u1">
-        <el2 xmlns:q="u2" xmlns:ns1="u1" ns1:name="v"/>
+        <el2 xmlns:q="u2" q:name="v"/>
       </el1>`, done)
   })
 

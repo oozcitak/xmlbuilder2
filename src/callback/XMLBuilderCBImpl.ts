@@ -47,7 +47,6 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
   private _currentElementSerialized = false
   private _openTags: Array<[string, string | null, NamespacePrefixMap, boolean]> = []
 
-  private _namespace: string | null
   private _prefixMap: NamespacePrefixMap
   private _prefixIndex: PrefixIndex
 
@@ -89,7 +88,6 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       this.on("error", this._options.error)
     }
 
-    this._namespace = null
     this._prefixMap = new NamespacePrefixMap()
     this._prefixMap.set("xml", infraNamespace.XML)
     this._prefixIndex = { value: 1 }
@@ -366,8 +364,9 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
     let map = this._prefixMap.copy()
     let localPrefixesMap: { [key: string]: string } = {}
     let localDefaultNamespace = this._recordNamespaceInformation(node, map, localPrefixesMap)
-    let inheritedNS = this._namespace
+    let inheritedNS = this._openTags.length === 0 ? null : this._openTags[this._openTags.length - 1][1]
     let ns = node.namespaceURI
+    if (ns === null) ns = inheritedNS
 
     if (inheritedNS === ns) {
       if (localDefaultNamespace !== null) {
@@ -463,14 +462,13 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
      * Save qualified name, original inherited ns, original prefix map, and
      * hasChildren flag.
      */
-    this._openTags.push([qualifiedName, this._namespace, this._prefixMap, hasChildren])
+    this._openTags.push([qualifiedName, inheritedNS, this._prefixMap, hasChildren])
 
     /**
      * New values of inherited namespace and prefix map will be used while
      * serializing child nodes. They will be returned to their original values
      * when this node is closed using the _openTags array item we saved above.
      */
-    this._namespace = inheritedNS
     if (this._isPrefixMapModified(this._prefixMap, map)) {
       this._prefixMap = map
     }
@@ -497,7 +495,6 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
     /**
      * Restore original values of inherited namespace and prefix map.
      */
-    this._namespace = ns
     this._prefixMap = map
     if (!hasChildren) return
 

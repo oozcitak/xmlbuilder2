@@ -141,4 +141,9 @@ describe('att()', () => {
       `)
   })
 
+  test('attribute can only be applied to element nodes', () => {
+    const txt = $$.create().ele('root').txt('hello').first()
+    expect(() => txt.att('att', 'val')).toThrow()
+  })
+
 })

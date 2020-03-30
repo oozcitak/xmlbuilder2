@@ -192,14 +192,14 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
       try {
         this._serializeNodeNS(node, namespace, prefixMap, prefixIndex,
           requireWellFormed)
-      } catch {
-        throw new InvalidStateError()
+      } catch (e) {
+        throw new InvalidStateError(e.message)
       }
     } else {
       try {
         this._serializeNode(node, requireWellFormed)
-      } catch {
-        throw new InvalidStateError()
+      } catch (e) {
+        throw new InvalidStateError(e.message)
       }
     }
   }

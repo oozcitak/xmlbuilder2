@@ -39,8 +39,7 @@ describe('namespaces examples in the wiki', () => {
     const svgNs = 'http://www.w3.org/2000/svg'
     const xlinkNs = 'http://www.w3.org/1999/xlink'
 
-    const doc = $$.create().ele(svgNs, 'svg', { 
-      "xmlns:xlink": xlinkNs })
+    const doc = $$.create().ele(svgNs, 'svg', { "xmlns:xlink": xlinkNs })
       .ele('script', { xmlns: "", type: "text/ecmascript", "xlink:href": "foo.js" })
       .doc()
 

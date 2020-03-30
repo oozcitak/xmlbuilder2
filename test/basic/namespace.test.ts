@@ -12,9 +12,9 @@ describe('namespaces', () => {
 
     expect($$.serialize(doc)).toBe(
       '<root xmlns="http://example.com/ns1">' +
-        '<foo>' +
-          '<bar>foobar</bar>' +
-        '</foo>' +
+      '<foo>' +
+      '<bar>foobar</bar>' +
+      '</foo>' +
       '</root>')
 
     expect(doc.documentElement.namespaceURI).toBe(ns1)
@@ -32,11 +32,11 @@ describe('namespaces', () => {
 
     expect($$.serialize(doc)).toBe(
       '<root xmlns="http://example.com/ns1"' +
-        ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
-        ' xsi:schemaLocation="http://example.com/n1 schema.xsd">' +
-        '<foo>' +
-          '<bar>foobar</bar>' +
-        '</foo>' +
+      ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
+      ' xsi:schemaLocation="http://example.com/n1 schema.xsd">' +
+      '<foo>' +
+      '<bar>foobar</bar>' +
+      '</foo>' +
       '</root>')
   })
 
@@ -56,11 +56,11 @@ describe('namespaces', () => {
 
     expect($$.serialize(doc)).toBe(
       '<root xmlns="http://example.com/ns1"' +
-        ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
-        ' xsi:schemaLocation="http://example.com/n1 schema.xsd">' +
-        '<foo>' +
-          '<bar>foobar</bar>' +
-        '</foo>' +
+      ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
+      ' xsi:schemaLocation="http://example.com/n1 schema.xsd">' +
+      '<foo>' +
+      '<bar>foobar</bar>' +
+      '</foo>' +
       '</root>')
   })
 
@@ -71,14 +71,14 @@ describe('namespaces', () => {
     const doc = $$.create().ele(svgNs, 'svg')
       .att('http://www.w3.org/2000/xmlns/', 'xmlns:xlink', xlinkNs)
       .ele(svgNs, 'script')
-        .att('type', 'text/ecmascript')
-        .att(xlinkNs, 'xlink:href', 'foo.js')
+      .att('type', 'text/ecmascript')
+      .att(xlinkNs, 'xlink:href', 'foo.js')
       .doc().node as any
 
     expect($$.serialize(doc)).toBe(
       '<svg xmlns="http://www.w3.org/2000/svg"' +
-        ' xmlns:xlink="http://www.w3.org/1999/xlink">' +
-        '<script type="text/ecmascript" xlink:href="foo.js"/>' +
+      ' xmlns:xlink="http://www.w3.org/1999/xlink">' +
+      '<script type="text/ecmascript" xlink:href="foo.js"/>' +
       '</svg>')
   })
 
@@ -126,7 +126,7 @@ describe('namespaces', () => {
   })
 
   test('built-in namespace alias with JS object', () => {
-    const doc1 = $$.create().ele({ 'root@@xml': { '@att@@xml': 'val' }})
+    const doc1 = $$.create().ele({ 'root@@xml': { '@att@@xml': 'val' } })
     expect($$.serialize(doc1.node)).toBe('<xml:root xml:att="val"/>')
     const doc2 = $$.create().ele({ 'root@@svg': {} })
     expect($$.serialize(doc2.node)).toBe('<root xmlns="http://www.w3.org/2000/svg"/>')
@@ -146,11 +146,30 @@ describe('namespaces', () => {
   test('default namespace does not apply if was declared in an ancestor', () => {
     const doc = $$.create()
       .ele('root').att('http://www.w3.org/2000/xmlns/', 'xmlns:x', 'uri1')
-        .ele('uri1', 'table').att('http://www.w3.org/2000/xmlns/', 'xmlns', 'uri1')
+      .ele('uri1', 'table').att('http://www.w3.org/2000/xmlns/', 'xmlns', 'uri1')
       .doc().node as any
     expect($$.serialize(doc)).toBe(
       '<root xmlns:x="uri1">' +
       '<table xmlns="uri1"/>' +
+      '</root>'
+    )
+  })
+
+  test('default namespace cannot be specified later', () => {
+    // this is just a limitation of the current implementation
+    // recursively changing child element namespaces is simply
+    // not implemented
+    const doc = $$.create()
+      .ele('root', { att: "val" })
+      .ele('foo').up()
+      .ele('bar').up()
+      .att("xmlns", "ns")
+      .doc().node as any
+
+    expect($$.serialize(doc)).toBe(
+      '<root att="val" xmlns="ns">' +
+      '<foo xmlns=""/>' +
+      '<bar xmlns=""/>' +
       '</root>'
     )
   })
