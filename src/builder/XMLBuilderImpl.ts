@@ -14,7 +14,7 @@ import { Guard } from "@oozcitak/dom/lib/util"
 import {
   namespace_extractQName, tree_index, create_element
 } from "@oozcitak/dom/lib/algorithm"
-import { createParser, throwIfParserError } from "./dom"
+import { createParser, throwIfParserError, sanitizeInput } from "./dom"
 import { namespace as infraNamespace } from "@oozcitak/infra"
 /**
  * Represents a wrapper that extends XML nodes to implement easy to use and
@@ -57,7 +57,8 @@ export class XMLBuilderImpl implements XMLBuilder {
       // parse XML string
       const contents = "<TEMP_ROOT>" + p1 + "</TEMP_ROOT>"
       const domParser = createParser()
-      const doc = domParser.parseFromString(contents, "text/xml")
+      const doc = domParser.parseFromString(
+        sanitizeInput(contents, this._options.invalidCharReplacement), "text/xml")
       /* istanbul ignore next */
       if (doc.documentElement === null) {
         throw new Error("Document element is null.")
@@ -177,7 +178,9 @@ export class XMLBuilderImpl implements XMLBuilder {
         }
       }, this)
     } else {
-      [namespace, name] = this._extractNamespace(namespace, name, true)
+      [namespace, name] = this._extractNamespace(
+        sanitizeInput(namespace, this._options.invalidCharReplacement), 
+        sanitizeInput(name, this._options.invalidCharReplacement), true)
 
       // inherit namespace from parent
       if (namespace === undefined) {
@@ -266,6 +269,9 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
     let ele = this.node as Element
     [namespace, name] = this._extractNamespace(namespace, name, false)
+    name = sanitizeInput(name, this._options.invalidCharReplacement)
+    namespace = sanitizeInput(namespace, this._options.invalidCharReplacement)
+    value = sanitizeInput(value, this._options.invalidCharReplacement)
     const [prefix, localName] = namespace_extractQName(name)
     const [elePrefix, eleLocalName] = namespace_extractQName(ele.prefix ? ele.prefix + ':' + ele.localName : ele.localName)
 
@@ -314,6 +320,9 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   removeAtt(p1: string | null | string[], p2?: string | string[]): XMLBuilder {
+    if (!Guard.isElementNode(this.node)) {
+      throw new Error("An attribute can only be removed from an element node.")
+    }
 
     // get primitive values
     p1 = getValue(p1)
@@ -340,10 +349,13 @@ export class XMLBuilderImpl implements XMLBuilder {
         namespace === undefined ? this.removeAtt(attName) : this.removeAtt(namespace, attName), this)
     } else if (namespace !== undefined) {
       // removeAtt(namespace: string, name: string)
-      (this.node as Element).removeAttributeNS(namespace, name + "")
+      name = sanitizeInput(name, this._options.invalidCharReplacement)
+      namespace = sanitizeInput(namespace, this._options.invalidCharReplacement)
+      this.node.removeAttributeNS(namespace, name)
     } else {
       // removeAtt(name: string)
-      (this.node as Element).removeAttribute(name + "")
+      name = sanitizeInput(name, this._options.invalidCharReplacement)
+      this.node.removeAttribute(name)
     }
 
     return this
@@ -351,7 +363,8 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   txt(content: string): XMLBuilder {
-    const child = this._doc.createTextNode(content + "")
+    const child = this._doc.createTextNode(
+      sanitizeInput(content, this._options.invalidCharReplacement))
     this.node.appendChild(child)
 
     return this
@@ -359,7 +372,8 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   com(content: string): XMLBuilder {
-    const child = this._doc.createComment(content + "")
+    const child = this._doc.createComment(
+      sanitizeInput(content, this._options.invalidCharReplacement))
     this.node.appendChild(child)
 
     return this
@@ -367,7 +381,8 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   dat(content: string): XMLBuilder {
-    const child = this._doc.createCDATASection(content + "")
+    const child = this._doc.createCDATASection(
+      sanitizeInput(content, this._options.invalidCharReplacement))
     this.node.appendChild(child)
 
     return this
@@ -387,7 +402,9 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else if (isMap(target) || isObject(target)) {
       forEachObject(target, (insTarget, insValue) => this.ins(insTarget, insValue), this)
     } else {
-      const child = this._doc.createProcessingInstruction(target + "", content + "")
+      const child = this._doc.createProcessingInstruction(
+        sanitizeInput(target, this._options.invalidCharReplacement),
+        sanitizeInput(content, this._options.invalidCharReplacement))
       this.node.appendChild(child)
     }
 
@@ -405,9 +422,9 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   dtd(options?: DTDOptions): XMLBuilder {
-    const name = ((options && options.name) || (this._doc.documentElement ? this._doc.documentElement.tagName : "ROOT")) + ""
-    const pubID = ((options && options.pubID) || "") + ""
-    const sysID = ((options && options.sysID) || "") + ""
+    const name = sanitizeInput((options && options.name) || (this._doc.documentElement ? this._doc.documentElement.tagName : "ROOT"), this._options.invalidCharReplacement)
+    const pubID = sanitizeInput((options && options.pubID) || "", this._options.invalidCharReplacement)
+    const sysID = sanitizeInput((options && options.sysID) || "", this._options.invalidCharReplacement)
 
     // name must match document element
     if (this._doc.documentElement !== null && name !== this._doc.documentElement.tagName) {

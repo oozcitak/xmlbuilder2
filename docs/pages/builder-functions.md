@@ -375,11 +375,15 @@ ___
 * `keepNullAttributes` - whether attributes with `null` and `undefined` values will be kept or ignored: `true` or `false`. Defaults to `false`, which silently ignores attributes with `null` and `undefined` values. When set to `true`, `null` will be treated as an empty string.
 * `ignoreConverters` - whether converter strings will be ignored when converting JS objects: `true` or `false`. Defaults to `false`.
 * `convert` - an object defining converter strings. Default converter strings are described below.
-  * `att` -  When prepended to a JS object key, converts its key-value pair to an attribute. Defaults to `'@'`.
-  * `ins` - When prepended to a JS object key, converts its value to a processing instruction node. Defaults to `'?'`.
-  * `text` - When prepended to a JS object key, converts its value to a text node. Defaults to `'#'`.
-  * `cdata` - When prepended to a JS object key, converts its value to a CDATA section node. Defaults to `'$'`.
-  * `comment` - When prepended to a JS object key, converts its value to a comment node. Defaults to `'!'`.
+  * `att` -  when prepended to a JS object key, converts its key-value pair to an attribute. Defaults to `'@'`.
+  * `ins` - when prepended to a JS object key, converts its value to a processing instruction node. Defaults to `'?'`.
+  * `text` - when prepended to a JS object key, converts its value to a text node. Defaults to `'#'`.
+  * `cdata` - when prepended to a JS object key, converts its value to a CDATA section node. Defaults to `'$'`.
+  * `comment` - when prepended to a JS object key, converts its value to a comment node. Defaults to `'!'`.
+* `invalidCharReplacement` - defines a replacement value for invalid characters in input strings. If value is a string, each invalid character in an input string will be replaced with it; otherwise if value is a function it will be passed each invalid character and should return a replacement character. The arguments to the replacement function are:
+  - `char` - the invalid character to be replaced
+  - `offset` - the offset of the invalid character
+  - `str` - the input string
 
 #### Settings related to XML namespaces
 

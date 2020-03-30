@@ -10,7 +10,7 @@ import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
 import { Guard } from '@oozcitak/dom/lib/util'
 import { XMLBuilderImpl } from './builder'
-import { createDocument, createParser, throwIfParserError } from './builder/dom'
+import { createDocument, createParser, throwIfParserError, sanitizeInput } from './builder/dom'
 import { isArray } from 'util'
 import { XMLBuilderCBImpl } from './builder'
 
@@ -140,7 +140,8 @@ export function create(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   } else if (/^\s*</.test(contents)) {
     // XML document
     const domParser = createParser()
-    const doc = domParser.parseFromString(contents, "text/xml")
+    const doc = domParser.parseFromString(
+      sanitizeInput(contents, options.invalidCharReplacement), "text/xml")
     throwIfParserError(doc)
     builder = new XMLBuilderImpl(doc)
     setOptions(doc, options)
@@ -219,7 +220,8 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   } else if (/^\s*</.test(contents)) {
     // XML document
     const domParser = createParser()
-    const doc = domParser.parseFromString("<TEMP_ROOT>" + contents + "</TEMP_ROOT>", "text/xml")
+    const doc = domParser.parseFromString("<TEMP_ROOT>" + 
+      sanitizeInput(contents, options.invalidCharReplacement) + "</TEMP_ROOT>", "text/xml")
     throwIfParserError(doc)
     setOptions(doc, options)
     /* istanbul ignore next */

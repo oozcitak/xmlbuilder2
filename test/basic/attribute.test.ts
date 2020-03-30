@@ -146,4 +146,9 @@ describe('att()', () => {
     expect(() => txt.att('att', 'val')).toThrow()
   })
 
+  test('removeAttribute can only be applied to element nodes', () => {
+    const txt = $$.create().ele('root').att('att', 'val').txt('first').first()
+    expect(() => txt.removeAtt('att')).toThrow()
+  })
+
 })

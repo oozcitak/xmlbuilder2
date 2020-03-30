@@ -80,6 +80,20 @@ export interface XMLBuilderOptions {
      */
     [key: string]: string | null
   }
+  /**
+   * Defines a replacement for invalid characters in input strings.
+   * 
+   * If `invalidCharReplacement` is a string, each invalid character in an input
+   * string will be replaced with it; otherwise if `invalidCharReplacement`
+   * is a function it will be passed each invalid character and should return
+   * a replacement character. 
+   * 
+   * The arguments to the replacement function are:
+   * - char - the invalid character to be replaced
+   * - offset - the offset of the invalid character
+   * - str - the input string
+   */
+  invalidCharReplacement: string | ((char: string, offset:number, str: string) => string) | undefined
 }
 
 /**
@@ -115,7 +129,8 @@ export const DefaultBuilderOptions: XMLBuilderOptions = {
     mathml: "http://www.w3.org/1998/Math/MathML",
     svg: "http://www.w3.org/2000/svg",
     xlink: "http://www.w3.org/1999/xlink"
-  }
+  },
+  invalidCharReplacement: undefined
 }
 
 /**
@@ -1108,6 +1123,14 @@ export type XMLBuilderCBOptions = CBWriterOptions & {
    * Defines namespace aliases.
    */
   namespaceAlias: { [key: string]: string | null }
+    /**
+   * Replacement for invalid characters in input strings.
+   * If `invalidCharReplacement` is a string, each invalid character in an input
+   * string will be replaced with it; otherwise if `invalidCharReplacement`
+   * is a function it will be passed each invalid character and should return
+   * a replacement character.
+   */
+  invalidCharReplacement: string | ((substring: string, ...args: any[]) => string) | undefined
 }
 
 /**
