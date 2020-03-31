@@ -24,6 +24,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
     const options = applyDefaults(writerOptions, {
       format: "object",
       wellFormed: false,
+      noDoubleEncoding: false,
       group: false
     }) as Required<ObjectWriterOptions>
 
@@ -50,7 +51,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
      *   ]
      * ]
      */
-    this.serializeNode(node, options.wellFormed)
+    this.serializeNode(node, options.wellFormed, options.noDoubleEncoding)
 
     /**
      * Second pass, process node lists. Above example becomes:

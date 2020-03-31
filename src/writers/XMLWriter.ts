@@ -24,6 +24,7 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
     // provide default options
     this._options = applyDefaults(writerOptions, {
       wellFormed: false,
+      noDoubleEncoding: false,
       headless: false,
       prettyPrint: false,
       indent: "  ",
@@ -52,7 +53,7 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
       this._endLine()
     }
 
-    this.serializeNode(node, this._options.wellFormed)
+    this.serializeNode(node, this._options.wellFormed, this._options.noDoubleEncoding)
 
     // remove trailing newline
     if (this._options.prettyPrint &&

@@ -153,7 +153,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param node - node to serialize
    * @param requireWellFormed - whether to check conformance
    */
-  serializeNode(node: Node, requireWellFormed: boolean): void {
+  serializeNode(node: Node, requireWellFormed: boolean, noDoubleEncoding: boolean): void {
     const hasNamespaces = (node._nodeDocument !== undefined && node._nodeDocument._hasNamespaces)
 
     this.level = 0
@@ -191,13 +191,13 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
        */
       try {
         this._serializeNodeNS(node, namespace, prefixMap, prefixIndex,
-          requireWellFormed)
+          requireWellFormed, noDoubleEncoding)
       } catch (e) {
         throw new InvalidStateError(e.message)
       }
     } else {
       try {
-        this._serializeNode(node, requireWellFormed)
+        this._serializeNode(node, requireWellFormed, noDoubleEncoding)
       } catch (e) {
         throw new InvalidStateError(e.message)
       }
@@ -215,34 +215,34 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    */
   private _serializeNodeNS(node: Node, namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean): void {
+    requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     this.currentNode = node
 
     switch (node.nodeType) {
       case NodeType.Element:
-        this._serializeElementNS(node as Element, namespace, prefixMap, prefixIndex, requireWellFormed)
+        this._serializeElementNS(node as Element, namespace, prefixMap, prefixIndex, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.Document:
-        this._serializeDocumentNS(node as Document, namespace, prefixMap, prefixIndex, requireWellFormed)
+        this._serializeDocumentNS(node as Document, namespace, prefixMap, prefixIndex, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.Comment:
-        this._serializeComment(node as Comment, requireWellFormed)
+        this._serializeComment(node as Comment, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.Text:
-        this._serializeText(node as Text, requireWellFormed)
+        this._serializeText(node as Text, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.DocumentFragment:
-        this._serializeDocumentFragmentNS(node as DocumentFragment, namespace, prefixMap, prefixIndex, requireWellFormed)
+        this._serializeDocumentFragmentNS(node as DocumentFragment, namespace, prefixMap, prefixIndex, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.DocumentType:
-        this._serializeDocumentType(node as DocumentType, requireWellFormed)
+        this._serializeDocumentType(node as DocumentType, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.ProcessingInstruction:
-        this._serializeProcessingInstruction(node as ProcessingInstruction, requireWellFormed)
+        this._serializeProcessingInstruction(node as ProcessingInstruction, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.CData:
-        this._serializeCData(node as CDATASection, requireWellFormed)
+        this._serializeCData(node as CDATASection, requireWellFormed, noDoubleEncoding)
         break
       default:
         throw new Error(`Unknown node type: ${node.nodeType}`)
@@ -255,34 +255,34 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param node - node to serialize
    * @param requireWellFormed - whether to check conformance
    */
-  private _serializeNode(node: Node, requireWellFormed: boolean): void {
+  private _serializeNode(node: Node, requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     this.currentNode = node
 
     switch (node.nodeType) {
       case NodeType.Element:
-        this._serializeElement(node as Element, requireWellFormed)
+        this._serializeElement(node as Element, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.Document:
-        this._serializeDocument(node as Document, requireWellFormed)
+        this._serializeDocument(node as Document, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.Comment:
-        this._serializeComment(node as Comment, requireWellFormed)
+        this._serializeComment(node as Comment, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.Text:
-        this._serializeText(node as Text, requireWellFormed)
+        this._serializeText(node as Text, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.DocumentFragment:
-        this._serializeDocumentFragment(node as DocumentFragment, requireWellFormed)
+        this._serializeDocumentFragment(node as DocumentFragment, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.DocumentType:
-        this._serializeDocumentType(node as DocumentType, requireWellFormed)
+        this._serializeDocumentType(node as DocumentType, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.ProcessingInstruction:
-        this._serializeProcessingInstruction(node as ProcessingInstruction, requireWellFormed)
+        this._serializeProcessingInstruction(node as ProcessingInstruction, requireWellFormed, noDoubleEncoding)
         break
       case NodeType.CData:
-        this._serializeCData(node as CDATASection, requireWellFormed)
+        this._serializeCData(node as CDATASection, requireWellFormed, noDoubleEncoding)
         break
       default:
         throw new Error(`Unknown node type: ${node.nodeType}`)
@@ -300,7 +300,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    */
   private _serializeElementNS(node: Element, namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean): void {
+    requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     const attributes: [string | null, string | null, string, string][] = []
 
@@ -505,7 +505,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
          * 12.5.5.6. """ (U+0022 QUOTATION MARK).
          */
         attributes.push([null, 'xmlns', prefix,
-          this._serializeAttributeValue(ns, requireWellFormed)])
+          this._serializeAttributeValue(ns, requireWellFormed, noDoubleEncoding)])
 
         /**
          * 12.5.5.7. If local default namespace is not null (there exists a
@@ -563,7 +563,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
          * 12.6.5.5. """ (U+0022 QUOTATION MARK).
          */
         attributes.push([null, null, 'xmlns',
-          this._serializeAttributeValue(ns, requireWellFormed)])
+          this._serializeAttributeValue(ns, requireWellFormed, noDoubleEncoding)])
 
         /**
          * 12.7. Otherwise, the node has a local default namespace that matches 
@@ -585,7 +585,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * definition attribute flag, and require well-formed flag.
      */
     attributes.push(...this._serializeAttributesNS(node, map, prefixIndex,
-      localPrefixesMap, ignoreNamespaceDefinitionAttribute, requireWellFormed))
+      localPrefixesMap, ignoreNamespaceDefinitionAttribute, requireWellFormed, noDoubleEncoding))
     this.attributes(attributes)
 
     /**
@@ -643,7 +643,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
     } else {
       for (const childNode of node.childNodes) {
         this.level++
-        this._serializeNodeNS(childNode, inheritedNS, map, prefixIndex, requireWellFormed)
+        this._serializeNodeNS(childNode, inheritedNS, map, prefixIndex, requireWellFormed, noDoubleEncoding)
         this.level--
       }
     }
@@ -665,7 +665,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param node - node to serialize
    * @param requireWellFormed - whether to check conformance
    */
-  private _serializeElement(node: Element, requireWellFormed: boolean): void {
+  private _serializeElement(node: Element, requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     /**
      * From: https://w3c.github.io/DOM-Parsing/#xml-serializing-an-element-node
@@ -734,7 +734,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * attributes given map, prefix index, local prefixes map, ignore namespace
      * definition attribute flag, and require well-formed flag.
      */
-    const attributes = this._serializeAttributes(node, requireWellFormed)
+    const attributes = this._serializeAttributes(node, requireWellFormed, noDoubleEncoding)
     this.attributes(attributes)
 
     /**
@@ -783,7 +783,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      */
     for (const childNode of node._children) {
       this.level++
-      this._serializeNode(childNode, requireWellFormed)
+      this._serializeNode(childNode, requireWellFormed, noDoubleEncoding)
       this.level--
     }
 
@@ -809,7 +809,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    */
   private _serializeDocumentNS(node: Document, namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean): void {
+    requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     /**
      * If the require well-formed flag is set (its value is true), and this node
@@ -836,7 +836,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
     */
     for (const childNode of node.childNodes) {
       this._serializeNodeNS(childNode, namespace, prefixMap,
-        prefixIndex, requireWellFormed)
+        prefixIndex, requireWellFormed, noDoubleEncoding)
     }
   }
 
@@ -846,7 +846,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param node - node to serialize
    * @param requireWellFormed - whether to check conformance
    */
-  private _serializeDocument(node: Document, requireWellFormed: boolean): void {
+  private _serializeDocument(node: Document, requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     /**
      * If the require well-formed flag is set (its value is true), and this node
@@ -872,7 +872,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * 3. Return the value of serialized document.
     */
     for (const childNode of node._children) {
-      this._serializeNode(childNode, requireWellFormed)
+      this._serializeNode(childNode, requireWellFormed, noDoubleEncoding)
     }
   }
 
@@ -882,7 +882,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param node - node to serialize
    * @param requireWellFormed - whether to check conformance
    */
-  private _serializeComment(node: Comment, requireWellFormed: boolean): void {
+  private _serializeComment(node: Comment, requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     /**
      * If the require well-formed flag is set (its value is true), and node's 
@@ -909,7 +909,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param requireWellFormed - whether to check conformance
    * @param level - current depth of the XML tree
    */
-  private _serializeText(node: CharacterData, requireWellFormed: boolean): void {
+  private _serializeText(node: CharacterData, requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     /**
      * 1. If the require well-formed flag is set (its value is true), and 
@@ -929,16 +929,24 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * 6. Return the value of markup.
      */
     let markup = ""
-    for (let i = 0; i < node.data.length; i++) {
-      const c = node.data[i]
-      if (c === "&")
-        markup += "&amp;"
-      else if (c === "<")
-        markup += "&lt;"
-      else if (c === ">")
-        markup += "&gt;"
-      else
-        markup += c
+
+    if (noDoubleEncoding) {
+      markup = node.data.replace(/(?!&\S+;)&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\r/g, '&#xD;')
+    } else {
+      for (let i = 0; i < node.data.length; i++) {
+        const c = node.data[i]
+        if (c === "&")
+          markup += "&amp;"
+        else if (c === "<")
+          markup += "&lt;"
+        else if (c === ">")
+          markup += "&gt;"
+        else
+          markup += c
+      }
     }
 
     this.text(markup)
@@ -956,7 +964,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
   private _serializeDocumentFragmentNS(node: DocumentFragment,
     namespace: string | null,
     prefixMap: NamespacePrefixMap, prefixIndex: PrefixIndex,
-    requireWellFormed: boolean): void {
+    requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     /**
      * 1. Let markup the empty string.
@@ -967,7 +975,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      */
     for (const childNode of node.childNodes) {
       this._serializeNodeNS(childNode, namespace, prefixMap,
-        prefixIndex, requireWellFormed)
+        prefixIndex, requireWellFormed, noDoubleEncoding)
     }
   }
 
@@ -978,7 +986,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param requireWellFormed - whether to check conformance
    */
   private _serializeDocumentFragment(node: DocumentFragment,
-    requireWellFormed: boolean): void {
+    requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     /**
      * 1. Let markup the empty string.
@@ -988,7 +996,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * 3. Return the value of markup.
      */
     for (const childNode of node._children) {
-      this._serializeNode(childNode, requireWellFormed)
+      this._serializeNode(childNode, requireWellFormed, noDoubleEncoding)
     }
   }
 
@@ -999,7 +1007,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param requireWellFormed - whether to check conformance
    */
   private _serializeDocumentType(node: DocumentType,
-    requireWellFormed: boolean): void {
+    requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     /**
      * 1. If the require well-formed flag is true and the node's publicId 
@@ -1062,7 +1070,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param requireWellFormed - whether to check conformance
    */
   private _serializeProcessingInstruction(node: ProcessingInstruction,
-    requireWellFormed: boolean): void {
+    requireWellFormed: boolean, noDoubleEncoding: boolean): void {
 
     /**
      * 1. If the require well-formed flag is set (its value is true), and node's
@@ -1104,7 +1112,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param node - node to serialize
    * @param requireWellFormed - whether to check conformance
    */
-  private _serializeCData(node: CDATASection, requireWellFormed: boolean): void {
+  private _serializeCData(node: CDATASection, requireWellFormed: boolean, noDoubleEncoding: boolean): void {
     if (requireWellFormed && (node.data.indexOf("]]>") !== -1)) {
       throw new Error("CDATA contains invalid characters (well-formed required).")
     }
@@ -1126,7 +1134,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
   private _serializeAttributesNS(node: Element, map: NamespacePrefixMap,
     prefixIndex: PrefixIndex, localPrefixesMap: { [key: string]: string },
     ignoreNamespaceDefinitionAttribute: boolean,
-    requireWellFormed: boolean): [string | null, string | null, string, string][] {
+    requireWellFormed: boolean, noDoubleEncoding: boolean): [string | null, string | null, string, string][] {
 
     /**
      * 1. Let result be the empty string.
@@ -1149,7 +1157,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
       // Optimize common case
       if (!requireWellFormed && !ignoreNamespaceDefinitionAttribute && attr.namespaceURI === null) {
         result.push([null, null, attr.localName,
-          this._serializeAttributeValue(attr.value, requireWellFormed)])
+          this._serializeAttributeValue(attr.value, requireWellFormed, noDoubleEncoding)])
         continue
       }
 
@@ -1288,7 +1296,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
            * 3.5.3.2.6. """ (U+0022 QUOTATION MARK).
           */
           result.push([null, "xmlns", candidatePrefix,
-            this._serializeAttributeValue(attributeNamespace, requireWellFormed)])
+            this._serializeAttributeValue(attributeNamespace, requireWellFormed, noDoubleEncoding)])
         }
       }
 
@@ -1325,7 +1333,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
        * 3.9.4. """ (U+0022 QUOTATION MARK).
        */
       result.push([attributeNamespace, candidatePrefix, attr.localName,
-        this._serializeAttributeValue(attr.value, requireWellFormed)])
+        this._serializeAttributeValue(attr.value, requireWellFormed, noDoubleEncoding)])
     }
 
     /**
@@ -1340,7 +1348,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param node - node to serialize
    * @param requireWellFormed - whether to check conformance
   */
-  private _serializeAttributes(node: Element, requireWellFormed: boolean):
+  private _serializeAttributes(node: Element, requireWellFormed: boolean, noDoubleEncoding: boolean):
     [string | null, string | null, string, string][] {
 
     /**
@@ -1365,7 +1373,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
       // Optimize common case
       if (!requireWellFormed) {
         result.push([null, null, attr.localName,
-          this._serializeAttributeValue(attr.value, requireWellFormed)])
+          this._serializeAttributeValue(attr.value, requireWellFormed, noDoubleEncoding)])
         continue
       }
 
@@ -1418,7 +1426,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
        * 3.9.4. """ (U+0022 QUOTATION MARK).
        */
       result.push([null, null, attr.localName,
-        this._serializeAttributeValue(attr.value, requireWellFormed)])
+        this._serializeAttributeValue(attr.value, requireWellFormed, noDoubleEncoding)])
     }
 
     /**
@@ -1576,7 +1584,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param value - attribute value
    * @param requireWellFormed - whether to check conformance
    */
-  private _serializeAttributeValue(value: string | null, requireWellFormed: boolean): string {
+  private _serializeAttributeValue(value: string | null, requireWellFormed: boolean, noDoubleEncoding: boolean): string {
     /**
      * From: https://w3c.github.io/DOM-Parsing/#dfn-serializing-an-attribute-value
      * 
@@ -1606,21 +1614,30 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * grammar requirement in the XML specification's AttValue production by
      * also replacing ">" characters.
      */
-    let result = ""
-    for (let i = 0; i < value.length; i++) {
-      const c = value[i]
-      if (c === "\"")
-        result += "&quot;"
-      else if (c === "&")
-        result += "&amp;"
-      else if (c === "<")
-        result += "&lt;"
-      else if (c === ">")
-        result += "&gt;"
-      else
-        result += c
+    if (noDoubleEncoding) {
+      return value.replace(/(?!&\S+;)&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;')
+        .replace(/\t/g, '&#x9;')
+        .replace(/\n/g, '&#xA;')
+        .replace(/\r/g, '&#xD;')
+    } else {
+      let result = ""
+      for (let i = 0; i < value.length; i++) {
+        const c = value[i]
+        if (c === "\"")
+          result += "&quot;"
+        else if (c === "&")
+          result += "&amp;"
+        else if (c === "<")
+          result += "&lt;"
+        else if (c === ">")
+          result += "&gt;"
+        else
+          result += c
+      }
+      return result
     }
-    return result
   }
 
 }
