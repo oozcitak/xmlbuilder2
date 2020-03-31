@@ -203,20 +203,27 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       return this
     }
 
-    let result = ""
-    for (let i = 0; i < node.data.length; i++) {
-      const c = node.data[i]
-      if (c === "&")
-        result += "&amp;"
-      else if (c === "<")
-        result += "&lt;"
-      else if (c === ">")
-        result += "&gt;"
-      else
-        result += c
+    let markup = ""
+    if (this._options.noDoubleEncoding) {
+      markup = node.data.replace(/(?!&\S+;)&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\r/g, '&#xD;')
+    } else {
+      for (let i = 0; i < node.data.length; i++) {
+        const c = node.data[i]
+        if (c === "&")
+          markup += "&amp;"
+        else if (c === "<")
+          markup += "&lt;"
+        else if (c === ">")
+          markup += "&gt;"
+        else
+          markup += c
+      }
     }
 
-    this._push(this._writer.text(result))
+    this._push(this._writer.text(markup))
     return this
   }
 
@@ -665,21 +672,30 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
     if (value === null) return ""
 
-    let result = ""
-    for (let i = 0; i < value.length; i++) {
-      const c = value[i]
-      if (c === "\"")
-        result += "&quot;"
-      else if (c === "&")
-        result += "&amp;"
-      else if (c === "<")
-        result += "&lt;"
-      else if (c === ">")
-        result += "&gt;"
-      else
-        result += c
+    if (this._options.noDoubleEncoding) {
+      return value.replace(/(?!&\S+;)&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;')
+        .replace(/\t/g, '&#x9;')
+        .replace(/\n/g, '&#xA;')
+        .replace(/\r/g, '&#xD;')
+    } else {
+      let result = ""
+      for (let i = 0; i < value.length; i++) {
+        const c = value[i]
+        if (c === "\"")
+          result += "&quot;"
+        else if (c === "&")
+          result += "&amp;"
+        else if (c === "<")
+          result += "&lt;"
+        else if (c === ">")
+          result += "&gt;"
+        else
+          result += c
+      }
+      return result
     }
-    return result
   }
 
   /**

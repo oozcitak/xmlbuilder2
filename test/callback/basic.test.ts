@@ -146,4 +146,58 @@ describe('basic callback API tests', () => {
     xmlStream.com("comment2")
   })
 
+  test('No double encoding', (done) => {
+    const obj = {
+      root: {
+        '@att': 'attribute value with &num; and &#35;',
+        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+      }
+    }
+
+    const xmlStream = $$.createCB({ noDoubleEncoding: true })
+
+    xmlStream.ele(obj).end()
+
+    $$.expectCBResult(xmlStream,
+      '<root att="attribute value with &num; and &#35;">' +
+      'HTML entities for umlaut are &uuml; and &#252;.' +
+      '</root>', done)
+  })
+
+  test('Double encoding', (done) => {
+    const obj = {
+      root: {
+        '@att': 'attribute value with &num; and &#35;',
+        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+      }
+    }
+
+    const xmlStream = $$.createCB({ noDoubleEncoding: false })
+
+    xmlStream.ele(obj).end()
+
+    $$.expectCBResult(xmlStream,
+      '<root att="attribute value with &amp;num; and &amp;#35;">' +
+      'HTML entities for umlaut are &amp;uuml; and &amp;#252;.' +
+      '</root>', done)
+  })
+
+  test('Double encoding - default behavior', (done) => {
+    const obj = {
+      root: {
+        '@att': 'attribute value with &num; and &#35;',
+        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+      }
+    }
+
+    const xmlStream = $$.createCB()
+
+    xmlStream.ele(obj).end()
+
+    $$.expectCBResult(xmlStream,
+      '<root att="attribute value with &amp;num; and &amp;#35;">' +
+      'HTML entities for umlaut are &amp;uuml; and &amp;#252;.' +
+      '</root>', done)
+  })
+
 })

@@ -512,7 +512,7 @@ describe('XMLWriter', () => {
 
   test('Pretty print attributes - 1', () => {
     expect(
-      $$.create().ele('test').ele('node', {"first":"1", "second":"2"})
+      $$.create().ele('test').ele('node', { "first": "1", "second": "2" })
         .end({ headless: true, prettyPrint: true, width: 20 })
     ).toBe($$.t`
     <test>
@@ -522,12 +522,12 @@ describe('XMLWriter', () => {
     `)
   })
 
-test('Pretty print attributes - 2', () => {
-  expect(
-    $$.create().ele('test')
-      .ele('node', {"first":"1", "second":"2", "third":"33333333333333333333", "fourth": 4})
-      .end({ headless: true, prettyPrint: true, width: 10 })
-  ).toBe($$.t`
+  test('Pretty print attributes - 2', () => {
+    expect(
+      $$.create().ele('test')
+        .ele('node', { "first": "1", "second": "2", "third": "33333333333333333333", "fourth": 4 })
+        .end({ headless: true, prettyPrint: true, width: 10 })
+    ).toBe($$.t`
     <test>
       <node
         first="1"
@@ -538,12 +538,12 @@ test('Pretty print attributes - 2', () => {
     `)
   })
 
-test('Pretty print attributes - 3', () => {
-  expect(
-    $$.create().ele('test')
-      .ele('node', {"first":"1", "second":"2", "third":"33333333333333333333", "fourth": 4})
-      .end({ headless: true, prettyPrint: true, width: 1 })
-  ).toBe($$.t`
+  test('Pretty print attributes - 3', () => {
+    expect(
+      $$.create().ele('test')
+        .ele('node', { "first": "1", "second": "2", "third": "33333333333333333333", "fourth": 4 })
+        .end({ headless: true, prettyPrint: true, width: 1 })
+    ).toBe($$.t`
     <test>
       <node
         first="1"
@@ -554,12 +554,12 @@ test('Pretty print attributes - 3', () => {
     `)
   })
 
-test('Pretty print attributes - 4', () => {
-  expect(
-    $$.create().ele('test')
-      .ele('node', {"first":"1", "second":"2"}).ele('child')
-      .end({ headless: true, prettyPrint: true, width: 10 })
-  ).toBe($$.t`
+  test('Pretty print attributes - 4', () => {
+    expect(
+      $$.create().ele('test')
+        .ele('node', { "first": "1", "second": "2" }).ele('child')
+        .end({ headless: true, prettyPrint: true, width: 10 })
+    ).toBe($$.t`
     <test>
       <node
         first="1"
@@ -568,6 +568,67 @@ test('Pretty print attributes - 4', () => {
       </node>
     </test>
     `)
+  })
+
+  test('Pretty print attributes - 4', () => {
+    expect(
+      $$.create().ele('test')
+        .ele('node', { "first": "1", "second": "2" }).ele('child')
+        .end({ headless: true, prettyPrint: true, width: 10 })
+    ).toBe($$.t`
+      <test>
+        <node
+          first="1"
+          second="2">
+          <child/>
+        </node>
+      </test>
+      `)
+  })
+
+  test('No double encoding', () => {
+    const obj = {
+      root: {
+        '@att': 'attribute value with &num; and &#35;',
+        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+      }
+    }
+
+    expect($$.create(obj).end({ noDoubleEncoding: true })).toBe(
+      '<?xml version="1.0"?>' +
+      '<root att="attribute value with &num; and &#35;">' +
+      'HTML entities for umlaut are &uuml; and &#252;.' +
+      '</root>')
+  })
+
+  test('Double encoding', () => {
+    const obj = {
+      root: {
+        '@att': 'attribute value with &num; and &#35;',
+        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+      }
+    }
+
+    expect($$.create(obj).end({ noDoubleEncoding: false })).toBe(
+      '<?xml version="1.0"?>' +
+      '<root att="attribute value with &amp;num; and &amp;#35;">' +
+      'HTML entities for umlaut are &amp;uuml; and &amp;#252;.' +
+      '</root>')
+  })
+
+  test('Double encoding - default behavior', () => {
+    const obj = {
+      root: {
+        '@att': 'attribute value with &num; and &#35;',
+        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+      }
+    }
+
+    expect($$.create(obj).end()).toBe(
+      '<?xml version="1.0"?>' +
+      '<root att="attribute value with &amp;num; and &amp;#35;">' +
+      'HTML entities for umlaut are &amp;uuml; and &amp;#252;.' +
+      '</root>')
   })
 
 })
