@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.1.0] - 2020-03-31
+
+### Features
+- Added the `noDoubleEncoding` option to prevent html entities from being re-encoded when serialized (See [#15](https://github.com/oozcitak/xmlbuilder2/issues/15)).
+
 ## [2.0.0] - 2020-03-30
 
 ### Bug Fixes
