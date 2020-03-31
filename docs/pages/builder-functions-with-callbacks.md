@@ -129,27 +129,28 @@ The function will receive the error object as its argument.
 
 #### Settings related to value conversions
 
-* `keepNullNodes` - whether nodes with `null` and `undefined` values will be kept or ignored: `true` or `false`. Defaults to `false`, which silently ignores nodes with `null` and `undefined` values. When set to `true`, `null` will be treated as an empty string.
-* `keepNullAttributes` - whether attributes with `null` and `undefined` values will be kept or ignored: `true` or `false`. Defaults to `false`, which silently ignores attributes with `null` and `undefined` values. When set to `true`, `null` will be treated as an empty string.
-* `ignoreConverters` - whether converter strings will be ignored when converting JS objects: `true` or `false`. Defaults to `false`.
-* `convert` - an object defining converter strings. Default converter strings are described below.
+* `keepNullNodes` - Whether nodes with `null` and `undefined` values will be kept or ignored: `true` or `false`. Defaults to `false`, which silently ignores nodes with `null` and `undefined` values. When set to `true`, `null` will be treated as an empty string.
+* `keepNullAttributes` - Whether attributes with `null` and `undefined` values will be kept or ignored: `true` or `false`. Defaults to `false`, which silently ignores attributes with `null` and `undefined` values. When set to `true`, `null` will be treated as an empty string.
+* `ignoreConverters` - Whether converter strings will be ignored when converting JS objects: `true` or `false`. Defaults to `false`.
+* `convert` - An object defining converter strings. Default converter strings are described below.
   * `att` -  When prepended to a JS object key, converts its key-value pair to an attribute. Defaults to `'@'`.
   * `ins` - When prepended to a JS object key, converts its value to a processing instruction node. Defaults to `'?'`.
-  * `text` - When prepended to a JS object key, converts its value to a text node. Defaults to `'#'`.
-  * `cdata` - When prepended to a JS object key, converts its value to a CDATA section node. Defaults to `'$'`.
+  * `text` - when prepended to a JS object key, converts its value to a text node. Defaults to `'#'`.
+  * `cdata` - when prepended to a JS object key, converts its value to a CDATA section node. Defaults to `'$'`.
   * `comment` - When prepended to a JS object key, converts its value to a comment node. Defaults to `'!'`.
 
 #### Settings related to XML namespaces
 
-* `defaultNamespace` - contains default namespaces to apply to all elements and attributes (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-defaults))
+* `defaultNamespace` - Contains default namespaces to apply to all elements and attributes (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-defaults))
   * `ele` - default namespace for element nodes
   * `att` - default namespace for attributes
-* `namespaceAlias` - contains namespace aliases where object keys are namespace aliases and object values are namespaces (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-aliases))
+* `namespaceAlias` - Contains namespace aliases where object keys are namespace aliases and object values are namespaces (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-aliases))
 
 #### Serialization settings
 
 * `format` - Output format. Either `'xml'` or `'json'`.
 * `wellFormed` - Ensures that the document adheres to the syntax rules specified by the XML specification. If this flag is set and the document is not well-formed errors will be thrown. Defaults to `false`.
+* `noDoubleEncoding` - Prevents existing html entities from being re-encoded when serialized. Defaults to `false`.
 * `prettyPrint` - Pretty-prints the XML tree. Defaults to `false`.
 * `indent` - Determines the indentation string for pretty printing. Defaults to two space characters.
 * `newline` - Determines the newline string for pretty printing. Defaults to `'\n'`.
