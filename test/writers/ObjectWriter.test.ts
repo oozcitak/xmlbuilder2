@@ -629,4 +629,28 @@ describe('ObjectWriter', () => {
     })
   })
 
+  test('fragment', () => {
+    const result = $$.fragment()
+      .ele('foo', { att: "val" }).up()
+      .ele('foo').up()
+      .ele('bar').up()
+      .ele('foo').up()
+      .end({ format: "object" })
+
+    expect($$.printMap(result)).toBe($$.t`
+      {
+        #: [
+          {
+            foo: [
+              { @att: val },
+              { }
+            ]
+          },
+          { bar: { } },
+          { foo: { } }
+        ]
+      }
+      `)      
+  })
+
 })
