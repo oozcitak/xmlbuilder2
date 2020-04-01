@@ -653,4 +653,13 @@ describe('ObjectWriter', () => {
       `)      
   })
 
+  test('fragment with unique keys', () => {
+    const result = $$.fragment()
+      .ele('foo').up()
+      .ele('bar').up()
+      .end({ format: "object" })
+
+    expect(result).toEqual({ foo: { }, bar: { } })
+  })
+
 })
