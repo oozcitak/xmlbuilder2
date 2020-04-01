@@ -5,6 +5,7 @@ import { Node, Document } from "@oozcitak/dom/lib/dom/interfaces"
  */
 export interface DocumentWithSettings extends Document {
   _xmlBuilderOptions: XMLBuilderOptions
+  _isFragment?: boolean
 }
 
 /**

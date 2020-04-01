@@ -209,12 +209,12 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   if (contents === undefined) {
     // empty fragment
     const doc = createDocument()
-    setOptions(doc, options)
+    setOptions(doc, options, true)
     builder = new XMLBuilderImpl(doc.createDocumentFragment())
   } else if (isObject(contents)) {
     // JS object
     const doc = createDocument()
-    setOptions(doc, options)
+    setOptions(doc, options, true)
     builder = new XMLBuilderImpl(doc.createDocumentFragment())
     builder.ele(contents)
   } else if (/^\s*</.test(contents)) {
@@ -223,7 +223,7 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
     const doc = domParser.parseFromString("<TEMP_ROOT>" + 
       sanitizeInput(contents, options.invalidCharReplacement) + "</TEMP_ROOT>", "text/xml")
     throwIfParserError(doc)
-    setOptions(doc, options)
+    setOptions(doc, options, true)
     /* istanbul ignore next */
     if (doc.documentElement === null) {
       throw new Error("Document element is null.")
@@ -237,7 +237,7 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   } else {
     // JSON
     const doc = createDocument()
-    setOptions(doc, options)
+    setOptions(doc, options, true)
     builder = new XMLBuilderImpl(doc.createDocumentFragment())
     const obj = JSON.parse(contents) as ExpandObject
     builder.ele(obj)
@@ -445,7 +445,8 @@ function formatBuilderOptions(createOptions: XMLBuilderCreateOptions = {}) {
   return options
 }
 
-function setOptions(doc: Document, options: XMLBuilderOptions): void {
+function setOptions(doc: Document, options: XMLBuilderOptions, isFragment?: boolean): void {
   const docWithSettings = doc as DocumentWithSettings
   docWithSettings._xmlBuilderOptions = options
+  docWithSettings._isFragment = isFragment
 }

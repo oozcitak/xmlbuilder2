@@ -9,7 +9,7 @@ import {
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
 import { XMLWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
-import { Document, Node, Element, Attr } from "@oozcitak/dom/lib/dom/interfaces"
+import { Document, Node, Element, Attr, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { Guard } from "@oozcitak/dom/lib/util"
 import {
   namespace_extractQName, tree_index, create_element
@@ -179,7 +179,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       }, this)
     } else {
       [namespace, name] = this._extractNamespace(
-        sanitizeInput(namespace, this._options.invalidCharReplacement), 
+        sanitizeInput(namespace, this._options.invalidCharReplacement),
         sanitizeInput(name, this._options.invalidCharReplacement), true)
 
       // inherit namespace from parent
@@ -477,7 +477,19 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   doc(): XMLBuilder {
-    return new XMLBuilderImpl(this._doc)
+    if ((this._doc as DocumentWithSettings)._isFragment) {
+      let node: Node | null = this.node
+      while (node && node.nodeType !== NodeType.DocumentFragment) {
+        node = node.parentNode
+      }
+      /* istanbul ignore next */
+      if (node === null) {
+        throw new Error("Node has no parent node while searching for document fragment ancestor.")
+      }
+      return new XMLBuilderImpl(node)
+    } else {
+      return new XMLBuilderImpl(this._doc)
+    }
   }
 
   /** @inheritdoc */
