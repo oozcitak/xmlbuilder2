@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.1.1] - 2020-04-01
+
+### Bug Fixes
+- Fixed a bug where calling `end` on a document fragment node would serialize the fragment's owner document not the fragment itself.
+
 ## [2.1.0] - 2020-03-31
 
 ### Features
@@ -119,3 +124,5 @@ All notable changes to this project are documented in this file. This project ad
 [1.8.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.7.0...v1.8.0
 [1.8.1]: https://github.com/oozcitak/xmlbuilder2/compare/v1.8.0...v1.8.1
 [2.0.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.8.1...v2.0.0
+[2.1.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.0.0...v2.1.0
+[2.1.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.0...v2.1.1
