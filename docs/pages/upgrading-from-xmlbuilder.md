@@ -17,32 +17,58 @@ Please note the following changes if you are upgrading from [xmlbuilder](https:/
 #### `xmlbuilder2` is a wrapper
 
 `xmlbuilder2` is a wrapper over a DOM node, while `xmlbuilder` extends the node prototype. The difference should only matter if builder objects are used in other libraries. In `xmlbuilder` builder objects can be passed directly to a DOM library as node objects. In `xmlbuilder2` the underlying DOM node can be accessed using the `node` property.
+<div class="row">
+  <div class="col-md-6">
 
-```js
+{% highlight js %}
+// xmlbuilder
 const { select } = require("xpath");
+const builder = require("xmlbuilder");
 
-const { xmlbuilder } = require("xmlbuilder");
 const root = builder.create("root");
 select("//root", doc);
+{% endhighlight %}
 
-// equivalent code in xmlbuilder2
+  </div>
+  <div class="col-md-6">
+
+{% highlight js %}
+// xmlbuilder2 equivalent
+const { select } = require("xpath");
 const { create } = require("xmlbuilder2");
+
 const root = create().ele("root");
 select("//root", doc.node);
-```
+{% endhighlight %}
 
-#### `create` and `begin` functions are replaced by [`create`]({{ site.baseurl }}{% link pages/builder-functions.md %}#create)
+  </div>
+</div>
+
+
+#### `create` and `begin` functions are replaced by `create`
 
 `xmlbuilder` exports two functions for creating a new XML document: `create` and `begin`. `create` creates a document with a root element node and returns this node and `begin` creates and returns an empty XML document. In `xmlbuilder2` there is a single [`create`]({{ site.baseurl }}{% link pages/builder-functions.md %}#create) function which creates an empty XML document and returns the document node.
 
-```js
-const xmlbuilder = require("xmlbuilder");
-const root = builder.create("root");
+<div class="row">
+  <div class="col-md-6">
 
-// equivalent code in xmlbuilder2
+{% highlight js %}
+// xmlbuilder
+const builder = require("xmlbuilder");
+const root = builder.create("root");
+{% endhighlight %}
+
+  </div>
+  <div class="col-md-6">
+
+{% highlight js %}
+// xmlbuilder2 equivalent
 const { create } = require("xmlbuilder2");
 const root = create().ele("root");
-```
+{% endhighlight %}
+
+  </div>
+</div>
 
 #### `begin` with callback is renamed to `createCB`
 
@@ -52,14 +78,29 @@ const root = create().ele("root");
 
 In `xmlbuilder`, the `ele` function can create a default text node if a string is passed as its third argument. In `xmlbuilder2`, text nodes are always explicitly created with the [`txt`]({{ site.baseurl }}{% link pages/node-creation-functions.md %}#txt) function.
 
-```js
-const xmlbuilder = require("xmlbuilder");
-const root = builder.begin().ele("root", { att: "val" }, "text node");
+<div class="row">
+  <div class="col-md-6">
 
-// equivalent code in xmlbuilder2
+{% highlight js %}
+// xmlbuilder
+const builder = require("xmlbuilder");
+const root = builder.begin()
+  .ele("root", { att: "val" }, "text");
+{% endhighlight %}
+
+  </div>
+  <div class="col-md-6">
+
+{% highlight js %}
+// xmlbuilder2 equivalent
 const { create } = require("xmlbuilder2");
-const root = create().ele("root", { att: "val" }).txt("text node");
-```
+const root = create()
+  .ele("root", { att: "val" })
+  .txt("text");
+{% endhighlight %}
+
+  </div>
+</div>
 
 #### raw text nodes are removed
 
@@ -69,63 +110,121 @@ const root = create().ele("root", { att: "val" }).txt("text node");
 
 In `xmlbuilder`, a processing instruction node is created from a JS object key/value pair when the key starts with `"?"`. In `xmlbuilder2`, both the instruction target and value is extracted from the object value.
 
-```js
-const xmlbuilder = require("xmlbuilder");
-const root = builder.create("root").ele({ "?target": "content" });
+<div class="row">
+  <div class="col-md-6">
 
-// equivalent code in xmlbuilder2
+{% highlight js %}
+// xmlbuilder
+const builder = require("xmlbuilder");
+const root = builder.create("root")
+  .ele({ "?target": "content" });
+{% endhighlight %}
+
+  </div>
+  <div class="col-md-6">
+
+{% highlight js %}
+// xmlbuilder2 equivalent
 const { create } = require("xmlbuilder2");
-const root = create().ele("root").ele({ "?": "target content" });
-```
+const root = create().ele("root")
+  .ele({ "?": "target content" });
+{% endhighlight %}
+
+  </div>
+</div>
 
 #### JS object conversion syntax of CDATA section nodes is changed
 
 In `xmlbuilder`, a CDATA section node is created from a JS object value when its key starts with `"#cdata"`. In `xmlbuilder2`, the key should be `"$"`.
 
-```js
-const xmlbuilder = require("xmlbuilder");
-const root = builder.create("root").ele({ "#cdata": "value" });
+<div class="row">
+  <div class="col-md-6">
 
-// equivalent code in xmlbuilder2
+{% highlight js %}
+// xmlbuilder
+const builder = require("xmlbuilder");
+const root = builder.create("root")
+  ele({ "#cdata": "value" });
+{% endhighlight %}
+
+  </div>
+  <div class="col-md-6">
+
+{% highlight js %}
+// xmlbuilder2 equivalent
 const { create } = require("xmlbuilder2");
-const root = create().ele("root").ele({ "$": "value" });
+const root = create().ele("root")
+  .ele({ "$": "value" });
 // or alternatively override the converter string
 // note that we also override the text converter
 // since it also begins with "#"
 const root = create({ convert: { text: "#text", cdata: "#cdata" } })
   .ele("root").ele({ "#cdata": "value" });
-```
+{% endhighlight %}
+
+  </div>
+</div>
 
 #### JS object conversion syntax of comment nodes is changed
 
 In `xmlbuilder`, a comment node is created from a JS object value when its key starts with `"#comment"`. In `xmlbuilder2`, the key should be `"!"`.
 
-```js
-const xmlbuilder = require("xmlbuilder");
-const root = builder.create("root").ele({ "#comment": "value" });
+<div class="row">
+  <div class="col-md-6">
 
-// equivalent code in xmlbuilder2
+{% highlight js %}
+// xmlbuilder
+const builder = require("xmlbuilder");
+const root = builder.create("root")
+  .ele({ "#comment": "value" });
+{% endhighlight %}
+
+  </div>
+  <div class="col-md-6">
+
+{% highlight js %}
+// xmlbuilder2 equivalent
 const { create } = require("xmlbuilder2");
-const root = document().ele("root").ele({ "!": "value" });
+const root = document().ele("root")
+  .ele({ "!": "value" });
 // or alternatively override the converter string
 // note that we also override the text converter
 // since it also begins with "#"
 const root = create({ convert: { text: "#text", comment: "#comment" } })
   .ele("root").ele({ "#comment": "value" });
-```
+{% endhighlight %}
+
+  </div>
+</div>
 
 #### output format setting `pretty` is changed to `prettyPrint`
 
 The `pretty` setting in [`end`]({{ site.baseurl }}{% link pages/conversion-functions.md %}#end) function is renamed to `prettyPrint` in `xmlbuilder2`.
 
-```js
-const xmlbuilder = require("xmlbuilder");
-const xml = builder.create("root").ele("foo").end({ pretty: true });
+<div class="row">
+  <div class="col-md-6">
 
-// equivalent code in xmlbuilder2
+{% highlight js %}
+// xmlbuilder
+const builder = require("xmlbuilder");
+const xml = builder.create("root")
+  .ele("foo")
+  .end({ pretty: true });
+{% endhighlight %}
+
+  </div>
+  <div class="col-md-6">
+
+{% highlight js %}
+// xmlbuilder2 equivalent
 const { create } = require("xmlbuilder2");
-const xml = create().ele("root").ele("foo").end({ prettyPrint: true });
-```
+const xml = create().ele("root")
+  .ele("foo")
+  .end({ prettyPrint: true });
+{% endhighlight %}
+
+  </div>
+</div>
 
 #### `importDocument` function is renamed to `import`
 

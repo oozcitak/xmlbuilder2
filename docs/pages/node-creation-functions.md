@@ -209,14 +209,14 @@ ___
 
 ###  ele
 
-Creates a new element node and appends it to the list of child nodes.
+Creates a new element node, appends it to the list of child nodes and returns the new element node.
 
 {% capture cb_note %}
   The `ele` function returns the newly created element node. If multiple
   element nodes are created with a single `ele` call, it returns the last top
   level element node created.
 {% endcapture %}
-{% include note.html content=cb_note %}
+{% include note.html content=cb_note markdown=1 %}
 
 <details markdown="1">
 <summary><code><strong>ele</strong>(<code>namespace</code>: string, <code>name</code>: string, <code>attributes</code>?: object)</code></summary>

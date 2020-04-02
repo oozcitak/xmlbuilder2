@@ -30,8 +30,6 @@ Returns the DOM node wrapped by `xmlbuilder2`.
 <summary><code><strong>node</strong></code></summary>
 <br/>
 
-For example:
-
 ```js
 const { create } = require('xmlbuilder2');
 

@@ -15,7 +15,7 @@ page for the settings object used by these functions.
 {% capture cb_note %}
   `end` function converts the _entire_ XML document, where `toString` and `toObject` functions convert only the node they are called with.
 {% endcapture %}
-{% include note.html content=cb_note %}
+{% include note.html content=cb_note markdown=1 %}
 
 ###  end
 

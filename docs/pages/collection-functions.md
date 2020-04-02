@@ -103,7 +103,7 @@ Returns the first child node satisfying the given predicate, or `undefined` if t
 {% capture cb_note %}
   `find` returns as soon as a node satisfies the predicate, without necessarily visiting all child nodes.
 {% endcapture %}
-{% include note.html content=cb_note %}
+{% include note.html content=cb_note markdown=1 %}
 
 <details markdown="1">
 <summary><code><strong>find</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
@@ -190,7 +190,7 @@ Returns `true` if any of the child nodes pass the given predicate test.
 {% capture cb_note %}
   `some` returns as soon as a node satisfies the predicate, without necessarily visiting all child nodes.
 {% endcapture %}
-{% include note.html content=cb_note %}
+{% include note.html content=cb_note markdown=1 %}
 
 <details markdown="1">
 <summary><code><strong>some</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
