@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.1.2] - 2020-04-09
+
+### Bug Fixes
+- Fixed a bug where the `noDoubleEncoding` flag kept named entities other than [those specified in the spec](https://www.w3.org/TR/xml/#sec-predefined-ent) (see [#16](https://github.com/oozcitak/xmlbuilder2/issues/16)).
+
 ## [2.1.1] - 2020-04-01
 
 ### Bug Fixes
@@ -10,18 +15,18 @@ All notable changes to this project are documented in this file. This project ad
 ## [2.1.0] - 2020-03-31
 
 ### Features
-- Added the `noDoubleEncoding` option to prevent html entities from being re-encoded when serialized (See [#15](https://github.com/oozcitak/xmlbuilder2/issues/15)).
+- Added the `noDoubleEncoding` option to prevent html entities from being re-encoded when serialized (see [#15](https://github.com/oozcitak/xmlbuilder2/issues/15)).
 
 ## [2.0.0] - 2020-03-30
 
 ### Bug Fixes
-- Fixed namespace inheritance logic, so that a preferred prefix is not retrieved from a parent element if the element has no prefix and its namespace matches the default namespace declaration (See: https://github.com/web-platform-tests/wpt/pull/16703).
-- Namespace declaration attributes from JS objects are now applied correctly to their parent elements (See [#13](https://github.com/oozcitak/xmlbuilder2/issues/13)).
+- Fixed namespace inheritance logic, so that a preferred prefix is not retrieved from a parent element if the element has no prefix and its namespace matches the default namespace declaration (see: https://github.com/web-platform-tests/wpt/pull/16703).
+- Namespace declaration attributes from JS objects are now applied correctly to their parent elements (see [#13](https://github.com/oozcitak/xmlbuilder2/issues/13)).
 ### Features
-- Narrowed return value types of functions for better intellisense support with TypeScript (See [#14](https://github.com/oozcitak/xmlbuilder2/issues/14)).
-- Added `invalidCharReplacement` option to sanitize input strings by replacing invalid characters (See [#12](https://github.com/oozcitak/xmlbuilder2/issues/12)). The option has no defaults and must be configured by the user.
+- Narrowed return value types of functions for better intellisense support with TypeScript (see [#14](https://github.com/oozcitak/xmlbuilder2/issues/14)).
+- Added `invalidCharReplacement` option to sanitize input strings by replacing invalid characters (see [#12](https://github.com/oozcitak/xmlbuilder2/issues/12)). The option has no defaults and must be configured by the user.
 ### BREAKING CHANGES
-- Removed `inheritNS` options (See [#1](https://github.com/oozcitak/xmlbuilder2/issues/1), [#6](https://github.com/oozcitak/xmlbuilder2/issues/6) and [#13](https://github.com/oozcitak/xmlbuilder2/issues/13)). Element nodes now inherit namespaces from their parent element nodes by default. To reset the default namespace declaration create an `"xmlns"` attribute with an empty value (`""`) as in the DOM.
+- Removed `inheritNS` options (see [#1](https://github.com/oozcitak/xmlbuilder2/issues/1), [#6](https://github.com/oozcitak/xmlbuilder2/issues/6) and [#13](https://github.com/oozcitak/xmlbuilder2/issues/13)). Element nodes now inherit namespaces from their parent element nodes by default. To reset the default namespace declaration create an `"xmlns"` attribute with an empty value (`""`) as in the DOM.
 
 ## [1.8.1] - 2020-03-27
 
@@ -54,12 +59,12 @@ All notable changes to this project are documented in this file. This project ad
 ## [1.4.3] - 2020-03-03
 
 ### Bug Fixes
-- `keepNullNodes` and `keepNullAttributes` flags now properly keep `null` **and** `undefined` values (See [#5](https://github.com/oozcitak/xmlbuilder2/issues/5)). Without these flags, `null` **and** `undefined` will be silently skipped.
+- `keepNullNodes` and `keepNullAttributes` flags now properly keep `null` **and** `undefined` values (see [#5](https://github.com/oozcitak/xmlbuilder2/issues/5)). Without these flags, `null` **and** `undefined` will be silently skipped.
 
 ## [1.4.2] - 2020-03-02
 
 ### Bug Fixes
-- Added `types` to `package.json` to help IDEs infer types (See [#4](https://github.com/oozcitak/xmlbuilder2/issues/4)).
+- Added `types` to `package.json` to help IDEs infer types (see [#4](https://github.com/oozcitak/xmlbuilder2/issues/4)).
 
 ## [1.4.1] - 2020-02-28
 
@@ -69,7 +74,7 @@ All notable changes to this project are documented in this file. This project ad
 ## [1.4.0] - 2020-02-28
 
 ### Features
-- Added callback API (See [#2](https://github.com/oozcitak/xmlbuilder2/issues/2)).
+- Added callback API (see [#2](https://github.com/oozcitak/xmlbuilder2/issues/2)).
 
 ## [1.3.0] - 2020-02-18
 
@@ -91,7 +96,7 @@ All notable changes to this project are documented in this file. This project ad
 ## [1.1.2] - 2020-02-17
 
 ### Bug Fixes
-- Prevented child element namespaces to be inherited from their parent elements (See [#1](https://github.com/oozcitak/xmlbuilder2/issues/1)).
+- Prevented child element namespaces to be inherited from their parent elements (see [#1](https://github.com/oozcitak/xmlbuilder2/issues/1)).
 - Fixed JS object parser to allow namespaces for both element nodes and attributes with the `{ "prefix:name@ns": {} }` notation.
 
 ## [1.1.1] - 2020-02-13
@@ -126,3 +131,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.0.0]: https://github.com/oozcitak/xmlbuilder2/compare/v1.8.1...v2.0.0
 [2.1.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.0.0...v2.1.0
 [2.1.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.0...v2.1.1
+[2.1.2]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.1...v2.1.2
