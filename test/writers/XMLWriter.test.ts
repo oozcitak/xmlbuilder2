@@ -589,45 +589,45 @@ describe('XMLWriter', () => {
   test('No double encoding', () => {
     const obj = {
       root: {
-        '@att': 'attribute value with &num; and &#35;',
-        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+        '@att': 'attribute value with &amp; and &#38;',
+        '#': 'XML entities for ampersand are &amp; and &#38;.'
       }
     }
 
     expect($$.create(obj).end({ noDoubleEncoding: true })).toBe(
       '<?xml version="1.0"?>' +
-      '<root att="attribute value with &num; and &#35;">' +
-      'HTML entities for umlaut are &uuml; and &#252;.' +
+      '<root att="attribute value with &amp; and &amp;#38;">' +
+      'XML entities for ampersand are &amp; and &amp;#38;.' +
       '</root>')
   })
 
   test('Double encoding', () => {
     const obj = {
       root: {
-        '@att': 'attribute value with &num; and &#35;',
-        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+        '@att': 'attribute value with &amp; and &#38;',
+        '#': 'XML entities for ampersand are &amp; and &#38;.'
       }
     }
 
     expect($$.create(obj).end({ noDoubleEncoding: false })).toBe(
       '<?xml version="1.0"?>' +
-      '<root att="attribute value with &amp;num; and &amp;#35;">' +
-      'HTML entities for umlaut are &amp;uuml; and &amp;#252;.' +
+      '<root att="attribute value with &amp;amp; and &amp;#38;">' +
+      'XML entities for ampersand are &amp;amp; and &amp;#38;.' +
       '</root>')
   })
 
   test('Double encoding - default behavior', () => {
     const obj = {
       root: {
-        '@att': 'attribute value with &num; and &#35;',
-        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+        '@att': 'attribute value with &amp; and &#38;',
+        '#': 'XML entities for ampersand are &amp; and &#38;.'
       }
     }
 
     expect($$.create(obj).end()).toBe(
       '<?xml version="1.0"?>' +
-      '<root att="attribute value with &amp;num; and &amp;#35;">' +
-      'HTML entities for umlaut are &amp;uuml; and &amp;#252;.' +
+      '<root att="attribute value with &amp;amp; and &amp;#38;">' +
+      'XML entities for ampersand are &amp;amp; and &amp;#38;.' +
       '</root>')
   })
 

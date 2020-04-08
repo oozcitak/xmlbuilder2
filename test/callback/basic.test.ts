@@ -149,8 +149,8 @@ describe('basic callback API tests', () => {
   test('No double encoding', (done) => {
     const obj = {
       root: {
-        '@att': 'attribute value with &num; and &#35;',
-        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+        '@att': 'attribute value with &amp; and &#38;',
+        '#': 'XML entities for ampersand are &amp; and &#38;.'
       }
     }
 
@@ -159,16 +159,16 @@ describe('basic callback API tests', () => {
     xmlStream.ele(obj).end()
 
     $$.expectCBResult(xmlStream,
-      '<root att="attribute value with &num; and &#35;">' +
-      'HTML entities for umlaut are &uuml; and &#252;.' +
+      '<root att="attribute value with &amp; and &amp;#38;">' +
+      'XML entities for ampersand are &amp; and &amp;#38;.' +
       '</root>', done)
   })
 
   test('Double encoding', (done) => {
     const obj = {
       root: {
-        '@att': 'attribute value with &num; and &#35;',
-        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+        '@att': 'attribute value with &amp; and &#38;',
+        '#': 'XML entities for ampersand are &amp; and &#38;.'
       }
     }
 
@@ -177,16 +177,16 @@ describe('basic callback API tests', () => {
     xmlStream.ele(obj).end()
 
     $$.expectCBResult(xmlStream,
-      '<root att="attribute value with &amp;num; and &amp;#35;">' +
-      'HTML entities for umlaut are &amp;uuml; and &amp;#252;.' +
+      '<root att="attribute value with &amp;amp; and &amp;#38;">' +
+      'XML entities for ampersand are &amp;amp; and &amp;#38;.' +
       '</root>', done)
   })
 
   test('Double encoding - default behavior', (done) => {
     const obj = {
       root: {
-        '@att': 'attribute value with &num; and &#35;',
-        '#': 'HTML entities for umlaut are &uuml; and &#252;.'
+        '@att': 'attribute value with &amp; and &#38;',
+        '#': 'XML entities for ampersand are &amp; and &#38;.'
       }
     }
 
@@ -195,8 +195,8 @@ describe('basic callback API tests', () => {
     xmlStream.ele(obj).end()
 
     $$.expectCBResult(xmlStream,
-      '<root att="attribute value with &amp;num; and &amp;#35;">' +
-      'HTML entities for umlaut are &amp;uuml; and &amp;#252;.' +
+      '<root att="attribute value with &amp;amp; and &amp;#38;">' +
+      'XML entities for ampersand are &amp;amp; and &amp;#38;.' +
       '</root>', done)
   })
 
