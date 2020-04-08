@@ -931,7 +931,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
     let markup = ""
 
     if (noDoubleEncoding) {
-      markup = node.data.replace(/(?!&\S+;)&/g, '&amp;')
+      markup = node.data.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/\r/g, '&#xD;')
@@ -1615,7 +1615,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * also replacing ">" characters.
      */
     if (noDoubleEncoding) {
-      return value.replace(/(?!&\S+;)&/g, '&amp;')
+      return value.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/"/g, '&quot;')
         .replace(/\t/g, '&#x9;')
