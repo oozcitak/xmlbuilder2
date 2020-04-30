@@ -84,14 +84,19 @@ will be converted into:
 ```xml
 <pilot callsign="Maverick" rank="Lieutenant"/>
 ````
-Alternatively, multiple attributes can be grouped under the attribute key.
+
+{% capture cb_note %}
+  An alternative notation is to group multiple attributes under the attribute key.
 ```js
 obj = { pilot: { '@': { 'callsign': 'Maverick', 'rank': 'Lieutenant' } } }
 ```
-is also converted into:
+  is also converted into:
 ```xml
 <pilot callsign="Maverick" rank="Lieutenant"/>
 ````
+{% endcapture %}
+{% include note.html content=cb_note markdown=1 %}
+
 ___
 
 #### ins
