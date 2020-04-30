@@ -30,11 +30,17 @@ const root = create().ele('root');
 root.ele('a').up()
     .ele('b').up()
     .ele('c').up();
-const names = [];
-root.each(n => names.push(n.node.nodeName));
-console.log(names); // ['a', 'b', 'c']
+root.each((n, i) => n.att('id', i + 1));
+console.log(root.end({ prettyPrint: true }));
 ```
-
+```xml
+<?xml version="1.0"?>
+<root>
+  <a id="1"/>
+  <b id="2"/>
+  <c id="3"/>
+</root>
+```
 </details>
 
 ___
