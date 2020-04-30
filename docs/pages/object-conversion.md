@@ -76,12 +76,19 @@ Converter strings can be customized with the `convert` option while initializing
 
 #### att
 
-Converts its key-value pair to an element attribute. Defaults to `'@'`. Multiple attributes can also be grouped under the attribute key.
+Converts its key-value pair to an element attribute. Defaults to `'@'`.
 ```js
-obj1 = { pilot: { '@callsign': 'Maverick', '@rank': 'Lieutenant' } }
-obj2 = { pilot: { '@': { 'callsign': 'Maverick', 'rank': 'Lieutenant' } } }
+obj = { pilot: { '@callsign': 'Maverick', '@rank': 'Lieutenant' } }
 ```
-are both converted into:
+will be converted into:
+```xml
+<pilot callsign="Maverick" rank="Lieutenant"/>
+````
+Alternatively, multiple attributes can be grouped under the attribute key.
+```js
+obj = { pilot: { '@': { 'callsign': 'Maverick', 'rank': 'Lieutenant' } } }
+```
+is also converted into:
 ```xml
 <pilot callsign="Maverick" rank="Lieutenant"/>
 ````
@@ -92,7 +99,7 @@ ___
 Converts its value to a processing instruction node. Defaults to `'?'`. Instruction target and value should be separated with a single space character.
 ```js
 obj = { 
-  '?': 'background classified ref='NAM#123456'',
+  '?': 'background classified ref="NAM#123456"',
   pilot: 'Pete Mitchell'
 }
 ```
@@ -108,13 +115,27 @@ ___
 Converts its value to a text node if it is a string, otherwise expands its value under its parent element node. Defaults to `'#'`.
 ```js
 obj = { monologue: {
-  '#': 'Talk to me Goose!',
+  '#': 'Talk to me Goose!'
 } }
 ```
 becomes:
 ```xml
 <monologue>Talk to me Goose!</monologue>
-````
+```
+
+{% capture cb_note %}
+  `text` converter is usually not needed as object values are converted to text nodes
+  by default. So the above example is equivalent to:
+```js
+obj = { monologue: 'Talk to me Goose!' }
+```
+```xml
+<monologue>Talk to me Goose!</monologue>
+```
+  `text` converter is needed in advanced use cases as explained below.
+{% endcapture %}
+{% include note.html content=cb_note markdown=1 %}
+
 {% capture cb_note %}
   Since JS objects cannot contain duplicate keys, multiple text nodes can be 
   created by adding some unique text after each object key or grouping node
