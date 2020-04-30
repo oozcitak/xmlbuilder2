@@ -109,7 +109,7 @@ Returns the first child node satisfying the given predicate, or `undefined` if t
 <summary><code><strong>find</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
-* `predicate` - a predicate function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating if the current node is the node sought
+* `predicate` - a function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating whether the child node satisfies the predicate
 * `self` - whether to visit the current node along with child nodes (optional)
 * `recursive` - whether to visit all descendant nodes in tree-order or only the immediate child nodes (optional)
 * `thisArg` - value to use as this when executing callback (optional)
@@ -137,7 +137,7 @@ Produces an array of child nodes which pass the given predicate test.
 <summary><code><strong>filter</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
-* `predicate` - a predicate function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating if the current node is the node sought
+* `predicate` - a function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating whether the child node satisfies the predicate
 * `self` - whether to visit the current node along with child nodes (optional)
 * `recursive` - whether to visit all descendant nodes in tree-order or only the immediate child nodes (optional)
 * `thisArg` - value to use as this when executing callback (optional)
@@ -165,7 +165,7 @@ Returns `true` if all child nodes pass the given predicate test.
 <summary><code><strong>every</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
-* `predicate` - a predicate function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating if the current node is the node sought
+* `predicate` - a function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating whether the child node satisfies the predicate
 * `self` - whether to visit the current node along with child nodes (optional)
 * `recursive` - whether to visit all descendant nodes in tree-order or only the immediate child nodes (optional)
 * `thisArg` - value to use as this when executing callback (optional)
@@ -196,7 +196,7 @@ Returns `true` if any of the child nodes pass the given predicate test.
 <summary><code><strong>some</strong>(<code>predicate</code>: (node: XMLBuilder, index: number, level: number) => boolean, <code>self</code>?: boolean, <code>recursive</code>?: boolean, <code>thisArg</code>?: any)</code></summary>
 <br/>
 
-* `predicate` - a predicate function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating if the current node is the node sought
+* `predicate` - a function which receives each child node as its first argument, child node index as its second argument and child node level as its third argument and returns a boolean value indicating whether the child node satisfies the predicate
 * `self` - whether to visit the current node along with child nodes (optional)
 * `recursive` - whether to visit all descendant nodes in tree-order or only the immediate child nodes (optional)
 * `thisArg` - value to use as this when executing callback (optional)
