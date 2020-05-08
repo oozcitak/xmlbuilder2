@@ -16,6 +16,6 @@ describe("Replicate issue", () => {
         { example: "&notanentity&lt;" },
         { format: "xml", noDoubleEncoding: true }
       )
-    ).toBe('<?xml version="1.0"?><example>&amp;notanentity&lt;</example>');
-  });
-});
+    ).toBe('<?xml version="1.0"?><example>&amp;notanentity&lt;</example>')
+  })
+})
