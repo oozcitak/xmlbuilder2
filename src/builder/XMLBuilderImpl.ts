@@ -273,7 +273,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     namespace = sanitizeInput(namespace, this._options.invalidCharReplacement)
     value = sanitizeInput(value, this._options.invalidCharReplacement)
     const [prefix, localName] = namespace_extractQName(name)
-    const [elePrefix, eleLocalName] = namespace_extractQName(ele.prefix ? ele.prefix + ':' + ele.localName : ele.localName)
+    const [elePrefix] = namespace_extractQName(ele.prefix ? ele.prefix + ':' + ele.localName : ele.localName)
 
     // check if this is a namespace declaration attribute
     // assign a new element namespace if it wasn't previously assigned
@@ -291,22 +291,8 @@ export class XMLBuilderImpl implements XMLBuilder {
     // re-create the element node if its namespace changed
     // we can't simply change the namespaceURI since its read-only
     if (eleNamespace !== null) {
-      const newEle = create_element(this._doc, eleLocalName,
-        eleNamespace, elePrefix)
-      for (const attr of ele.attributes) {
-        newEle.setAttributeNodeNS(attr.cloneNode() as Attr)
-      }
-      for (const childNode of ele.childNodes) {
-        newEle.appendChild(childNode.cloneNode())
-      }
-      const parent = ele.parentNode
-      /* istanbul ignore next */
-      if (parent === null) {
-        throw new Error("Parent node is null." + this._debugInfo())
-      }
-      parent.replaceChild(newEle, ele)
-      this._domNode = newEle
-      ele = newEle
+      this._updateNamespace(eleNamespace)
+      ele = this.node as Element
     }
 
     if (namespace !== undefined) {
@@ -458,18 +444,31 @@ export class XMLBuilderImpl implements XMLBuilder {
       if (elementNode === null) {
         throw new Error("Imported document has no document element node. " + this._debugInfo())
       }
-      const clone = hostDoc.importNode(elementNode, true)
+      const clone = hostDoc.importNode(elementNode, true) as Element
       hostNode.appendChild(clone)
+      const [prefix] = namespace_extractQName(clone.prefix ? clone.prefix + ':' + clone.localName : clone.localName)
+      const namespace = hostNode.lookupNamespaceURI(prefix)
+      new XMLBuilderImpl(clone)._updateNamespace(namespace)
     } else if (Guard.isDocumentFragmentNode(importedNode)) {
       // import child nodes
       for (const childNode of importedNode.childNodes) {
         const clone = hostDoc.importNode(childNode, true)
         hostNode.appendChild(clone)
+        if (Guard.isElementNode(clone)) {
+          const [prefix] = namespace_extractQName(clone.prefix ? clone.prefix + ':' + clone.localName : clone.localName)
+          const namespace = hostNode.lookupNamespaceURI(prefix)
+          new XMLBuilderImpl(clone)._updateNamespace(namespace)
+        }
       }
     } else {
       // import node
       const clone = hostDoc.importNode(importedNode, true)
       hostNode.appendChild(clone)
+      if (Guard.isElementNode(clone)) {
+        const [prefix] = namespace_extractQName(clone.prefix ? clone.prefix + ':' + clone.localName : clone.localName)
+        const namespace = hostNode.lookupNamespaceURI(prefix)
+        new XMLBuilderImpl(clone)._updateNamespace(namespace)
+      }
     }
 
     return this
@@ -484,7 +483,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       }
       /* istanbul ignore next */
       if (node === null) {
-        throw new Error("Node has no parent node while searching for document fragment ancestor.")
+        throw new Error("Node has no parent node while searching for document fragment ancestor. " + this._debugInfo())
       }
       return new XMLBuilderImpl(node)
     } else {
@@ -795,6 +794,52 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
 
     return [namespace, name]
+  }
+
+  /**
+   * Updates the element's namespace.
+   * 
+   * @param ns - new namespace
+   */
+  private _updateNamespace(ns: string | null): void {
+    const ele = this._domNode
+    if (Guard.isElementNode(ele) && ns !== null && ele.namespaceURI !== ns) {
+      const [elePrefix, eleLocalName] = namespace_extractQName(ele.prefix ? ele.prefix + ':' + ele.localName : ele.localName)
+
+      // re-create the element node if its namespace changed
+      // we can't simply change the namespaceURI since its read-only
+      const newEle = create_element(this._doc, eleLocalName, ns, elePrefix)
+      for (const attr of ele.attributes) {
+        const attrQName = attr.prefix ? attr.prefix + ':' + attr.localName : attr.localName
+        const [attrPrefix] = namespace_extractQName(attrQName)
+        if (attrPrefix === null) {
+          newEle.setAttribute(attrQName, attr.value)
+        } else {
+          const newAttrNS = newEle.lookupNamespaceURI(attrPrefix)
+          newEle.setAttributeNS(newAttrNS, attrQName, attr.value)
+        }
+      }
+
+      // replace the new node in parent node
+      const parent = ele.parentNode
+      /* istanbul ignore next */
+      if (parent === null) {
+        throw new Error("Parent node is null." + this._debugInfo())
+      }
+      parent.replaceChild(newEle, ele)
+      this._domNode = newEle
+
+      // check child nodes
+      for (const childNode of ele.childNodes) {
+        const newChildNode = childNode.cloneNode(true)
+        newEle.appendChild(newChildNode)
+        if (Guard.isElementNode(newChildNode)) {
+          const [newChildNodePrefix] = namespace_extractQName(newChildNode.prefix ? newChildNode.prefix + ':' + newChildNode.localName : newChildNode.localName)
+          const newChildNodeNS = newEle.lookupNamespaceURI(newChildNodePrefix)
+          new XMLBuilderImpl(newChildNode)._updateNamespace(newChildNodeNS)
+        }
+      }
+    }
   }
 
   /**

@@ -155,10 +155,7 @@ describe('namespaces', () => {
     )
   })
 
-  test('default namespace cannot be specified later', () => {
-    // this is just a limitation of the current implementation
-    // recursively changing child element namespaces is simply
-    // not implemented
+  test('default namespace can be specified later', () => {
     const doc = $$.create()
       .ele('root', { att: "val" })
       .ele('foo').up()
@@ -168,8 +165,8 @@ describe('namespaces', () => {
 
     expect($$.serialize(doc)).toBe(
       '<root att="val" xmlns="ns">' +
-      '<foo xmlns=""/>' +
-      '<bar xmlns=""/>' +
+      '<foo/>' +
+      '<bar/>' +
       '</root>'
     )
   })
