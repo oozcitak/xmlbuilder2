@@ -339,4 +339,22 @@ describe('object', () => {
     expect(() => $$.create().ele({})).toThrow()
   })
 
+  test('exec function', () => {
+    const nums = [1, 2, 3, 4, 5]
+    const obj = {
+      squares: {
+        '#': () => nums.map(i => ({ data: { '@x': i, '@y': i * i } }))
+      }
+    }
+    expect($$.create(obj).end({ prettyPrint: true, headless: true })).toBe($$.t`
+    <squares>
+      <data x="1" y="1"/>
+      <data x="2" y="4"/>
+      <data x="3" y="9"/>
+      <data x="4" y="16"/>
+      <data x="5" y="25"/>
+    </squares>
+    `)
+  })
+
 })
