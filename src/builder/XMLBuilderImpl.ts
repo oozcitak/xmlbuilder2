@@ -168,7 +168,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
           // expand child nodes under parent
           lastChild.ele(val)
-        } else if (val != null && value !== '') {
+        } else if (val != null && val !== '') {
           // leaf element node with a single text node
           lastChild = this.ele(key)
           lastChild.txt(val)
