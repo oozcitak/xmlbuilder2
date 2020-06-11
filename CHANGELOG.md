@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.1.3] - 2020-06-11
+
+### Bug Fixes
+- Fixed a bug where child nodes did not inherit the parent namespace (see [#18](https://github.com/oozcitak/xmlbuilder2/issues/18)).
+- Fixed a bug where falsey values passed as node contents caused missing nodes (see [#21](https://github.com/oozcitak/xmlbuilder2/issues/21)).
+
 ## [2.1.2] - 2020-04-09
 
 ### Bug Fixes
