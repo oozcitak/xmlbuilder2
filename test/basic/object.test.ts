@@ -357,4 +357,21 @@ describe('object', () => {
     `)
   })
 
+  test('falsy values', () => {
+    const obj = {
+      value: {
+        string: '',
+        number: 0,
+        boolean: false
+      }
+    }
+    expect($$.create(obj).end({ prettyPrint: true, headless: true })).toBe($$.t`
+    <value>
+      <string/>
+      <number>0</number>
+      <boolean>false</boolean>
+    </value>
+    `)
+  })
+
 })
