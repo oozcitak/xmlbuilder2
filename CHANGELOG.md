@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.1.4] - 2020-06-16
+
+### Bug Fixes
+- Fixed a bug where mixin classes overwrote DOM class constructors (see [#23](https://github.com/oozcitak/xmlbuilder2/issues/23)).
+
 ## [2.1.3] - 2020-06-11
 
 ### Bug Fixes
@@ -139,3 +144,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.1.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.0...v2.1.1
 [2.1.2]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.1...v2.1.2
 [2.1.3]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.2...v2.1.3
+[2.1.4]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.3...v2.1.4
