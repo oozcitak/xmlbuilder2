@@ -74,7 +74,7 @@ entries:
       url: /node-creation-functions.html#remove
       output: web
     - title: removeAtt
-      url: /node-creation-functions.html#removeAtt
+      url: /node-creation-functions.html#removeatt
       output: web
     - title: txt
       url: /node-creation-functions.html#txt
@@ -123,7 +123,7 @@ entries:
       url: /collection-functions.html#some
       output: web
     - title: toArray
-      url: /collection-functions.html#toArray
+      url: /collection-functions.html#toarray
       output: web
     - separator: true
       output: web
@@ -131,10 +131,10 @@ entries:
       url: /conversion-functions.html#end
       output: web
     - title: toObject
-      url: /conversion-functions.html#toObject
+      url: /conversion-functions.html#toobject
       output: web
     - title: toString
-      url: /conversion-functions.html#toString
+      url: /conversion-functions.html#tostring
       output: web
     - separator: true
       output: web
@@ -148,10 +148,10 @@ entries:
     output: web
     folderitems:
     - title: createCB
-      url: /builder-functions-with-callbacks.html#createCB
+      url: /builder-functions-with-callbacks.html#createcb
       output: web
     - title: fragmentCB
-      url: /builder-functions-with-callbacks.html#fragmentCB
+      url: /builder-functions-with-callbacks.html#fragmentcb
       output: web
     - separator: true
       output: web
