@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.1.5] - 2020-06-18
+
+### Bug Fixes
+- Fixed a bug where carriage return characters (`'\r'`) were escaped in text and attribute contents (see [#24](https://github.com/oozcitak/xmlbuilder2/issues/24)).
+
 ## [2.1.4] - 2020-06-16
 
 ### Bug Fixes
@@ -11,7 +16,7 @@ All notable changes to this project are documented in this file. This project ad
 
 ### Bug Fixes
 - Fixed a bug where child nodes did not inherit the parent namespace (see [#18](https://github.com/oozcitak/xmlbuilder2/issues/18)).
-- Fixed a bug where falsey values passed as node contents caused missing nodes (see [#21](https://github.com/oozcitak/xmlbuilder2/issues/21)).
+- Fixed a bug where falsy values passed as node contents caused missing nodes (see [#21](https://github.com/oozcitak/xmlbuilder2/issues/21)).
 
 ## [2.1.2] - 2020-04-09
 
@@ -145,3 +150,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.1.2]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.1...v2.1.2
 [2.1.3]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.2...v2.1.3
 [2.1.4]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.3...v2.1.4
+[2.1.5]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.4...v2.1.5
