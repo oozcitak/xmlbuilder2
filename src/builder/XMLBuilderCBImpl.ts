@@ -208,7 +208,6 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       markup = node.data.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/\r/g, '&#xD;')
     } else {
       for (let i = 0; i < node.data.length; i++) {
         const c = node.data[i]
@@ -675,10 +674,8 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
     if (this._options.noDoubleEncoding) {
       return value.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
         .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace(/\t/g, '&#x9;')
-        .replace(/\n/g, '&#xA;')
-        .replace(/\r/g, '&#xD;')
     } else {
       let result = ""
       for (let i = 0; i < value.length; i++) {

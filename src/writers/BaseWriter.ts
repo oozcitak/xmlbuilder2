@@ -934,7 +934,6 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
       markup = node.data.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/\r/g, '&#xD;')
     } else {
       for (let i = 0; i < node.data.length; i++) {
         const c = node.data[i]
@@ -1617,10 +1616,8 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
     if (noDoubleEncoding) {
       return value.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
         .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace(/\t/g, '&#x9;')
-        .replace(/\n/g, '&#xA;')
-        .replace(/\r/g, '&#xD;')
     } else {
       let result = ""
       for (let i = 0; i < value.length; i++) {
