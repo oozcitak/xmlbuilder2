@@ -4,7 +4,7 @@ import {
   ExpandObject, XMLBuilderCBCreateOptions, XMLBuilderOptions, BaseCBWriterOptions
 } from "../interfaces"
 import { applyDefaults, isString, isObject } from "@oozcitak/util"
-import { fragment, create } from ".."
+import { fragment, create } from "./BuilderFunctions"
 import {
   xml_isName, xml_isLegalChar, xml_isPubidChar
 } from "@oozcitak/dom/lib/algorithm"
