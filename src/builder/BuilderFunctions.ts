@@ -6,12 +6,11 @@ import {
   MapWriterOptions, XMLSerializedAsMap, XMLSerializedAsMapArray,
   XMLSerializedValue
 } from '../interfaces'
-import { isPlainObject, applyDefaults, isObject } from '@oozcitak/util'
+import { isPlainObject, applyDefaults, isObject, isArray } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
 import { Guard } from '@oozcitak/dom/lib/util'
 import { XMLBuilderImpl } from '.'
 import { createDocument, createParser, throwIfParserError, sanitizeInput } from '../builder/dom'
-import { isArray } from 'util'
 
 /**
  * Wraps a DOM node for use with XML builder with default options.

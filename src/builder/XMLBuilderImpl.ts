@@ -9,7 +9,7 @@ import {
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
 import { XMLWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
-import { Document, Node, Element, Attr, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
+import { Document, Node, Element, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { Guard } from "@oozcitak/dom/lib/util"
 import {
   namespace_extractQName, tree_index, create_element

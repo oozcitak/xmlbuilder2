@@ -1,7 +1,7 @@
 import { Document } from "@oozcitak/dom/lib/dom/interfaces"
 import { DOMParser, DOMImplementation } from "@oozcitak/dom"
 import { dom } from "@oozcitak/dom/lib/dom"
-import { isString } from "util"
+import { isString } from '@oozcitak/util'
 
 dom.setFeatures(false)
 
