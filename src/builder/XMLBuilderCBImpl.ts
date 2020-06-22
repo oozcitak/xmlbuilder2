@@ -205,7 +205,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
     let markup = ""
     if (this._options.noDoubleEncoding) {
-      markup = node.data.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
+      markup = node.data.replace(/(?!&(lt|gt|amp|apos|quot|#xD|#xA|#x9);)&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
     } else {
@@ -672,7 +672,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
     if (value === null) return ""
 
     if (this._options.noDoubleEncoding) {
-      return value.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
+      return value.replace(/(?!&(lt|gt|amp|apos|quot|#xD|#xA|#x9);)&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
