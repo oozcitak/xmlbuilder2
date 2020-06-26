@@ -18,11 +18,13 @@
     "url": "http://github.com/oozcitak/xmlbuilder2/issues"
   },
   "main": "./lib/index",
+  "browser": "./umd/bundle",
   "engines": {
     "node": ">=8.0"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "dist/**/*"
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
@@ -43,10 +45,18 @@
     "jest": "*",
     "libxmljs": "*",
     "ts-jest": "*",
+    "ts-loader": "*",
     "ts-node": "*",
     "typescript": "*",
+    "webpack": "*",
+    "webpack-cli": "*",
     "xmlbuilder": "*",
-    "xpath": "*"
+    "xpath": "*",
+    "selenium-webdriver": "*",
+    "chromedriver": "*",
+    "geckodriver": "*",
+    "@types/selenium-webdriver": "*",
+    "@types/chromedriver": "*"
   },
   "jest": {
     "transform": {
@@ -59,7 +69,7 @@
     ]
   },
   "scripts": {
-    "pretest": "rm -rf ./lib && tsc --version && tsc",
+    "pretest": "rm -rf ./lib && tsc --version && tsc && webpack",
     "test": "jest --coverage",
     "perf": "npm run pretest && ts-node ./perf/perf.ts",
     "perf-cb": "npm run pretest && ts-node ./perf/perf-cb.ts",

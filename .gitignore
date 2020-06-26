@@ -1,4 +1,5 @@
 lib/
+umd/
 node_modules/
 coverage/
 .vs/
