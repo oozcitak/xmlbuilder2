@@ -28,9 +28,9 @@
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
-    "@oozcitak/util": "8.3.4",
-    "@oozcitak/dom": "1.15.6",
-    "@oozcitak/infra": "1.0.5"
+    "@oozcitak/util": "8.3.7",
+    "@oozcitak/dom": "1.15.7",
+    "@oozcitak/infra": "1.0.7"
   },
   "devDependencies": {
     "@types/benchmark": "*",
