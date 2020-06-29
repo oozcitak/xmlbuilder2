@@ -20,7 +20,7 @@
   "main": "./lib/index",
   "browser": "./umd/bundle",
   "engines": {
-    "node": ">=8.0"
+    "node": ">=10.0"
   },
   "files": [
     "lib/**/*",
