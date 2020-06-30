@@ -28,18 +28,22 @@
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
-    "@oozcitak/util": "8.3.7",
-    "@oozcitak/dom": "1.15.7",
-    "@oozcitak/infra": "1.0.7"
+    "@oozcitak/util": "8.3.8",
+    "@oozcitak/dom": "1.15.8",
+    "@oozcitak/infra": "1.0.8"
   },
   "devDependencies": {
+    "@babel/preset-env": "*",
+    "@babel/runtime-corejs3": "7.10.3",
     "@types/benchmark": "*",
     "@types/dedent": "*",
     "@types/jest": "*",
     "@types/libxmljs": "*",
     "@types/node": "*",
+    "babel-loader": "*",
     "benchmark": "*",
     "chalk": "*",
+    "core-js": "3.6.5",
     "dedent": "*",
     "glob": "*",
     "jest": "*",

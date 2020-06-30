@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   entry: './src/index.ts',
   devtool: 'inline-source-map',
-  mode: 'development',
+  mode: 'production', // production | development
   node: {
     global: true,
     __filename: false,
@@ -13,8 +13,33 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              sourceType: "unambiguous",
+              presets: [
+                [
+                  '@babel/preset-env',
+                  { 
+                    useBuiltIns: "usage",
+                    modules: false,
+                    corejs: 3,
+                    //debug: true,
+                    targets: {
+                      browsers: [
+                        "defaults",
+                        "ie >= 11"
+                      ]
+                    }
+                  }
+                ]
+              ]
+            },
+          },
+          { loader: 'ts-loader' }
+        ],
+        exclude: /node_modules/
       },
     ],
   },
@@ -22,8 +47,9 @@ module.exports = {
     extensions: [ '.tsx', '.ts', '.js' ],
   },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'umd'),
+    filename: 'index.js',
+    path: path.resolve(__dirname, 'dist'),
     library: 'xmlbuilder2',
-    libraryTarget: 'umd'  },
+    libraryTarget: 'umd' 
+  }
 };
