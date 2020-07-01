@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: './src/index.ts',
-  devtool: 'inline-source-map',
+  // devtool: 'inline-source-map',
   mode: 'production', // production | development
   node: {
     global: true,
@@ -47,8 +47,8 @@ module.exports = {
     extensions: [ '.tsx', '.ts', '.js' ],
   },
   output: {
-    filename: 'index.js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: 'xmlbuilder2.min.js',
+    path: path.resolve(__dirname, 'lib'),
     library: 'xmlbuilder2',
     libraryTarget: 'umd' 
   }

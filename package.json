@@ -18,13 +18,12 @@
     "url": "http://github.com/oozcitak/xmlbuilder2/issues"
   },
   "main": "./lib/index",
-  "browser": "./umd/bundle",
+  "browser": "./lib/xmlbuilder2.min.js",
   "engines": {
     "node": ">=10.0"
   },
   "files": [
-    "lib/**/*",
-    "dist/**/*"
+    "lib/**/*"
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
