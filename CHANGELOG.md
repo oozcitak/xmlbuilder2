@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file. This project ad
 ## [2.1.6] - 2020-07-02
 
 ### Bug Fixes
-- Added minified browser bundle from transpiled ES5 code so that the library can be used on old browsers (see [#28](https://github.com/oozcitak/xmlbuilder2/issues/28)). Note that `Promise` and `Reflect` polyfills are required to use the library on IE 11.
+- Added minified browser bundle from transpiled ES5 code so that the library can be used on old browsers (see [#28](https://github.com/oozcitak/xmlbuilder2/issues/28)). Note that `Proxy` and `Reflect` polyfills are required to use the library on IE 11.
 
 ## [2.1.5] - 2020-06-18
 
