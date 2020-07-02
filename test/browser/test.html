@@ -4,7 +4,7 @@
         <script type = "text/javascript" src = "../../lib/xmlbuilder2.min.js"></script>
         <script>
             function load() {
-              for (var i = 0; i< tests.length; i++)
+              for (var i = 0; i < tests.length; i++)
               {
                 var check = tests[i]();
                 if (check !== true) {
@@ -34,7 +34,9 @@
                     contact: {
                       phone: ["555-1234", "555-1235"]
                     },
-                    id: () => ({ "@xmlns": "ns", "#": 42 }),
+                    id: function() {
+                      return { "@xmlns": "ns", "#": 42 }
+                    },
                     details: {
                       '#text': 'classified'
                     }

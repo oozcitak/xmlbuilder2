@@ -1,5 +1,5 @@
 import { Builder, WebDriver, Capabilities, By } from 'selenium-webdriver'
-import { ServiceBuilder, setDefaultService } from 'selenium-webdriver/chrome'
+import { Options, ServiceBuilder, setDefaultService } from 'selenium-webdriver/chrome'
 import { path as chromePath } from 'chromedriver'
 import { resolve, join } from 'path'
 
@@ -8,13 +8,13 @@ describe('chrome', () => {
   let driver: WebDriver
 
   beforeAll(async () => {
-    const service = new ServiceBuilder(chromePath).addArguments('--allow-file-access-from-files') .build()
+    const service = new ServiceBuilder(chromePath).build()
     setDefaultService(service)
 
-    driver = await new Builder()
+    driver = new Builder()
       .withCapabilities(Capabilities.chrome())
+      .setChromeOptions(new Options().headless())
       .build()
-    await driver.getWindowHandle()
   }, 10000)
 
   afterAll(async () => {
