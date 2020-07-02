@@ -45,6 +45,8 @@
     "core-js": "3.6.5",
     "dedent": "*",
     "glob": "*",
+    "es6-proxy-polyfill": "*",
+    "harmony-reflect": "*",
     "jest": "*",
     "libxmljs": "*",
     "ts-jest": "*",
@@ -58,6 +60,7 @@
     "selenium-webdriver": "*",
     "chromedriver": "*",
     "geckodriver": "*",
+    "iedriver": "*",
     "@types/selenium-webdriver": "*",
     "@types/chromedriver": "*"
   },
@@ -66,6 +69,7 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "/test/.*\\.test\\.tsx?$",
+    "testPathIgnorePatterns": [ "/test/browser/.*" ],
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}"
