@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.1.6] - 2020-07-02
+
+### Bug Fixes
+- Added minified browser from transpiled ES5 code so that the library can be used on old browsers (see [#28](https://github.com/oozcitak/xmlbuilder2/issues/28)). `Promise` and `Reflect` polyfills are required to use the library on IE 11.
+
 ## [2.1.5] - 2020-06-18
 
 ### Bug Fixes
@@ -151,3 +156,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.1.3]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.2...v2.1.3
 [2.1.4]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.3...v2.1.4
 [2.1.5]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.4...v2.1.5
+[2.1.6]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.5...v2.1.6
