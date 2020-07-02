@@ -1,6 +1,6 @@
 {
   "name": "xmlbuilder2",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "keywords": [
     "xml",
     "xmlbuilder"
@@ -69,7 +69,9 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "/test/.*\\.test\\.tsx?$",
-    "testPathIgnorePatterns": [ "/test/browser/.*" ],
+    "testPathIgnorePatterns": [
+      "/test/browser/.*"
+    ],
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}"
