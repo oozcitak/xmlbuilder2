@@ -1,7 +1,5 @@
 import { Builder, WebDriver, By } from 'selenium-webdriver'
 import { Options } from 'selenium-webdriver/ie'
-// @ts-ignore
-import { start as startIE, stop as stopIE } from 'iedriver'
 import { resolve, join } from 'path'
 
 describe('ie 11', () => {
@@ -9,7 +7,6 @@ describe('ie 11', () => {
   let driver: WebDriver
 
   beforeAll(async () => {
-    startIE()
     driver = await new Builder()
       .forBrowser('internet explorer')
       .setIeOptions(new Options())
@@ -18,7 +15,6 @@ describe('ie 11', () => {
 
   afterAll(async () => {
     await driver.quit()
-    stopIE()
   }, 10000)
 
   test('browser tests', async () => {

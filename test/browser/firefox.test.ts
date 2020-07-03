@@ -1,7 +1,5 @@
 import { Builder, WebDriver, By, Capabilities } from 'selenium-webdriver'
-import { Options, ServiceBuilder } from 'selenium-webdriver/firefox'
-// @ts-ignore
-import { path as firefoxPath, start as startFirefox, stop as stopFirefox } from 'geckodriver'
+import { Options } from 'selenium-webdriver/firefox'
 import { resolve, join } from 'path'
 
 describe('firefox', () => {
@@ -12,7 +10,7 @@ describe('firefox', () => {
     driver = await new Builder()
       .forBrowser('firefox')
       .withCapabilities(Capabilities.firefox())
-      .setFirefoxOptions(new Options().headless().setBinary(firefoxPath))
+      .setFirefoxOptions(new Options().headless())
       .build()
   }, 10000)
 

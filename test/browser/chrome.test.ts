@@ -12,6 +12,7 @@ describe('chrome', () => {
     setDefaultService(service)
 
     driver = new Builder()
+      .forBrowser('chrome')
       .withCapabilities(Capabilities.chrome())
       .setChromeOptions(new Options().headless())
       .build()
