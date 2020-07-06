@@ -65,7 +65,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       }
       throwIfParserError(doc)
       for (const child of doc.documentElement.childNodes) {
-        const newChild = doc.importNode(child, true)
+        const newChild = this._doc.importNode(child, true)
         lastChild = new XMLBuilderImpl(newChild)
         this._domNode.appendChild(newChild)
       }
