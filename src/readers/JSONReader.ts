@@ -7,7 +7,7 @@ import { ObjectReader } from "./ObjectReader"
 export class JSONReader {
 
   /**
-   * Parses the given document represenatation.
+   * Parses the given document representation.
    * 
    * @param node - node receive parsed XML nodes
    * @param str - JSON string to parse

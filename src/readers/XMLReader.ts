@@ -8,7 +8,7 @@ import { XMLBuilderImpl } from "../builder/XMLBuilderImpl"
 export class XMLReader {
 
   /**
-   * Parses the given document represenatation.
+   * Parses the given document representation.
    * 
    * @param node - node receive parsed XML nodes
    * @param str - XML document string to parse

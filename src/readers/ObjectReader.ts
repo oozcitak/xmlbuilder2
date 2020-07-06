@@ -12,7 +12,7 @@ import { XMLBuilderImpl } from "../builder/XMLBuilderImpl"
 export class ObjectReader {
 
   /**
-   * Parses the given document represenatation.
+   * Parses the given document representation.
    * 
    * @param node - node receive parsed XML nodes
    * @param obj - object to parse
