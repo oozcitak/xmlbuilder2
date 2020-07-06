@@ -5,7 +5,7 @@ import {
   JSONWriterOptions, ObjectWriterOptions, MapWriterOptions
 } from "../interfaces"
 import {
-  applyDefaults, isObject, isString, isMap, isArray, isEmpty,
+  applyDefaults, isObject, isString, isMap, isArray, isEmpty, isFunction,
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
 import { XMLWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
@@ -38,6 +38,9 @@ export class XMLBuilderImpl implements XMLBuilder {
   get node(): Node { return this._domNode }
 
   /** @inheritdoc */
+  get options(): XMLBuilderOptions { return this._options }
+
+  /** @inheritdoc */
   set(options: Partial<XMLBuilderOptions>): XMLBuilder {
     this._options = applyDefaults(
       applyDefaults(this._options, options, true), // apply user settings
@@ -55,7 +58,16 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     let lastChild: XMLBuilder | null = null
 
-    if (isString(p1) && /^\s*</.test(p1)) {
+    if (p1 !== null && isFunction(p2)) {
+      // parse with custom parser function
+      lastChild = p2.call(this, p1)
+
+      if (lastChild === null) {
+        throw new Error("Could not create any elements with: " + p1.toString() + ". " + this._debugInfo())
+      }
+  
+      return lastChild
+    } else if (isString(p1) && /^\s*</.test(p1)) {
       // parse XML document string
       return new XMLReader().parse(this, p1)
     } else if (isString(p1) && /^\s*[\{\[]/.test(p1)) {
@@ -118,7 +130,6 @@ export class XMLBuilderImpl implements XMLBuilder {
     }
 
     return lastChild
-
   }
 
   /** @inheritdoc */

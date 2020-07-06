@@ -16,7 +16,7 @@ export class XMLReader {
   parse(node: XMLBuilder, str: string): XMLBuilder {
 
     const ele = node as any
-    const options = ele._options as XMLBuilderOptions
+    const options = node.options
 
     let lastChild: XMLBuilder | null = null
 

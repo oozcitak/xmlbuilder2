@@ -13,7 +13,6 @@ export class JSONReader {
    * @param str - JSON string to parse
    */
   parse(node: XMLBuilder, str: string): XMLBuilder {
-
     return new ObjectReader().parse(node, JSON.parse(str))
   }
 }

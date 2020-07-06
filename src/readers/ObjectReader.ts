@@ -19,7 +19,7 @@ export class ObjectReader {
    */
   parse(node: XMLBuilder, obj: ExpandObject): XMLBuilder {
 
-    const options = (node as any)._options as XMLBuilderOptions
+    const options = node.options
 
     let lastChild: XMLBuilder | null = null
 

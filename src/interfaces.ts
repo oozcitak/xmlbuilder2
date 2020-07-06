@@ -485,6 +485,11 @@ export interface XMLBuilder {
   readonly node: Node
 
   /**
+   * Gets the options used while creating an XML document.
+   */
+  readonly options: XMLBuilderOptions
+
+  /**
    * Sets builder options.
    * 
    * @param - builder options
@@ -523,6 +528,16 @@ export interface XMLBuilder {
    * @returns the last top level element node created
    */
   ele(obj: ExpandObject): XMLBuilder
+
+  /**
+   * Creates new element nodes from the given JS object and appends it to the
+   * list of child nodes.
+   * 
+   * @param obj - a JS object representing nodes to insert
+   * 
+   * @returns the last top level element node created
+   */
+  ele(obj: ExpandObject, parser: ((obj: ExpandObject) => XMLBuilder)): XMLBuilder
 
   /**
    * Removes this node from the XML document.
