@@ -5,7 +5,7 @@ import {
   JSONWriterOptions, ObjectWriterOptions, MapWriterOptions
 } from "../interfaces"
 import {
-  applyDefaults, isObject, isString, isFunction, isMap, isArray, isEmpty,
+  applyDefaults, isObject, isString, isMap, isArray, isEmpty,
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
 import { XMLWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
@@ -14,8 +14,10 @@ import { Guard } from "@oozcitak/dom/lib/util"
 import {
   namespace_extractQName, tree_index, create_element
 } from "@oozcitak/dom/lib/algorithm"
-import { createParser, throwIfParserError, sanitizeInput } from "./dom"
+import { sanitizeInput } from "./dom"
 import { namespace as infraNamespace } from "@oozcitak/infra"
+import { ObjectReader, JSONReader, XMLReader } from "../readers"
+
 /**
  * Represents a wrapper that extends XML nodes to implement easy to use and
  * chainable document builder methods.
@@ -54,33 +56,17 @@ export class XMLBuilderImpl implements XMLBuilder {
     let lastChild: XMLBuilder | null = null
 
     if (isString(p1) && /^\s*</.test(p1)) {
-      // parse XML string
-      const contents = "<TEMP_ROOT>" + p1 + "</TEMP_ROOT>"
-      const domParser = createParser()
-      const doc = domParser.parseFromString(
-        sanitizeInput(contents, this._options.invalidCharReplacement), "text/xml")
-      /* istanbul ignore next */
-      if (doc.documentElement === null) {
-        throw new Error("Document element is null.")
-      }
-      throwIfParserError(doc)
-      for (const child of doc.documentElement.childNodes) {
-        const newChild = this._doc.importNode(child, true)
-        lastChild = new XMLBuilderImpl(newChild)
-        this._domNode.appendChild(newChild)
-      }
-      if (lastChild === null) {
-        throw new Error("Could not create any elements with: " + p1.toString() + ". " + this._debugInfo())
-      }
-      return lastChild
+      // parse XML document string
+      return new XMLReader().parse(this, p1)
     } else if (isString(p1) && /^\s*[\{\[]/.test(p1)) {
       // parse JSON string
-      const obj = JSON.parse(p1) as ExpandObject
-      return this.ele(obj)
+      return new JSONReader().parse(this, p1)
     } else if (isObject(p1)) {
       // ele(obj: ExpandObject)
-      [namespace, name, attributes] = [undefined, p1, undefined]
-    } else if ((p1 === null || isString(p1)) && isString(p2)) {
+      return new ObjectReader().parse(this, p1)
+    }
+
+    if ((p1 === null || isString(p1)) && isString(p2)) {
       // ele(namespace: string, name: string, attributes?: AttributesObject)
       [namespace, name, attributes] = [p1, p2, p3]
     } else if (p1 !== null) {
@@ -94,122 +80,37 @@ export class XMLBuilderImpl implements XMLBuilder {
       attributes = getValue(attributes)
     }
 
-    if (isFunction(name)) {
-      // evaluate if function
-      lastChild = this.ele(name.apply(this))
-    } else if (isArray(name) || isSet(name)) {
-      forEachArray(name, item => lastChild = this.ele(item), this)
-    } else if (isMap(name) || isObject(name)) {
-      // expand if object
-      forEachObject(name, (key, val) => {
-        if (isFunction(val)) {
-          // evaluate if function
-          val = val.apply(this)
-        }
+    [namespace, name] = this._extractNamespace(
+      sanitizeInput(namespace, this._options.invalidCharReplacement),
+      sanitizeInput(name, this._options.invalidCharReplacement), true)
 
-        if (!this._options.ignoreConverters && key.indexOf(this._options.convert.att) === 0) {
-          // assign attributes
-          if (key === this._options.convert.att) {
-            lastChild = this.att(val)
-          } else {
-            lastChild = this.att(key.substr(this._options.convert.att.length), val)
-          }
-        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.text) === 0) {
-          // text node
-          if (isMap(val) || isObject(val)) {
-            // if the key is #text expand child nodes under this node to support mixed content
-            lastChild = this.ele(val)
-          } else {
-            lastChild = this.txt(val)
-          }
-        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.cdata) === 0) {
-          // cdata node
-          if (isArray(val) || isSet(val)) {
-            forEachArray(val, item => lastChild = this.dat(item), this)
-          } else {
-            lastChild = this.dat(val)
-          }
-        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.comment) === 0) {
-          // comment node
-          if (isArray(val) || isSet(val)) {
-            forEachArray(val, item => lastChild = this.com(item), this)
-          } else {
-            lastChild = this.com(val)
-          }
-        } else if (!this._options.ignoreConverters && key.indexOf(this._options.convert.ins) === 0) {
-          // processing instruction
-          if (isString(val)) {
-            const insIndex = val.indexOf(' ')
-            const insTarget = (insIndex === -1 ? val : val.substr(0, insIndex))
-            const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
-            lastChild = this.ins(insTarget, insValue)
-          } else {
-            lastChild = this.ins(val)
-          }
-        } else if ((isArray(val) || isSet(val)) && isEmpty(val)) {
-          // skip empty arrays
-          lastChild = this._dummy()
-        } else if ((isMap(val) || isObject(val)) && isEmpty(val)) {
-          // empty objects produce one node
-          lastChild = this.ele(key)
-        } else if (!this._options.keepNullNodes && (val == null)) {
-          // skip null and undefined nodes
-          lastChild = this._dummy()
-        } else if (isArray(val) || isSet(val)) {
-          // expand list by creating child nodes
-          forEachArray(val, item => {
-            const childNode: { [key: string]: any } = {}
-            childNode[key] = item
-            lastChild = this.ele(childNode)
-          }, this)
-        } else if (isMap(val) || isObject(val)) {
-          // create a parent node
-          lastChild = this.ele(key)
+    // inherit namespace from parent
+    if (namespace === undefined) {
+      const [prefix] = namespace_extractQName(name)
+      namespace = this.node.lookupNamespaceURI(prefix)
+    }
 
-          // expand child nodes under parent
-          lastChild.ele(val)
-        } else if (val != null && val !== '') {
-          // leaf element node with a single text node
-          lastChild = this.ele(key)
-          lastChild.txt(val)
-        } else {
-          // leaf element node
-          lastChild = this.ele(key)
-        }
-      }, this)
-    } else {
-      [namespace, name] = this._extractNamespace(
-        sanitizeInput(namespace, this._options.invalidCharReplacement),
-        sanitizeInput(name, this._options.invalidCharReplacement), true)
+    // create a child element node
+    const childNode = (namespace !== undefined && namespace !== null ?
+      this._doc.createElementNS(namespace, name) :
+      this._doc.createElement(name)
+    )
 
-      // inherit namespace from parent
-      if (namespace === undefined) {
-        const [prefix] = namespace_extractQName(name)
-        namespace = this.node.lookupNamespaceURI(prefix)
-      }
+    this.node.appendChild(childNode)
+    lastChild = new XMLBuilderImpl(childNode)
 
-      // create a child element node
-      const childNode = (namespace !== undefined && namespace !== null ?
-        this._doc.createElementNS(namespace, name) :
-        this._doc.createElement(name)
-      )
+    // update doctype node if the new node is the document element node
+    const oldDocType = this._doc.doctype
+    if (childNode === this._doc.documentElement && oldDocType !== null) {
+      const docType = this._doc.implementation.createDocumentType(
+        this._doc.documentElement.tagName,
+        oldDocType.publicId, oldDocType.systemId)
+      this._doc.replaceChild(docType, oldDocType)
+    }
 
-      this.node.appendChild(childNode)
-      lastChild = new XMLBuilderImpl(childNode)
-
-      // update doctype node if the new node is the document element node
-      const oldDocType = this._doc.doctype
-      if (childNode === this._doc.documentElement && oldDocType !== null) {
-        const docType = this._doc.implementation.createDocumentType(
-          this._doc.documentElement.tagName,
-          oldDocType.publicId, oldDocType.systemId)
-        this._doc.replaceChild(docType, oldDocType)
-      }
-
-      // create attributes
-      if (attributes && !isEmpty(attributes)) {
-        lastChild.att(attributes)
-      }
+    // create attributes
+    if (attributes && !isEmpty(attributes)) {
+      lastChild.att(attributes)
     }
 
     if (lastChild === null) {
@@ -749,20 +650,6 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else {
       throw new Error("Invalid writer format: " + writerOptions.format + ". " + this._debugInfo())
     }
-  }
-
-  /**
-   * Creates a dummy element node without adding it to the list of child nodes.
-   * 
-   * Dummy nodes are special nodes representing a node with a `null` value. 
-   * Dummy nodes are created while recursively building the XML tree. Simply
-   * skipping `null` values doesn't work because that would break the recursive
-   * chain.
-   * 
-   * @returns the new dummy element node
-   */
-  private _dummy(): XMLBuilder {
-    return new XMLBuilderImpl(this._doc.createElement('dummy_node'))
   }
 
   /**
