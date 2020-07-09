@@ -4,6 +4,8 @@ An XML builder for [node.js](https://nodejs.org/).
 
 [![License](https://badgen.net/github/license/oozcitak/xmlbuilder2)](http://opensource.org/licenses/MIT)
 [![NPM Version](https://badgen.net/npm/v/xmlbuilder2)](https://www.npmjs.com/package/xmlbuilder2)
+[![NPM Downloads](https://badgen.net/npm/dm/xmlbuilder2)](https://www.npmjs.com/package/xmlbuilder2)
+[![jsDelivr](https://badgen.net/jsdelivr/hits/npm/xmlbuilder2)](https://www.jsdelivr.com/package/npm/xmlbuilder2)
 
 [![Node.js CI](https://github.com/oozcitak/xmlbuilder2/workflows/build/badge.svg)](https://github.com/oozcitak/xmlbuilder2/actions)
 [![Code Coverage](https://codecov.io/gh/oozcitak/xmlbuilder2/branch/master/graph/badge.svg)](https://codecov.io/gh/oozcitak/xmlbuilder2)
@@ -157,6 +159,17 @@ This will result in:
   <data x="4" y="16"/>
   <data x="5" y="25"/>
 </squares>
+```
+
+### Usage in the browser:
+
+You can build the minified production bundle (`lib\xmlbuilder2.min.js`) after cloning the repository and issuing `npx webpack` in your terminal. The bundle is also in the npm package, so you can also use a public npm CDN like [jsDelivr](https://www.jsdelivr.com/) or [unpkg](https://unpkg.com/):
+
+```html
+<!-- latest version from jsDelivr -->
+<script src="https://cdn.jsdelivr.net/npm/xmlbuilder2/lib/xmlbuilder2.min.js"></script>
+<!-- latest version from unpkg -->
+<script src="https://unpkg.com/xmlbuilder2/lib/xmlbuilder2.min.js"></script>
 ```
 
 ### Documentation:
