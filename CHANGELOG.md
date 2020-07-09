@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.1.7] - 2020-07-09
+
+### Bug Fixes
+- Prevented object converter from grouping attributes into element content (see [#29](https://github.com/oozcitak/xmlbuilder2/issues/29)).
+
 ## [2.1.6] - 2020-07-02
 
 ### Bug Fixes
@@ -157,3 +162,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.1.4]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.3...v2.1.4
 [2.1.5]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.4...v2.1.5
 [2.1.6]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.5...v2.1.6
+[2.1.7]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.6...v2.1.7
