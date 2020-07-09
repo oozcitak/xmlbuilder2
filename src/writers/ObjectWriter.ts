@@ -124,22 +124,30 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
       // special case of an element node with a single text node
       return (items[0] as TextNode)["#"]
     } else if (hasNonUniqueNames) {
+      const obj: XMLSerializedAsObject | XMLSerializedAsObjectArray = { }
+      // process attributes first
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        const key = Object.keys(item)[0]
+        if (key === "@") {
+          const attrs = (item as AttrNode)["@"]
+          const attrKeys = Object.keys(attrs)
+          if (attrKeys.length === 1) {
+            obj[defAttrKey + attrKeys[0]] = attrs[attrKeys[0]]
+          } else {
+            obj[defAttrKey] = (item as AttrNode)["@"]
+          }
+        }
+      }
       // list contains element nodes with non-unique names
       // return an array with mixed content notation
       const result: XMLSerializedAsObject | XMLSerializedAsObjectArray = []
-      const obj: XMLSerializedAsObject | XMLSerializedAsObjectArray = { [defTextKey]: result }
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
         const key = Object.keys(item)[0]
         switch (key) {
           case "@":
-            const attrs = (item as AttrNode)["@"]
-            const attrKeys = Object.keys(attrs)
-            if (attrKeys.length === 1) {
-              result.push({ [defAttrKey + attrKeys[0]]: attrs[attrKeys[0]] })
-            } else {
-              result.push({ [defAttrKey]: (item as AttrNode)["@"] })
-            }
+            // attributes were processed above
             break
           case "#":
             result.push({ [defTextKey]: (item as TextNode)["#"] })
@@ -171,6 +179,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
             break
         }
       }
+      obj[defTextKey] = result
       return obj
     } else {
       // all element nodes have unique names

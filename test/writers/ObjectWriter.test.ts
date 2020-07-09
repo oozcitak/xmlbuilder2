@@ -300,8 +300,8 @@ describe('ObjectWriter', () => {
     expect($$.printMap(result)).toBe($$.t`
       {
         root: {
+          @att: val,
           #: [
-            { @att: val },
             { node: { @att: val } },
             { #: text },
             { node: { } }
@@ -324,14 +324,12 @@ describe('ObjectWriter', () => {
     expect($$.printMap(result)).toBe($$.t`
       {
         root: {
+          @: {
+            att1: val1,
+            att2: val2,
+            att3: val3
+          },
           #: [
-            {
-              @: {
-                att1: val1,
-                att2: val2,
-                att3: val3
-              }
-            },
             { node: { @att: val } },
             { #: text },
             { node: { } }
