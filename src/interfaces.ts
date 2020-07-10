@@ -306,7 +306,7 @@ export type MapWriterOptions = BaseWriterOptions & {
   format?: "map"
   /**
    * Groups consecutive nodes of same type under a single object. Defaults to
-   * `true`.
+   * `false`.
    */
   group?: boolean
 }
@@ -319,7 +319,7 @@ export type ObjectWriterOptions = BaseWriterOptions & {
   format?: "object"
   /**
    * Groups consecutive nodes of same type under a single object. Defaults to
-   * `true`.
+   * `false`.
    */
   group?: boolean
 }
@@ -423,7 +423,7 @@ export type JSONWriterOptions = BaseWriterOptions & {
   offset?: number
   /**
    * Groups consecutive nodes of same type under a single object. Defaults to
-   * `true`.
+   * `false`.
    */
   group?: boolean
 }
