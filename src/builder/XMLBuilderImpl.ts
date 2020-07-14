@@ -462,8 +462,9 @@ export class XMLBuilderImpl implements XMLBuilder {
     recursive = false, thisArg?: any): XMLBuilder {
     let result = this._getFirstDescendantNode(this._domNode, self, recursive)
     while (result[0]) {
+      const nextResult = this._getNextDescendantNode(this._domNode, result[0], recursive, result[1], result[2])
       callback.call(thisArg, new XMLBuilderImpl(result[0]), result[1], result[2])
-      result = this._getNextDescendantNode(this._domNode, result[0], recursive, result[1], result[2])
+      result = nextResult
     }
 
     return this
