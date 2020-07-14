@@ -196,4 +196,76 @@ describe('JSONWriter', () => {
     expect(() => ele.end({ format: "json" })).toThrow()
   })
   
+  test("verbose", () => {
+    const input2 = $$.t`
+    <data>
+      <row id="0">
+        <TYPE>X</TYPE>
+        <ID>123</ID>
+      </row>
+      <row id="1">
+        <TYPE>Y</TYPE>
+        <ID>321</ID>
+      </row>
+    </data>`
+
+    const json2 = $$.convert(input2, { format: 'json', verbose: true, prettyPrint: true })
+    expect(json2).toBe($$.t`
+      {
+        "data": [
+          {
+            "row": [
+              {
+                "@id": "0",
+                "TYPE": [
+                  "X"
+                ],
+                "ID": [
+                  "123"
+                ]
+              },
+              {
+                "@id": "1",
+                "TYPE": [
+                  "Y"
+                ],
+                "ID": [
+                  "321"
+                ]
+              }
+            ]
+          }
+        ]
+      }`)
+    expect($$.create(json2).end({ headless: true, prettyPrint: true })).toBe(input2)
+
+    const input1 = $$.t`
+    <data>
+      <row id="0">
+        <TYPE>X</TYPE>
+        <ID>123</ID>
+      </row>
+    </data>`
+    const json1 = $$.convert(input1, { format: 'json', verbose: true, prettyPrint: true })
+    expect(json1).toEqual($$.t`
+      {
+        "data": [
+          {
+            "row": [
+              {
+                "@id": "0",
+                "TYPE": [
+                  "X"
+                ],
+                "ID": [
+                  "123"
+                ]
+              }
+            ]
+          }
+        ]
+      }`)
+    expect($$.create(json1).end({ headless: true, prettyPrint: true })).toBe(input1)
+  })
+
 })

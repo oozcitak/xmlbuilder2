@@ -23,14 +23,16 @@ export class MapWriter extends BaseWriter<MapWriterOptions, XMLSerializedAsMap |
       format: "map",
       wellFormed: false,
       noDoubleEncoding: false,
-      group: false
+      group: false,
+      verbose: false
     })
 
     // convert to object
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(options, {
       format: "object",
       wellFormed: false,
-      noDoubleEncoding: false
+      noDoubleEncoding: false,
+      verbose: false
     })
     const objectWriter = new ObjectWriter(this._builderOptions)
     const val = objectWriter.serialize(node, objectWriterOptions)

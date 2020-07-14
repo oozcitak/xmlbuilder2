@@ -25,7 +25,8 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
       format: "object",
       wellFormed: false,
       noDoubleEncoding: false,
-      group: false
+      group: false,
+      verbose: false
     }) as Required<ObjectWriterOptions>
 
     this._currentList = []
@@ -174,7 +175,11 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
               result.push({ [key]: eleGroup })
             } else {
               // single element node
-              result.push({ [key]: this._process(ele[key] as NodeList, options) })
+              if (options.verbose) {
+                result.push({ [key]: [this._process(ele[key] as NodeList, options) as any] })
+              } else {
+                result.push({ [key]: this._process(ele[key] as NodeList, options) })
+              }
             }
             break
         }
@@ -237,7 +242,11 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
               obj[key] = eleGroup
             } else {
               // single element node
-              obj[key] = this._process(ele[key] as NodeList, options)
+              if (options.verbose) {
+                obj[key] = [this._process(ele[key] as NodeList, options) as any]
+              } else {
+                obj[key] = this._process(ele[key] as NodeList, options)
+              }
             }
             break
         }

@@ -169,4 +169,64 @@ describe('MapWriter', () => {
     expect(() => ele.end({ format: "map" })).toThrow()
   })
 
+  test("verbose", () => {
+    const input2 = $$.t`
+    <data>
+      <row id="0">
+        <TYPE>X</TYPE>
+        <ID>123</ID>
+      </row>
+      <row id="1">
+        <TYPE>Y</TYPE>
+        <ID>321</ID>
+      </row>
+    </data>`
+
+    const result2 = $$.convert(input2, { format: 'map', verbose: true })
+    expect($$.printMap(result2)).toBe($$.t`
+      M{
+        data: [
+          M{
+            row: [
+              M{
+                @id: 0,
+                TYPE: [ X ],
+                ID: [ 123 ]
+              },
+              M{
+                @id: 1,
+                TYPE: [ Y ],
+                ID: [ 321 ]
+              }
+            ]
+          }
+        ]
+      }`)
+    expect($$.create(result2).end({ headless: true, prettyPrint: true })).toBe(input2)
+
+    const input1 = $$.t`
+    <data>
+      <row id="0">
+        <TYPE>X</TYPE>
+        <ID>123</ID>
+      </row>
+    </data>`
+    const result1 = $$.convert(input1, { format: 'map', verbose: true })
+    expect($$.printMap(result1)).toEqual($$.t`
+      M{
+        data: [
+          M{
+            row: [
+              M{
+                @id: 0,
+                TYPE: [ X ],
+                ID: [ 123 ]
+              }
+            ]
+          }
+        ]
+      }`)
+    expect($$.create(result1).end({ headless: true, prettyPrint: true })).toBe(input1)
+  })
+
 })

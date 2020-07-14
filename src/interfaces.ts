@@ -94,7 +94,7 @@ export interface XMLBuilderOptions {
    * - offset - the offset of the invalid character
    * - str - the input string
    */
-  invalidCharReplacement: string | ((char: string, offset:number, str: string) => string) | undefined
+  invalidCharReplacement: string | ((char: string, offset: number, str: string) => string) | undefined
 }
 
 /**
@@ -309,6 +309,11 @@ export type MapWriterOptions = BaseWriterOptions & {
    * `false`.
    */
   group?: boolean
+  /**
+   * Outputs child nodes as an array, even if the parent node has zero or one
+   * child nodes.
+   */
+  verbose?: boolean
 }
 
 /**
@@ -322,6 +327,11 @@ export type ObjectWriterOptions = BaseWriterOptions & {
    * `false`.
    */
   group?: boolean
+  /**
+   * Outputs child nodes as an array, even if the parent node has zero or one
+   * child nodes.
+   */
+  verbose?: boolean
 }
 
 /**
@@ -426,6 +436,11 @@ export type JSONWriterOptions = BaseWriterOptions & {
    * `false`.
    */
   group?: boolean
+  /**
+   * Outputs child nodes as an array, even if the parent node has zero or one
+   * child nodes.
+   */
+  verbose?: boolean
 }
 
 /**
@@ -859,11 +874,11 @@ export interface XMLBuilder {
    */
   toObject(writerOptions?: ObjectWriterOptions): XMLSerializedAsObject | XMLSerializedAsObjectArray
 
-    /**
-   * Converts the node into its object representation using ES6 maps.
-   * 
-   * @param options - serialization options
-   */
+  /**
+ * Converts the node into its object representation using ES6 maps.
+ * 
+ * @param options - serialization options
+ */
   toObject(writerOptions: MapWriterOptions): XMLSerializedAsMap | XMLSerializedAsMapArray
 
   /**
@@ -1143,13 +1158,13 @@ export type XMLBuilderCBOptions = CBWriterOptions & {
    * Defines namespace aliases.
    */
   namespaceAlias: { [key: string]: string | null }
-    /**
-   * Replacement for invalid characters in input strings.
-   * If `invalidCharReplacement` is a string, each invalid character in an input
-   * string will be replaced with it; otherwise if `invalidCharReplacement`
-   * is a function it will be passed each invalid character and should return
-   * a replacement character.
-   */
+  /**
+ * Replacement for invalid characters in input strings.
+ * If `invalidCharReplacement` is a string, each invalid character in an input
+ * string will be replaced with it; otherwise if `invalidCharReplacement`
+ * is a function it will be passed each invalid character and should return
+ * a replacement character.
+ */
   invalidCharReplacement: string | ((substring: string, ...args: any[]) => string) | undefined
 }
 
@@ -1162,7 +1177,7 @@ export type BaseCBWriterOptions = {
    * - `"xml"` - Serializes the document as a string in XML format.
    * - `"json"` - Serializes the document as a JSON string.
    */
-  format?: "xml" | "json"  
+  format?: "xml" | "json"
   /**
    * Ensures that the document adheres to the syntax rules specified by the
    * XML specification. If this flag is set and the document is not well-formed
@@ -1178,7 +1193,7 @@ export type BaseCBWriterOptions = {
 /**
  * Defines the options passed to the callback builder's XML writer.
  */
-export type XMLCBWriterOptions  = BaseCBWriterOptions & {
+export type XMLCBWriterOptions = BaseCBWriterOptions & {
   /** @inheritdoc */
   format?: "xml"
   /**
@@ -1231,7 +1246,7 @@ export type XMLCBWriterOptions  = BaseCBWriterOptions & {
 /**
  * Defines the options passed to the callback builder's JSON writer.
  */
-export type JSONCBWriterOptions  = BaseCBWriterOptions & {
+export type JSONCBWriterOptions = BaseCBWriterOptions & {
   /** @inheritdoc */
   format?: "json"
   /**
