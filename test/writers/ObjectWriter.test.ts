@@ -718,6 +718,21 @@ describe('ObjectWriter', () => {
         ]
       })
     expect($$.create(obj1).end({ headless: true, prettyPrint: true })).toBe(input1)
+
+    const input3 = $$.t`
+    <data>
+      <row/>
+    </data>`
+    const obj3 = $$.convert(input3, { format: 'object', verbose: true })
+    expect(obj3).toEqual(
+      {
+        "data": [
+          {
+            "row": [ {} ]
+          }
+        ]
+      })
+    expect($$.create(obj1).end({ headless: true, prettyPrint: true })).toBe(input1)    
   })
 
 })
