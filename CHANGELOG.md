@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.2.0] - 2020-07-14
+
+### Bug Fixes
+- Fixed a bug where `each` would stop traversing the document tree if the current node was removed inside the callback.
+### Features
+- Added the `verbose` option to object serializer to create consistent yet verbose output (see [#30](https://github.com/oozcitak/xmlbuilder2/issues/30)).
+
 ## [2.1.7] - 2020-07-09
 
 ### Bug Fixes
@@ -163,3 +170,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.1.5]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.4...v2.1.5
 [2.1.6]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.5...v2.1.6
 [2.1.7]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.6...v2.1.7
+[2.2.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.7...v2.2.0
