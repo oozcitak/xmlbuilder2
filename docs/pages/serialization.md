@@ -34,7 +34,7 @@ const doc = create(xmlString);
 
 Above document representation stored in the variable `doc` can be serialized into a JS object by calling the [`end`]({{ site.baseurl }}{% link pages/conversion-functions.md %}#end) function with the `format` argument set to `"object"`:
 ```js
-const obj = doc.end({ format: "object" });
+const obj = doc.end({ format: 'object' });
 ```
 which will result in the following JS object:
 ```js
@@ -61,7 +61,7 @@ which will result in the following JS object:
 
 Similarly, the document can be serialized into an XML string by setting the `format` to `"xml"`:
 ```js
-const serializedXML = doc.end({ format: "xml", prettyPrint: true });
+const serializedXML = doc.end({ format: 'xml', prettyPrint: true });
 ```
 which will result in the following string:
 ```xml
@@ -84,7 +84,7 @@ Here `prettyPrint` is an optional argument which indents the output string accor
 
 The document can be serialized into a JSON string by setting the `format` to `"json"`:
 ```js
-const jsonString = doc.end({ format: "json", prettyPrint: true });
+const jsonString = doc.end({ format: 'json', prettyPrint: true });
 ```
 which will result in the following string:
 ```js
@@ -123,7 +123,7 @@ which will result in the following string:
 
 This format is similar to JS object, however ES6 maps are used. The `format` argument is `"map"`:
 ```js
-const obj = doc.end({ format: "map" });
+const obj = doc.end({ format: 'map' });
 ```
 which will result in the following object:
 ```js
@@ -173,7 +173,7 @@ with group set to `true`:
 const { create } = require('xmlbuilder2');
 
 const doc = create().ele('root').att({ foo: 'bar', fizz: 'buzz' });
-console.log(doc.end({ format: "object", group: true }));
+console.log(doc.end({ format: 'object', group: true }));
 ```
 ```js
 {
@@ -185,13 +185,57 @@ with group set to `false`:
 const { create } = require('xmlbuilder2');
 
 const doc = create().ele('root').att({ foo: 'bar', fizz: 'buzz' });
-console.log(doc.end({ format: "object", group: false }));
+console.log(doc.end({ format: 'object', group: false }));
 ```
 ```js
 {
   root: { '@foo': 'bar', '@fizz': 'buzz' }
 }
 ```
+
+* `verbose` -  Outputs child nodes as an array, even if the parent node has zero or one child nodes. Defaults to `false`.
+
+with verbose set to `true`:
+```js
+const { create } = require('xmlbuilder2');
+
+const doc = create().ele('root').ele('node').txt('text').up().ele('node');
+console.log(doc.end({ format: 'object', verbose: true }));
+```
+```js
+{
+  root: [
+    { 
+      node: [
+        "text",
+        {}
+      ]
+    }
+  ]
+}
+```
+with verbose set to `false`:
+```js
+const { create } = require('xmlbuilder2');
+
+const doc = create().ele('root').att({ foo: 'bar', fizz: 'buzz' });
+console.log(doc.end({ format: 'object', verbose: false }));
+```
+```js
+{
+  root: {
+    node: [
+      "text",
+      {}
+    ]
+  }
+}
+```
+{% capture verbose_tip %}
+  The `verbose` option is useful for processing the resulting JS object. A processor can assume that an element node will always have an array of child nodes.
+  Without using the `verbose` option, the processor has to check whether object value is an object or an array and branch accordingly.
+{% endcapture %}
+{% include tip.html content=verbose_tip %}
 
 #### JSON Serializer
 
@@ -200,3 +244,4 @@ console.log(doc.end({ format: "object", group: false }));
 * `newline` - Determines the newline string for pretty printing. Defaults to `"\n"`.
 * `offset` - Defines a fixed number of indentations to add to every line. Defaults to `0`.
 * `group` - Groups consecutive nodes of same type under a single object. Defaults to `false`. See [JS object serializer]({{ site.baseurl }}{% link pages/serialization.md %}#js-object-and-map-serializers) for usage example.
+* `verbose` -  Outputs child nodes as an array, even if the parent node has zero or one child nodes. Defaults to `false`. See [JS object serializer]({{ site.baseurl }}{% link pages/serialization.md %}#js-object-and-map-serializers) for usage example.

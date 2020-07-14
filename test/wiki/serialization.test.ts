@@ -128,5 +128,31 @@ describe('serialization examples in wiki', () => {
       })      
   })
 
+  test('verbose settings', () => {
+    const doc2 = $$.create().ele('root').ele('node').txt('text').up().ele('node');
+
+    expect(doc2.end({ format: "object", verbose: true })).toEqual(
+      {
+        root: [
+          { 
+            node: [
+              "text",
+              {}
+            ]
+          }
+        ]
+      })
+
+    expect(doc2.end({ format: "object", verbose: false })).toEqual(
+      {
+        root: {
+          node: [
+            "text",
+            {}
+          ]
+        }
+      })      
+  })
+
 })
 
