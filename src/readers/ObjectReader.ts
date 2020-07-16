@@ -4,12 +4,42 @@ import {
   forEachObject, isEmpty
 } from "@oozcitak/util"
 import { XMLBuilderImpl } from "../builder/XMLBuilderImpl"
+import { BaseReader } from "./BaseReader"
 
 /**
  * Parses XML nodes from objects and arrays.
  * ES6 maps and sets are laso suupoted.
  */
-export class ObjectReader {
+export class ObjectReader extends BaseReader<ExpandObject> {
+
+  _docType(name: string, publicId: string, systemId: string): XMLBuilder | undefined {
+    // document type nodes cannot be represented in a JS object
+    return undefined
+  }
+
+  _comment(parent: XMLBuilder, data: string): XMLBuilder | undefined {
+    return parent.com(data)
+  }
+
+  _text(parent: XMLBuilder, data: string): XMLBuilder | undefined {
+    return parent.txt(data)
+  }
+
+  _instruction(parent: XMLBuilder, target: string, data: string): XMLBuilder | undefined {
+    return parent.ins(target, data)
+  }
+
+  _cdata(parent: XMLBuilder, data: string): XMLBuilder | undefined {
+    return parent.dat(data)
+  }
+
+  _element(parent: XMLBuilder, name: string): XMLBuilder | undefined {
+    return parent.ele(name)
+  }
+
+  _attribute(parent: XMLBuilder, name: string, value: string): XMLBuilder | undefined {
+    return parent.att(name, value)
+  }
 
   /**
    * Parses the given document representation.
@@ -17,17 +47,17 @@ export class ObjectReader {
    * @param node - node receive parsed XML nodes
    * @param obj - object to parse
    */
-  parse(node: XMLBuilder, obj: ExpandObject): XMLBuilder {
+  _parse(node: XMLBuilder, obj: ExpandObject): XMLBuilder {
 
-    const options = node.options
+    const options = this._builderOptions
 
     let lastChild: XMLBuilder | null = null
 
     if (isFunction(obj)) {
       // evaluate if function
-      lastChild = node.ele(obj.apply(this))
+      lastChild = this.parse(node, obj.apply(this))
     } else if (isArray(obj) || isSet(obj)) {
-      forEachArray(obj, item => lastChild = node.ele(item), this)
+      forEachArray(obj, item => lastChild = this.parse(node, item), this)
     } else /* if (isMap(obj) || isObject(obj)) */ {
       // expand if object
       forEachObject(obj, (key, val) => {
@@ -39,31 +69,37 @@ export class ObjectReader {
         if (!options.ignoreConverters && key.indexOf(options.convert.att) === 0) {
           // assign attributes
           if (key === options.convert.att) {
-            lastChild = node.att(val)
+            if (isArray(val) || isSet(val)) {
+              throw new Error("Invalid attribute: " + val.toString() + ". " + (node as any)._debugInfo())
+            } else /* if (isMap(val) || isObject(val)) */ {
+              forEachObject(val, (attrKey, attrVal) => {
+                lastChild = this.attribute(node, attrKey, attrVal as string) || lastChild
+              })
+            }
           } else {
-            lastChild = node.att(key.substr(options.convert.att.length), val)
+            lastChild = this.attribute(node, key.substr(options.convert.att.length), val) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.text) === 0) {
           // text node
           if (isMap(val) || isObject(val)) {
             // if the key is #text expand child nodes under this node to support mixed content
-            lastChild = node.ele(val)
+            lastChild = this.parse(node, val)
           } else {
-            lastChild = node.txt(val)
+            lastChild = this.text(node, val) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.cdata) === 0) {
           // cdata node
           if (isArray(val) || isSet(val)) {
-            forEachArray(val, item => lastChild = node.dat(item), this)
+            forEachArray(val, item => lastChild = this.cdata(node, item) || lastChild, this)
           } else {
-            lastChild = node.dat(val)
+            lastChild = this.cdata(node, val) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.comment) === 0) {
           // comment node
           if (isArray(val) || isSet(val)) {
-            forEachArray(val, item => lastChild = node.com(item), this)
+            forEachArray(val, item => lastChild = this.comment(node, item) || lastChild, this)
           } else {
-            lastChild = node.com(val)
+            lastChild = this.comment(node, val) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.ins) === 0) {
           // processing instruction
@@ -71,39 +107,49 @@ export class ObjectReader {
             const insIndex = val.indexOf(' ')
             const insTarget = (insIndex === -1 ? val : val.substr(0, insIndex))
             const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
-            lastChild = node.ins(insTarget, insValue)
-          } else {
-            lastChild = node.ins(val)
+            lastChild = this.instruction(node, insTarget, insValue) || lastChild
+          } else if (isArray(val) || isSet(val)) {
+            forEachArray(val, item => {
+              const insIndex = item.indexOf(' ')
+              const insTarget = (insIndex === -1 ? item : item.substr(0, insIndex))
+              const insValue = (insIndex === -1 ? '' : item.substr(insIndex + 1))
+              lastChild = this.instruction(node, insTarget, insValue) || lastChild
+            }, this)
+          } else /* if (isMap(target) || isObject(target)) */ {
+            forEachObject(val, (insTarget, insValue) => lastChild = this.instruction(node, insTarget, insValue as string) || lastChild, this)
           }
         } else if ((isArray(val) || isSet(val)) && isEmpty(val)) {
           // skip empty arrays
-          lastChild = this._dummy(node)
         } else if ((isMap(val) || isObject(val)) && isEmpty(val)) {
           // empty objects produce one node
-          lastChild = node.ele(key)
+          lastChild = this.element(node, key) || lastChild
         } else if (!options.keepNullNodes && (val == null)) {
           // skip null and undefined nodes
-          lastChild = this._dummy(node)
         } else if (isArray(val) || isSet(val)) {
           // expand list by creating child nodes
           forEachArray(val, item => {
             const childNode: { [key: string]: any } = {}
             childNode[key] = item
-            lastChild = node.ele(childNode)
+            lastChild = this.parse(node, childNode)
           }, this)
         } else if (isMap(val) || isObject(val)) {
           // create a parent node
-          lastChild = node.ele(key)
-
-          // expand child nodes under parent
-          lastChild.ele(val)
+          const parent = this.element(node, key)
+          if (parent) {
+            lastChild = parent
+            // expand child nodes under parent
+            this.parse(parent, val)
+          }
         } else if (val != null && val !== '') {
           // leaf element node with a single text node
-          lastChild = node.ele(key)
-          lastChild.txt(val)
+          const parent = this.element(node, key)
+          if (parent) {
+            lastChild = parent
+            this.text(parent, val)
+          }
         } else {
           // leaf element node
-          lastChild = node.ele(key)
+          lastChild = this.element(node, key) || lastChild
         }
       }, this)
     }
@@ -115,17 +161,4 @@ export class ObjectReader {
     return lastChild
   }
 
-  /**
-   * Creates a dummy element node without adding it to the list of child nodes.
-   * 
-   * Dummy nodes are special nodes representing a node with a `null` value. 
-   * Dummy nodes are created while recursively building the XML tree. Simply
-   * skipping `null` values doesn't work because that would break the recursive
-   * chain.
-   * 
-   * @returns the new dummy element node
-   */
-  private _dummy(node: XMLBuilder): XMLBuilder {
-    return new XMLBuilderImpl((node as any)._doc.createElement('dummy_node'))
-  }
 }

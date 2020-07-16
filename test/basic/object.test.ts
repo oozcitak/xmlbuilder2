@@ -324,6 +324,14 @@ describe('object', () => {
       `)
   })
 
+  test('invalid attributes', () => {
+    const obj = {
+      '@': [ 'att1 val1', 'att2 val2' ]
+    }
+    const root = $$.create({ keepNullNodes: true }).ele('root')
+    expect(() => root.ele(obj)).toThrow()
+  })
+
   test('custom converter', () => {
     const obj = {
       'root': {

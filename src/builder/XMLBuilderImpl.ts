@@ -56,18 +56,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     let name: string | ExpandObject | undefined
     let attributes: AttributesObject | undefined
 
-    let lastChild: XMLBuilder | null = null
-
-    if (p1 !== null && isFunction(p2)) {
-      // parse with custom parser function
-      lastChild = p2.call(this, p1)
-
-      if (lastChild === null) {
-        throw new Error("Could not create any elements with: " + p1.toString() + ". " + this._debugInfo())
-      }
-  
-      return lastChild
-    } else if (isString(p1) && /^\s*</.test(p1)) {
+    if (isString(p1) && /^\s*</.test(p1)) {
       // parse XML document string
       return new XMLReader().parse(this, p1)
     } else if (isString(p1) && /^\s*[\{\[]/.test(p1)) {
@@ -75,7 +64,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       return new JSONReader().parse(this, p1)
     } else if (isObject(p1)) {
       // ele(obj: ExpandObject)
-      return new ObjectReader().parse(this, p1)
+      return new ObjectReader(this._options).parse(this, p1)
     }
 
     if ((p1 === null || isString(p1)) && isString(p2)) {
@@ -109,7 +98,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     )
 
     this.node.appendChild(childNode)
-    lastChild = new XMLBuilderImpl(childNode)
+    const builder = new XMLBuilderImpl(childNode)
 
     // update doctype node if the new node is the document element node
     const oldDocType = this._doc.doctype
@@ -122,14 +111,10 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     // create attributes
     if (attributes && !isEmpty(attributes)) {
-      lastChild.att(attributes)
+      builder.att(attributes)
     }
 
-    if (lastChild === null) {
-      throw new Error("Could not create any elements with: " + name.toString() + ". " + this._debugInfo())
-    }
-
-    return lastChild
+    return builder
   }
 
   /** @inheritdoc */

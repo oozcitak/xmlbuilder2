@@ -19,4 +19,26 @@ describe('ins()', () => {
         `)
   })
 
+  test('array', () => {
+    const root = $$.create().ele('root')
+    root.ins(['target1 content', 'target2'])
+
+    expect($$.printTree(root.doc().node)).toBe($$.t`
+      root
+        ? target1 content
+        ? target2
+        `)
+  })
+
+  test('object', () => {
+    const root = $$.create().ele('root')
+    root.ins({ target1: 'content', target2: '' })
+
+    expect($$.printTree(root.doc().node)).toBe($$.t`
+      root
+        ? target1 content
+        ? target2
+        `)
+  })
+
 })
