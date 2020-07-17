@@ -1,11 +1,12 @@
-import { XMLBuilder, XMLBuilderOptions } from "../interfaces"
+import { XMLBuilder } from "../interfaces"
 import { createParser, sanitizeInput, throwIfParserError } from "../builder/dom"
 import { XMLBuilderImpl } from "../builder/XMLBuilderImpl"
+import { BaseReader } from "./BaseReader"
 
 /**
- * Parses XML nodes from JSON string.
+ * Parses XML nodes from an XML document string.
  */
-export class XMLReader {
+export class XMLReader extends BaseReader<string> {
 
   /**
    * Parses the given document representation.
@@ -13,7 +14,7 @@ export class XMLReader {
    * @param node - node receive parsed XML nodes
    * @param str - XML document string to parse
    */
-  parse(node: XMLBuilder, str: string): XMLBuilder {
+  _parse(node: XMLBuilder, str: string): XMLBuilder {
 
     const ele = node as any
     const options = node.options

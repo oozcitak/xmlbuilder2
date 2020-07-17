@@ -8,25 +8,49 @@ export abstract class BaseReader<U extends string | ExpandObject> {
   protected _builderOptions: XMLBuilderOptions
 
   /**
-   * Initializes a new instance of `BaseWriter`.
+   * Initializes a new instance of `BaseReader`.
    * 
    * @param builderOptions - XML builder options
    */
   constructor(builderOptions: XMLBuilderOptions) {
     this._builderOptions = builderOptions
+    if (builderOptions.parser) {
+      Object.assign(this, builderOptions.parser)
+    }
   }
 
   abstract _parse(node: XMLBuilder, obj: U): XMLBuilder
-  abstract _docType(name: string, publicId: string, systemId: string): XMLBuilder | undefined
-  abstract _comment(parent: XMLBuilder, data: string): XMLBuilder | undefined
-  abstract _text(parent: XMLBuilder, data: string): XMLBuilder | undefined
-  abstract _instruction(parent: XMLBuilder, target: string, data: string): XMLBuilder | undefined
-  abstract _cdata(parent: XMLBuilder, data: string): XMLBuilder | undefined
-  abstract _element(parent: XMLBuilder, name: string): XMLBuilder | undefined
-  abstract _attribute(parent: XMLBuilder, name: string, value: string): XMLBuilder | undefined
 
-    /**
-   * Produces an XML serialization of the given node.
+  _docType(parent: XMLBuilder, name: string, publicId: string, systemId: string): XMLBuilder | undefined {
+    return parent.dtd({ name: name, pubID: publicId, sysID: systemId })
+  }
+
+  _comment(parent: XMLBuilder, data: string): XMLBuilder | undefined {
+    return parent.com(data)
+  }
+
+  _text(parent: XMLBuilder, data: string): XMLBuilder | undefined {
+    return parent.txt(data)
+  }
+
+  _instruction(parent: XMLBuilder, target: string, data: string): XMLBuilder | undefined {
+    return parent.ins(target, data)
+  }
+
+  _cdata(parent: XMLBuilder, data: string): XMLBuilder | undefined {
+    return parent.dat(data)
+  }
+
+  _element(parent: XMLBuilder, name: string): XMLBuilder | undefined {
+    return parent.ele(name)
+  }
+
+  _attribute(parent: XMLBuilder, name: string, value: string): XMLBuilder | undefined {
+    return parent.att(name, value)
+  }
+
+  /**
+   * Main parser function which parses the given object and returns an XMLBuilder.
    * 
    * @param node - node to recieve parsed content
    * @param obj - object to parse
@@ -36,18 +60,20 @@ export abstract class BaseReader<U extends string | ExpandObject> {
   }
 
   /**
-   * Used by derived classes to create a DocType node.
+   * Creates a DocType node.
+   * The node will be skipped if the function returns `undefined`.
    * 
    * @param name - node name
    * @param publicId - public identifier
    * @param systemId - system identifier
    */
-  docType(name: string, publicId: string, systemId: string): XMLBuilder | undefined {
-    return this._docType(name, publicId, systemId)
+  docType(parent: XMLBuilder, name: string, publicId: string, systemId: string): XMLBuilder | undefined {
+    return this._docType(parent, name, publicId, systemId)
   }
 
   /**
-   * Used by derived classes to create a comment node.
+   * Creates a comment node.
+   * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
    * @param data - node data
@@ -57,54 +83,59 @@ export abstract class BaseReader<U extends string | ExpandObject> {
   }
 
   /**
-   * Used by derived classes to create a text node.
+   * Creates a text node.
+   * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
    * @param data - node data
    */
-  text(parent: XMLBuilder, data: string) {
+  text(parent: XMLBuilder, data: string): XMLBuilder | undefined {
     return this._text(parent, data)
   }
 
   /**
-   * Used by derived classes to create a processing instruction node.
+   * Creates a processing instruction node.
+   * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
    * @param target - instruction target
    * @param data - node data
    */
-  instruction(parent: XMLBuilder, target: string, data: string) {
+  instruction(parent: XMLBuilder, target: string, data: string): XMLBuilder | undefined {
     return this._instruction(parent, target, data)
   }
 
   /**
-   * Used by derived classes to create a CData section node.
+   * Creates a CData section node.
+   * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
    * @param data - node data
    */
-  cdata(parent: XMLBuilder, data: string) {
+  cdata(parent: XMLBuilder, data: string): XMLBuilder | undefined {
     return this._cdata(parent, data)
   }
 
   /**
-   * Used by derived classes to create an element node.
+   * Creates an element node.
+   * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
    * @param name - node name
    */
-  element(parent: XMLBuilder, name: string) {
+  element(parent: XMLBuilder, name: string): XMLBuilder | undefined {
     return this._element(parent, name)
   }
 
   /**
-   * Used by derived classes to create an attribute or namespace declaration.
+   * Creates an attribute or namespace declaration.
+   * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
    * @param name - node name
    * @param value - node value
    */
-  attribute(parent: XMLBuilder, name: string, value: string) {
+  attribute(parent: XMLBuilder, name: string, value: string): XMLBuilder | undefined {
     return this._attribute(parent, name, value)
   }
 

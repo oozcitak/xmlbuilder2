@@ -1,44 +1,20 @@
-import { XMLBuilder, ExpandObject, XMLBuilderOptions } from "../interfaces"
+import { XMLBuilder, ExpandObject } from "../interfaces"
 import {
   isArray, isString, isFunction, forEachArray, isSet, isMap, isObject,
   forEachObject, isEmpty
 } from "@oozcitak/util"
-import { XMLBuilderImpl } from "../builder/XMLBuilderImpl"
 import { BaseReader } from "./BaseReader"
 
 /**
  * Parses XML nodes from objects and arrays.
- * ES6 maps and sets are laso suupoted.
+ * ES6 maps and sets are also supoorted.
  */
 export class ObjectReader extends BaseReader<ExpandObject> {
 
-  _docType(name: string, publicId: string, systemId: string): XMLBuilder | undefined {
+  /** @inheritdoc */
+  docType(parent: XMLBuilder, name: string, publicId: string, systemId: string): XMLBuilder | undefined {
     // document type nodes cannot be represented in a JS object
     return undefined
-  }
-
-  _comment(parent: XMLBuilder, data: string): XMLBuilder | undefined {
-    return parent.com(data)
-  }
-
-  _text(parent: XMLBuilder, data: string): XMLBuilder | undefined {
-    return parent.txt(data)
-  }
-
-  _instruction(parent: XMLBuilder, target: string, data: string): XMLBuilder | undefined {
-    return parent.ins(target, data)
-  }
-
-  _cdata(parent: XMLBuilder, data: string): XMLBuilder | undefined {
-    return parent.dat(data)
-  }
-
-  _element(parent: XMLBuilder, name: string): XMLBuilder | undefined {
-    return parent.ele(name)
-  }
-
-  _attribute(parent: XMLBuilder, name: string, value: string): XMLBuilder | undefined {
-    return parent.att(name, value)
   }
 
   /**

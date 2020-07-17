@@ -5,7 +5,7 @@ import {
   JSONWriterOptions, ObjectWriterOptions, MapWriterOptions
 } from "../interfaces"
 import {
-  applyDefaults, isObject, isString, isMap, isArray, isEmpty, isFunction,
+  applyDefaults, isObject, isString, isMap, isArray, isEmpty,
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
 import { XMLWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
@@ -58,10 +58,10 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     if (isString(p1) && /^\s*</.test(p1)) {
       // parse XML document string
-      return new XMLReader().parse(this, p1)
+      return new XMLReader(this._options).parse(this, p1)
     } else if (isString(p1) && /^\s*[\{\[]/.test(p1)) {
       // parse JSON string
-      return new JSONReader().parse(this, p1)
+      return new JSONReader(this._options).parse(this, p1)
     } else if (isObject(p1)) {
       // ele(obj: ExpandObject)
       return new ObjectReader(this._options).parse(this, p1)

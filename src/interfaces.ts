@@ -95,6 +95,10 @@ export interface XMLBuilderOptions {
    * - str - the input string
    */
   invalidCharReplacement: string | ((char: string, offset: number, str: string) => string) | undefined
+  /**
+   * Defines custom parser functions.
+   */
+  parser: ParserOptions | undefined
 }
 
 /**
@@ -131,7 +135,8 @@ export const DefaultBuilderOptions: XMLBuilderOptions = {
     svg: "http://www.w3.org/2000/svg",
     xlink: "http://www.w3.org/1999/xlink"
   },
-  invalidCharReplacement: undefined
+  invalidCharReplacement: undefined,
+  parser: undefined
 }
 
 /**
@@ -270,6 +275,85 @@ export interface ConvertOptions {
    * ````
    */
   comment: string
+}
+
+/**
+ * Defines custom parser functions.
+ */
+export type ParserOptions = {
+  /**
+   * Main parser function which parses the given object and returns an XMLBuilder.
+   * 
+   * @param node - node to recieve parsed content
+   * @param obj - object to parse
+   */
+  parse?: (node: XMLBuilder, obj: string | ExpandObject) => XMLBuilder
+
+  /**
+   * Creates a DocType node.
+   * The node will be skipped if the function returns `undefined`.
+   * 
+   * @param name - node name
+   * @param publicId - public identifier
+   * @param systemId - system identifier
+   */
+  docType?: (name: string, publicId: string, systemId: string) => XMLBuilder | undefined
+
+  /**
+   * Creates a comment node.
+   * The node will be skipped if the function returns `undefined`.
+   * 
+   * @param parent - parent node
+   * @param data - node data
+   */
+  comment?: (parent: XMLBuilder, data: string) => XMLBuilder | undefined
+
+  /**
+   * Creates a text node.
+   * The node will be skipped if the function returns `undefined`.
+   * 
+   * @param parent - parent node
+   * @param data - node data
+   */
+  text?: (parent: XMLBuilder, data: string) => XMLBuilder | undefined
+
+  /**
+   * Creates a processing instruction node.
+   * The node will be skipped if the function returns `undefined`.
+   * 
+   * @param parent - parent node
+   * @param target - instruction target
+   * @param data - node data
+   */
+  instruction?: (parent: XMLBuilder, target: string, data: string) => XMLBuilder | undefined
+
+  /**
+   * Creates a CData section node.
+   * The node will be skipped if the function returns `undefined`.
+   * 
+   * @param parent - parent node
+   * @param data - node data
+   */
+  cdata?: (parent: XMLBuilder, data: string) => XMLBuilder | undefined
+
+  /**
+   * Creates an element node.
+   * The node will be skipped if the function returns `undefined`.
+   * 
+   * @param parent - parent node
+   * @param name - node name
+   */
+  element?: (parent: XMLBuilder, name: string) => XMLBuilder | undefined
+
+  /**
+   * Creates an attribute or namespace declaration.
+   * The node will be skipped if the function returns `undefined`.
+   * 
+   * @param parent - parent node
+   * @param name - node name
+   * @param value - node value
+   */
+  attribute?: (parent: XMLBuilder, name: string, value: string) => XMLBuilder | undefined
 }
 
 /**
@@ -544,15 +628,15 @@ export interface XMLBuilder {
    */
   ele(obj: ExpandObject): XMLBuilder
 
-  /**
-   * Creates new element nodes from the given JS object and appends it to the
+    /**
+   * Creates new element nodes from the given XML document string appends it to the
    * list of child nodes.
    * 
-   * @param obj - a JS object representing nodes to insert
+   * @param content - an XML document string representing nodes to insert
    * 
    * @returns the last top level element node created
    */
-  ele(obj: ExpandObject, parser: ((obj: ExpandObject) => XMLBuilder)): XMLBuilder
+  ele(content: string): XMLBuilder
 
   /**
    * Removes this node from the XML document.
