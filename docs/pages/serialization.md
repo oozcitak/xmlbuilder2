@@ -193,7 +193,7 @@ console.log(doc.end({ format: 'object', group: false }));
 }
 ```
 
-* `verbose` -  Outputs child nodes as an array, even if the parent node has zero or one child nodes. Defaults to `false`.
+* `verbose` -  Outputs child nodes as an array, even if the parent node only one child node. Defaults to `false`.
 
 with verbose set to `true`:
 ```js

@@ -385,6 +385,18 @@ ___
   - `offset` - the offset of the invalid character
   - `str` - the input string
 
+{% capture invalidCharReplacement_tip %}
+  `invalidCharReplacement` is limited to the `Char` production in the [XML spec](https://www.w3.org/TR/xml/#charsets):
+
+  > /* any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. */
+  > Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+
+  It doesn't replace any other characters. For example `ele('-name')` will still
+  throw an error, because `-` is not allowed as a name start character. But the
+  `invalidCharReplacement` option does not replace it for performance reasons.
+{% endcapture %}
+{% include warning.html content=invalidCharReplacement_tip %}
+
 #### Settings related to XML namespaces
 
 * `defaultNamespace` - contains default namespaces to apply to all elements and attributes (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-defaults))
