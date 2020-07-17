@@ -29,4 +29,16 @@ describe("Replicate issue", () => {
 
   })
 
+  const xml = `<root xmlns:soap12="http://www.w3.org/2003/05/soap-envelope"><soap12:node/></root>`
+  const doc = $$.create(xml)
+  const obj = doc.end( { format: "object" })
+  expect(obj).toEqual({
+    root: {
+      '@xmlns:soap12': 'http://www.w3.org/2003/05/soap-envelope',
+      'soap12:node': { }
+    }
+  })
+  const xmlr = $$.create(obj).end({ headless: true })
+  expect(xmlr).toBe(xml)
+
 })
