@@ -41,12 +41,12 @@ export abstract class BaseReader<U extends string | ExpandObject> {
     return parent.dat(data)
   }
 
-  _element(parent: XMLBuilder, name: string): XMLBuilder | undefined {
-    return parent.ele(name)
+  _element(parent: XMLBuilder, namespace: string | null | undefined, name: string): XMLBuilder | undefined {
+    return (namespace === undefined ? parent.ele(name) : parent.ele(namespace, name))
   }
 
-  _attribute(parent: XMLBuilder, name: string, value: string): XMLBuilder | undefined {
-    return parent.att(name, value)
+  _attribute(parent: XMLBuilder, namespace: string | null | undefined, name: string, value: string): XMLBuilder | undefined {
+    return (namespace === undefined ? parent.att(name, value) : parent.att(namespace, name, value))
   }
 
   /**
@@ -121,10 +121,11 @@ export abstract class BaseReader<U extends string | ExpandObject> {
    * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
+   * @param namespace - node namespace
    * @param name - node name
    */
-  element(parent: XMLBuilder, name: string): XMLBuilder | undefined {
-    return this._element(parent, name)
+  element(parent: XMLBuilder, namespace: string | null | undefined, name: string): XMLBuilder | undefined {
+    return this._element(parent, namespace, name)
   }
 
   /**
@@ -132,11 +133,12 @@ export abstract class BaseReader<U extends string | ExpandObject> {
    * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
+   * @param namespace - node namespace
    * @param name - node name
    * @param value - node value
    */
-  attribute(parent: XMLBuilder, name: string, value: string): XMLBuilder | undefined {
-    return this._attribute(parent, name, value)
+  attribute(parent: XMLBuilder, namespace: string | null | undefined, name: string, value: string): XMLBuilder | undefined {
+    return this._attribute(parent, namespace, name, value)
   }
 
 }

@@ -68,11 +68,6 @@ describe('ele()', () => {
       `)
   })
 
-  test('from XML string error', () => {
-    const root = $$.create().ele('root')
-    expect(() => root.ele('<?xml version="1.0"?>')).toThrow()
-  })
-
   test('from JSON string', () => {
     const root = $$.create().ele('root')
     root.ele(`{

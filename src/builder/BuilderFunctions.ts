@@ -1,16 +1,16 @@
 import {
   XMLBuilderCreateOptions, ExpandObject, XMLBuilder, WriterOptions,
   XMLBuilderOptions, DefaultBuilderOptions, DocumentWithSettings,
-  XMLBuilderOptionKeys, XMLWriterOptions, JSONWriterOptions, 
-  ObjectWriterOptions, XMLSerializedAsObject, XMLSerializedAsObjectArray, 
+  XMLBuilderOptionKeys, XMLWriterOptions, JSONWriterOptions,
+  ObjectWriterOptions, XMLSerializedAsObject, XMLSerializedAsObjectArray,
   MapWriterOptions, XMLSerializedAsMap, XMLSerializedAsMapArray,
   XMLSerializedValue
 } from '../interfaces'
-import { isPlainObject, applyDefaults, isObject, isArray } from '@oozcitak/util'
+import { isPlainObject, applyDefaults, isArray } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
 import { Guard } from '@oozcitak/dom/lib/util'
 import { XMLBuilderImpl } from '.'
-import { createDocument, createParser, throwIfParserError, sanitizeInput } from '../builder/dom'
+import { createDocument } from '../builder/dom'
 
 /**
  * Wraps a DOM node for use with XML builder with default options.
@@ -122,34 +122,13 @@ export function create(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   const contents: string | ExpandObject | undefined =
     isXMLBuilderCreateOptions(p1) ? p2 : p1
 
-  let builder: XMLBuilder
+  const doc = createDocument()
+  setOptions(doc, options)
+  const builder = new XMLBuilderImpl(doc)
 
-  if (contents === undefined) {
-    // empty document
-    const doc = createDocument()
-    builder = new XMLBuilderImpl(doc)
-    setOptions(doc, options)
-  } else if (isObject(contents)) {
-    // JS object
-    const doc = createDocument()
-    builder = new XMLBuilderImpl(doc)
-    setOptions(doc, options)
-    builder.ele(contents)
-  } else if (/^\s*</.test(contents)) {
-    // XML document
-    const domParser = createParser()
-    const doc = domParser.parseFromString(
-      sanitizeInput(contents, options.invalidCharReplacement), "text/xml")
-    throwIfParserError(doc)
-    builder = new XMLBuilderImpl(doc)
-    setOptions(doc, options)
-  } else {
-    // JSON
-    const doc = createDocument()
-    builder = new XMLBuilderImpl(doc)
-    setOptions(doc, options)
-    const obj = JSON.parse(contents) as ExpandObject
-    builder.ele(obj)
+  if (contents !== undefined) {
+    // parse contents
+    builder.ele(contents as any)
   }
 
   return builder
@@ -202,43 +181,13 @@ export function fragment(p1?: XMLBuilderCreateOptions | string | ExpandObject,
   const contents: string | ExpandObject | undefined =
     isXMLBuilderCreateOptions(p1) ? p2 : p1
 
-  let builder: XMLBuilder
+  const doc = createDocument()
+  setOptions(doc, options, true)
+  const builder = new XMLBuilderImpl(doc.createDocumentFragment())
 
-  if (contents === undefined) {
-    // empty fragment
-    const doc = createDocument()
-    setOptions(doc, options, true)
-    builder = new XMLBuilderImpl(doc.createDocumentFragment())
-  } else if (isObject(contents)) {
-    // JS object
-    const doc = createDocument()
-    setOptions(doc, options, true)
-    builder = new XMLBuilderImpl(doc.createDocumentFragment())
-    builder.ele(contents)
-  } else if (/^\s*</.test(contents)) {
-    // XML document
-    const domParser = createParser()
-    const doc = domParser.parseFromString("<TEMP_ROOT>" + 
-      sanitizeInput(contents, options.invalidCharReplacement) + "</TEMP_ROOT>", "text/xml")
-    throwIfParserError(doc)
-    setOptions(doc, options, true)
-    /* istanbul ignore next */
-    if (doc.documentElement === null) {
-      throw new Error("Document element is null.")
-    }
-    const frag = doc.createDocumentFragment()
-    for (const child of doc.documentElement.childNodes) {
-      const newChild = doc.importNode(child, true)
-      frag.appendChild(newChild)
-    }
-    builder = new XMLBuilderImpl(frag)
-  } else {
-    // JSON
-    const doc = createDocument()
-    setOptions(doc, options, true)
-    builder = new XMLBuilderImpl(doc.createDocumentFragment())
-    const obj = JSON.parse(contents) as ExpandObject
-    builder.ele(obj)
+  if (contents !== undefined) {
+    // parse contents
+    builder.ele(contents as any)
   }
 
   return builder

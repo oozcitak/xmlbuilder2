@@ -446,12 +446,6 @@ describe('XMLWriter with namespaces', () => {
       `)
   })
 
-  test('redundant xmlns is dropped', () => {
-    expect($$.convert('<root><child xmlns=""/></root>', { headless: true })).toBe('<root><child/></root>')
-    expect($$.convert('<root xmlns=""><child xmlns=""/></root>', { headless: true })).toBe('<root><child/></root>')
-    expect($$.convert('<root xmlns="u1"><child xmlns="u1"/></root>', { headless: true })).toBe('<root xmlns="u1"><child/></root>')
-  })
-
   test('attribute with no prefix and namespace', () => {
     const doc = $$.create('<r xmlns:x0="uri" xmlns:x2="uri"><b xmlns:x1="uri"/></r>')
     const root = doc.root()

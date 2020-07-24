@@ -12,9 +12,6 @@ describe('examples in the function reference wiki page', () => {
     const doc3 = $$.create('<root><foo><bar>foobar</bar></foo></root>')
     expect(doc3.end({ headless: true }))
       .toBe('<root><foo><bar>foobar</bar></foo></root>')
-    
-    expect(() => $$.create({ version: "1.0" }, '<root>text\x00</root>')).toThrow()
-    expect(() => $$.create({ version: "1.0" }, '<root>text\x01</root>')).toThrow()
   })
 
   test('fragment()', () => {
@@ -27,9 +24,6 @@ describe('examples in the function reference wiki page', () => {
     const frag3 = $$.fragment('<foo1>bar</foo1><foo2>baz</foo2>')
     expect(frag3.toString())
       .toBe('<foo1>bar</foo1><foo2>baz</foo2>')
-    
-    expect(() => $$.fragment({ version: "1.0" }, '<root>text\x00</root>')).toThrow()
-    expect(() => $$.fragment({ version: "1.0" }, '<root>text\x01</root>')).toThrow()
   })
 
   test('ele()', () => {

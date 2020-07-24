@@ -49,11 +49,11 @@ export class ObjectReader extends BaseReader<ExpandObject> {
               throw new Error("Invalid attribute: " + val.toString() + ". " + (node as any)._debugInfo())
             } else /* if (isMap(val) || isObject(val)) */ {
               forEachObject(val, (attrKey, attrVal) => {
-                lastChild = this.attribute(node, attrKey, attrVal as string) || lastChild
+                lastChild = this.attribute(node, undefined, attrKey, attrVal as string) || lastChild
               })
             }
           } else {
-            lastChild = this.attribute(node, key.substr(options.convert.att.length), val) || lastChild
+            lastChild = this.attribute(node, undefined, key.substr(options.convert.att.length), val) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.text) === 0) {
           // text node
@@ -98,7 +98,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
           // skip empty arrays
         } else if ((isMap(val) || isObject(val)) && isEmpty(val)) {
           // empty objects produce one node
-          lastChild = this.element(node, key) || lastChild
+          lastChild = this.element(node, undefined, key) || lastChild
         } else if (!options.keepNullNodes && (val == null)) {
           // skip null and undefined nodes
         } else if (isArray(val) || isSet(val)) {
@@ -110,7 +110,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
           }, this)
         } else if (isMap(val) || isObject(val)) {
           // create a parent node
-          const parent = this.element(node, key)
+          const parent = this.element(node, undefined, key)
           if (parent) {
             lastChild = parent
             // expand child nodes under parent
@@ -118,14 +118,14 @@ export class ObjectReader extends BaseReader<ExpandObject> {
           }
         } else if (val != null && val !== '') {
           // leaf element node with a single text node
-          const parent = this.element(node, key)
+          const parent = this.element(node, undefined, key)
           if (parent) {
             lastChild = parent
             this.text(parent, val)
           }
         } else {
           // leaf element node
-          lastChild = this.element(node, key) || lastChild
+          lastChild = this.element(node, undefined, key) || lastChild
         }
       }, this)
     }

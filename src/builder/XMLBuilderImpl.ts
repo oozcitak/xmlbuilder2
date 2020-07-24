@@ -56,15 +56,15 @@ export class XMLBuilderImpl implements XMLBuilder {
     let name: string | ExpandObject | undefined
     let attributes: AttributesObject | undefined
 
-    if (isString(p1) && /^\s*</.test(p1)) {
-      // parse XML document string
-      return new XMLReader(this._options).parse(this, p1)
-    } else if (isString(p1) && /^\s*[\{\[]/.test(p1)) {
-      // parse JSON string
-      return new JSONReader(this._options).parse(this, p1)
-    } else if (isObject(p1)) {
+    if (isObject(p1)) {
       // ele(obj: ExpandObject)
       return new ObjectReader(this._options).parse(this, p1)
+    } else if (p1 !== null && /^\s*</.test(p1)) {
+      // parse XML document string
+      return new XMLReader(this._options).parse(this, p1)
+    } else if (p1 !== null && /^\s*[\{\[]/.test(p1)) {
+      // parse JSON string
+      return new JSONReader(this._options).parse(this, p1)
     }
 
     if ((p1 === null || isString(p1)) && isString(p2)) {
@@ -654,7 +654,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * 
    * @param namespace - namespace
    * @param name - a string containing both a name and namespace separated by an
-   * '@' character
+   * `'@'` character
    * @param ele - `true` if this is an element namespace; otherwise `false`
    */
   private _extractNamespace(namespace: string | null | undefined, name: string, ele: boolean): [string | null | undefined, string] {

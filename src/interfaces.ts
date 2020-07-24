@@ -293,11 +293,12 @@ export type ParserOptions = {
    * Creates a DocType node.
    * The node will be skipped if the function returns `undefined`.
    * 
+   * @param parent - parent node
    * @param name - node name
    * @param publicId - public identifier
    * @param systemId - system identifier
    */
-  docType?: (name: string, publicId: string, systemId: string) => XMLBuilder | undefined
+  docType?: (parent: XMLBuilder, name: string, publicId: string, systemId: string) => XMLBuilder | undefined
 
   /**
    * Creates a comment node.
@@ -341,19 +342,21 @@ export type ParserOptions = {
    * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
+   * @param namespace - element namespace
    * @param name - node name
    */
-  element?: (parent: XMLBuilder, name: string) => XMLBuilder | undefined
+  element?: (parent: XMLBuilder, namespace: string | null | undefined, name: string) => XMLBuilder | undefined
 
   /**
    * Creates an attribute or namespace declaration.
    * The node will be skipped if the function returns `undefined`.
    * 
    * @param parent - parent node
-   * @param name - node name
-   * @param value - node value
+   * @param namespace - attribute namespace
+   * @param name - attribute name
+   * @param value - attribute value
    */
-  attribute?: (parent: XMLBuilder, name: string, value: string) => XMLBuilder | undefined
+  attribute?: (parent: XMLBuilder, namespace: string | null | undefined, name: string, value: string) => XMLBuilder | undefined
 }
 
 /**
