@@ -289,7 +289,7 @@ export type ParserOptions = {
    * 
    * @returns the last top level element node created
    */
-  parse?: (node: XMLBuilder, obj: string | ExpandObject) => XMLBuilder
+  parse?: (parent: XMLBuilder, obj: string | ExpandObject) => XMLBuilder
 
   /**
    * Creates a DocType node.
@@ -387,8 +387,9 @@ export type BaseWriterOptions = {
    * - `"object"` - Serializes the document as an object using `Object`s and
    * `Array`s.
    * - `"json"` - Serializes the document as a JSON string.
+   * - `"yaml"` - Serilizes the document as a YAML string
    */
-  format?: "xml" | "map" | "object" | "json"
+  format?: "xml" | "map" | "object" | "json" | "yaml"
   /**
    * Ensures that the document adheres to the syntax rules specified by the
    * XML specification. If this flag is set and the document is not well-formed
@@ -547,10 +548,46 @@ export type JSONWriterOptions = BaseWriterOptions & {
 }
 
 /**
+ * Defines the options passed to the YAML writer.
+ */
+export type YAMLWriterOptions = BaseWriterOptions & {
+  /** @inheritdoc */
+  format?: "yaml"
+  /**
+   * Pretty-prints the XML tree. Defaults to `false`.
+   */
+  prettyPrint?: boolean
+  /**
+   * Determines the indentation string for pretty printing. Defaults to two
+   * space characters.
+   */
+  indent?: string
+  /**
+   * Determines the newline string for pretty printing. Defaults to `"\n"`.
+   */
+  newline?: string
+  /**
+   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * `0`.
+   */
+  offset?: number
+  /**
+   * Groups consecutive nodes of same type under a single object. Defaults to
+   * `false`.
+   */
+  group?: boolean
+  /**
+   * Outputs child nodes as an array, even if the parent node has only one
+   * child node.
+   */
+  verbose?: boolean
+}
+
+/**
  * Defines the options passed to the writer.
  */
 export type WriterOptions = XMLWriterOptions | ObjectWriterOptions |
-  JSONWriterOptions | MapWriterOptions
+  JSONWriterOptions | MapWriterOptions | YAMLWriterOptions
 
 /**
  * Defines recursive types that can represent objects, arrays and maps of
@@ -971,6 +1008,13 @@ export interface XMLBuilder {
   toString(writerOptions: JSONWriterOptions): string
 
   /**
+ * Converts the node into a YAML string.
+ * 
+ * @param options - serialization options
+ */
+  toString(writerOptions: YAMLWriterOptions): string
+
+  /**
    * Converts the node into its object representation.
    * 
    * @param options - serialization options
@@ -1003,6 +1047,13 @@ export interface XMLBuilder {
    * @param options - serialization options
    */
   end(writerOptions: JSONWriterOptions): string
+
+  /**
+   * Converts the entire XML document into a YAML string.
+   * 
+   * @param options - serialization options
+   */
+  end(writerOptions: YAMLWriterOptions): string
 
   /**
    * Converts the entire XML document into its object representation.

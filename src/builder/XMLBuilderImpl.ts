@@ -2,7 +2,7 @@ import {
   XMLBuilderOptions, XMLBuilder, AttributesObject, ExpandObject,
   WriterOptions, XMLSerializedValue, DTDOptions,
   DefaultBuilderOptions, PIObject, DocumentWithSettings, XMLWriterOptions,
-  JSONWriterOptions, ObjectWriterOptions, MapWriterOptions
+  JSONWriterOptions, ObjectWriterOptions, MapWriterOptions, YAMLWriterOptions
 } from "../interfaces"
 import {
   applyDefaults, isObject, isString, isMap, isArray, isEmpty,
@@ -539,7 +539,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   }
 
   /** @inheritdoc */
-  toString(writerOptions?: XMLWriterOptions | JSONWriterOptions): string {
+  toString(writerOptions?: XMLWriterOptions | JSONWriterOptions | YAMLWriterOptions): string {
     writerOptions = writerOptions || {}
     if (writerOptions.format === undefined) {
       writerOptions.format = "xml"
