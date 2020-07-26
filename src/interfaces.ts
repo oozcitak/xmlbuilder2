@@ -282,10 +282,12 @@ export interface ConvertOptions {
  */
 export type ParserOptions = {
   /**
-   * Main parser function which parses the given object and returns an XMLBuilder.
+   * Main parser function which parses the given object and returns an `XMLBuilder`.
    * 
    * @param node - node to recieve parsed content
    * @param obj - object to parse
+   * 
+   * @returns the last top level element node created
    */
   parse?: (node: XMLBuilder, obj: string | ExpandObject) => XMLBuilder
 
@@ -297,6 +299,8 @@ export type ParserOptions = {
    * @param name - node name
    * @param publicId - public identifier
    * @param systemId - system identifier
+   * 
+   * @returns the parent document node
    */
   docType?: (parent: XMLBuilder, name: string, publicId: string, systemId: string) => XMLBuilder | undefined
 
@@ -306,6 +310,8 @@ export type ParserOptions = {
    * 
    * @param parent - parent node
    * @param data - node data
+   * 
+   * @returns the parent element node
    */
   comment?: (parent: XMLBuilder, data: string) => XMLBuilder | undefined
 
@@ -315,6 +321,8 @@ export type ParserOptions = {
    * 
    * @param parent - parent node
    * @param data - node data
+   * 
+   * @returns the parent element node
    */
   text?: (parent: XMLBuilder, data: string) => XMLBuilder | undefined
 
@@ -325,6 +333,8 @@ export type ParserOptions = {
    * @param parent - parent node
    * @param target - instruction target
    * @param data - node data
+   * 
+   * @returns the parent element node
    */
   instruction?: (parent: XMLBuilder, target: string, data: string) => XMLBuilder | undefined
 
@@ -334,6 +344,8 @@ export type ParserOptions = {
    * 
    * @param parent - parent node
    * @param data - node data
+   * 
+   * @returns the parent element node
    */
   cdata?: (parent: XMLBuilder, data: string) => XMLBuilder | undefined
 
@@ -344,6 +356,8 @@ export type ParserOptions = {
    * @param parent - parent node
    * @param namespace - element namespace
    * @param name - node name
+   * 
+   * @returns the new element node
    */
   element?: (parent: XMLBuilder, namespace: string | null | undefined, name: string) => XMLBuilder | undefined
 
@@ -355,6 +369,8 @@ export type ParserOptions = {
    * @param namespace - attribute namespace
    * @param name - attribute name
    * @param value - attribute value
+   * 
+   * @returns the parent element node
    */
   attribute?: (parent: XMLBuilder, namespace: string | null | undefined, name: string, value: string) => XMLBuilder | undefined
 }
@@ -631,14 +647,14 @@ export interface XMLBuilder {
    */
   ele(obj: ExpandObject): XMLBuilder
 
-    /**
-   * Creates new element nodes from the given XML document string appends it to the
-   * list of child nodes.
-   * 
-   * @param content - an XML document string representing nodes to insert
-   * 
-   * @returns the last top level element node created
-   */
+  /**
+ * Creates new element nodes from the given XML document string appends it to the
+ * list of child nodes.
+ * 
+ * @param content - an XML document string representing nodes to insert
+ * 
+ * @returns the last top level element node created
+ */
   ele(content: string): XMLBuilder
 
   /**
