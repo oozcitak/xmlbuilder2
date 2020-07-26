@@ -375,31 +375,40 @@ ___
 * `keepNullAttributes` - whether attributes with `null` and `undefined` values will be kept or ignored: `true` or `false`. Defaults to `false`, which silently ignores attributes with `null` and `undefined` values. When set to `true`, `null` will be treated as an empty string.
 * `ignoreConverters` - whether converter strings will be ignored when converting JS objects: `true` or `false`. Defaults to `false`.
 * `convert` - an object defining converter strings. Default converter strings are described below.
-  * `att` -  when prepended to a JS object key, converts its key-value pair to an attribute. Defaults to `'@'`.
-  * `ins` - when prepended to a JS object key, converts its value to a processing instruction node. Defaults to `'?'`.
-  * `text` - when prepended to a JS object key, converts its value to a text node. Defaults to `'#'`.
-  * `cdata` - when prepended to a JS object key, converts its value to a CDATA section node. Defaults to `'$'`.
-  * `comment` - when prepended to a JS object key, converts its value to a comment node. Defaults to `'!'`.
+  - `att` -  when prepended to a JS object key, converts its key-value pair to an attribute. Defaults to `'@'`.
+  - `ins` - when prepended to a JS object key, converts its value to a processing instruction node. Defaults to `'?'`.
+  - `text` - when prepended to a JS object key, converts its value to a text node. Defaults to `'#'`.
+  - `cdata` - when prepended to a JS object key, converts its value to a CDATA section node. Defaults to `'$'`.
+  - `comment` - when prepended to a JS object key, converts its value to a comment node. Defaults to `'!'`.
 * `invalidCharReplacement` - defines a replacement value for invalid characters in input strings. If value is a string, each invalid character in an input string will be replaced with it; otherwise if value is a function it will be passed each invalid character and should return a replacement character. The arguments to the replacement function are:
   - `char` - the invalid character to be replaced
   - `offset` - the offset of the invalid character
   - `str` - the input string
 
 {% capture invalidCharReplacement_tip %}
-  `invalidCharReplacement` is limited to the `Char` production in the [XML spec](https://www.w3.org/TR/xml/#charsets):
+  `invalidCharReplacement` is limited to the `Char` production in the [XML spec](https://www.w3.org/TR/xml/#charsets): `#x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]`.
 
-  > /* any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. */
-  > Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-
-  It doesn't replace any other characters. For example `ele('-name')` will still
-  throw an error, because `-` is not allowed as a name start character. But the
+  It doesn't replace any other character. For example `ele('-name')` will still
+  throw an error, because `'-'` is not allowed as a name start character. But the
   `invalidCharReplacement` option does not replace it for performance reasons.
 {% endcapture %}
 {% include warning.html content=invalidCharReplacement_tip %}
 
+* `parser` - defines custom parser functions:
+  - `parse` - main parser function
+  - `docType` - creates a DocType node from parsed content
+  - `comment` - creates a comment node from parsed content
+  - `text` - creates a text node from parsed content
+  - `instruction` - creates a processing instruction node from parsed content
+  - `cdata` - creates a CData node from parsed content
+  - `element` - creates an element node from parsed content
+  - `attribute` - creates an attribute or namespace declaration from parsed content
+
+See [custom parsers]({{ site.baseurl }}{% link pages/custom-parsers.md %}) for more information and examples.
+
 #### Settings related to XML namespaces
 
 * `defaultNamespace` - contains default namespaces to apply to all elements and attributes (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-defaults))
-  * `ele` - default namespace for element nodes
-  * `att` - default namespace for attributes
+  - `ele` - default namespace for element nodes
+  - `att` - default namespace for attributes
 * `namespaceAlias` - contains namespace aliases where object keys are namespace aliases and object values are namespaces (see: [example]({{ site.baseurl }}{% link pages/namespaces.md %}#namespace-aliases))

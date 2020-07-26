@@ -345,6 +345,10 @@ const root = create().ele('http://example.com/ns1', 'root');
 
 `xmlbuilder2` introduces the collection functions [`each`]({{ site.baseurl }}{% link pages/collection-functions.md %}#each), [`map`]({{ site.baseurl }}{% link pages/collection-functions.md %}#map), [`reduce`]({{ site.baseurl }}{% link pages/collection-functions.md %}#reduce), [`find`]({{ site.baseurl }}{% link pages/collection-functions.md %}#find), [`filter`]({{ site.baseurl }}{% link pages/collection-functions.md %}#filter), [`every`]({{ site.baseurl }}{% link pages/collection-functions.md %}#every), [`some`]({{ site.baseurl }}{% link pages/collection-functions.md %}#some) and [`toArray`]({{ site.baseurl }}{% link pages/collection-functions.md %}#toArray). These functions can work on immediate child nodes or descendant nodes.
 
+#### Custom parsers
+
+The behavior of `xmlbuilder2`'s parsers can be customized with [custom parser functions]({{ site.baseurl }}{% link pages/custom-parsers.md %}).
+
 ### Comparison with `xmlbuilder`
 
 Following table compares `xmlbuilder2` with its predecessor.
@@ -361,4 +365,5 @@ Serializing into JS objects | <i class="fa fa-times fa-red"> | <i class="fa fa-c
 Serializing into XML strings | <i class="fa fa-check fa-green"></i> | <i class="fa fa-check fa-green"></i> | 
 Performance | <i class="fa fa-check fa-green"></i> | <i class="fa fa-check fa-green"></i> | `xmlbuilder2` is 40-65% slower for some operations due to various validity checks of its full DOM implementation.
 Creating an XML document in chunks | <i class="fa fa-check fa-green"></i> | <i class="fa fa-check fa-green"></i> | 
+Custom parsers | <i class="fa fa-times fa-red"></i> | <i class="fa fa-check fa-green"></i> | 
 Custom serializers | <i class="fa fa-check fa-green"></i> | <i class="fa fa-times fa-red"></i> | 

@@ -17,6 +17,9 @@ entries:
     - title: Parsing
       url: /parsing.html
       output: web
+    - title: Custom Parsers
+      url: /custom-parsers.html
+      output: web
     - title: Serialization
       url: /serialization.html
       output: web
