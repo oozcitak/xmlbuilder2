@@ -43,8 +43,8 @@ describe('YAMLWriter', () => {
             "street": "End of long and winding road"
           "contact":
             "phone":
-              - "555-1234"
-              - "555-1235"
+            - "555-1234"
+            - "555-1235"
           "id": "42"
           "details": "classified"
       `)
@@ -71,7 +71,6 @@ describe('YAMLWriter', () => {
   })
 
   test('negative offset', () => {
-    // note: this is invalid YAML
     const obj = {
       ele: "simple element",
       person: {
@@ -80,15 +79,23 @@ describe('YAMLWriter', () => {
       }
     }
 
-    expect($$.create().ele('root').ele(obj).root().
-      toString({ format: "yaml", offset: -4 })).toBe($$.t`
-      ---
-      "root":
-      "ele": "simple element"
-      "person":
-      "@age": "35"
-      "name": "John"
-      `)
+    const root = $$.create().ele('root').ele(obj).root()
+
+    expect(() => root.toString({ format: "yaml", offset: -4 })).toThrow()
+  })
+
+  test('invalid indentation', () => {
+    const obj = {
+      ele: "simple element",
+      person: {
+        name: "John",
+        '@age': 35,
+      }
+    }
+
+    const root = $$.create().ele('root').ele(obj).root()
+
+    expect(() => root.toString({ format: "yaml", indent: " " })).toThrow()
   })
 
   test('duplicate tag names', () => {
@@ -101,8 +108,8 @@ describe('YAMLWriter', () => {
     ---
     "people":
       "person":
-        - "@name": "xxx"
-        - "@name": "yyy"
+      - "@name": "xxx"
+      - "@name": "yyy"
     `)
   })
 
@@ -136,8 +143,8 @@ describe('YAMLWriter', () => {
     "people":
       "#1": "hello"
       "person":
-        - "@name": "xxx"
-        - "@name": "yyy"
+      - "@name": "xxx"
+      - "@name": "yyy"
       "#2": "world"
       `)
   })
@@ -154,12 +161,12 @@ describe('YAMLWriter', () => {
     ---
     "people":
       "#":
-        - "#": "hello"
-        - "person":
-            "@name": "xxx"
-        - "#": "world"
-        - "person":
-            "@name": "yyy"
+      - "#": "hello"
+      - "person":
+          "@name": "xxx"
+      - "#": "world"
+      - "person":
+          "@name": "yyy"
       `)
   })
 
@@ -212,17 +219,17 @@ describe('YAMLWriter', () => {
     expect(json2).toBe($$.t`
     ---
     "data":
-      - "row":
-        - "@id": "0"
-          "TYPE":
-            - "X"
-          "ID":
-            - "123"
-        - "@id": "1"
-          "TYPE":
-            - "Y"
-          "ID":
-            - "321"           
+    - "row":
+      - "@id": "0"
+        "TYPE":
+        - "X"
+        "ID":
+        - "123"
+      - "@id": "1"
+        "TYPE":
+        - "Y"
+        "ID":
+        - "321"           
     `)
 
     const input1 = $$.t`
@@ -236,12 +243,12 @@ describe('YAMLWriter', () => {
     expect(json1).toEqual($$.t`
     ---
     "data":
-      - "row":
-        "@id": "0"
+    - "row":
+      - "@id": "0"
         "TYPE":
-          - "X"
+        - "X"
         "ID":
-          - "123"
+        - "123"
     `)
   })
 

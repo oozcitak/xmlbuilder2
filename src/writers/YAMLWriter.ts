@@ -32,6 +32,13 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
       verbose: false
     }) as Required<YAMLWriterOptions>
 
+    if (options.indent.length < 2) {
+      throw new Error("YAML indententation string must be at least two characters long.")
+    }
+    if (options.offset < 0) {
+      throw new Error("YAML offset should be zero or a positive number.")
+    }
+
     // convert to object
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(options, {
       format: "object",
@@ -41,7 +48,15 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
     const objectWriter = new ObjectWriter(this._builderOptions)
     const val = objectWriter.serialize(node, objectWriterOptions)
 
-    return this._beginLine(options, 0) + '---' + this._convertObject(val, options, -1, true)
+    let markup = this._beginLine(options, 0) + '---' + this._endLine(options) +
+      this._convertObject(val, options, 0)
+
+    // remove trailing newline
+    if (markup.slice(-options.newline.length) === options.newline) {
+      markup = markup.slice(0, -options.newline.length)
+    }
+
+    return markup
   }
 
   /**
@@ -53,36 +68,38 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
    * @param indentLeaf - indents leaf nodes
    */
   private _convertObject(obj: string | XMLSerializedAsObject | XMLSerializedAsObjectArray,
-    options: Required<YAMLWriterOptions>, level: number = 0, indentLeaf: boolean = false, 
-    supressIndent: boolean = false): string {
+    options: Required<YAMLWriterOptions>, level: number = 0, suppressIndent: boolean = false): string {
 
     let markup = ''
 
     if (isArray(obj)) {
       for (const val of obj) {
-        markup += this._endLine(options, level + 1) +
-          this._beginLine(options, level + 2, true) +
-          this._convertObject(val, options, level + 1, false, true)
+        markup += this._beginLine(options, level, true)
+        if (!isObject(val)) {
+          markup += '"' + val + '"' + this._endLine(options)
+        } else if (isEmpty(val)) {
+          markup += ' ""' + this._endLine(options)          
+        } else {
+          markup += this._convertObject(val, options, level, true)
+        }
       }
     } else if (isObject(obj)) {
-      const leaf = this._isLeafNode(obj)
-      if (isEmpty(obj)) {
-        markup += ' ""'
-      } else {
-        forEachObject(obj, (key, val) => {
-          if (supressIndent || (leaf && !indentLeaf)) {
-            markup += ' "' + key + '":' +
-              this._convertObject(val, options, level + 1, true)
-          } else {
-            markup += this._endLine(options, level + 1) +
-              this._beginLine(options, level + 1) +
-              '"' + key + '":' +
-              this._convertObject(val, options, level + 1, true)
-          }
-        }, this)
-      }
-    } else {
-      markup += ' "' + obj + '"'
+      forEachObject(obj, (key, val) => {
+        if (suppressIndent) {
+          markup += '"' + key + '":'
+          suppressIndent = false
+        } else {
+          markup += this._beginLine(options, level) + '"' + key + '":'
+        }
+        if (!isObject(val)) {
+          markup += ' "' + val + '"' + this._endLine(options)
+        } else if (isEmpty(val)) {
+          markup += ' ""' + this._endLine(options)
+        } else {
+          markup += this._endLine(options) +
+            this._convertObject(val, options, level + 1)
+        }
+      }, this)
     }
     return markup
   }
@@ -101,7 +118,7 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
     if (indentLevel > 0) {
       let chars = new Array(indentLevel).join(options.indent)
       if (isArray) {
-        return chars.substr(0, chars.length - 2) + '-'
+        return chars.substr(0, chars.length - 2) + '-' + chars.substr(-1, 1)
       } else {
         return chars
       }
@@ -115,19 +132,9 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
    * mode.
    * 
    * @param options - serialization options
-   * @param level - current depth of the XML tree
    */
-  private _endLine(options: Required<YAMLWriterOptions>, level: number): string {
+  private _endLine(options: Required<YAMLWriterOptions>): string {
     return options.newline
-  }
-
-  /**
-   * Determines if an object is a leaf node.
-   * 
-   * @param obj 
-   */
-  private _isLeafNode(obj: any): boolean {
-    return this._descendantCount(obj) <= 1
   }
 
   /**
