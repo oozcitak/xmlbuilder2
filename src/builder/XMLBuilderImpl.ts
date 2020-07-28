@@ -8,7 +8,7 @@ import {
   applyDefaults, isObject, isString, isMap, isArray, isEmpty,
   getValue, forEachObject, forEachArray, isSet
 } from "@oozcitak/util"
-import { XMLWriter, MapWriter, ObjectWriter, JSONWriter } from "../writers"
+import { XMLWriter, MapWriter, ObjectWriter, JSONWriter, YAMLWriter } from "../writers"
 import { Document, Node, Element, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { Guard } from "@oozcitak/dom/lib/util"
 import {
@@ -643,6 +643,9 @@ export class XMLBuilderImpl implements XMLBuilder {
       return writer.serialize(this.node, writerOptions)
     } else if (writerOptions.format === "json") {
       const writer = new JSONWriter(this._options)
+      return writer.serialize(this.node, writerOptions)
+    } else if (writerOptions.format === "yaml") {
+      const writer = new YAMLWriter(this._options)
       return writer.serialize(this.node, writerOptions)
     } else {
       throw new Error("Invalid writer format: " + writerOptions.format + ". " + this._debugInfo())

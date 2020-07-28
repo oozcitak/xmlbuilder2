@@ -4,7 +4,8 @@ import {
   XMLBuilderOptionKeys, XMLWriterOptions, JSONWriterOptions,
   ObjectWriterOptions, XMLSerializedAsObject, XMLSerializedAsObjectArray,
   MapWriterOptions, XMLSerializedAsMap, XMLSerializedAsMapArray,
-  XMLSerializedValue
+  XMLSerializedValue,
+  YAMLWriterOptions
 } from '../interfaces'
 import { isPlainObject, applyDefaults, isArray } from '@oozcitak/util'
 import { Node, Document } from '@oozcitak/dom/lib/dom/interfaces'
@@ -243,6 +244,18 @@ export function convert(contents: string | ExpandObject,
   convertOptions: JSONWriterOptions): string
 
 /**
+ * Parses an XML document with the default options and converts it a YAML string.
+ * 
+ * @param contents - a string containing an XML document in either XML or JSON
+ * format or a JS object representing nodes to insert
+ * @param convertOptions - convert options
+ * 
+ * @returns document node
+ */
+export function convert(contents: string | ExpandObject,
+  convertOptions: YAMLWriterOptions): string
+
+/**
  * Parses an XML document with the default options and converts it to its object
  * representation.
  * 
@@ -295,6 +308,20 @@ export function convert(builderOptions: XMLBuilderCreateOptions,
  */
 export function convert(builderOptions: XMLBuilderCreateOptions,
   contents: string | ExpandObject, convertOptions: JSONWriterOptions): string
+
+/**
+ * Parses an XML document with the given options and converts it to a YAML
+ * string.
+ * 
+ * @param builderOptions - builder options
+ * @param contents - a string containing an XML document in either XML or JSON
+ * format or a JS object representing nodes to insert
+ * @param convertOptions - convert options
+ * 
+ * @returns document node
+ */
+export function convert(builderOptions: XMLBuilderCreateOptions,
+  contents: string | ExpandObject, convertOptions: YAMLWriterOptions): string
 
 /**
  * Parses an XML document with the given options and converts it to its object

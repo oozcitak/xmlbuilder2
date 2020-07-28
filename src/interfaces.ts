@@ -554,16 +554,11 @@ export type YAMLWriterOptions = BaseWriterOptions & {
   /** @inheritdoc */
   format?: "yaml"
   /**
-   * Pretty-prints the XML tree. Defaults to `false`.
-   */
-  prettyPrint?: boolean
-  /**
-   * Determines the indentation string for pretty printing. Defaults to two
-   * space characters.
+   * Determines the indentation string. Defaults to two space characters.
    */
   indent?: string
   /**
-   * Determines the newline string for pretty printing. Defaults to `"\n"`.
+   * Determines the newline string. Defaults to `"\n"`.
    */
   newline?: string
   /**
