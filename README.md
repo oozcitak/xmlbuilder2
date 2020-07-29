@@ -163,7 +163,7 @@ This will result in:
 
 ### Usage in the browser:
 
-You can build the minified production bundle (`lib\xmlbuilder2.min.js`) after cloning the repository and issuing `npx webpack` in your terminal. The bundle is also in the npm package, so you can also use a public npm CDN like [jsDelivr](https://www.jsdelivr.com/) or [unpkg](https://unpkg.com/):
+You can build the minified production bundle (`lib/xmlbuilder2.min.js`) after cloning the repository and issuing `npx webpack` in your terminal. The bundle is also in the npm package, so you can also use a public npm CDN like [jsDelivr](https://www.jsdelivr.com/) or [unpkg](https://unpkg.com/):
 
 ```html
 <!-- latest version from jsDelivr -->
