@@ -9,12 +9,17 @@ export class XMLCBWriter extends BaseCBWriter<XMLCBWriterOptions> {
   private _lineLength = 0
 
   /**
-   * Initializes a new instance of `BaseCBWriter`.
+   * Initializes a new instance of `XMLCBWriter`.
    * 
    * @param builderOptions - XML builder options
    */
   constructor(builderOptions: XMLBuilderCBOptions) {
     super(builderOptions)
+  }
+
+  /** @inheritdoc */
+  frontMatter(): string {
+    return ""
   }
 
   /** @inheritdoc */

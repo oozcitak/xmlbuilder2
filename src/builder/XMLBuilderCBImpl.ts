@@ -18,6 +18,7 @@ import { Guard } from "@oozcitak/dom/lib/util"
 import { BaseCBWriter } from "../writers/BaseCBWriter"
 import { XMLCBWriter } from "../writers/XMLCBWriter"
 import { JSONCBWriter } from "../writers/JSONCBWriter"
+import { YAMLCBWriter } from "../writers/YAMLCBWriter"
 import { EventEmitter } from "events"
 
 /**
@@ -75,7 +76,13 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       namespaceAlias: this._options.namespaceAlias
     }
 
-    this._writer = this._options.format === "xml" ? new XMLCBWriter(this._options) : new JSONCBWriter(this._options)
+    if (this._options.format === "json") {
+      this._writer = new JSONCBWriter(this._options)
+    } else if (this._options.format === "yaml") {
+      this._writer = new YAMLCBWriter(this._options)
+    } else {
+      this._writer = new XMLCBWriter(this._options)
+    }
 
     // automatically create listeners for callbacks passed via options
     if (this._options.data !== undefined) {
@@ -91,6 +98,8 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
     this._prefixMap = new NamespacePrefixMap()
     this._prefixMap.set("xml", infraNamespace.XML)
     this._prefixIndex = { value: 1 }
+
+    this._push(this._writer.frontMatter())
   }
 
   /** @inheritdoc */

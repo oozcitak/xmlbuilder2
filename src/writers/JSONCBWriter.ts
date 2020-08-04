@@ -10,12 +10,17 @@ export class JSONCBWriter extends BaseCBWriter<JSONCBWriterOptions> {
   private _additionalLevel = 0
 
   /**
-   * Initializes a new instance of `BaseCBWriter`.
+   * Initializes a new instance of `JSONCBWriter`.
    * 
    * @param builderOptions - XML builder options
    */
   constructor(builderOptions: XMLBuilderCBOptions) {
     super(builderOptions)
+  }
+
+  /** @inheritdoc */
+  frontMatter(): string {
+    return ""
   }
 
   /** @inheritdoc */

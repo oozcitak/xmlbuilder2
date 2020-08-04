@@ -29,6 +29,11 @@ export abstract class BaseCBWriter<T extends BaseCBWriterOptions> {
   }
 
   /**
+   * Used by derived classes to serialize a front matter.
+   */  
+  abstract frontMatter(): string
+
+  /**
    * Used by derived classes to serialize the XML declaration.
    * 
    * @param version - XML version

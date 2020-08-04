@@ -1325,8 +1325,9 @@ export type BaseCBWriterOptions = {
    * Output format. Defaults to `"xml"`.
    * - `"xml"` - Serializes the document as a string in XML format.
    * - `"json"` - Serializes the document as a JSON string.
+   * - `"yaml"` - Serializes the document as a YAML string.
    */
-  format?: "xml" | "json"
+  format?: "xml" | "json" | "yaml"
   /**
    * Ensures that the document adheres to the syntax rules specified by the
    * XML specification. If this flag is set and the document is not well-formed
@@ -1419,9 +1420,30 @@ export type JSONCBWriterOptions = BaseCBWriterOptions & {
 }
 
 /**
+ * Defines the options passed to the the callback builder's YAML writer.
+ */
+export type YAMLCBWriterOptions = BaseCBWriterOptions & {
+  /** @inheritdoc */
+  format?: "yaml"
+  /**
+   * Determines the indentation string. Defaults to two space characters.
+   */
+  indent: string
+  /**
+   * Determines the newline string. Defaults to `"\n"`.
+   */
+  newline: string
+  /**
+   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * `0`.
+   */
+  offset: number
+}
+
+/**
  * Defines the options passed to the callback builder's writer.
  */
-export type CBWriterOptions = XMLCBWriterOptions | JSONCBWriterOptions
+export type CBWriterOptions = XMLCBWriterOptions | JSONCBWriterOptions | YAMLCBWriterOptions
 
 /**
  * Defines the options passed to the callback builder.

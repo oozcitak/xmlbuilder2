@@ -116,7 +116,7 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
   private _beginLine(options: Required<YAMLWriterOptions>, level: number, isArray: boolean = false): string {
     const indentLevel = options.offset + level + 1
     if (indentLevel > 0) {
-      let chars = new Array(indentLevel).join(options.indent)
+      const chars = new Array(indentLevel).join(options.indent)
       if (isArray) {
         return chars.substr(0, chars.length - 2) + '-' + chars.substr(-1, 1)
       } else {

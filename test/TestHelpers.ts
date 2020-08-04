@@ -18,16 +18,16 @@ export default class TestHelpers {
 
   static createCB(options?: XMLBuilderCBCreateOptions): XMLBuilderCB {
     options = options || {}
-    options.data = options.data || (function (this: XMLBuilderCB, chunk: string) {
-      (this as any).result += chunk
+    options.data = options.data || (function (this: any, chunk: string) {
+      if (this.result === undefined) this.result = ""
+      this.result += chunk
     })
     options.end = options.end || (() => { })
-    options.error = options.error || (function (this: XMLBuilderCB, err: Error) {
-      str.error = err
+    options.error = options.error || (function (this: any, err: Error) {
+      this.error = err
     })
     const str = createCB(options as XMLBuilderCBOptions) as any
     str.error = "Did not throw"
-    str.result = ""
     return str
   }
 
