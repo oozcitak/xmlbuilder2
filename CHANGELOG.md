@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.3.0] - 2020-08-04
+
+### Bug Fixes
+- Fixed a bug where JSON serializer would not escape special characters (see [#44](https://github.com/oozcitak/xmlbuilder2/issues/44)).
+### Features
+- Added custom parsers (see [#25](https://github.com/oozcitak/xmlbuilder2/issues/25)).
+- Added YAML parser and serializer.
+
 ## [2.2.0] - 2020-07-14
 
 ### Bug Fixes
