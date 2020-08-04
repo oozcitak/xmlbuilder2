@@ -671,6 +671,7 @@ describe('ObjectWriter', () => {
         <TYPE>Y</TYPE>
         <ID>321</ID>
       </row>
+      <row/>
     </data>`
 
     const obj2 = $$.convert(input2, { format: 'object', verbose: true })
@@ -688,7 +689,8 @@ describe('ObjectWriter', () => {
                 "@id": "1",
                 "TYPE": [ "Y" ],
                 "ID": [ "321" ]
-              }
+              },
+              {}
             ]
           }
         ]
@@ -733,6 +735,30 @@ describe('ObjectWriter', () => {
         ]
       })
     expect($$.create(obj1).end({ headless: true, prettyPrint: true })).toBe(input1)    
+  })
+
+  test('fragment with verbose', () => {
+    const obj = $$.fragment()
+      .ele('foo', { att: "val" }).up()
+      .ele('foo').up()
+      .ele('bar').up()
+      .ele('foo').up()
+      .end({ format: "object", verbose: true })
+
+    expect($$.printMap(obj)).toBe($$.t`
+      {
+        #: [
+          {
+            foo: [
+              { @att: val },
+              { }
+            ]
+          },
+          { bar: [ { } ] },
+          { foo: [ { } ] }
+        ]
+      }
+      `)      
   })
 
 })
