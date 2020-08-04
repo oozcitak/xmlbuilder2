@@ -65,7 +65,7 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else if (p1 !== null && /^\s*[\{\[]/.test(p1)) {
       // parse JSON string
       return new JSONReader(this._options).parse(this, p1)
-    } else if (p1 !== null && /^\s*---/.test(p1)) {
+    } else if (p1 !== null && /^(\s*|(#.*)|(%.*))*---/.test(p1)) {
       // parse YAML string
       return new YAMLReader(this._options).parse(this, p1)
     }

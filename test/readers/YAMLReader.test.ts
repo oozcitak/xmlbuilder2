@@ -4,6 +4,9 @@ describe('YAMLReader', () => {
 
   test('basic', () => {
     const yaml = $$.t`
+    # yaml test
+    %YAML 1.2
+    # comment
     ---
     "root":
       "ele": "simple element"
