@@ -16,7 +16,7 @@ import {
 } from "@oozcitak/dom/lib/algorithm"
 import { sanitizeInput } from "./dom"
 import { namespace as infraNamespace } from "@oozcitak/infra"
-import { ObjectReader, JSONReader, XMLReader } from "../readers"
+import { ObjectReader, JSONReader, XMLReader, YAMLReader } from "../readers"
 
 /**
  * Represents a wrapper that extends XML nodes to implement easy to use and
@@ -65,6 +65,9 @@ export class XMLBuilderImpl implements XMLBuilder {
     } else if (p1 !== null && /^\s*[\{\[]/.test(p1)) {
       // parse JSON string
       return new JSONReader(this._options).parse(this, p1)
+    } else if (p1 !== null && /^\s*---/.test(p1)) {
+      // parse YAML string
+      return new YAMLReader(this._options).parse(this, p1)
     }
 
     if ((p1 === null || isString(p1)) && isString(p2)) {

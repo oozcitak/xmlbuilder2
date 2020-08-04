@@ -29,7 +29,8 @@
   "dependencies": {
     "@oozcitak/util": "8.3.8",
     "@oozcitak/dom": "1.15.8",
-    "@oozcitak/infra": "1.0.8"
+    "@oozcitak/infra": "1.0.8",
+    "js-yaml": "3.14.0"
   },
   "devDependencies": {
     "@babel/preset-env": "*",
@@ -39,6 +40,7 @@
     "@types/jest": "*",
     "@types/libxmljs": "*",
     "@types/node": "*",
+    "@types/js-yaml": "3.11.1",
     "babel-loader": "*",
     "benchmark": "*",
     "chalk": "*",
