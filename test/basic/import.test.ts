@@ -41,6 +41,7 @@ describe('import()', () => {
     root.com('fighter pilots')
 
     const pilots = $$.fragment()
+      .com('protagonist')
       .ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell').up()
       .ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw').up()
       .ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky').up()
@@ -50,6 +51,7 @@ describe('import()', () => {
     expect($$.printTree(root.doc().node)).toBe($$.t`
       roster
         ! fighter pilots
+        ! protagonist
         pilot callsign="Maverick" rank="Lieutenant"
           # Pete Mitchell
         pilot callsign="Goose" rank="Lieutenant (j.g.)"
@@ -63,10 +65,12 @@ describe('import()', () => {
     const root = $$.create().ele('roster')
     root.com('fighter pilots')
 
+    const comment = $$.create().com('protagonist').first()
     const pilot1 = $$.create().ele('pilot', { 'callsign': 'Maverick', 'rank': 'Lieutenant' }).txt('Pete Mitchell')
     const pilot2 = $$.create().ele('pilot', { 'callsign': 'Goose', 'rank': 'Lieutenant (j.g.)' }).txt('Nick Bradshaw')
     const pilot3 = $$.create().ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky')
     
+    root.import(comment)
     root.import(pilot1)
     root.import(pilot2)
     root.import(pilot3)
@@ -74,6 +78,7 @@ describe('import()', () => {
     expect($$.printTree(root.doc().node)).toBe($$.t`
       roster
         ! fighter pilots
+        ! protagonist
         pilot callsign="Maverick" rank="Lieutenant"
           # Pete Mitchell
         pilot callsign="Goose" rank="Lieutenant (j.g.)"
