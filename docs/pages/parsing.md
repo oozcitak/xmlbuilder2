@@ -106,6 +106,45 @@ console.log(xml);
 ```
 This will result in the same XML document given above.
 
+### YAML
+
+YAML strings representing the XML document tree are expanded by creating child element nodes from object keys.
+
+```js
+const { create } = require('xmlbuilder2');
+
+const yamlString = 
+`---
+"topgun":
+  "pilots":
+    "pilot":
+    - "@callsign": "Iceman"
+      "@rank": "Lieutenant"
+      "#": "Tom Kazansky"
+    - "@callsign": "Maverick"
+      "@rank": "Lieutenant"
+      "#": "Pete Mitchell"
+    - "@callsign": "Goose"
+      "@rank": "Lieutenant (j.g.)"
+      "#": "Nick Bradshaw"
+  "hangar":
+    "aircraft":
+    - "F-14 Tomcat"
+    - "MiG-28"`
+
+const doc = create(yamlString);
+const xml = doc.end({ prettyPrint: true });
+console.log(xml);
+```
+This will result in the same XML document given above.
+
+{% capture yaml_note %}
+  YAML strings must start with the directives end marker (i.e. `'---'`) in
+  order to be recognized as a valid YAML document. Multi-document streams 
+  are not supported.
+{% endcapture %}
+{% include important.html content=yaml_note markdown=1 %}
+
 ### Maps
 
 In addition to plain JS objects, ES6 maps are also converted into XML nodes.

@@ -88,7 +88,7 @@ const jsonString = doc.end({ format: 'json', prettyPrint: true });
 ```
 which will result in the following string:
 ```js
-{
+`{
   "topgun": {
     "pilots": {
       "pilot": [
@@ -116,7 +116,34 @@ which will result in the following string:
       ]
     }
   }
-}
+}`
+```
+
+### YAML
+
+The document can be serialized into a YAML string by setting the `format` to `"yaml"`:
+```js
+const jsonString = doc.end({ format: 'yaml', prettyPrint: true });
+```
+which will result in the following string:
+```js
+`---
+"topgun":
+  "pilots":
+    "pilot":
+    - "@callsign": "Iceman"
+      "@rank": "Lieutenant"
+      "#": "Tom Kazansky"
+    - "@callsign": "Maverick"
+      "@rank": "Lieutenant"
+      "#": "Pete Mitchell"
+    - "@callsign": "Goose"
+      "@rank": "Lieutenant (j.g.)"
+      "#": "Nick Bradshaw"
+  "hangar":
+    "aircraft":
+    - "F-14 Tomcat"
+    - "MiG-28"`
 ```
 
 ### Map
@@ -245,3 +272,16 @@ console.log(doc.end({ format: 'object', verbose: false }));
 * `offset` - Defines a fixed number of indentations to add to every line. Defaults to `0`.
 * `group` - Groups consecutive nodes of same type under a single object. Defaults to `false`. See [JS object serializer]({{ site.baseurl }}{% link pages/serialization.md %}#js-object-and-map-serializers) for usage example.
 * `verbose` -  Outputs child nodes as an array, even if the parent node has zero or one child nodes. Defaults to `false`. See [JS object serializer]({{ site.baseurl }}{% link pages/serialization.md %}#js-object-and-map-serializers) for usage example.
+
+#### YAML Serializer
+
+* `indent` - Determines the indentation string for pretty printing. Defaults to two space characters.
+* `newline` - Determines the newline string for pretty printing. Defaults to `"\n"`.
+* `offset` - Defines a fixed number of indentations to add to every line. Defaults to `0`.
+* `group` - Groups consecutive nodes of same type under a single object. Defaults to `false`. See [JS object serializer]({{ site.baseurl }}{% link pages/serialization.md %}#js-object-and-map-serializers) for usage example.
+* `verbose` -  Outputs child nodes as an array, even if the parent node has zero or one child nodes. Defaults to `false`. See [JS object serializer]({{ site.baseurl }}{% link pages/serialization.md %}#js-object-and-map-serializers) for usage example.
+
+{% capture yaml_note %}
+  YAML flow styles are not currently supported.
+{% endcapture %}
+{% include note.html content=yaml_note markdown=1 %}

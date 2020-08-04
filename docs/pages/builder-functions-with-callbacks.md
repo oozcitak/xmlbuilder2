@@ -148,7 +148,7 @@ The function will receive the error object as its argument.
 
 #### Serialization settings
 
-* `format` - Output format. Either `'xml'` or `'json'`.
+* `format` - Output format. Either `'xml'`, `'json'` or `'yaml'`.
 * `wellFormed` - Ensures that the document adheres to the syntax rules specified by the XML specification. If this flag is set and the document is not well-formed errors will be thrown. Defaults to `false`.
 * `noDoubleEncoding` - Prevents existing html entities from being re-encoded when serialized. Defaults to `false`.
 * `prettyPrint` - Pretty-prints the XML tree. Defaults to `false`.

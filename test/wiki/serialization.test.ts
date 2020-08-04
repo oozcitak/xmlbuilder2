@@ -93,6 +93,29 @@ describe('serialization examples in wiki', () => {
     expect(doc.end({ format: "json", prettyPrint: true })).toBe(jsonString)
   })
 
+  test('YAML', () => {
+    const yamlString = $$.t`
+    ---
+    "topgun":
+      "pilots":
+        "pilot":
+        - "@callsign": "Iceman"
+          "@rank": "Lieutenant"
+          "#": "Tom Kazansky"
+        - "@callsign": "Maverick"
+          "@rank": "Lieutenant"
+          "#": "Pete Mitchell"
+        - "@callsign": "Goose"
+          "@rank": "Lieutenant (j.g.)"
+          "#": "Nick Bradshaw"
+      "hangar":
+        "aircraft":
+        - "F-14 Tomcat"
+        - "MiG-28"`
+
+    expect(doc.end({ format: "yaml" })).toBe(yamlString)
+  })
+
   test('Map', () => {
     const pilots = new Map<string, any>()
     pilots.set("pilot", [
