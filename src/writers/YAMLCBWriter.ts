@@ -84,9 +84,9 @@ export class YAMLCBWriter extends BaseCBWriter<YAMLCBWriterOptions> {
     let str = this._beginLine() + this._key(name)
     if (!this._rootWritten) {
       this._rootWritten = true
-      this._additionalLevel++
     }
     this.hasData = true
+    this._additionalLevel++
     str += this._beginLine(true) + this._key(this._builderOptions.convert.text)
     return str
   }
@@ -99,6 +99,7 @@ export class YAMLCBWriter extends BaseCBWriter<YAMLCBWriterOptions> {
   }
   /** @inheritdoc */
   closeTag(name: string): string {
+    this._additionalLevel--
     return ""
   }
   /** @inheritdoc */
