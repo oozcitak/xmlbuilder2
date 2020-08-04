@@ -252,4 +252,56 @@ describe('YAMLWriter', () => {
     `)
   })
 
+  test('round trip', (done) => {
+    const obj = {
+      root: {
+        ele: "simple element",
+        person: {
+          name: "John",
+          '@age': 35,
+          '?': ['pi mypi', 'pi'],
+          '!': 'Good guy',
+          '$': 'well formed!',
+          address: {
+            city: "Istanbul",
+            street: "End of long and winding road"
+          },
+          contact: {
+            phone: ["555-1234", "555-1235"]
+          },
+          id: () => ({ "@xmlns": "ns", "#": 42 }),
+          details: {
+            '#text': 'classified'
+          }
+        }
+      }
+    }
+
+    const yamlStr = $$.create(obj).end({ format: "yaml"})
+    expect($$.convert({ version: "1.0", encoding: "UTF-8", standalone: true }, yamlStr, { format: "xml", prettyPrint: true })).toBe($$.t`
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <root>
+      <ele>simple element</ele>
+      <person age="35">
+        <name>John</name>
+        <?pi mypi?>
+        <?pi?>
+        <!--Good guy-->
+        <![CDATA[well formed!]]>
+        <address>
+          <city>Istanbul</city>
+          <street>End of long and winding road</street>
+        </address>
+        <contact>
+          <phone>555-1234</phone>
+          <phone>555-1235</phone>
+        </contact>
+        <id xmlns="ns">42</id>
+        <details>classified</details>
+      </person>
+    </root>    
+    `)
+    done()
+  })
+
 })
