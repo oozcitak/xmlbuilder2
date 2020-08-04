@@ -179,3 +179,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.1.6]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.5...v2.1.6
 [2.1.7]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.6...v2.1.7
 [2.2.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.7...v2.2.0
+[2.3.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.2.0...v2.3.0
