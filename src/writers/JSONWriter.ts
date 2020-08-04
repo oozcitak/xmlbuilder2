@@ -96,7 +96,7 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
       }
       markup += '}'
     } else {
-      markup += '"' + obj + '"'
+      markup += JSON.stringify(obj)
     }
     return markup
   }

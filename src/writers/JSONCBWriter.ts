@@ -150,7 +150,7 @@ export class JSONCBWriter extends BaseCBWriter<JSONCBWriterOptions> {
    * Produces a JSON value string delimited with double quotes.
    */
   private _val(val: string): string {
-    return "\"" + val + "\""
+    return JSON.stringify(val)
   }
 
 }
