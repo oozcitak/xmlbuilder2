@@ -120,8 +120,9 @@ export class YAMLCBWriter extends BaseCBWriter<YAMLCBWriterOptions> {
    * Produces an indentation string.
    * 
    * @param level - depth of the tree
+   * @param suppressArray - whether the suppress array marker
    */
-  private _indent(level: number, suppressArray = false): string {
+  private _indent(level: number, suppressArray: boolean): string {
     if (level + this._additionalLevel <= 0) {
       return ""
     } else {

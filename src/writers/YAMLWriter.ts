@@ -52,6 +52,7 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
       this._convertObject(val, options, 0)
 
     // remove trailing newline
+    /* istanbul ignore else */
     if (markup.slice(-options.newline.length) === options.newline) {
       markup = markup.slice(0, -options.newline.length)
     }
@@ -67,8 +68,8 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
    * @param level - depth of the XML tree
    * @param indentLeaf - indents leaf nodes
    */
-  private _convertObject(obj: string | XMLSerializedAsObject | XMLSerializedAsObjectArray,
-    options: Required<YAMLWriterOptions>, level: number = 0, suppressIndent: boolean = false): string {
+  private _convertObject(obj: XMLSerializedAsObject | XMLSerializedAsObjectArray,
+    options: Required<YAMLWriterOptions>, level: number, suppressIndent: boolean = false): string {
 
     let markup = ''
 
@@ -78,12 +79,12 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
         if (!isObject(val)) {
           markup += '"' + val + '"' + this._endLine(options)
         } else if (isEmpty(val)) {
-          markup += ' ""' + this._endLine(options)          
+          markup += '""' + this._endLine(options)          
         } else {
           markup += this._convertObject(val, options, level, true)
         }
       }
-    } else if (isObject(obj)) {
+    } else /* if (isObject(obj)) */ {
       forEachObject(obj, (key, val) => {
         if (suppressIndent) {
           markup += '"' + key + '":'
@@ -115,16 +116,12 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
    */
   private _beginLine(options: Required<YAMLWriterOptions>, level: number, isArray: boolean = false): string {
     const indentLevel = options.offset + level + 1
-    if (indentLevel > 0) {
-      const chars = new Array(indentLevel).join(options.indent)
-      if (isArray) {
-        return chars.substr(0, chars.length - 2) + '-' + chars.substr(-1, 1)
-      } else {
-        return chars
-      }
+    const chars = new Array(indentLevel).join(options.indent)
+    if (isArray) {
+      return chars.substr(0, chars.length - 2) + '-' + chars.substr(-1, 1)
+    } else {
+      return chars
     }
-
-    return ''
   }
 
   /**
@@ -135,22 +132,5 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
    */
   private _endLine(options: Required<YAMLWriterOptions>): string {
     return options.newline
-  }
-
-  /**
-   * Counts the number of descendants of the given object.
-   * 
-   * @param obj 
-   * @param count 
-   */
-  private _descendantCount(obj: any, count: number = 0): number {
-    if (isArray(obj)) {
-      forEachArray(obj, val => count += this._descendantCount(val, count), this)
-    } else if (isObject(obj)) {
-      forEachObject(obj, (key, val) => count += this._descendantCount(val, count), this)
-    } else {
-      count++
-    }
-    return count
   }
 }

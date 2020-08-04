@@ -102,6 +102,7 @@ describe('YAMLWriter', () => {
     const result = $$.create().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
+      .ele('person').up()
       .end({ format: "yaml" })
 
     expect(result).toBe($$.t`
@@ -110,6 +111,7 @@ describe('YAMLWriter', () => {
       "person":
       - "@name": "xxx"
       - "@name": "yyy"
+      - ""
     `)
   })
 
@@ -252,7 +254,7 @@ describe('YAMLWriter', () => {
     `)
   })
 
-  test('round trip', (done) => {
+  test('round trip', () => {
     const obj = {
       root: {
         ele: "simple element",
@@ -301,7 +303,6 @@ describe('YAMLWriter', () => {
       </person>
     </root>    
     `)
-    done()
   })
 
 })
