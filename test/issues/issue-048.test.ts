@@ -1,5 +1,4 @@
 import $$ from "../TestHelpers";
-import { XMLBuilder } from "../../src/interfaces";
 
 describe("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/48
