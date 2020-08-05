@@ -118,10 +118,6 @@ export class XMLReader extends BaseReader<string> {
           }
           break
         case TokenType.ClosingTag:
-          const closingTag = <ClosingTagToken>token
-            if (sanitizeInput(closingTag.name, this._builderOptions.invalidCharReplacement) !== context.node.nodeName) {
-            throw new Error('Closing tag name does not match opening tag name.')
-          }
           /* istanbul ignore else */
           if (context.node.parentNode) {
             context = context.up()
