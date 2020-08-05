@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.3.1] - 2020-08-05
+
+### Bug Fixes
+- Fixed a bug where YAML serializer would not escape special characters.
+- Fixed a bug where the `element` function of a custom parser would throw an error if it changed the node name (see [#46](https://github.com/oozcitak/xmlbuilder2/issues/46)).
+- Fixed a bug where XML parser would ignore `encoding` and `standalone` in XML declaration.
+- Fixed a bug where the `ele` function would throw an error if it failed to create any child nodes.
+
 ## [2.3.0] - 2020-08-04
 
 ### Bug Fixes
@@ -180,3 +188,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.1.7]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.6...v2.1.7
 [2.2.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.7...v2.2.0
 [2.3.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.2.0...v2.3.0
+[2.3.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.3.0...v2.3.1
