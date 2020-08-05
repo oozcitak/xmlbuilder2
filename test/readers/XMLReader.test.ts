@@ -2,6 +2,15 @@ import $$ from '../TestHelpers'
 
 describe('XMLReader', () => {
 
+  test('invalid version', () => {
+    const xml = $$.t`
+    <?xml version="1.1"?>
+    <root/>
+    `    
+
+    expect(() => $$.create(xml)).toThrow()
+  })
+
   test('docType', () => {
     const xml = $$.t`
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

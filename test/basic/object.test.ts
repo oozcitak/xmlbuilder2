@@ -343,8 +343,9 @@ describe('object', () => {
     expect(doc.end({ headless: true })).toBe('<root att="val">42</root>')
   })
 
-  test('error if no nodes created', () => {
-    expect(() => $$.create().ele({})).toThrow()
+  test('return parent node if no nodes created', () => {
+    const doc = $$.create()
+    expect(doc.ele({})).toBe(doc)
   })
 
   test('exec function', () => {

@@ -53,7 +53,8 @@ describe('YAMLReader', () => {
   })
 
   test('empty document', () => {
-    expect(() => $$.create('---')).toThrow()
+    const doc = $$.create('---')
+    expect(doc.end()).toBe('<?xml version="1.0"?>')
   })
 
 })

@@ -119,10 +119,5 @@ describe('object', () => {
     <root xmlns:ns1="book" ns1:isbn="111"/>
     `, done)
   })
-
-  test('error if no nodes created', (done) => {
-    const xmlStream = $$.createCB()
-    $$.expectCBError(xmlStream, () => xmlStream.ele({}).end(), done)
-  })
-  
+ 
 })

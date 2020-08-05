@@ -11,12 +11,6 @@ import { BaseReader } from "./BaseReader"
  */
 export class ObjectReader extends BaseReader<ExpandObject> {
 
-  /** @inheritdoc */
-  docType(parent: XMLBuilder, name: string, publicId: string, systemId: string): XMLBuilder | undefined {
-    // document type nodes cannot be represented in a JS object
-    return undefined
-  }
-
   /**
    * Parses the given document representation.
    * 
@@ -130,11 +124,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
       }, this)
     }
 
-    if (lastChild === null) {
-      throw new Error("Could not create any elements with: " + obj.toString() + ". " + (node as any)._debugInfo())
-    }
-
-    return lastChild
+    return lastChild || node
   }
 
 }
