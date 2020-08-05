@@ -16,6 +16,7 @@ export class YAMLReader extends BaseReader<string> {
    */
   _parse(node: XMLBuilder, str: string): XMLBuilder {
     const result = safeLoad(str)
+    /* istanbul ignore next */
     if (result === undefined) {
       throw new Error("Unable to parse YAML document.")
     }
