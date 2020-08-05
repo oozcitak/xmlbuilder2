@@ -1,13 +1,11 @@
 import { XMLStringLexer } from "@oozcitak/dom/lib/parser/XMLStringLexer"
 import {
-  TokenType, DeclarationToken, DocTypeToken, CDATAToken, CommentToken, 
-  TextToken, PIToken, ElementToken, ClosingTagToken
+  TokenType, DeclarationToken, DocTypeToken, CDATAToken, CommentToken,
+  TextToken, PIToken, ElementToken
 } from "@oozcitak/dom/lib/parser/interfaces"
 import { namespace as infraNamespace } from "@oozcitak/infra"
-import {
-  namespace_extractQName
-} from "@oozcitak/dom/lib/algorithm"
-import { XMLBuilder } from "../interfaces"
+import { namespace_extractQName } from "@oozcitak/dom/lib/algorithm"
+import { XMLBuilder, XMLBuilderOptions } from "../interfaces"
 import { sanitizeInput } from "../builder/dom"
 import { BaseReader } from "./BaseReader"
 
@@ -34,6 +32,16 @@ export class XMLReader extends BaseReader<string> {
           if (declaration.version !== "1.0") {
             throw new Error("Invalid xml version: " + declaration.version)
           }
+          const builderOptions: Partial<XMLBuilderOptions> = {
+            version: declaration.version
+          }
+          if (declaration.encoding) {
+            builderOptions.encoding = declaration.encoding
+          }
+          if (declaration.standalone) {
+            builderOptions.standalone = (declaration.standalone === "yes")
+          }
+          context.set(builderOptions)
           break
         case TokenType.DocType:
           const doctype = <DocTypeToken>token
@@ -87,7 +95,7 @@ export class XMLReader extends BaseReader<string> {
           const elementNode = (namespace !== null ?
             this.element(context, namespace, element.name) :
             this.element(context, undefined, element.name))
-          if(elementNode === undefined) break
+          if (elementNode === undefined) break
 
           // assign attributes
           for (let [attName, attValue] of element.attributes) {
