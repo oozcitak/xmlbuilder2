@@ -38,21 +38,13 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
 
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
 
-    // Serialize XML declaration since base serializer does not serialize it
+    // Serialize XML declaration
     if (node.nodeType === NodeType.Document && !this._options.headless) {
-      this._beginLine()
-      this._refs.markup = "<?xml"
-      this._refs.markup += " version=\"" + this._builderOptions.version + "\""
-      if (this._builderOptions.encoding !== undefined) {
-        this._refs.markup += " encoding=\"" + this._builderOptions.encoding + "\""
-      }
-      if (this._builderOptions.standalone !== undefined) {
-        this._refs.markup += " standalone=\"" + (this._builderOptions.standalone ? "yes" : "no") + "\""
-      }
-      this._refs.markup += "?>"
-      this._endLine()
+      this.declaration(this._builderOptions.version, this._builderOptions.encoding,
+        this._builderOptions.standalone)
     }
 
+    // recursively serialize node
     this.serializeNode(node, this._options.wellFormed, this._options.noDoubleEncoding)
 
     // remove trailing newline
@@ -62,6 +54,22 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
     }
 
     return this._refs.markup
+  }
+
+  /** @inheritdoc */
+  declaration(version: "1.0", encoding?: string, standalone?: boolean): void {
+    this._beginLine()
+
+    this._refs.markup += "<?xml version=\"" + version + "\""
+    if (encoding !== undefined) {
+      this._refs.markup += " encoding=\"" + encoding + "\""
+    }
+    if (standalone !== undefined) {
+      this._refs.markup += " standalone=\"" + (standalone ? "yes" : "no") + "\""
+    }
+    this._refs.markup += "?>"
+
+    this._endLine()
   }
 
   /** @inheritdoc */

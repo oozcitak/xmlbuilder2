@@ -38,6 +38,15 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
   abstract serialize(node: Node, writerOptions?: T): U
 
   /**
+   * Used by derived classes to serialize the XML declaration.
+   * 
+   * @param version - a version number string
+   * @param encoding - encoding declaration
+   * @param standalone - standalone document declaration
+   */
+  declaration(version: "1.0", encoding?: string, standalone?: boolean) { }
+
+  /**
    * Used by derived classes to serialize a DocType node.
    * 
    * @param name - node name
