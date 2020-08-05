@@ -107,7 +107,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
     p3?: AttributesObject): this {
 
     // parse if JS object or XML or JSON string
-    if (isObject(p1) || (isString(p1) && (/^\s*</.test(p1) || /^\s*[\{\[]/.test(p1)))) {
+    if (isObject(p1) || (isString(p1) && (/^\s*</.test(p1) || /^\s*[\{\[]/.test(p1) || /^(\s*|(#.*)|(%.*))*---/.test(p1)))) {
       const frag = fragment().set(this._options as unknown as Partial<XMLBuilderOptions>)
       try {
         frag.ele(p1 as any)
