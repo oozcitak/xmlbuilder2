@@ -83,7 +83,7 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
         } else {
           markup += this._endLine(options, level + 1) + this._beginLine(options, level + 1)
         }
-        markup += '"' + key + '":'
+        markup += this._key(key)
         if (options.prettyPrint) { markup += ' ' }
         markup += this._convertObject(val, options, level + 1)
         if (i < len - 1) { markup += ',' }
@@ -96,7 +96,7 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
       }
       markup += '}'
     } else {
-      markup += JSON.stringify(obj)
+      markup += this._val(obj)
     }
     return markup
   }
@@ -135,6 +135,20 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
     } else {
       return options.newline
     }
+  }
+
+  /**
+   * Produces a JSON key string delimited with double quotes.
+   */
+  private _key(key: string): string {
+    return "\"" + key + "\":"
+  }
+
+  /**
+   * Produces a JSON value string delimited with double quotes.
+   */
+  private _val(val: string): string {
+    return JSON.stringify(val)
   }
 
   /**

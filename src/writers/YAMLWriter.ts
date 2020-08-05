@@ -77,7 +77,7 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
       for (const val of obj) {
         markup += this._beginLine(options, level, true)
         if (!isObject(val)) {
-          markup += '"' + val + '"' + this._endLine(options)
+          markup += this._val(val) + this._endLine(options)
         } else if (isEmpty(val)) {
           markup += '""' + this._endLine(options)          
         } else {
@@ -87,13 +87,13 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
     } else /* if (isObject(obj)) */ {
       forEachObject(obj, (key, val) => {
         if (suppressIndent) {
-          markup += '"' + key + '":'
+          markup += this._key(key)
           suppressIndent = false
         } else {
-          markup += this._beginLine(options, level) + '"' + key + '":'
+          markup += this._beginLine(options, level) + this._key(key)
         }
         if (!isObject(val)) {
-          markup += ' "' + val + '"' + this._endLine(options)
+          markup += ' ' + this._val(val) + this._endLine(options)
         } else if (isEmpty(val)) {
           markup += ' ""' + this._endLine(options)
         } else {
@@ -133,4 +133,19 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
   private _endLine(options: Required<YAMLWriterOptions>): string {
     return options.newline
   }
+
+  /**
+   * Produces a YAML key string delimited with double quotes.
+   */
+  private _key(key: string): string {
+    return "\"" + key + "\":"
+  }
+
+  /**
+   * Produces a YAML value string delimited with double quotes.
+   */
+  private _val(val: string): string {
+    return JSON.stringify(val)
+  }
+
 }

@@ -135,17 +135,17 @@ export class YAMLCBWriter extends BaseCBWriter<YAMLCBWriterOptions> {
   }
 
   /**
-   * Produces a JSON key string delimited with double quotes.
+   * Produces a YAML key string delimited with double quotes.
    */
   private _key(key: string): string {
     return "\"" + key + "\":"
   }
 
   /**
-   * Produces a JSON value string delimited with double quotes.
+   * Produces a YAML value string delimited with double quotes.
    */
   private _val(val: string): string {
-    return "\"" + val + "\""
+    return JSON.stringify(val)
   }
 
 }
