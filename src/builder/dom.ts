@@ -51,16 +51,9 @@ export function sanitizeInput(str: any,
       } else if (n >= 0xD800 && n <= 0xDBFF && i < str.length - 1) {
         const n2 = str.charCodeAt(i + 1)
         if (n2 >= 0xDC00 && n2 <= 0xDFFF) {
+          // valid surrogate pair
           n = (n - 0xD800) * 0x400 + n2 - 0xDC00 + 0x10000
-
-          if (n >= 0x10000 && n <= 0x10FFFF) {
-            // valid surrogate pair
-            result += String.fromCodePoint(n)
-          } else {
-            // invalid surrogate pair
-            result += isString(replacement) ? replacement : replacement(String.fromCodePoint(n), i, str)
-          }
-
+          result += String.fromCodePoint(n)
           i++
         } else {
           // invalid lone surrogate
