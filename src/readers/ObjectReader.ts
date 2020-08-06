@@ -4,6 +4,7 @@ import {
   forEachObject, isEmpty
 } from "@oozcitak/util"
 import { BaseReader } from "./BaseReader"
+import { sanitizeInput } from "../builder/dom"
 
 /**
  * Parses XML nodes from objects and arrays.
@@ -20,6 +21,12 @@ export class ObjectReader extends BaseReader<ExpandObject> {
   _parse(node: XMLBuilder, obj: ExpandObject): XMLBuilder {
 
     const options = this._builderOptions
+
+    // sanitizes input characters
+    const invalidCharReplacement = options.invalidCharReplacement
+    const s = function (str: string): string {
+      return sanitizeInput(str, invalidCharReplacement)
+    }
 
     let lastChild: XMLBuilder | null = null
 
@@ -43,11 +50,14 @@ export class ObjectReader extends BaseReader<ExpandObject> {
               throw new Error("Invalid attribute: " + val.toString() + ". " + (node as any)._debugInfo())
             } else /* if (isMap(val) || isObject(val)) */ {
               forEachObject(val, (attrKey, attrVal) => {
-                lastChild = this.attribute(node, undefined, attrKey, attrVal as string) || lastChild
+                lastChild = this.attribute(node, undefined,
+                  s(attrKey), s(attrVal as string)) || lastChild
               })
             }
           } else {
-            lastChild = this.attribute(node, undefined, key.substr(options.convert.att.length), val) || lastChild
+            lastChild = this.attribute(node, undefined,
+              s(key.substr(options.convert.att.length)),
+              s(val)) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.text) === 0) {
           // text node
@@ -55,21 +65,21 @@ export class ObjectReader extends BaseReader<ExpandObject> {
             // if the key is #text expand child nodes under this node to support mixed content
             lastChild = this.parse(node, val)
           } else {
-            lastChild = this.text(node, val) || lastChild
+            lastChild = this.text(node, s(val)) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.cdata) === 0) {
           // cdata node
           if (isArray(val) || isSet(val)) {
-            forEachArray(val, item => lastChild = this.cdata(node, item) || lastChild, this)
+            forEachArray(val, item => lastChild = this.cdata(node, s(item)) || lastChild, this)
           } else {
-            lastChild = this.cdata(node, val) || lastChild
+            lastChild = this.cdata(node, s(val)) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.comment) === 0) {
           // comment node
           if (isArray(val) || isSet(val)) {
-            forEachArray(val, item => lastChild = this.comment(node, item) || lastChild, this)
+            forEachArray(val, item => lastChild = this.comment(node, s(item)) || lastChild, this)
           } else {
-            lastChild = this.comment(node, val) || lastChild
+            lastChild = this.comment(node, s(val)) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.ins) === 0) {
           // processing instruction
@@ -77,22 +87,24 @@ export class ObjectReader extends BaseReader<ExpandObject> {
             const insIndex = val.indexOf(' ')
             const insTarget = (insIndex === -1 ? val : val.substr(0, insIndex))
             const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
-            lastChild = this.instruction(node, insTarget, insValue) || lastChild
+            lastChild = this.instruction(node, s(insTarget), s(insValue)) || lastChild
           } else if (isArray(val) || isSet(val)) {
             forEachArray(val, item => {
               const insIndex = item.indexOf(' ')
               const insTarget = (insIndex === -1 ? item : item.substr(0, insIndex))
               const insValue = (insIndex === -1 ? '' : item.substr(insIndex + 1))
-              lastChild = this.instruction(node, insTarget, insValue) || lastChild
+              lastChild = this.instruction(node, s(insTarget), s(insValue)) || lastChild
             }, this)
           } else /* if (isMap(target) || isObject(target)) */ {
-            forEachObject(val, (insTarget, insValue) => lastChild = this.instruction(node, insTarget, insValue as string) || lastChild, this)
+            forEachObject(val, (insTarget, insValue) => lastChild = this.instruction(node,
+              s(insTarget),
+              s(insValue as string)) || lastChild, this)
           }
         } else if ((isArray(val) || isSet(val)) && isEmpty(val)) {
           // skip empty arrays
         } else if ((isMap(val) || isObject(val)) && isEmpty(val)) {
           // empty objects produce one node
-          lastChild = this.element(node, undefined, key) || lastChild
+          lastChild = this.element(node, undefined, s(key)) || lastChild
         } else if (!options.keepNullNodes && (val == null)) {
           // skip null and undefined nodes
         } else if (isArray(val) || isSet(val)) {
@@ -115,11 +127,11 @@ export class ObjectReader extends BaseReader<ExpandObject> {
           const parent = this.element(node, undefined, key)
           if (parent) {
             lastChild = parent
-            this.text(parent, val)
+            this.text(parent, s(val))
           }
         } else {
           // leaf element node
-          lastChild = this.element(node, undefined, key) || lastChild
+          lastChild = this.element(node, undefined, s(key)) || lastChild
         }
       }, this)
     }

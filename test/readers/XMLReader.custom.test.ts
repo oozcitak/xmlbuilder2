@@ -1,4 +1,5 @@
 import $$ from '../TestHelpers'
+import { sanitizeInput } from '../../src/builder/dom'
 
 describe('custom XMLReader', () => {
 
@@ -53,6 +54,41 @@ describe('custom XMLReader', () => {
     expect($$.printTree(doc.node)).toBe($$.t`
       root
       `)
+  })
+
+  test('skip DocType', () => {
+    const xml = $$.t`
+    <?xml version="1.0"?>
+    <!DOCTYPE root PUBLIC "pub" "sys">
+    <root xmlns="ns"/>`
+
+    const doc = $$.create({ parser: { docType: () => undefined } }, xml).doc()
+    expect(doc.end()).toBe('<?xml version="1.0"?><root xmlns="ns"/>')
+  })
+
+  test("invalidCharReplacement should apply before parser functions", () => {
+    const xml = `
+    <root>
+      <node1\x00/>
+      <node2/>
+    </root>
+    `
+
+    const obj = $$.convert({
+      invalidCharReplacement: '',
+      parser: {
+        element: (parent, ns, name: string) => {
+          expect(sanitizeInput(name, '')).toBe(name)
+          return parent.ele(name)
+        }
+      }
+    }, xml, { format: 'object' })
+    expect(obj).toEqual({
+      root: {
+        node1: {},
+        node2: {}
+      }
+    })
   })
 
 })

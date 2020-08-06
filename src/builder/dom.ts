@@ -29,6 +29,7 @@ export function sanitizeInput(str: string | null | undefined,
  * Sanitizes input strings with user supplied replacement characters.
  * 
  * @param str - input string
+ * @param replacement - replacement character or function
  */
 export function sanitizeInput(str: any,
   replacement?: string | ((char: string, offset: number, str: string) => string)): any {

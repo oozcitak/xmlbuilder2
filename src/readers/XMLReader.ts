@@ -23,52 +23,59 @@ export class XMLReader extends BaseReader<string> {
   _parse(node: XMLBuilder, str: string): XMLBuilder {
     const lexer = new XMLStringLexer(str, { skipWhitespaceOnlyText: true })
 
+    // sanitizes input characters
+    const invalidCharReplacement = this._builderOptions.invalidCharReplacement
+    const s = function(str: string): string {
+      return sanitizeInput(str, invalidCharReplacement)
+    }
+
     let context = node
     let token = lexer.nextToken()
     while (token.type !== TokenType.EOF) {
       switch (token.type) {
         case TokenType.Declaration:
           const declaration = <DeclarationToken>token
-          if (declaration.version !== "1.0") {
-            throw new Error("Invalid xml version: " + declaration.version)
+          const version = s(declaration.version)
+          if (version !== "1.0") {
+            throw new Error("Invalid xml version: " + version)
           }
           const builderOptions: Partial<XMLBuilderOptions> = {
-            version: declaration.version
+            version: version
           }
           if (declaration.encoding) {
-            builderOptions.encoding = declaration.encoding
+            builderOptions.encoding = s(declaration.encoding)
           }
           if (declaration.standalone) {
-            builderOptions.standalone = (declaration.standalone === "yes")
+            builderOptions.standalone = (s(declaration.standalone) === "yes")
           }
           context.set(builderOptions)
           break
         case TokenType.DocType:
           const doctype = <DocTypeToken>token
-          context = this.docType(context, doctype.name, doctype.pubId, doctype.sysId) || context
+          context = this.docType(context, s(doctype.name), s(doctype.pubId), s(doctype.sysId)) || context
           break
         case TokenType.CDATA:
           const cdata = <CDATAToken>token
-          context = this.cdata(context, cdata.data) || context
+          context = this.cdata(context, s(cdata.data)) || context
           break
         case TokenType.Comment:
           const comment = <CommentToken>token
-          context = this.comment(context, comment.data) || context
+          context = this.comment(context, s(comment.data)) || context
           break
         case TokenType.PI:
           const pi = <PIToken>token
-          context = this.instruction(context, pi.target, pi.data) || context
+          context = this.instruction(context, s(pi.target), s(pi.data)) || context
           break
         case TokenType.Text:
           const text = <TextToken>token
-          context = this.text(context, text.data) || context
+          context = this.text(context, s(text.data)) || context
           break
         case TokenType.Element:
           const element = <ElementToken>token
+          const elementName = s(element.name)
 
           // inherit namespace from parent
-          const [prefix] = namespace_extractQName(
-            sanitizeInput(element.name, this._builderOptions.invalidCharReplacement))
+          const [prefix] = namespace_extractQName(elementName)
           let namespace = context.node.lookupNamespaceURI(prefix)
 
           // override namespace if there is a namespace declaration
@@ -76,8 +83,8 @@ export class XMLReader extends BaseReader<string> {
           // also lookup namespace declaration attributes
           const nsDeclarations: { [key: string]: string } = {}
           for (let [attName, attValue] of element.attributes) {
-            attName = sanitizeInput(attName, this._builderOptions.invalidCharReplacement)
-            attValue = sanitizeInput(attValue, this._builderOptions.invalidCharReplacement)
+            attName = s(attName)
+            attValue = s(attValue)
             if (attName === "xmlns") {
               namespace = attValue
             } else {
@@ -93,14 +100,14 @@ export class XMLReader extends BaseReader<string> {
 
           // create the DOM element node
           const elementNode = (namespace !== null ?
-            this.element(context, namespace, element.name) :
-            this.element(context, undefined, element.name))
+            this.element(context, namespace, elementName) :
+            this.element(context, undefined, elementName))
           if (elementNode === undefined) break
 
           // assign attributes
           for (let [attName, attValue] of element.attributes) {
-            attName = sanitizeInput(attName, this._builderOptions.invalidCharReplacement)
-            attValue = sanitizeInput(attValue, this._builderOptions.invalidCharReplacement)
+            attName = s(attName)
+            attValue = s(attValue)
             const [attPrefix, attLocalName] = namespace_extractQName(attName)
             let attNamespace: string | null = null
             if (attPrefix === "xmlns" || (attPrefix === null && attLocalName === "xmlns")) {
