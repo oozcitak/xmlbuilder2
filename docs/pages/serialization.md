@@ -174,7 +174,7 @@ new Map([
 
 These settings are common to all serializers.
 
-* `format` - Output format. Either `"object"`, `"xml"`, `"json"` or `"map"`. Defaults to `"xml"`.
+* `format` - Output format. Either `"object"`, `"xml"`, `"json"`, `"yaml"` or `"map"`. Defaults to `"xml"`.
 * `wellFormed` - Ensures that the document adheres to the syntax rules specified by the XML specification. If this flag is set and the document is not well-formed errors will be thrown. Defaults to `false`.
 * `noDoubleEncoding` - Prevents existing html entities from being re-encoded when serialized. Defaults to `false`.
 
