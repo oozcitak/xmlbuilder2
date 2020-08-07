@@ -636,20 +636,20 @@ export class XMLBuilderImpl implements XMLBuilder {
    */
   private _serialize(writerOptions: WriterOptions): XMLSerializedValue {
     if (writerOptions.format === "xml") {
-      const writer = new XMLWriter(this._options)
-      return writer.serialize(this.node, writerOptions)
+      const writer = new XMLWriter(this._options, writerOptions)
+      return writer.serialize(this.node)
     } else if (writerOptions.format === "map") {
-      const writer = new MapWriter(this._options)
-      return writer.serialize(this.node, writerOptions)
+      const writer = new MapWriter(this._options, writerOptions)
+      return writer.serialize(this.node)
     } else if (writerOptions.format === "object") {
-      const writer = new ObjectWriter(this._options)
-      return writer.serialize(this.node, writerOptions)
+      const writer = new ObjectWriter(this._options, writerOptions)
+      return writer.serialize(this.node)
     } else if (writerOptions.format === "json") {
-      const writer = new JSONWriter(this._options)
-      return writer.serialize(this.node, writerOptions)
+      const writer = new JSONWriter(this._options, writerOptions)
+      return writer.serialize(this.node)
     } else if (writerOptions.format === "yaml") {
-      const writer = new YAMLWriter(this._options)
-      return writer.serialize(this.node, writerOptions)
+      const writer = new YAMLWriter(this._options, writerOptions)
+      return writer.serialize(this.node)
     } else {
       throw new Error("Invalid writer format: " + writerOptions.format + ". " + this._debugInfo())
     }

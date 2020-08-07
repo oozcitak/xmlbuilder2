@@ -1,10 +1,10 @@
 import {
   YAMLWriterOptions, ObjectWriterOptions, XMLSerializedAsObject,
-  XMLSerializedAsObjectArray
+  XMLSerializedAsObjectArray, XMLBuilderOptions
 } from "../interfaces"
 import { ObjectWriter } from "./ObjectWriter"
 import {
-  applyDefaults, isArray, isObject, forEachObject, forEachArray, isEmpty
+  applyDefaults, isArray, isObject, forEachObject, isEmpty
 } from "@oozcitak/util"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { BaseWriter } from "./BaseWriter"
@@ -15,14 +15,15 @@ import { BaseWriter } from "./BaseWriter"
 export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
 
   /**
-   * Produces an XML serialization of the given node.
+   * Initializes a new instance of `YAMLWriter`.
    * 
-   * @param node - node to serialize
+   * @param builderOptions - XML builder options
    * @param writerOptions - serialization options
    */
-  serialize(node: Node, writerOptions?: YAMLWriterOptions): string {
+  constructor(builderOptions: XMLBuilderOptions, writerOptions: YAMLWriterOptions) {
+    super(builderOptions)
     // provide default options
-    const options = applyDefaults(writerOptions, {
+    this._writerOptions = applyDefaults(writerOptions, {
       wellFormed: false,
       noDoubleEncoding: false,
       indent: '  ',
@@ -32,29 +33,37 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
       verbose: false
     }) as Required<YAMLWriterOptions>
 
-    if (options.indent.length < 2) {
+    if (this._writerOptions.indent.length < 2) {
       throw new Error("YAML indententation string must be at least two characters long.")
     }
-    if (options.offset < 0) {
+    if (this._writerOptions.offset < 0) {
       throw new Error("YAML offset should be zero or a positive number.")
     }
+  }
 
+  /**
+   * Produces an XML serialization of the given node.
+   * 
+   * @param node - node to serialize
+   * @param writerOptions - serialization options
+   */
+  serialize(node: Node): string {
     // convert to object
-    const objectWriterOptions: ObjectWriterOptions = applyDefaults(options, {
+    const objectWriterOptions: ObjectWriterOptions = applyDefaults(this._writerOptions, {
       format: "object",
       wellFormed: false,
       noDoubleEncoding: false,
     })
-    const objectWriter = new ObjectWriter(this._builderOptions)
-    const val = objectWriter.serialize(node, objectWriterOptions)
+    const objectWriter = new ObjectWriter(this._builderOptions, objectWriterOptions)
+    const val = objectWriter.serialize(node)
 
-    let markup = this._beginLine(options, 0) + '---' + this._endLine(options) +
-      this._convertObject(val, options, 0)
+    let markup = this._beginLine(this._writerOptions, 0) + '---' + this._endLine(this._writerOptions) +
+      this._convertObject(val, this._writerOptions, 0)
 
     // remove trailing newline
     /* istanbul ignore else */
-    if (markup.slice(-options.newline.length) === options.newline) {
-      markup = markup.slice(0, -options.newline.length)
+    if (markup.slice(-this._writerOptions.newline.length) === this._writerOptions.newline) {
+      markup = markup.slice(0, -this._writerOptions.newline.length)
     }
 
     return markup

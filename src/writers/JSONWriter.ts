@@ -1,6 +1,6 @@
 import {
   JSONWriterOptions, ObjectWriterOptions, XMLSerializedAsObject, 
-  XMLSerializedAsObjectArray
+  XMLSerializedAsObjectArray, XMLBuilderOptions
 } from "../interfaces"
 import { ObjectWriter } from "./ObjectWriter"
 import {
@@ -16,14 +16,15 @@ import { BaseWriter } from "./BaseWriter"
 export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
 
   /**
-   * Produces an XML serialization of the given node.
+   * Initializes a new instance of `JSONWriter`.
    * 
-   * @param node - node to serialize
+   * @param builderOptions - XML builder options
    * @param writerOptions - serialization options
    */
-  serialize(node: Node, writerOptions?: JSONWriterOptions): string {
+  constructor(builderOptions: XMLBuilderOptions, writerOptions: JSONWriterOptions) {
+    super(builderOptions)
     // provide default options
-    const options = applyDefaults(writerOptions, {
+    this._writerOptions = applyDefaults(writerOptions, {
       wellFormed: false,
       noDoubleEncoding: false,
       prettyPrint: false,
@@ -33,18 +34,26 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
       group: false,
       verbose: false
     }) as Required<JSONWriterOptions>
+  }
 
+  /**
+   * Produces an XML serialization of the given node.
+   * 
+   * @param node - node to serialize
+   * @param writerOptions - serialization options
+   */
+  serialize(node: Node): string {
     // convert to object
-    const objectWriterOptions: ObjectWriterOptions = applyDefaults(options, {
+    const objectWriterOptions: ObjectWriterOptions = applyDefaults(this._writerOptions, {
       format: "object",
       wellFormed: false,
       noDoubleEncoding: false,
     })
-    const objectWriter = new ObjectWriter(this._builderOptions)
-    const val = objectWriter.serialize(node, objectWriterOptions)
+    const objectWriter = new ObjectWriter(this._builderOptions, objectWriterOptions)
+    const val = objectWriter.serialize(node)
 
     // recursively convert object into JSON string
-    return this._beginLine(options, 0) + this._convertObject(val, options)
+    return this._beginLine(this._writerOptions, 0) + this._convertObject(val, this._writerOptions)
   }
 
   /**

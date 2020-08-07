@@ -1,6 +1,6 @@
 import {
   MapWriterOptions, ObjectWriterOptions, XMLSerializedAsMap, 
-  XMLSerializedAsMapArray
+  XMLSerializedAsMapArray, XMLBuilderOptions
 } from "../interfaces"
 import { applyDefaults, isArray, isObject } from "@oozcitak/util"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
@@ -13,29 +13,38 @@ import { BaseWriter } from "./BaseWriter"
 export class MapWriter extends BaseWriter<MapWriterOptions, XMLSerializedAsMap | XMLSerializedAsMapArray> {
 
   /**
-   * Produces an XML serialization of the given node.
+   * Initializes a new instance of `MapWriter`.
    * 
-   * @param node - node to serialize
+   * @param builderOptions - XML builder options
    * @param writerOptions - serialization options
    */
-  serialize(node: Node, writerOptions?: MapWriterOptions): XMLSerializedAsMap | XMLSerializedAsMapArray {
-    const options: MapWriterOptions = applyDefaults(writerOptions, {
+  constructor(builderOptions: XMLBuilderOptions, writerOptions: MapWriterOptions) {
+    super(builderOptions)
+    // provide default options
+    this._writerOptions = applyDefaults(writerOptions, {
       format: "map",
       wellFormed: false,
       noDoubleEncoding: false,
       group: false,
       verbose: false
-    })
+    }) as Required<MapWriterOptions>
+  }
 
+  /**
+   * Produces an XML serialization of the given node.
+   * 
+   * @param node - node to serialize
+   */
+  serialize(node: Node): XMLSerializedAsMap | XMLSerializedAsMapArray {
     // convert to object
-    const objectWriterOptions: ObjectWriterOptions = applyDefaults(options, {
+    const objectWriterOptions: ObjectWriterOptions = applyDefaults(this._writerOptions, {
       format: "object",
       wellFormed: false,
       noDoubleEncoding: false,
       verbose: false
     })
-    const objectWriter = new ObjectWriter(this._builderOptions)
-    const val = objectWriter.serialize(node, objectWriterOptions)
+    const objectWriter = new ObjectWriter(this._builderOptions, objectWriterOptions)
+    const val = objectWriter.serialize(node)
 
     // recursively convert object into Map
     return this._convertObject(val)

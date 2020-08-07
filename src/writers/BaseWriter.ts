@@ -19,6 +19,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
     'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'])
 
   protected _builderOptions: XMLBuilderOptions
+  protected _writerOptions!: Required<T>
 
   /**
    * Initializes a new instance of `BaseWriter`.
@@ -33,9 +34,8 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * Produces an XML serialization of the given node.
    * 
    * @param node - node to serialize
-   * @param writerOptions - serialization options
    */
-  abstract serialize(node: Node, writerOptions?: T): U
+  abstract serialize(node: Node): U
 
   /**
    * Used by derived classes to serialize the XML declaration.

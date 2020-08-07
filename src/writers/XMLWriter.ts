@@ -1,4 +1,4 @@
-import { XMLWriterOptions } from "../interfaces"
+import { XMLWriterOptions, XMLBuilderOptions } from "../interfaces"
 import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { BaseWriter } from "./BaseWriter"
@@ -9,20 +9,20 @@ import { Guard } from "@oozcitak/dom/lib/util"
  */
 export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
 
-  protected _options!: Required<XMLWriterOptions>
   private _refs!: StringWriterRefs
   private _indentation: { [key: number]: string } = {}
   private _lengthToLastNewline = 0
 
   /**
-   * Produces an XML serialization of the given node.
+   * Initializes a new instance of `XMLWriter`.
    * 
-   * @param node - node to serialize
+   * @param builderOptions - XML builder options
    * @param writerOptions - serialization options
    */
-  serialize(node: Node, writerOptions?: XMLWriterOptions): string {
+  constructor(builderOptions: XMLBuilderOptions, writerOptions: XMLWriterOptions) {
+    super(builderOptions)
     // provide default options
-    this._options = applyDefaults(writerOptions, {
+    this._writerOptions = applyDefaults(writerOptions, {
       wellFormed: false,
       noDoubleEncoding: false,
       headless: false,
@@ -35,22 +35,29 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
       indentTextOnlyNodes: false,
       spaceBeforeSlash: false
     }) as Required<XMLWriterOptions>
-
+  }
+  
+  /**
+   * Produces an XML serialization of the given node.
+   * 
+   * @param node - node to serialize
+   */
+  serialize(node: Node): string {
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
 
     // Serialize XML declaration
-    if (node.nodeType === NodeType.Document && !this._options.headless) {
+    if (node.nodeType === NodeType.Document && !this._writerOptions.headless) {
       this.declaration(this._builderOptions.version, this._builderOptions.encoding,
         this._builderOptions.standalone)
     }
 
     // recursively serialize node
-    this.serializeNode(node, this._options.wellFormed, this._options.noDoubleEncoding)
+    this.serializeNode(node, this._writerOptions.wellFormed, this._writerOptions.noDoubleEncoding)
 
     // remove trailing newline
-    if (this._options.prettyPrint &&
-      this._refs.markup.slice(-this._options.newline.length) === this._options.newline) {
-      this._refs.markup = this._refs.markup.slice(0, -this._options.newline.length)
+    if (this._writerOptions.prettyPrint &&
+      this._refs.markup.slice(-this._writerOptions.newline.length) === this._writerOptions.newline) {
+      this._refs.markup = this._refs.markup.slice(0, -this._writerOptions.newline.length)
     }
 
     return this._refs.markup
@@ -100,7 +107,7 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
     // do not indent text only elements or elements with empty text nodes
     this._refs.suppressPretty = false
     this._refs.emptyNode = false
-    if (this._options.prettyPrint && !selfClosing && !voidElement) {
+    if (this._writerOptions.prettyPrint && !selfClosing && !voidElement) {
       let textOnlyNode = true
       let emptyNode = true
       let childNode = this.currentNode.firstChild
@@ -123,15 +130,15 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
 
         childNode = childNode.nextSibling
       }
-      this._refs.suppressPretty = !this._options.indentTextOnlyNodes && textOnlyNode && ((cdataCount <= 1 && textCount === 0) || cdataCount === 0)
+      this._refs.suppressPretty = !this._writerOptions.indentTextOnlyNodes && textOnlyNode && ((cdataCount <= 1 && textCount === 0) || cdataCount === 0)
       this._refs.emptyNode = emptyNode
     }
 
-    if ((voidElement || selfClosing || this._refs.emptyNode) && this._options.allowEmptyTags) {
+    if ((voidElement || selfClosing || this._refs.emptyNode) && this._writerOptions.allowEmptyTags) {
       this._refs.markup += "></" + name + ">"
     } else {
       this._refs.markup += voidElement ? " />" :
-        (selfClosing || this._refs.emptyNode) ? (this._options.spaceBeforeSlash ? " />" : "/>") : ">"
+        (selfClosing || this._refs.emptyNode) ? (this._writerOptions.spaceBeforeSlash ? " />" : "/>") : ">"
     }
     this._endLine()
   }
@@ -152,8 +159,8 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
   /** @inheritdoc */
   attribute(name: string, value: string): void {
     const str = name + "=\"" + value + "\""
-    if (this._options.prettyPrint && this._options.width > 0 &&
-      this._refs.markup.length - this._lengthToLastNewline + 1 + str.length > this._options.width) {
+    if (this._writerOptions.prettyPrint && this._writerOptions.width > 0 &&
+      this._refs.markup.length - this._lengthToLastNewline + 1 + str.length > this._writerOptions.width) {
       this._endLine()
       this._beginLine()
       this._refs.markup += this._indent(1) + str
@@ -199,8 +206,8 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
    * mode.
    */
   private _beginLine(): void {
-    if (this._options.prettyPrint && !this._refs.suppressPretty) {
-      this._refs.markup += this._indent(this._options.offset + this.level)
+    if (this._writerOptions.prettyPrint && !this._refs.suppressPretty) {
+      this._refs.markup += this._indent(this._writerOptions.offset + this.level)
     }
   }
 
@@ -209,8 +216,8 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
    * mode.
    */
   private _endLine(): void {
-    if (this._options.prettyPrint && !this._refs.suppressPretty) {
-      this._refs.markup += this._options.newline
+    if (this._writerOptions.prettyPrint && !this._refs.suppressPretty) {
+      this._refs.markup += this._writerOptions.newline
       this._lengthToLastNewline = this._refs.markup.length
     }
   }
@@ -226,7 +233,7 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
     } else if (this._indentation[level] !== undefined) {
       return this._indentation[level]
     } else {
-      const str = this._options.indent.repeat(level)
+      const str = this._writerOptions.indent.repeat(level)
       this._indentation[level] = str
       return str
     }

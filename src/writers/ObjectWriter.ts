@@ -1,5 +1,6 @@
 import {
-  ObjectWriterOptions, XMLSerializedAsObject, XMLSerializedAsObjectArray
+  ObjectWriterOptions, XMLSerializedAsObject, XMLSerializedAsObjectArray,
+  XMLBuilderOptions
 } from "../interfaces"
 import { applyDefaults, isArray, isString } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
@@ -15,20 +16,28 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
   private _listRegister!: NodeList[]
 
   /**
-   * Produces an XML serialization of the given node.
+   * Initializes a new instance of `ObjectWriter`.
    * 
-   * @param node - node to serialize
+   * @param builderOptions - XML builder options
    * @param writerOptions - serialization options
    */
-  serialize(node: Node, writerOptions?: ObjectWriterOptions): XMLSerializedAsObject | XMLSerializedAsObjectArray {
-    const options = applyDefaults(writerOptions, {
+  constructor(builderOptions: XMLBuilderOptions, writerOptions: ObjectWriterOptions) {
+    super(builderOptions)
+    this._writerOptions = applyDefaults(writerOptions, {
       format: "object",
       wellFormed: false,
       noDoubleEncoding: false,
       group: false,
       verbose: false
     }) as Required<ObjectWriterOptions>
+  }
 
+  /**
+   * Produces an XML serialization of the given node.
+   * 
+   * @param node - node to serialize
+   */
+  serialize(node: Node): XMLSerializedAsObject | XMLSerializedAsObjectArray {
     this._currentList = []
     this._currentIndex = 0
     this._listRegister = [this._currentList]
@@ -52,7 +61,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
      *   ]
      * ]
      */
-    this.serializeNode(node, options.wellFormed, options.noDoubleEncoding)
+    this.serializeNode(node, this._writerOptions.wellFormed, this._writerOptions.noDoubleEncoding)
 
     /**
      * Second pass, process node lists. Above example becomes:
@@ -74,7 +83,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
      *   }
      * }
      */
-    return this._process(this._currentList, options) as any
+    return this._process(this._currentList, this._writerOptions) as any
   }
 
   private _process(items: NodeList, options: Required<ObjectWriterOptions>): string | XMLSerializedAsObject | XMLSerializedAsObjectArray {
