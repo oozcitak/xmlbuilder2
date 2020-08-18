@@ -95,7 +95,7 @@ const { createWriteStream } = require('fs');
 const filename = 'path/to/output/file';
 const outFile = createWriteStream(filename);
 
-const xmlBuilder = createCB({
+const xmlBuilder = fragmentCB({
   'data': (chunk) => outFile.write(chunk),
   'end': () => outFile.end(),
   prettyPrint: true
