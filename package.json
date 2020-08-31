@@ -30,7 +30,8 @@
     "@oozcitak/util": "8.3.8",
     "@oozcitak/dom": "1.15.8",
     "@oozcitak/infra": "1.0.8",
-    "js-yaml": "3.14.0"
+    "js-yaml": "3.14.0",
+    "@types/node": "14.6.2"
   },
   "devDependencies": {
     "@babel/preset-env": "*",
@@ -39,7 +40,6 @@
     "@types/dedent": "*",
     "@types/jest": "*",
     "@types/libxmljs": "*",
-    "@types/node": "*",
     "@types/js-yaml": "3.11.1",
     "babel-loader": "*",
     "benchmark": "*",
