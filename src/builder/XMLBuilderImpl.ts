@@ -702,10 +702,14 @@ export class XMLBuilderImpl implements XMLBuilder {
       for (const attr of ele.attributes) {
         const attrQName = attr.prefix ? attr.prefix + ':' + attr.localName : attr.localName
         const [attrPrefix] = namespace_extractQName(attrQName)
-        if (attrPrefix === null) {
+        let newAttrNS = attr.namespaceURI
+        if (newAttrNS === null && attrPrefix !== null) {
+          newAttrNS = ele.lookupNamespaceURI(attrPrefix)
+        }
+        
+        if (newAttrNS === null) {
           newEle.setAttribute(attrQName, attr.value)
         } else {
-          const newAttrNS = newEle.lookupNamespaceURI(attrPrefix)
           newEle.setAttributeNS(newAttrNS, attrQName, attr.value)
         }
       }
