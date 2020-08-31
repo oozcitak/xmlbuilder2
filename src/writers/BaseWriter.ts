@@ -198,18 +198,10 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
        * of the algorithm, then catch that exception and throw an 
        * "InvalidStateError" DOMException.
        */
-      try {
-        this._serializeNodeNS(node, namespace, prefixMap, prefixIndex,
-          requireWellFormed, noDoubleEncoding)
-      } catch (e) {
-        throw new InvalidStateError(e.message)
-      }
+      this._serializeNodeNS(node, namespace, prefixMap, prefixIndex,
+        requireWellFormed, noDoubleEncoding)
     } else {
-      try {
-        this._serializeNode(node, requireWellFormed, noDoubleEncoding)
-      } catch (e) {
-        throw new InvalidStateError(e.message)
-      }
+      this._serializeNode(node, requireWellFormed, noDoubleEncoding)
     }
   }
 
