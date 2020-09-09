@@ -176,3 +176,7 @@ You can build the minified production bundle (`lib/xmlbuilder2.min.js`) after cl
 
 See: https://oozcitak.github.io/xmlbuilder2/
 
+### Donations:
+Please consider becoming a [backer](https://opencollective.com/xmlbuilder2/contribute/backers-20773/checkout) or [sponsor](https://opencollective.com/xmlbuilder2/contribute/sponsors-20774/checkout) to help support development.
+
+[<img src="https://opencollective.com/webpack/donate/button@2x.png?color=blue" alt="Donate Button" width="300"/>](https://opencollective.com/xmlbuilder2)
