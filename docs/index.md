@@ -108,3 +108,8 @@ console.log(obj);
 }
 ```
 See the [convert](builder-functions.html#convert) function.
+
+### Donations:
+Please consider becoming a backer or sponsor to help support development.
+
+[<img src="https://opencollective.com/webpack/donate/button@2x.png?color=blue" alt="Donate Button" width="300"/>](https://opencollective.com/xmlbuilder2)
