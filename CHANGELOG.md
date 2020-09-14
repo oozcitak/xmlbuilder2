@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.4.0] - 2020-09-14
+
+### Bug Fixes
+- Fixed a bug where the iput of custom parsers were not sanitized.
+- Fixed a bug where attributes would not lookup their namespaces from their parent elements (see [#51](https://github.com/oozcitak/xmlbuilder2/issues/51) and [#53](https://github.com/oozcitak/xmlbuilder2/issues/53)).
+- Fixed a bug where typings were not included in the package (see [#52](https://github.com/oozcitak/xmlbuilder2/issues/52)).
+
+### Features
+- Added `declaration` function to serializers.
+- Add YAML parser to callback builder
+
 ## [2.3.1] - 2020-08-05
 
 ### Bug Fixes
@@ -189,3 +200,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.2.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.1.7...v2.2.0
 [2.3.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.2.0...v2.3.0
 [2.3.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.3.0...v2.3.1
+[2.4.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.3.1...v2.4.0
