@@ -249,6 +249,16 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   txt(content: string): XMLBuilder {
+    if (content === null || content === undefined) {
+      if (this._options.keepNullNodes) {
+        // keep null nodes
+        content = ""
+      } else {
+        // skip null|undefined attributes
+        return this
+      }
+    }
+
     const child = this._doc.createTextNode(
       sanitizeInput(content, this._options.invalidCharReplacement))
     this.node.appendChild(child)
@@ -258,6 +268,16 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   com(content: string): XMLBuilder {
+    if (content === null || content === undefined) {
+      if (this._options.keepNullNodes) {
+        // keep null nodes
+        content = ""
+      } else {
+        // skip null|undefined attributes
+        return this
+      }
+    }
+
     const child = this._doc.createComment(
       sanitizeInput(content, this._options.invalidCharReplacement))
     this.node.appendChild(child)
@@ -267,6 +287,16 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   dat(content: string): XMLBuilder {
+    if (content === null || content === undefined) {
+      if (this._options.keepNullNodes) {
+        // keep null nodes
+        content = ""
+      } else {
+        // skip null|undefined attributes
+        return this
+      }
+    }
+
     const child = this._doc.createCDATASection(
       sanitizeInput(content, this._options.invalidCharReplacement))
     this.node.appendChild(child)
@@ -276,6 +306,15 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /** @inheritdoc */
   ins(target: string | PIObject, content: string = ''): XMLBuilder {
+    if (content === null || content === undefined) {
+      if (this._options.keepNullNodes) {
+        // keep null nodes
+        content = ""
+      } else {
+        // skip null|undefined attributes
+        return this
+      }
+    }
 
     if (isArray(target) || isSet(target)) {
       forEachArray(target, item => {
@@ -706,7 +745,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         if (newAttrNS === null && attrPrefix !== null) {
           newAttrNS = ele.lookupNamespaceURI(attrPrefix)
         }
-        
+
         if (newAttrNS === null) {
           newEle.setAttribute(attrQName, attr.value)
         } else {
