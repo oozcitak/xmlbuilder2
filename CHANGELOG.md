@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file. This project ad
 ## [2.4.0] - 2020-09-14
 
 ### Bug Fixes
-- Fixed a bug where the iput of custom parsers were not sanitized.
+- Fixed a bug where the input of custom parsers were not sanitized.
 - Fixed a bug where attributes would not lookup their namespaces from their parent elements (see [#51](https://github.com/oozcitak/xmlbuilder2/issues/51) and [#53](https://github.com/oozcitak/xmlbuilder2/issues/53)).
 - Fixed a bug where typings were not included in the package (see [#52](https://github.com/oozcitak/xmlbuilder2/issues/52)).
 
