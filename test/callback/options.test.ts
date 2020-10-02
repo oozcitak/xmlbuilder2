@@ -161,7 +161,15 @@ describe('XMLStream options', () => {
         node1: '',
         node2: {},
         node3: null,
-        node4: undefined
+        node4: undefined,
+        '#1': null,
+        '#2': undefined,
+        '!1': null,
+        '!2': undefined,
+        '$1': null,
+        '$2': undefined,
+        '?pi1': null,
+        '?pi2': undefined
       }
     }).end()
 
@@ -179,7 +187,15 @@ describe('XMLStream options', () => {
         node1: '',
         node2: {},
         node3: null,
-        node4: undefined
+        node4: undefined,
+        '#1': null,
+        '#2': undefined,
+        '!1': null,
+        '!2': undefined,
+        '$1': null,
+        '$2': undefined,
+        '?1': null,
+        '?2': undefined        
       }
     }).end()
 
@@ -189,6 +205,10 @@ describe('XMLStream options', () => {
         <node2/>
         <node3/>
         <node4/>
+        <!---->
+        <!---->
+        <![CDATA[]]>
+        <![CDATA[]]>
       </root>`, done)
   })
 
