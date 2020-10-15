@@ -25,4 +25,30 @@ describe("Replicate issue", () => {
     `)
   })
 
+  test(`#60 - How to add stylesheet for sitemap?`, () => {
+    const doc = $$.create(
+      { version: '1.0', encoding: 'UTF-8' },
+      {
+        '?': 'xml-stylesheet type="text/xsl" href="//example.com/sitemap.xsl"',
+        sitemapindex: {
+          '@xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9',
+          sitemap: {
+            loc: 'https://example.com/sitemap-posts.xml',
+            lastmod: '2020-10-06T14:04:09.000Z'
+          }
+        }
+      }).doc()
+
+    expect(doc.end({prettyPrint: true })).toBe($$.t`
+    <?xml version="1.0" encoding="UTF-8"?>
+    <?xml-stylesheet type="text/xsl" href="//example.com/sitemap.xsl"?>
+    <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      <sitemap>
+        <loc>https://example.com/sitemap-posts.xml</loc>
+        <lastmod>2020-10-06T14:04:09.000Z</lastmod>
+      </sitemap>
+    </sitemapindex>
+    `)
+  })
+
 })
