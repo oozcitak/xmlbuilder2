@@ -9,11 +9,12 @@ import { BaseWriter } from "./BaseWriter"
 /**
  * Serializes XML nodes into objects and arrays.
  */
-export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedAsObject | XMLSerializedAsObjectArray> {
+export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedAsObject> {
 
   private _currentList!: NodeList
   private _currentIndex!: number
   private _listRegister!: NodeList[]
+  protected _contentNodeKeys: { [key: string]: undefined }
 
   /**
    * Initializes a new instance of `ObjectWriter`.
@@ -30,22 +31,38 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
       group: false,
       verbose: false
     }) as Required<ObjectWriterOptions>
+
+    this._contentNodeKeys = {
+      [builderOptions.convert.text]: undefined,
+      [builderOptions.convert.cdata]: undefined,
+      [builderOptions.convert.comment]: undefined,
+      [builderOptions.convert.ins]: undefined
+    }
   }
 
-  /**
-   * Produces an XML serialization of the given node.
-   * 
-   * @param node - node to serialize
-   */
-  serialize(node: Node): XMLSerializedAsObject | XMLSerializedAsObjectArray {
-    this._currentList = []
-    this._currentIndex = 0
-    this._listRegister = [this._currentList]
-
+  /** @inheritdoc */
+  serialize(node: Node): XMLSerializedAsObject {
     /**
-     * First pass, serialize nodes
-     * This creates a list of nodes grouped under node types while preserving
-     * insertion order. For example:
+     * Document is serialized in two passes. First pass serializes DOM nodes
+     * into lists of node values grouped under node types while preserving
+     * insertion order. Seconds pass compacts these node lists.
+     * 
+     * For example:
+     * 
+     * <root>
+     *   <node att1="val1" att2="val2">
+     *     node text
+     *     <childNode/>
+     *     more text
+     *   </node>
+     *   <node att="val">
+     *     text line1
+     *     text line2
+     *   </node>
+     * </root>
+     * 
+     * First pass serializes the document into node lists:
+     * 
      * [
      *   root: [
      *     node: [
@@ -60,11 +77,9 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
      *     ]
      *   ]
      * ]
-     */
-    this.serializeNode(node, this._writerOptions.wellFormed, this._writerOptions.noDoubleEncoding)
-
-    /**
-     * Second pass, process node lists. Above example becomes:
+     * 
+     * Second pass processes node lists. Above becomes:
+     * 
      * {
      *   root: {
      *     node: [
@@ -83,10 +98,70 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
      *   }
      * }
      */
-    return this._process(this._currentList, this._writerOptions) as any
+
+    this._currentList = []
+    this._currentIndex = 0
+    this._listRegister = [this._currentList]
+
+    this._serializeDOMNode(node)
+    return this._process(this._currentList as any) as any
   }
 
-  private _process(items: NodeList, options: Required<ObjectWriterOptions>): string | XMLSerializedAsObject | XMLSerializedAsObjectArray {
+  /** @inheritdoc */
+  _appendMarkup(markup: XMLSerializedAsObject | undefined): void {
+    if (markup === undefined) {
+      return
+    }
+
+    const key = Object.keys(markup)[0]
+    if (key === this._builderOptions.convert.att) {
+      // attributes create an object of attribute key/values
+      // markup should be { @: { name1: value1, name2: value2, ... } }
+      if (this._currentList.length === 0) {
+        this._currentList.push(markup as any)
+      } else {
+        const lastItem = this._currentList[this._currentList.length - 1]
+        if (key in lastItem) {
+          // lastItem[@] === { name1: value1, name2: value2, ... }
+          Object.assign(lastItem[key], markup[key])
+        } else {
+          this._currentList.push(markup as any)
+        }
+      }
+    } else {
+      // content nodes create an object with object key/array of object values
+      // markup should be { "$": value }, { "#": value }, ...
+      if (this._currentList.length === 0) {
+        this._currentList.push(markup as any)
+      } else {
+        const lastItem = this._currentList[this._currentList.length - 1]
+        if (key in lastItem) {
+          const arrayOrValue = lastItem[key]
+          if (isArray(arrayOrValue)) {
+            arrayOrValue.push(markup[key] as any)
+          } else {
+            lastItem[key] = [lastItem[key], markup[key] as any]
+          }
+        } else {
+          this._currentList.push(markup as any)
+        }
+      }
+
+      // an element node { [element name]: [list of child nodes] }
+      if (!(key in this._contentNodeKeys)) {
+        const childItems = markup[key]
+        this._currentIndex++
+        if (this._listRegister.length > this._currentIndex) {
+          this._listRegister[this._currentIndex] = childItems as any
+        } else {
+          this._listRegister.push(childItems as any)
+        }
+        this._currentList = childItems as any
+      }
+    }
+  }
+
+  private _process(items: NodeList): string | XMLSerializedAsObject | XMLSerializedAsObjectArray {
     if (items.length === 0) return {}
 
     // determine if there are non-unique element names
@@ -100,18 +175,18 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
       const item = items[i]
       const key = Object.keys(item)[0]
       switch (key) {
-        case "@":
+        case this._builderOptions.convert.att:
           continue
-        case "#":
+        case this._builderOptions.convert.text:
           textCount++
           break
-        case "!":
+        case this._builderOptions.convert.comment:
           commentCount++
           break
-        case "?":
+        case this._builderOptions.convert.ins:
           instructionCount++
           break
-        case "$":
+        case this._builderOptions.convert.cdata:
           cdataCount++
           break
         default:
@@ -130,22 +205,22 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
     const defInstructionKey = this._getNodeKey(NodeType.ProcessingInstruction)
     const defCdataKey = this._getNodeKey(NodeType.CData)
 
-    if (textCount === 1 && items.length === 1 && isString((items[0] as TextNode)["#"])) {
+    if (textCount === 1 && items.length === 1 && isString((items[0] as TextNode)[this._builderOptions.convert.text])) {
       // special case of an element node with a single text node
-      return (items[0] as TextNode)["#"]
+      return (items[0] as TextNode)[this._builderOptions.convert.text]
     } else if (hasNonUniqueNames) {
-      const obj: XMLSerializedAsObject | XMLSerializedAsObjectArray = { }
+      const obj: XMLSerializedAsObject | XMLSerializedAsObjectArray = {}
       // process attributes first
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
         const key = Object.keys(item)[0]
-        if (key === "@") {
-          const attrs = (item as AttrNode)["@"]
+        if (key === this._builderOptions.convert.att) {
+          const attrs = (item as AttrNode)[this._builderOptions.convert.att]
           const attrKeys = Object.keys(attrs)
           if (attrKeys.length === 1) {
             obj[defAttrKey + attrKeys[0]] = attrs[attrKeys[0]]
           } else {
-            obj[defAttrKey] = (item as AttrNode)["@"]
+            obj[defAttrKey] = (item as AttrNode)[this._builderOptions.convert.att]
           }
         }
       }
@@ -156,20 +231,20 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
         const item = items[i]
         const key = Object.keys(item)[0]
         switch (key) {
-          case "@":
+          case this._builderOptions.convert.att:
             // attributes were processed above
             break
-          case "#":
-            result.push({ [defTextKey]: (item as TextNode)["#"] })
+          case this._builderOptions.convert.text:
+            result.push({ [defTextKey]: (item as TextNode)[this._builderOptions.convert.text] })
             break
-          case "!":
-            result.push({ [defCommentKey]: (item as CommentNode)["!"] })
+          case this._builderOptions.convert.comment:
+            result.push({ [defCommentKey]: (item as TextNode)[this._builderOptions.convert.comment] })
             break
-          case "?":
-            result.push({ [defInstructionKey]: (item as InstructionNode)["?"] })
+          case this._builderOptions.convert.ins:
+            result.push({ [defInstructionKey]: (item as TextNode)[this._builderOptions.convert.ins] })
             break
-          case "$":
-            result.push({ [defCdataKey]: (item as CDATANode)["$"] })
+          case this._builderOptions.convert.comment:
+            result.push({ [defCdataKey]: (item as TextNode)[this._builderOptions.convert.cdata] })
             break
           default:
             // element node
@@ -179,15 +254,15 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
               const eleGroup: XMLSerializedAsObjectArray = []
               const listOfLists = ele[key] as NodeList[]
               for (let i = 0; i < listOfLists.length; i++) {
-                eleGroup.push(this._process(listOfLists[i], options) as any)
+                eleGroup.push(this._process(listOfLists[i]) as any)
               }
               result.push({ [key]: eleGroup })
             } else {
               // single element node
-              if (options.verbose) {
-                result.push({ [key]: [this._process(ele[key] as NodeList, options) as any] })
+              if (this._writerOptions.verbose) {
+                result.push({ [key]: [this._process(ele[key] as NodeList) as any] })
               } else {
-                result.push({ [key]: this._process(ele[key] as NodeList, options) })
+                result.push({ [key]: this._process(ele[key] as NodeList) })
               }
             }
             break
@@ -207,10 +282,10 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
         const item = items[i]
         const key = Object.keys(item)[0]
         switch (key) {
-          case "@":
-            const attrs = (item as AttrNode)["@"]
+          case this._builderOptions.convert.att:
+            const attrs = (item as AttrNode)[this._builderOptions.convert.att]
             const attrKeys = Object.keys(attrs)
-            if (!options.group || attrKeys.length === 1) {
+            if (!this._writerOptions.group || attrKeys.length === 1) {
               for (const attrName in attrs) {
                 obj[defAttrKey + attrName] = attrs[attrName]
               }
@@ -218,24 +293,24 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
               obj[defAttrKey] = attrs
             }
             break
-          case "#":
-            textId = this._processSpecItem((item as TextNode)["#"],
-              obj as any, options.group, defTextKey,
+          case this._builderOptions.convert.text:
+            textId = this._processSpecItem((item as TextNode)[this._builderOptions.convert.text],
+              obj as any, defTextKey,
               textCount, textId)
             break
-          case "!":
-            commentId = this._processSpecItem((item as CommentNode)["!"],
-              obj as any, options.group, defCommentKey,
+          case this._builderOptions.convert.comment:
+            commentId = this._processSpecItem((item as TextNode)[this._builderOptions.convert.comment],
+              obj as any, defCommentKey,
               commentCount, commentId)
             break
-          case "?":
-            instructionId = this._processSpecItem((item as InstructionNode)["?"],
-              obj as any, options.group, defInstructionKey,
+          case this._builderOptions.convert.ins:
+            instructionId = this._processSpecItem((item as TextNode)[this._builderOptions.convert.ins],
+              obj as any, defInstructionKey,
               instructionCount, instructionId)
             break
-          case "$":
-            cdataId = this._processSpecItem((item as CDATANode)["$"],
-              obj as any, options.group, defCdataKey,
+          case this._builderOptions.convert.cdata:
+            cdataId = this._processSpecItem((item as TextNode)[this._builderOptions.convert.cdata],
+              obj as any, defCdataKey,
               cdataCount, cdataId)
             break
           default:
@@ -246,15 +321,15 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
               const eleGroup: XMLSerializedAsObjectArray = []
               const listOfLists = ele[key] as NodeList[]
               for (let i = 0; i < listOfLists.length; i++) {
-                eleGroup.push(this._process(listOfLists[i], options) as any)
+                eleGroup.push(this._process(listOfLists[i]) as any)
               }
               obj[key] = eleGroup
             } else {
               // single element node
-              if (options.verbose) {
-                obj[key] = [this._process(ele[key] as NodeList, options) as any]
+              if (this._writerOptions.verbose) {
+                obj[key] = [this._process(ele[key] as NodeList) as any]
               } else {
-                obj[key] = this._process(ele[key] as NodeList, options)
+                obj[key] = this._process(ele[key] as NodeList)
               }
             }
             break
@@ -265,9 +340,9 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
   }
 
   private _processSpecItem(item: string | string[],
-    obj: { [key: string]: string | string[] }, group: boolean, defKey: string,
+    obj: { [key: string]: string | string[] }, defKey: string,
     count: number, id: number): number {
-    if (!group && isArray(item) && count + item.length > 2) {
+    if (!this._writerOptions.group && isArray(item) && count + item.length > 2) {
       for (const subItem of item) {
         const key = defKey + (id++).toString()
         obj[key] = subItem
@@ -280,148 +355,39 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
   }
 
   /** @inheritdoc */
-  beginElement(name: string) {
-    const childItems: NodeList = []
-    if (this._currentList.length === 0) {
-      this._currentList.push({ [name]: childItems })
-    } else {
-      const lastItem = this._currentList[this._currentList.length - 1]
-      if (this._isElementNode(lastItem, name)) {
-        if (lastItem[name].length !== 0 && isArray(lastItem[name][0])) {
-          const listOfLists = lastItem[name] as NodeList[]
-          listOfLists.push(childItems)
-        } else {
-          lastItem[name] = [lastItem[name] as NodeList, childItems]
-        }
-      } else {
-        this._currentList.push({ [name]: childItems })
-      }
-    }
-
-    this._currentIndex++
-    if (this._listRegister.length > this._currentIndex) {
-      this._listRegister[this._currentIndex] = childItems
-    } else {
-      this._listRegister.push(childItems)
-    }
-    this._currentList = childItems
+  beginElement(name: string): XMLSerializedAsObject | undefined {
+    return { [name]: [] }
   }
 
   /** @inheritdoc */
-  endElement() {
+  endElement(name: string): XMLSerializedAsObject | undefined {
     this._currentList = this._listRegister[--this._currentIndex]
+    return undefined
   }
 
   /** @inheritdoc */
-  attribute(name: string, value: string) {
-    if (this._currentList.length === 0) {
-      this._currentList.push({ "@": { [name]: value } })
-    } else {
-      const lastItem = this._currentList[this._currentList.length - 1]
-      /* istanbul ignore else */
-      if (this._isAttrNode(lastItem)) {
-        lastItem["@"][name] = value
-      } else {
-        this._currentList.push({ "@": { [name]: value } })
-      }
-    }
+  attribute(name: string, value: string): XMLSerializedAsObject | undefined {
+    return { [this._builderOptions.convert.att]: { [name]: value } }
   }
 
   /** @inheritdoc */
-  comment(data: string) {
-    if (this._currentList.length === 0) {
-      this._currentList.push({ "!": data })
-    } else {
-      const lastItem = this._currentList[this._currentList.length - 1]
-      if (this._isCommentNode(lastItem)) {
-        if (isArray(lastItem["!"])) {
-          lastItem["!"].push(data)
-        } else {
-          lastItem["!"] = [lastItem["!"], data]
-        }
-      } else {
-        this._currentList.push({ "!": data })
-      }
-    }
+  comment(data: string): XMLSerializedAsObject | undefined {
+    return { [this._builderOptions.convert.comment]: data }
   }
 
   /** @inheritdoc */
-  text(data: string) {
-    if (this._currentList.length === 0) {
-      this._currentList.push({ "#": data })
-    } else {
-      const lastItem = this._currentList[this._currentList.length - 1]
-      if (this._isTextNode(lastItem)) {
-        if (isArray(lastItem["#"])) {
-          lastItem["#"].push(data)
-        } else {
-          lastItem["#"] = [lastItem["#"], data]
-        }
-      } else {
-        this._currentList.push({ "#": data })
-      }
-    }
+  text(data: string): XMLSerializedAsObject | undefined {
+    return { [this._builderOptions.convert.text]: data }
   }
 
   /** @inheritdoc */
-  instruction(target: string, data: string) {
-    const value = (data === "" ? target : target + " " + data)
-    if (this._currentList.length === 0) {
-      this._currentList.push({ "?": value })
-    } else {
-      const lastItem = this._currentList[this._currentList.length - 1]
-      if (this._isInstructionNode(lastItem)) {
-        if (isArray(lastItem["?"])) {
-          lastItem["?"].push(value)
-        } else {
-          lastItem["?"] = [lastItem["?"], value]
-        }
-      } else {
-        this._currentList.push({ "?": value })
-      }
-    }
+  instruction(target: string, data: string): XMLSerializedAsObject | undefined {
+    return { [this._builderOptions.convert.ins]: (data === "" ? target : target + " " + data) }
   }
 
   /** @inheritdoc */
-  cdata(data: string) {
-    if (this._currentList.length === 0) {
-      this._currentList.push({ "$": data })
-    } else {
-      const lastItem = this._currentList[this._currentList.length - 1]
-      if (this._isCDATANode(lastItem)) {
-        if (isArray(lastItem["$"])) {
-          lastItem["$"].push(data)
-        } else {
-          lastItem["$"] = [lastItem["$"], data]
-        }
-      } else {
-        this._currentList.push({ "$": data })
-      }
-    }
-  }
-
-  private _isAttrNode(x: any): x is AttrNode {
-    return "@" in x
-  }
-
-  private _isTextNode(x: any): x is TextNode {
-    return "#" in x
-  }
-
-  private _isCommentNode(x: any): x is CommentNode {
-    return "!" in x
-  }
-
-  private _isInstructionNode(x: any): x is InstructionNode {
-    return "?" in x
-  }
-
-  private _isCDATANode(x: any): x is CDATANode {
-    return "$" in x
-  }
-
-  private _isElementNode(x: any, name: string): x is ElementNode {
-    return name in x
+  cdata(data: string): XMLSerializedAsObject | undefined {
+    return { [this._builderOptions.convert.cdata]: data }
   }
 
   /**
@@ -451,14 +417,13 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
         throw new Error("Invalid node type.")
     }
   }
-
 }
 
-type AttrNode = { "@": { [key: string]: string } }
-type TextNode = { "#": string | string[] }
-type CommentNode = { "!": string | string[] }
-type InstructionNode = { "?": string | string[] }
-type CDATANode = { "$": string | string[] }
-type NodeList = (ElementNode | AttrNode | TextNode | CommentNode |
-  InstructionNode | CDATANode)[]
+// Represents a object of attribute node
+type AttrNode = { [key: string]: { [key: string]: string } }
+// Represents a text, comment, PI o CData node, or an array of those
+type TextNode = { [key: string]: string | string[] }
+// Represents an element node or an array of element nodes with the same name
 type ElementNode = { [key: string]: NodeList | NodeList[] }
+// Represents an array of child nodes
+type NodeList = (ElementNode | AttrNode | TextNode)[]

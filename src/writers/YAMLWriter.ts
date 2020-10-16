@@ -13,6 +13,9 @@ import { BaseWriter } from "./BaseWriter"
  * Serializes XML nodes into a YAML string.
  */
 export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
+  _appendMarkup(markup: string | undefined): void {
+    throw new Error("Method not implemented.")
+  }
 
   /**
    * Initializes a new instance of `YAMLWriter`.
@@ -41,12 +44,7 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
     }
   }
 
-  /**
-   * Produces an XML serialization of the given node.
-   * 
-   * @param node - node to serialize
-   * @param writerOptions - serialization options
-   */
+  /** @inheritdoc */
   serialize(node: Node): string {
     // convert to object
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(this._writerOptions, {
