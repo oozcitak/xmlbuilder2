@@ -93,6 +93,9 @@ entries:
     - title: last
       url: /traversal-functions.html#last
       output: web
+    - title: next
+      url: /traversal-functions.html#next
+      output: web
     - title: prev
       url: /traversal-functions.html#prev
       output: web
