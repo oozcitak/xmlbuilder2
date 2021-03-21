@@ -12,7 +12,7 @@ import { BaseWriter } from "./BaseWriter"
  */
 export class MapWriter extends BaseWriter<MapWriterOptions, XMLSerializedAsMap | XMLSerializedAsMapArray> {
 
-  _appendMarkup(markup: string | undefined): void {
+  _appendMarkup(markup: XMLSerializedAsMap | XMLSerializedAsMapArray | undefined): void {
     throw new Error("Method not implemented.")
   }
   
