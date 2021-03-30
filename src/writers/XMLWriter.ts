@@ -3,7 +3,6 @@ import { applyDefaults } from "@oozcitak/util"
 import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { BaseWriter } from "./BaseWriter"
 import { Guard } from "@oozcitak/dom/lib/util"
-import { tree_isHostIncludingAncestorOf } from "@oozcitak/dom/lib/algorithm"
 
 /**
  * Serializes XML nodes into strings.
@@ -37,19 +36,23 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
       spaceBeforeSlash: false
     }) as Required<XMLWriterOptions>
   }
-
-  /** @inheritdoc */
+  
+  /**
+   * Produces an XML serialization of the given node.
+   * 
+   * @param node - node to serialize
+   */
   serialize(node: Node): string {
     this._refs = { suppressPretty: false, emptyNode: false, markup: "" }
 
     // Serialize XML declaration
     if (node.nodeType === NodeType.Document && !this._writerOptions.headless) {
-      this._appendMarkup(this.declaration(this._builderOptions.version,
-        this._builderOptions.encoding, this._builderOptions.standalone))
+      this.declaration(this._builderOptions.version, this._builderOptions.encoding,
+        this._builderOptions.standalone)
     }
 
     // recursively serialize node
-    this._serializeDOMNode(node)
+    this.serializeNode(node, this._writerOptions.wellFormed, this._writerOptions.noDoubleEncoding)
 
     // remove trailing newline
     if (this._writerOptions.prettyPrint &&
@@ -61,53 +64,46 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
   }
 
   /** @inheritdoc */
-  _appendMarkup(markup: string | undefined): void {
-    if (markup !== undefined) {
-      this._refs.markup += markup
-    }
-  }
+  declaration(version: "1.0", encoding?: string, standalone?: boolean): void {
+    this._beginLine()
 
-  /** @inheritdoc */
-  declaration(version: "1.0", encoding?: string, standalone?: boolean): string | undefined {
-    let r = this._beginLine()
-
-    r += "<?xml version=\"" + version + "\""
+    this._refs.markup += "<?xml version=\"" + version + "\""
     if (encoding !== undefined) {
-      r += " encoding=\"" + encoding + "\""
+      this._refs.markup += " encoding=\"" + encoding + "\""
     }
     if (standalone !== undefined) {
-      r += " standalone=\"" + (standalone ? "yes" : "no") + "\""
+      this._refs.markup += " standalone=\"" + (standalone ? "yes" : "no") + "\""
     }
-    r += "?>"
+    this._refs.markup += "?>"
 
-    return r + this._endLine()
+    this._endLine()
   }
 
   /** @inheritdoc */
-  docType(name: string, publicId: string, systemId: string): string | undefined {
-    let r = this._beginLine()
+  docType(name: string, publicId: string, systemId: string): void {
+    this._beginLine()
 
     if (publicId && systemId) {
-      r += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\" \"" + systemId + "\">"
+      this._refs.markup += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\" \"" + systemId + "\">"
     } else if (publicId) {
-      r += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\">"
+      this._refs.markup += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\">"
     } else if (systemId) {
-      r += "<!DOCTYPE " + name + " SYSTEM \"" + systemId + "\">"
+      this._refs.markup += "<!DOCTYPE " + name + " SYSTEM \"" + systemId + "\">"
     } else {
-      r += "<!DOCTYPE " + name + ">"
+      this._refs.markup += "<!DOCTYPE " + name + ">"
     }
 
-    return r + this._endLine()
+    this._endLine()
   }
 
   /** @inheritdoc */
-  openTagBegin(name: string): string | undefined {
-    return this._beginLine() + "<" + name
+  openTagBegin(name: string): void {
+    this._beginLine()
+    this._refs.markup += "<" + name
   }
 
   /** @inheritdoc */
-  openTagEnd(name: string, selfClosing: boolean, voidElement: boolean): string | undefined {
-    let r = ""
+  openTagEnd(name: string, selfClosing: boolean, voidElement: boolean): void {
     // do not indent text only elements or elements with empty text nodes
     this._refs.suppressPretty = false
     this._refs.emptyNode = false
@@ -139,73 +135,79 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
     }
 
     if ((voidElement || selfClosing || this._refs.emptyNode) && this._writerOptions.allowEmptyTags) {
-      r += "></" + name + ">"
+      this._refs.markup += "></" + name + ">"
     } else {
-      r += voidElement ? " />" :
+      this._refs.markup += voidElement ? " />" :
         (selfClosing || this._refs.emptyNode) ? (this._writerOptions.spaceBeforeSlash ? " />" : "/>") : ">"
     }
-
-    return r + this._endLine()
+    this._endLine()
   }
 
   /** @inheritdoc */
-  closeTag(name: string): string | undefined {
-    let r = ""
-
+  closeTag(name: string): void {
     if (!this._refs.emptyNode) {
-      r += this._beginLine() + "</" + name + ">"
+      this._beginLine()
+      this._refs.markup += "</" + name + ">"
     }
 
     this._refs.suppressPretty = false
     this._refs.emptyNode = false
 
-    return r + this._endLine()
+    this._endLine()
   }
 
   /** @inheritdoc */
-  attribute(name: string, value: string): string | undefined {
+  attribute(name: string, value: string): void {
     const str = name + "=\"" + value + "\""
     if (this._writerOptions.prettyPrint && this._writerOptions.width > 0 &&
       this._refs.markup.length - this._lengthToLastNewline + 1 + str.length > this._writerOptions.width) {
-      return this._endLine() + this._beginLine() + this._indent(1) + str
+      this._endLine()
+      this._beginLine()
+      this._refs.markup += this._indent(1) + str
     } else {
-      return " " + str
+      this._refs.markup += " " + str
     }
   }
 
   /** @inheritdoc */
-  text(data: string): string | undefined {
+  text(data: string): void {
     if (data !== '') {
-      return this._beginLine() + data + this._endLine()
+      this._beginLine()
+      this._refs.markup += data
+      this._endLine()
     }
   }
 
   /** @inheritdoc */
-  cdata(data: string): string | undefined {
+  cdata(data: string): void {
     if (data !== '') {
-      return this._beginLine() + "<![CDATA[" + data + "]]>" + this._endLine()
+      this._beginLine()
+      this._refs.markup += "<![CDATA[" + data + "]]>"
+      this._endLine()
     }
   }
 
   /** @inheritdoc */
-  comment(data: string): string | undefined {
-    return this._beginLine() + "<!--" + data + "-->" + this._endLine()
+  comment(data: string): void {
+    this._beginLine()
+    this._refs.markup += "<!--" + data + "-->"
+    this._endLine()
   }
 
   /** @inheritdoc */
-  instruction(target: string, data: string): string | undefined {
-    return this._beginLine() + "<?" + (data === "" ? target : target + " " + data) + "?>" + this._endLine()
+  instruction(target: string, data: string): void {
+    this._beginLine()
+    this._refs.markup += "<?" + (data === "" ? target : target + " " + data) + "?>"
+    this._endLine()
   }
 
   /**
    * Produces characters to be prepended to a line of string in pretty-print
    * mode.
    */
-  private _beginLine(): string {
+  private _beginLine(): void {
     if (this._writerOptions.prettyPrint && !this._refs.suppressPretty) {
-      return this._indent(this._writerOptions.offset + this.level)
-    } else {
-      return ""
+      this._refs.markup += this._indent(this._writerOptions.offset + this.level)
     }
   }
 
@@ -213,12 +215,10 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
    * Produces characters to be appended to a line of string in pretty-print
    * mode.
    */
-  private _endLine(): string {
+  private _endLine(): void {
     if (this._writerOptions.prettyPrint && !this._refs.suppressPretty) {
-      this._lengthToLastNewline = this._refs.markup.length + this._writerOptions.newline.length
-      return this._writerOptions.newline
-    } else {
-      return ""
+      this._refs.markup += this._writerOptions.newline
+      this._lengthToLastNewline = this._refs.markup.length
     }
   }
 

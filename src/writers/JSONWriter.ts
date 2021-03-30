@@ -14,9 +14,7 @@ import { BaseWriter } from "./BaseWriter"
  * Serializes XML nodes into a JSON string.
  */
 export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
-  _appendMarkup(markup: string | undefined): void {
-    throw new Error("Method not implemented.")
-  }
+
   /**
    * Initializes a new instance of `JSONWriter`.
    * 
@@ -38,8 +36,12 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
     }) as Required<JSONWriterOptions>
   }
 
-
-  /** @inheritdoc */
+  /**
+   * Produces an XML serialization of the given node.
+   * 
+   * @param node - node to serialize
+   * @param writerOptions - serialization options
+   */
   serialize(node: Node): string {
     // convert to object
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(this._writerOptions, {
@@ -177,7 +179,7 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
     if (isArray(obj)) {
       forEachArray(obj, val => count += this._descendantCount(val, count), this)
     } else if (isObject(obj)) {
-      forEachObject(obj, (_, val) => count += this._descendantCount(val, count), this)
+      forEachObject(obj, (key, val) => count += this._descendantCount(val, count), this)
     } else {
       count++
     }
