@@ -27,11 +27,11 @@
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
-    "@oozcitak/util": "8.3.8",
     "@oozcitak/dom": "1.15.8",
     "@oozcitak/infra": "1.0.8",
-    "js-yaml": "3.14.0",
-    "@types/node": "*"
+    "@oozcitak/util": "8.3.8",
+    "@types/node": "*",
+    "js-yaml": "3.14.0"
   },
   "devDependencies": {
     "@babel/preset-env": "*",
@@ -39,15 +39,15 @@
     "@types/benchmark": "*",
     "@types/dedent": "*",
     "@types/jest": "*",
-    "@types/libxmljs": "*",
     "@types/js-yaml": "3.11.1",
+    "@types/libxmljs": "*",
     "babel-loader": "*",
     "benchmark": "*",
     "chalk": "*",
     "core-js": "3.6.5",
     "dedent": "*",
-    "glob": "*",
     "es6-proxy-polyfill": "*",
+    "glob": "*",
     "harmony-reflect": "*",
     "jest": "*",
     "libxmljs": "*",
@@ -58,22 +58,13 @@
     "webpack": "*",
     "webpack-cli": "*",
     "xmlbuilder": "*",
-    "xpath": "*",
-    "selenium-webdriver": "*",
-    "chromedriver": "*",
-    "geckodriver": "*",
-    "iedriver": "*",
-    "@types/selenium-webdriver": "*",
-    "@types/chromedriver": "*"
+    "xpath": "*"
   },
   "jest": {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "/test/.*\\.test\\.tsx?$",
-    "testPathIgnorePatterns": [
-      "/test/browser/.*"
-    ],
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}"
