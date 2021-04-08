@@ -57,3 +57,8 @@ const xml = parseXml(xmlDoc.end());
   
 const result = xml.validate(xsd); // true
 ```
+
+{% capture ts_tip %}
+  `XMLBuilder2` uses its own TypeScript interfaces for DOM nodes; which typically will not be compatible withe the interfaces exported by other libraries. TypeScript users should cast those interfaces accordingly to prevent TS 2345 errors.
+{% endcapture %}
+{% include warning.html content=ts_tip %}
