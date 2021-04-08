@@ -6,7 +6,6 @@ import {
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { namespace_extractQName } from "@oozcitak/dom/lib/algorithm"
 import { XMLBuilder, XMLBuilderOptions } from "../interfaces"
-import { sanitizeInput } from "../builder/dom"
 import { BaseReader } from "./BaseReader"
 
 /**
@@ -23,19 +22,13 @@ export class XMLReader extends BaseReader<string> {
   _parse(node: XMLBuilder, str: string): XMLBuilder {
     const lexer = new XMLStringLexer(str, { skipWhitespaceOnlyText: true })
 
-    // sanitizes input characters
-    const invalidCharReplacement = this._builderOptions.invalidCharReplacement
-    const s = function(str: string): string {
-      return sanitizeInput(str, invalidCharReplacement)
-    }
-
     let context = node
     let token = lexer.nextToken()
     while (token.type !== TokenType.EOF) {
       switch (token.type) {
         case TokenType.Declaration:
           const declaration = <DeclarationToken>token
-          const version = s(declaration.version)
+          const version = this.sanitize(declaration.version)
           if (version !== "1.0") {
             throw new Error("Invalid xml version: " + version)
           }
@@ -43,36 +36,36 @@ export class XMLReader extends BaseReader<string> {
             version: version
           }
           if (declaration.encoding) {
-            builderOptions.encoding = s(declaration.encoding)
+            builderOptions.encoding = this.sanitize(declaration.encoding)
           }
           if (declaration.standalone) {
-            builderOptions.standalone = (s(declaration.standalone) === "yes")
+            builderOptions.standalone = (this.sanitize(declaration.standalone) === "yes")
           }
           context.set(builderOptions)
           break
         case TokenType.DocType:
           const doctype = <DocTypeToken>token
-          context = this.docType(context, s(doctype.name), s(doctype.pubId), s(doctype.sysId)) || context
+          context = this.docType(context, this.sanitize(doctype.name), this.sanitize(doctype.pubId), this.sanitize(doctype.sysId)) || context
           break
         case TokenType.CDATA:
           const cdata = <CDATAToken>token
-          context = this.cdata(context, s(cdata.data)) || context
+          context = this.cdata(context, this.sanitize(cdata.data)) || context
           break
         case TokenType.Comment:
           const comment = <CommentToken>token
-          context = this.comment(context, s(comment.data)) || context
+          context = this.comment(context, this.sanitize(comment.data)) || context
           break
         case TokenType.PI:
           const pi = <PIToken>token
-          context = this.instruction(context, s(pi.target), s(pi.data)) || context
+          context = this.instruction(context, this.sanitize(pi.target), this.sanitize(pi.data)) || context
           break
         case TokenType.Text:
           const text = <TextToken>token
-          context = this.text(context, s(text.data)) || context
+          context = this.text(context, this.sanitize(text.data)) || context
           break
         case TokenType.Element:
           const element = <ElementToken>token
-          const elementName = s(element.name)
+          const elementName = this.sanitize(element.name)
 
           // inherit namespace from parent
           const [prefix] = namespace_extractQName(elementName)
@@ -83,8 +76,8 @@ export class XMLReader extends BaseReader<string> {
           // also lookup namespace declaration attributes
           const nsDeclarations: { [key: string]: string } = {}
           for (let [attName, attValue] of element.attributes) {
-            attName = s(attName)
-            attValue = s(attValue)
+            attName = this.sanitize(attName)
+            attValue = this.sanitize(attValue)
             if (attName === "xmlns") {
               namespace = attValue
             } else {
@@ -106,8 +99,8 @@ export class XMLReader extends BaseReader<string> {
 
           // assign attributes
           for (let [attName, attValue] of element.attributes) {
-            attName = s(attName)
-            attValue = s(attValue)
+            attName = this.sanitize(attName)
+            attValue = this.sanitize(attValue)
             const [attPrefix, attLocalName] = namespace_extractQName(attName)
             let attNamespace: string | null = null
             if (attPrefix === "xmlns" || (attPrefix === null && attLocalName === "xmlns")) {

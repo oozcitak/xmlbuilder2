@@ -226,3 +226,15 @@ Creates a processing instruction node. The function should return the parent ele
 * `data` - node data
 
 </details>
+
+### sanitize
+
+<details markdown="1">
+<summary><code><strong>sanitize</strong>(<code>str</code>: string)</code></summary>
+<br/>
+
+Sanitizes the given string by removing invalid characters as defined in the [XML spec](https://www.w3.org/TR/xml/#charsets).
+
+* `str` - string to sanitize
+
+</details>

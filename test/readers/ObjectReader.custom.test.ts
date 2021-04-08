@@ -58,4 +58,20 @@ describe('custom ObjectReader', () => {
       `)
   })
 
+  test('custom sanitizer', () => {
+    const obj = {
+      ele: 'element\0',
+      '!': '\0comment'
+    }
+
+    const doc = $$.create({ parser: { sanitize: () => "clean" } }).ele('root').ele(obj).doc()
+
+    expect($$.printTree(doc.node)).toBe($$.t`
+      root
+        clean
+          # clean
+        ! clean
+      `)
+  })
+
 })

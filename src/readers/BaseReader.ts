@@ -1,4 +1,5 @@
 import { XMLBuilderOptions, ExpandObject, XMLBuilder } from "../interfaces"
+import { sanitizeInput } from "../builder/dom"
 
 /**
  * Pre-serializes XML nodes.
@@ -47,6 +48,10 @@ export abstract class BaseReader<U extends string | ExpandObject> {
 
   _attribute(parent: XMLBuilder, namespace: string | null | undefined, name: string, value: string): XMLBuilder | undefined {
     return (namespace === undefined ? parent.att(name, value) : parent.att(namespace, name, value))
+  }
+
+  _sanitize(str: string): string {
+    return sanitizeInput(str, this._builderOptions.invalidCharReplacement)
   }
 
   /**
@@ -139,6 +144,15 @@ export abstract class BaseReader<U extends string | ExpandObject> {
    */
   attribute(parent: XMLBuilder, namespace: string | null | undefined, name: string, value: string): XMLBuilder | undefined {
     return this._attribute(parent, namespace, name, value)
+  }
+
+  /**
+   * Sanitizes input strings.
+   * 
+   * @param str - input string
+   */
+  sanitize(str: string): string {
+    return this._sanitize(str)
   }
 
 }

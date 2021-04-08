@@ -373,6 +373,13 @@ export type ParserOptions = {
    * @returns the parent element node
    */
   attribute?: (parent: XMLBuilder, namespace: string | null | undefined, name: string, value: string) => XMLBuilder | undefined
+
+  /**
+   * Sanitizes input strings.
+   * 
+   * @param str - input string
+   */
+  sanitize?(str: string): string
 }
 
 /**
