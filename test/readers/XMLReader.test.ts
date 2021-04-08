@@ -6,7 +6,7 @@ describe('XMLReader', () => {
     const xml = $$.t`
     <?xml version="1.1"?>
     <root/>
-    `    
+    `
 
     expect(() => $$.create(xml)).toThrow()
   })
@@ -35,10 +35,21 @@ describe('XMLReader', () => {
         <details>classified</details>
       </person>
     </root>
-    `    
+    `
 
     const result = $$.create(xml).end({ prettyPrint: true })
     expect(result).toEqual(xml)
+  })
+
+  test('returned node should be the top level node', () => {
+    const baz = $$.create().ele('Qroot').ele($$.t`
+      <Qfoo>
+        <Qbar>foobar</Qbar>
+      </Qfoo>
+      <Qbaz/>
+    `);
+
+    expect(baz.toString()).toBe('<Qbaz/>')
   })
 
 })

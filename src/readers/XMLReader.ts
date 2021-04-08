@@ -22,7 +22,9 @@ export class XMLReader extends BaseReader<string> {
   _parse(node: XMLBuilder, str: string): XMLBuilder {
     const lexer = new XMLStringLexer(str, { skipWhitespaceOnlyText: true })
 
+    let lastChild = node
     let context = node
+
     let token = lexer.nextToken()
     while (token.type !== TokenType.EOF) {
       switch (token.type) {
@@ -96,6 +98,7 @@ export class XMLReader extends BaseReader<string> {
             this.element(context, namespace, elementName) :
             this.element(context, undefined, elementName))
           if (elementNode === undefined) break
+          if (context.node === node.node) lastChild = elementNode
 
           // assign attributes
           for (let [attName, attValue] of element.attributes) {
@@ -135,6 +138,7 @@ export class XMLReader extends BaseReader<string> {
 
       token = lexer.nextToken()
     }
-    return context
+
+    return lastChild
   }
 }
