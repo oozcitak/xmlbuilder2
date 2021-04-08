@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [2.4.1] - 2021-04-08
+
+### Bug Fixes
+- Fixed node type dependency to `*` (see [#69](https://github.com/oozcitak/xmlbuilder2/issues/69) and [#84](https://github.com/oozcitak/xmlbuilder2/issues/84)).
+- Added documentation link to `next` function (see [#61](https://github.com/oozcitak/xmlbuilder2/issues/61)).
+- Applied `keepNullNodes` option to all types of text nodes (see [#56](https://github.com/oozcitak/xmlbuilder2/issues/56)).
+- Fixed a typo in `CHANGELOG` (see [#54](https://github.com/oozcitak/xmlbuilder2/issues/54)).
+
+### Features
+- Added `sanitize` function to parsers (see [#65](https://github.com/oozcitak/xmlbuilder2/issues/65)).
+
 ## [2.4.0] - 2020-09-14
 
 ### Bug Fixes
@@ -201,3 +212,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.3.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.2.0...v2.3.0
 [2.3.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.3.0...v2.3.1
 [2.4.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.3.1...v2.4.0
+[2.4.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.4.0...v2.4.1
