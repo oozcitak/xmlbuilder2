@@ -254,7 +254,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         // keep null nodes
         content = ""
       } else {
-        // skip null|undefined attributes
+        // skip null|undefined nodes
         return this
       }
     }
@@ -273,7 +273,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         // keep null nodes
         content = ""
       } else {
-        // skip null|undefined attributes
+        // skip null|undefined nodes
         return this
       }
     }
@@ -292,7 +292,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         // keep null nodes
         content = ""
       } else {
-        // skip null|undefined attributes
+        // skip null|undefined nodes
         return this
       }
     }
@@ -311,7 +311,7 @@ export class XMLBuilderImpl implements XMLBuilder {
         // keep null nodes
         content = ""
       } else {
-        // skip null|undefined attributes
+        // skip null|undefined nodes
         return this
       }
     }
