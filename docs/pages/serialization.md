@@ -245,16 +245,13 @@ with verbose set to `false`:
 ```js
 const { create } = require('xmlbuilder2');
 
-const doc = create().ele('root').att({ foo: 'bar', fizz: 'buzz' });
+const doc = create().ele('root').ele('node').txt('text').up().ele('node');
 console.log(doc.end({ format: 'object', verbose: false }));
 ```
 ```js
 {
   root: {
-    node: [
-      "text",
-      {}
-    ]
+    node: "text"
   }
 }
 ```
