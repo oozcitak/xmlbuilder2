@@ -251,7 +251,10 @@ console.log(doc.end({ format: 'object', verbose: false }));
 ```js
 {
   root: {
-    node: "text"
+    node: [
+      "text",
+      {}
+    ]
   }
 }
 ```
