@@ -95,7 +95,7 @@ which would result in the following:
 
 ### Namespace Defaults
 
-`xmlbuilder2` can automatically insert namespace defaults for all element and attributes. This is especially useful for MathML and SVG documents. For example, to create the yin and yang svg:
+`xmlbuilder2` can automatically insert namespace defaults for all element and attributes. This is especially useful for MathML and SVG documents. For example, to create the yin and yang SVG:
 ```js
 const { create } = require('xmlbuilder2');
 
