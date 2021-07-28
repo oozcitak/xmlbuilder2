@@ -20,7 +20,7 @@
   "main": "./lib/index",
   "browser": "./lib/xmlbuilder2.min.js",
   "engines": {
-    "node": ">=10.0"
+    "node": ">=12.0"
   },
   "files": [
     "lib/**/*"
