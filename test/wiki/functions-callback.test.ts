@@ -5,7 +5,7 @@ import { createCB, fragmentCB } from '../../src'
 
 describe('examples in the callback function reference wiki page', () => {
 
-  test('documentCB()', async (done) => {
+  test('documentCB()', (done) => {
     const filename = resolve(__dirname, 'functions-documentCB.test.out')
     const outFile = createWriteStream(filename)
     
@@ -27,7 +27,7 @@ describe('examples in the callback function reference wiki page', () => {
       .end()
   })
 
-  test('fragmentCB()', async (done) => {
+  test('fragmentCB()', (done) => {
     const filename = resolve(__dirname, 'functions-fragmentCB.test.out')
     const outFile = createWriteStream(filename)
     
@@ -49,7 +49,7 @@ describe('examples in the callback function reference wiki page', () => {
       .end()
   })
 
-  test('EventEmitter', async (done) => {
+  test('EventEmitter', (done) => {
     const filename = resolve(__dirname, 'functions-EventEmitter.test.out')
     const outFile = createWriteStream(filename)
     

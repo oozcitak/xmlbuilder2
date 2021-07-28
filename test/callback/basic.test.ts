@@ -130,9 +130,8 @@ describe('basic callback API tests', () => {
         } else if (chunk === "<grandchild>") {
           expect(level).toBe(2)
         }
-
-        done()
-      }
+      },
+      end: () => done()
     })
 
     xmlStream.dec()
@@ -144,6 +143,7 @@ describe('basic callback API tests', () => {
     xmlStream.up()
     xmlStream.up()
     xmlStream.com("comment2")
+    xmlStream.end()
   })
 
   test('No double encoding', (done) => {

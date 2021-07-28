@@ -342,14 +342,16 @@ describe('namespaces', () => {
       </root>`, done)      
   })
 
-  test('built-in namespace alias', (done) => {
-    const xmlStream1 = $$.createCB()
-    xmlStream1.ele('@xml', 'root').att('@xml', 'att', 'val').end()
-    $$.expectCBResult(xmlStream1, '<xml:root xml:att="val"/>', done)
+  test('built-in namespace alias 1', (done) => {
+    const xmlStream = $$.createCB()
+    xmlStream.ele('@xml', 'root').att('@xml', 'att', 'val').end()
+    $$.expectCBResult(xmlStream, '<xml:root xml:att="val"/>', done)
+  })
 
-    const xmlStream2 = $$.createCB()
-    xmlStream2.ele('@svg', 'root').end()
-    $$.expectCBResult(xmlStream2, '<root xmlns="http://www.w3.org/2000/svg"/>', done)
+  test('built-in namespace alias 2', (done) => {
+    const xmlStream = $$.createCB()
+    xmlStream.ele('@svg', 'root').end()
+    $$.expectCBResult(xmlStream, '<root xmlns="http://www.w3.org/2000/svg"/>', done)
   })
 
   test('custom namespace alias', (done) => {

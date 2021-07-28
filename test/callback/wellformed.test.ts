@@ -135,20 +135,46 @@ describe('well-formed checks', () => {
     $$.expectCBError(xmlStream, () => xmlStream.txt('abc😊\0'), done)
   })
 
-  test('invalid document type node', (done) => {
+  test('invalid document type node 1', (done) => {
     const xmlStream = $$.createCB({ wellFormed: true })
     $$.expectCBError(xmlStream, () => xmlStream.dtd({ name: 'root\0', pubID: 'pub' }), done)
+  })
+
+  test('invalid document type node 2', (done) => {
+    const xmlStream = $$.createCB({ wellFormed: true })
     $$.expectCBError(xmlStream, () => xmlStream.dtd({ name: 'x:y:z', pubID: 'pub' }), done)
+  })
+
+  test('invalid document type node 3', (done) => {
+    const xmlStream = $$.createCB({ wellFormed: true })
     $$.expectCBError(xmlStream, () => xmlStream.dtd({ name: 'root', pubID: 'abc😊\0' }), done)
+  })
+
+  test('invalid document type node 4', (done) => {
+    const xmlStream = $$.createCB({ wellFormed: true })
     $$.expectCBError(xmlStream, () => xmlStream.dtd({ name: 'root', sysID: '\0' }), done)
+  })
+
+  test('invalid document type node 5', (done) => {
+    const xmlStream = $$.createCB({ wellFormed: true })
     $$.expectCBError(xmlStream, () => xmlStream.dtd({ name: 'root', sysID: '\'quote mismatch"' }), done)
   })
 
-  test('invalid processing instruction node', (done) => {
+  test('invalid processing instruction node 1', (done) => {
     const xmlStream = $$.createCB({ wellFormed: true })
     xmlStream.ele('ns', 'root')
     $$.expectCBError(xmlStream, () => xmlStream.ins(':'), done)
+  })
+
+  test('invalid processing instruction node 2', (done) => {
+    const xmlStream = $$.createCB({ wellFormed: true })
+    xmlStream.ele('ns', 'root')
     $$.expectCBError(xmlStream, () => xmlStream.ins('xml'), done)
+  })
+
+  test('invalid processing instruction node 3', (done) => {
+    const xmlStream = $$.createCB({ wellFormed: true })
+    xmlStream.ele('ns', 'root')
     $$.expectCBError(xmlStream, () => xmlStream.ins('name', '\0'), done)
   })
 
