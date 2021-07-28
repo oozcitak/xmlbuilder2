@@ -28,7 +28,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
       lastChild = this.parse(node, obj.apply(this))
     } else if (isArray(obj) || isSet(obj)) {
       forEachArray(obj, item => lastChild = this.parse(node, item), this)
-    } else /* if (isMap(obj) || isObject(obj)) */ {
+    } else if (isMap(obj) || isObject(obj)) {
       // expand if object
       forEachObject(obj, (key, val) => {
         if (isFunction(val)) {
@@ -127,6 +127,11 @@ export class ObjectReader extends BaseReader<ExpandObject> {
           lastChild = this.element(node, undefined, this.sanitize(key)) || lastChild
         }
       }, this)
+    } else if (!options.keepNullNodes && (obj == null)) {
+      // skip null and undefined nodes
+    } else {
+      // text node
+      lastChild = this.text(node, this.sanitize(obj)) || lastChild
     }
 
     return lastChild || node

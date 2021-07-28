@@ -13,7 +13,7 @@ describe("Replicate issue", () => {
       }
     };
     const doc = $$.create().ele(obj2);
-    expect(doc.end({ prettyPrint: true})).toBe(`
+    expect(doc.end({ headless: true, prettyPrint: true})).toBe($$.t`
     <monologue>
       Talk to me Goose!
       <cut>dog tag shot</cut>
