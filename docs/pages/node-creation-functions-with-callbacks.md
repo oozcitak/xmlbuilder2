@@ -483,6 +483,57 @@ xmlBuilder.ele('root').txt('val').end();
 
 </details>
 
+### import
+
+Imports and serializes a node. Descendant nodes and
+attributes will also be imported.
+
+{% capture cb_note %}
+  The node will be cloned before being imported and this clone will be 
+  inserted into the document; not the original node.
+{% endcapture %}
+{% include note.html content=cb_note %}
+
+{% capture cb_note %}
+  If the imported node is a document, its document element node will be
+  imported. If the imported node is a document fragment, its child nodes will be
+  imported. 
+{% endcapture %}
+{% include note.html content=cb_note %}
+
+<details markdown="1">
+<summary><code><strong>import</strong>(<code>node</code>: XMLBuilderNode)</code></summary>
+<br/>
+
+* `node` - the node to import
+
+```js
+const { createCB, create } = require('xmlbuilder2');
+
+const xmlBuilder = createCB({ 
+  data: (chunk) => console.log(chunk)
+  end: () => { },
+  prettyPrint: true
+});
+const item1 = create().ele('item').txt('001').up();
+const item2 = create().ele('item').txt('002').up();
+
+xmlBuilder.ele('root').import(item1).import(item2).end();
+
+```
+```xml
+<root>
+  <item>
+    001
+  </item>
+  <item>
+    002
+  </item>
+</root>
+```
+
+</details>
+
 ___
 
 ###  on

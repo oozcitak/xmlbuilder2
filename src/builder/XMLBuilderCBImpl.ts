@@ -341,6 +341,22 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
   }
 
   /** @inheritdoc */
+  import(node: XMLBuilder): this {
+    const frag = fragment().set(this._options as unknown as Partial<XMLBuilderOptions>)
+    try {
+      frag.import(node)
+    } catch (err) {
+      this.emit("error", err)
+      return this
+    }
+
+    for (const node of frag.node.childNodes) {
+      this._fromNode(node)
+    }
+    return this
+  }
+
+  /** @inheritdoc */
   up(): this {
     this._serializeOpenTag(false)
     this._serializeCloseTag()

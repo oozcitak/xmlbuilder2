@@ -1254,6 +1254,23 @@ export interface XMLBuilderCB {
   dtd(options: DTDOptions & { name: string }): this
 
   /**
+   * Imports a node as a child node of this node. The nodes' descendants and
+   * attributes will also be imported. 
+   * 
+   * @param node - the node to import
+   * 
+   * _Note:_ The node will be cloned before being imported and this clone will
+   * be inserted into the document; not the original node.
+   * 
+   * _Note:_ If the imported node is a document, its document element node will
+   * be imported. If the imported node is a document fragment its child nodes
+   * will be imported.
+   * 
+   * @returns callback builder
+   */
+  import(node: XMLBuilder): this
+
+  /**
    * Closes the current element node.
    * 
    * @returns callback builder
