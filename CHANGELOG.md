@@ -13,7 +13,8 @@ All notable changes to this project are documented in this file. This project ad
 - Added the `import` function to callback API (see [#2](https://github.com/oozcitak/xmlbuilder2/issues/2)).
 
 ### BREAKING CHANGES
-- Removed support for node.js 10
+- Removed support for node.js 10.
+- Removed the `noDoubleEncoding` flag from serializers. Parsers now decode predefined entities (see [#82](https://github.com/oozcitak/xmlbuilder2/issues/82), [#88](https://github.com/oozcitak/xmlbuilder2/issues/88) and [#98](https://github.com/oozcitak/xmlbuilder2/issues/98)).
 
 ## [2.4.1] - 2021-04-08
 
@@ -35,7 +36,7 @@ All notable changes to this project are documented in this file. This project ad
 
 ### Features
 - Added `declaration` function to serializers.
-- Add YAML parser to callback builder
+- Add YAML parser to callback builder.
 
 ## [2.3.1] - 2020-08-05
 
