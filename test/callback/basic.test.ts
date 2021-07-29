@@ -102,6 +102,20 @@ describe('basic callback API tests', () => {
     $$.expectCBResult(xmlStream, `<root><?target value?></root>`, done)
   })
 
+  test('import', (done) => {
+    const frag1 = $$.fragment().ele("node1")
+    const frag2 = $$.fragment().ele("node2")
+
+    const xmlStream = $$.createCB()
+
+    xmlStream.ele("root")
+      .import(frag1)
+      .import(frag2)
+      .end()
+
+    $$.expectCBResult(xmlStream, `<root><node1/><node2/></root>`, done)
+  })
+
   test('nodes at root level', (done) => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
@@ -162,6 +176,18 @@ describe('basic callback API tests', () => {
       '<root att="attribute value with &amp; and &amp;#38;">' +
       'XML entities for ampersand are &amp; and &amp;#38;.' +
       '</root>', done)
+  })
+
+  test('empty ele should throw', (done) => {
+    const xmlStream = $$.createCB()
+
+    $$.expectCBError(xmlStream, () => xmlStream.ele(undefined as any), done)
+  })
+
+  test('empty import should throw', (done) => {
+    const xmlStream = $$.createCB()
+
+    $$.expectCBError(xmlStream, () => xmlStream.import(undefined as any), done)
   })
 
 })
