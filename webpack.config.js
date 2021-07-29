@@ -50,6 +50,7 @@ module.exports = {
     filename: 'xmlbuilder2.min.js',
     path: path.resolve(__dirname, 'lib'),
     library: 'xmlbuilder2',
-    libraryTarget: 'umd' 
+    libraryTarget: 'umd',
+    globalObject: 'this'
   }
 };
