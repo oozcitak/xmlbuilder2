@@ -1,5 +1,5 @@
 import $$ from '../TestHelpers'
-import { parseXml } from 'libxmljs'
+import { parseXml } from 'libxmljs2'
 
 describe('Simple XSD validation', () => {
 
