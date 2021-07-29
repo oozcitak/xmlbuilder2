@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [3.0.0] - 2021-07-29
+
+### Bug Fixes
+- Fixed a bug where parsers did not decode predefined entities (see [#82](https://github.com/oozcitak/xmlbuilder2/issues/82), [#88](https://github.com/oozcitak/xmlbuilder2/issues/88) and [#98](https://github.com/oozcitak/xmlbuilder2/issues/98)).
+- Fixed a bug where XML parser would not always return the last top level element node created (see [#81](https://github.com/oozcitak/xmlbuilder2/issues/81)).
+- Fixed a bug where JS object parser would fail to parse mixed content (see [#90](https://github.com/oozcitak/xmlbuilder2/issues/90)).
+
+### Features
+- Added the `import` function to callback API (see [#2](https://github.com/oozcitak/xmlbuilder2/issues/2)).
+
+### BREAKING CHANGES
+- Removed support for node.js 10
+
 ## [2.4.1] - 2021-04-08
 
 ### Bug Fixes
@@ -213,3 +226,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.3.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.3.0...v2.3.1
 [2.4.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.3.1...v2.4.0
 [2.4.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.4.0...v2.4.1
+[3.0.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.4.1...v3.0.0
