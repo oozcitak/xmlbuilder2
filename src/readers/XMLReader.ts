@@ -7,7 +7,6 @@ import { namespace as infraNamespace } from "@oozcitak/infra"
 import { namespace_extractQName } from "@oozcitak/dom/lib/algorithm"
 import { XMLBuilder, XMLBuilderOptions } from "../interfaces"
 import { BaseReader } from "./BaseReader"
-import { decode } from "he"
 
 /**
  * Parses XML nodes from an XML document string.
@@ -64,7 +63,7 @@ export class XMLReader extends BaseReader<string> {
           break
         case TokenType.Text:
           const text = <TextToken>token
-          context = this.text(context, decode(this.sanitize(text.data))) || context
+          context = this.text(context, this._decodeText(this.sanitize(text.data))) || context
           break
         case TokenType.Element:
           const element = <ElementToken>token
@@ -120,9 +119,9 @@ export class XMLReader extends BaseReader<string> {
             }
 
             if (attNamespace !== null)
-              this.attribute(elementNode, attNamespace, attName, attValue)
+              this.attribute(elementNode, attNamespace, attName, this._decodeAttributeValue(attValue))
             else
-              this.attribute(elementNode, undefined, attName, attValue)
+              this.attribute(elementNode, undefined, attName, this._decodeAttributeValue(attValue))
           }
 
           if (!element.selfClosing) {

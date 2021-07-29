@@ -7,7 +7,7 @@ describe("Replicate issue", () => {
       text: 'Hello \r\n'
     }).ele('child').txt('Line 1\r\nLine 2\r\nLine 3')
     
-    expect(root.end({ headless: true, prettyPrint: true, noDoubleEncoding: true, newline: '\r\n' })).toBe(
+    expect(root.end({ headless: true, prettyPrint: true, newline: '\r\n' })).toBe(
     '<parent text="Hello \r\n">\r\n' +
     '  <child>Line 1\r\n' +
     'Line 2\r\n' +

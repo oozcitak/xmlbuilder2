@@ -44,13 +44,13 @@ export class ObjectReader extends BaseReader<ExpandObject> {
             } else /* if (isMap(val) || isObject(val)) */ {
               forEachObject(val, (attrKey, attrVal) => {
                 lastChild = this.attribute(node, undefined,
-                  this.sanitize(attrKey), this.sanitize(attrVal as string)) || lastChild
+                  this.sanitize(attrKey), this._decodeAttributeValue(this.sanitize(attrVal as string))) || lastChild
               })
             }
           } else {
             lastChild = this.attribute(node, undefined,
               this.sanitize(key.substr(options.convert.att.length)),
-              this.sanitize(val)) || lastChild
+              this._decodeAttributeValue(this.sanitize(val))) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.text) === 0) {
           // text node
@@ -58,7 +58,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
             // if the key is #text expand child nodes under this node to support mixed content
             lastChild = this.parse(node, val)
           } else {
-            lastChild = this.text(node, this.sanitize(val)) || lastChild
+            lastChild = this.text(node, this._decodeText(this.sanitize(val))) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.cdata) === 0) {
           // cdata node
@@ -120,7 +120,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
           const parent = this.element(node, undefined, this.sanitize(key))
           if (parent) {
             lastChild = parent
-            this.text(parent, this.sanitize(val))
+            this.text(parent, this._decodeText(this.sanitize(val)))
           }
         } else {
           // leaf element node
@@ -131,7 +131,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
       // skip null and undefined nodes
     } else {
       // text node
-      lastChild = this.text(node, this.sanitize(obj)) || lastChild
+      lastChild = this.text(node, this._decodeText(this.sanitize(obj))) || lastChild
     }
 
     return lastChild || node

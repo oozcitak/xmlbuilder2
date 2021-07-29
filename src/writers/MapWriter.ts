@@ -24,7 +24,6 @@ export class MapWriter extends BaseWriter<MapWriterOptions, XMLSerializedAsMap |
     this._writerOptions = applyDefaults(writerOptions, {
       format: "map",
       wellFormed: false,
-      noDoubleEncoding: false,
       group: false,
       verbose: false
     }) as Required<MapWriterOptions>
@@ -40,7 +39,6 @@ export class MapWriter extends BaseWriter<MapWriterOptions, XMLSerializedAsMap |
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(this._writerOptions, {
       format: "object",
       wellFormed: false,
-      noDoubleEncoding: false,
       verbose: false
     })
     const objectWriter = new ObjectWriter(this._builderOptions, objectWriterOptions)

@@ -55,6 +55,28 @@ export abstract class BaseReader<U extends string | ExpandObject> {
   }
 
   /**
+   * Decodes serialized text.
+   * 
+   * @param text - text value to serialize
+   */
+  _decodeText(text: string): string {
+    return text == null ? text : text.replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+  }
+
+  /**
+   * Decodes serialized attribute value.
+   * 
+   * @param text - attribute value to serialize
+   */
+  _decodeAttributeValue(text: string): string {
+    return text == null ? text : text.replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+  }
+
+  /**
    * Main parser function which parses the given object and returns an XMLBuilder.
    * 
    * @param node - node to recieve parsed content

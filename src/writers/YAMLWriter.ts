@@ -25,7 +25,6 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
     // provide default options
     this._writerOptions = applyDefaults(writerOptions, {
       wellFormed: false,
-      noDoubleEncoding: false,
       indent: '  ',
       newline: '\n',
       offset: 0,
@@ -51,8 +50,7 @@ export class YAMLWriter extends BaseWriter<YAMLWriterOptions, string> {
     // convert to object
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(this._writerOptions, {
       format: "object",
-      wellFormed: false,
-      noDoubleEncoding: false,
+      wellFormed: false
     })
     const objectWriter = new ObjectWriter(this._builderOptions, objectWriterOptions)
     const val = objectWriter.serialize(node)

@@ -586,37 +586,7 @@ describe('XMLWriter', () => {
       `)
   })
 
-  test('No double encoding', () => {
-    const obj = {
-      root: {
-        '@att': 'attribute value with &amp; and &#38;',
-        '#': 'XML entities for ampersand are &amp; and &#38;.'
-      }
-    }
-
-    expect($$.create(obj).end({ noDoubleEncoding: true })).toBe(
-      '<?xml version="1.0"?>' +
-      '<root att="attribute value with &amp; and &amp;#38;">' +
-      'XML entities for ampersand are &amp; and &amp;#38;.' +
-      '</root>')
-  })
-
-  test('Double encoding', () => {
-    const obj = {
-      root: {
-        '@att': 'attribute value with &amp; and &#38;',
-        '#': 'XML entities for ampersand are &amp; and &#38;.'
-      }
-    }
-
-    expect($$.create(obj).end({ noDoubleEncoding: false })).toBe(
-      '<?xml version="1.0"?>' +
-      '<root att="attribute value with &amp;amp; and &amp;#38;">' +
-      'XML entities for ampersand are &amp;amp; and &amp;#38;.' +
-      '</root>')
-  })
-
-  test('Double encoding - default behavior', () => {
+  test('Encoding', () => {
     const obj = {
       root: {
         '@att': 'attribute value with &amp; and &#38;',
@@ -626,8 +596,8 @@ describe('XMLWriter', () => {
 
     expect($$.create(obj).end()).toBe(
       '<?xml version="1.0"?>' +
-      '<root att="attribute value with &amp;amp; and &amp;#38;">' +
-      'XML entities for ampersand are &amp;amp; and &amp;#38;.' +
+      '<root att="attribute value with &amp; and &amp;#38;">' +
+      'XML entities for ampersand are &amp; and &amp;#38;.' +
       '</root>')
   })
 

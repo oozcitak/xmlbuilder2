@@ -6,7 +6,7 @@ describe("Replicate issue", () => {
     expect(
       $$.convert(
         { example: "&lt;p&gt;Hello&nbsp;World&lt;/p&gt;" },
-        { format: "xml", noDoubleEncoding: true }
+        { format: "xml" }
       )
     ).toBe(
       '<?xml version="1.0"?><example>&lt;p&gt;Hello&amp;nbsp;World&lt;/p&gt;</example>'
@@ -14,7 +14,7 @@ describe("Replicate issue", () => {
     expect(
       $$.convert(
         { example: "&notanentity&lt;" },
-        { format: "xml", noDoubleEncoding: true }
+        { format: "xml" }
       )
     ).toBe('<?xml version="1.0"?><example>&amp;notanentity&lt;</example>')
   })

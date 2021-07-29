@@ -27,12 +27,11 @@
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
-    "@oozcitak/dom": "1.15.9",
+    "@oozcitak/dom": "1.15.10",
     "@oozcitak/infra": "1.0.8",
     "@oozcitak/util": "8.3.8",
     "@types/node": "*",
-    "js-yaml": "3.14.0",
-    "he": "1.2.0"
+    "js-yaml": "3.14.0"
   },
   "devDependencies": {
     "@babel/preset-env": "*",
@@ -42,7 +41,6 @@
     "@types/jest": "*",
     "@types/js-yaml": "3.11.1",
     "@types/libxmljs": "*",
-    "@types/he": "*",
     "babel-loader": "*",
     "benchmark": "*",
     "chalk": "*",

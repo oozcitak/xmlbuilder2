@@ -403,10 +403,6 @@ export type BaseWriterOptions = {
    * errors will be thrown. Defaults to `false`.
    */
   wellFormed?: boolean
-  /**
-   * Prevents existing html entities from being re-encoded. Defaults to `false`.
-   */
-  noDoubleEncoding?: boolean
 }
 
 /**
@@ -1358,10 +1354,6 @@ export type BaseCBWriterOptions = {
    * errors will be thrown. Defaults to `false`.
    */
   wellFormed: boolean
-  /**
-   * Prevents existing html entities from being re-encoded. Defaults to `false.
-   */
-  noDoubleEncoding: boolean
 }
 
 /**

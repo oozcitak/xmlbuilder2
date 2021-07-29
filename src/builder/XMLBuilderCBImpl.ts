@@ -212,24 +212,9 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       return this
     }
 
-    let markup = ""
-    if (this._options.noDoubleEncoding) {
-      markup = node.data.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-    } else {
-      for (let i = 0; i < node.data.length; i++) {
-        const c = node.data[i]
-        if (c === "&")
-          markup += "&amp;"
-        else if (c === "<")
-          markup += "&lt;"
-        else if (c === ">")
-          markup += "&gt;"
-        else
-          markup += c
-      }
-    }
+    const markup = node.data.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
 
     this._push(this._writer.text(markup))
     return this
@@ -696,28 +681,10 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
     if (value === null) return ""
 
-    if (this._options.noDoubleEncoding) {
-      return value.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-    } else {
-      let result = ""
-      for (let i = 0; i < value.length; i++) {
-        const c = value[i]
-        if (c === "\"")
-          result += "&quot;"
-        else if (c === "&")
-          result += "&amp;"
-        else if (c === "<")
-          result += "&lt;"
-        else if (c === ">")
-          result += "&gt;"
-        else
-          result += c
-      }
-      return result
-    }
+    return value.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
   }
 
   /**

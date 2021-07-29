@@ -146,43 +146,7 @@ describe('basic callback API tests', () => {
     xmlStream.end()
   })
 
-  test('No double encoding', (done) => {
-    const obj = {
-      root: {
-        '@att': 'attribute value with &amp; and &#38;',
-        '#': 'XML entities for ampersand are &amp; and &#38;.'
-      }
-    }
-
-    const xmlStream = $$.createCB({ noDoubleEncoding: true })
-
-    xmlStream.ele(obj).end()
-
-    $$.expectCBResult(xmlStream,
-      '<root att="attribute value with &amp; and &amp;#38;">' +
-      'XML entities for ampersand are &amp; and &amp;#38;.' +
-      '</root>', done)
-  })
-
-  test('Double encoding', (done) => {
-    const obj = {
-      root: {
-        '@att': 'attribute value with &amp; and &#38;',
-        '#': 'XML entities for ampersand are &amp; and &#38;.'
-      }
-    }
-
-    const xmlStream = $$.createCB({ noDoubleEncoding: false })
-
-    xmlStream.ele(obj).end()
-
-    $$.expectCBResult(xmlStream,
-      '<root att="attribute value with &amp;amp; and &amp;#38;">' +
-      'XML entities for ampersand are &amp;amp; and &amp;#38;.' +
-      '</root>', done)
-  })
-
-  test('Double encoding - default behavior', (done) => {
+  test('Encoding', (done) => {
     const obj = {
       root: {
         '@att': 'attribute value with &amp; and &#38;',
@@ -195,8 +159,8 @@ describe('basic callback API tests', () => {
     xmlStream.ele(obj).end()
 
     $$.expectCBResult(xmlStream,
-      '<root att="attribute value with &amp;amp; and &amp;#38;">' +
-      'XML entities for ampersand are &amp;amp; and &amp;#38;.' +
+      '<root att="attribute value with &amp; and &amp;#38;">' +
+      'XML entities for ampersand are &amp; and &amp;#38;.' +
       '</root>', done)
   })
 

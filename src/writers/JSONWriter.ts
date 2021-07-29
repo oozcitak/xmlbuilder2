@@ -26,7 +26,6 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
     // provide default options
     this._writerOptions = applyDefaults(writerOptions, {
       wellFormed: false,
-      noDoubleEncoding: false,
       prettyPrint: false,
       indent: '  ',
       newline: '\n',
@@ -46,8 +45,7 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
     // convert to object
     const objectWriterOptions: ObjectWriterOptions = applyDefaults(this._writerOptions, {
       format: "object",
-      wellFormed: false,
-      noDoubleEncoding: false,
+      wellFormed: false
     })
     const objectWriter = new ObjectWriter(this._builderOptions, objectWriterOptions)
     const val = objectWriter.serialize(node)
