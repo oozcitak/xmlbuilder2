@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [3.0.1] - 2021-07-29
+
+### Bug Fixes
+- Fixed a bug which prevented web workers from consuming the webpack bundle (see [#77](https://github.com/oozcitak/xmlbuilder2/issues/77)).
+
 ## [3.0.0] - 2021-07-29
 
 ### Bug Fixes
@@ -228,3 +233,4 @@ All notable changes to this project are documented in this file. This project ad
 [2.4.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.3.1...v2.4.0
 [2.4.1]: https://github.com/oozcitak/xmlbuilder2/compare/v2.4.0...v2.4.1
 [3.0.0]: https://github.com/oozcitak/xmlbuilder2/compare/v2.4.1...v3.0.0
+[3.0.1]: https://github.com/oozcitak/xmlbuilder2/compare/v3.0.0...v3.0.1
