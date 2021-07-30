@@ -1,0 +1,16 @@
+import $$ from "../TestHelpers";
+
+describe("Replicate issue", () => {
+  // https://github.com/oozcitak/xmlbuilder2/issues/99
+  test(`#99 - Most XML entities not being decoded by reader (with unknown entity)`, () => {
+    expect(() => $$.create('<ssid>Me &amp; Myself&apos;s WiFi &copy;&#x1D306;</ssid>')).toThrow()
+  })
+
+  test(`#99 - Most XML entities not being decoded by reader`, () => {
+    const xmlResponse = $$.create('<ssid>Me &amp; Myself&apos;s WiFi &#x1D306;</ssid>');
+    const networkResponse = xmlResponse.end({format: 'object'});
+    expect(networkResponse).toEqual({
+      ssid: `Me &amp; Myself's WiFi 𝌆`
+    })
+  })
+})
