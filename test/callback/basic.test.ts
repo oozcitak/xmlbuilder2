@@ -173,8 +173,8 @@ describe('basic callback API tests', () => {
     xmlStream.ele(obj).end()
 
     $$.expectCBResult(xmlStream,
-      '<root att="attribute value with &amp; and &amp;#38;">' +
-      'XML entities for ampersand are &amp; and &amp;#38;.' +
+      '<root att="attribute value with &amp; and &amp;">' +
+      'XML entities for ampersand are &amp; and &amp;.' +
       '</root>', done)
   })
 

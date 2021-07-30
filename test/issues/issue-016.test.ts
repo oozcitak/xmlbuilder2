@@ -9,7 +9,7 @@ describe("Replicate issue", () => {
         { format: "xml" }
       )
     ).toBe(
-      '<?xml version="1.0"?><example>&lt;p&gt;Hello&amp;nbsp;World&lt;/p&gt;</example>'
+      '<?xml version="1.0"?><example>&lt;p&gt;Hello&nbsp;World&lt;/p&gt;</example>'
     );
     expect(
       $$.convert(

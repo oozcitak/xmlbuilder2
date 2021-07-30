@@ -5,7 +5,6 @@ import {
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { LocalNameSet } from "@oozcitak/dom/lib/serializer/LocalNameSet"
 import { NamespacePrefixMap } from "@oozcitak/dom/lib/serializer/NamespacePrefixMap"
-import { InvalidStateError } from "@oozcitak/dom/lib/dom/DOMException"
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { xml_isName, xml_isLegalChar, xml_isPubidChar } from "@oozcitak/dom/lib/algorithm"
 
@@ -929,7 +928,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * 5. Replace any occurrences of ">" in markup by "&gt;".
      * 6. Return the value of markup.
      */
-    const markup = node.data.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
+    const markup = node.data.replace(/(?!&([^&;]*);)&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
 
@@ -1598,7 +1597,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * grammar requirement in the XML specification's AttValue production by
      * also replacing ">" characters.
      */
-    return value.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
+    return value.replace(/(?!&([^&;]*);)&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')

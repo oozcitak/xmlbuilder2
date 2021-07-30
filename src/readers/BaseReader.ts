@@ -2,11 +2,18 @@ import { XMLBuilderOptions, ExpandObject, XMLBuilder } from "../interfaces"
 import { sanitizeInput } from "../builder/dom"
 
 /**
- * Pre-serializes XML nodes.
+ * Parses XML nodes.
  */
 export abstract class BaseReader<U extends string | ExpandObject> {
 
   protected _builderOptions: XMLBuilderOptions
+  private static _entityTable: { [key: string]: string } = {
+    "lt": "<",
+    "gt": ">",
+    "amp": "&",
+    "quot": '"',
+    "apos": "'",
+  }
 
   /**
    * Initializes a new instance of `BaseReader`.
@@ -60,9 +67,13 @@ export abstract class BaseReader<U extends string | ExpandObject> {
    * @param text - text value to serialize
    */
   _decodeText(text: string): string {
-    return text == null ? text : text.replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
+    if (text == null) return text
+
+    return text.replace(/&(quot|amp|apos|lt|gt);/g, (_match, tag) =>
+      BaseReader._entityTable[tag]
+    ).replace(/&#(?:x([a-fA-F0-9]+)|([0-9]+));/g, (_match, hexStr, numStr) =>
+      String.fromCodePoint(parseInt(hexStr || numStr, hexStr ? 16 : 10))
+    )
   }
 
   /**
@@ -71,9 +82,7 @@ export abstract class BaseReader<U extends string | ExpandObject> {
    * @param text - attribute value to serialize
    */
   _decodeAttributeValue(text: string): string {
-    return text == null ? text : text.replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
+    return this._decodeText(text)
   }
 
   /**

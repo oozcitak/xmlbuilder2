@@ -596,8 +596,8 @@ describe('XMLWriter', () => {
 
     expect($$.create(obj).end()).toBe(
       '<?xml version="1.0"?>' +
-      '<root att="attribute value with &amp; and &amp;#38;">' +
-      'XML entities for ampersand are &amp; and &amp;#38;.' +
+      '<root att="attribute value with &amp; and &amp;">' +
+      'XML entities for ampersand are &amp; and &amp;.' +
       '</root>')
   })
 
