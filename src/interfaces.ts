@@ -37,6 +37,12 @@ export interface XMLBuilderOptions {
    * objects to nodes
    */
   ignoreConverters: boolean
+
+  /**
+   * Whether whitespace-only text nodes are skipped or not.
+   */
+  skipWhitespaceOnlyText: boolean
+
   /** 
    * Defines string keys used while converting JS objects to nodes.
    */
@@ -116,6 +122,7 @@ export const DefaultBuilderOptions: XMLBuilderOptions = {
   keepNullNodes: false,
   keepNullAttributes: false,
   ignoreConverters: false,
+  skipWhitespaceOnlyText: true,
   convert: {
     att: "@",
     ins: "?",

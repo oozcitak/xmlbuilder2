@@ -20,7 +20,7 @@ export class XMLReader extends BaseReader<string> {
    * @param str - XML document string to parse
    */
   _parse(node: XMLBuilder, str: string): XMLBuilder {
-    const lexer = new XMLStringLexer(str, { skipWhitespaceOnlyText: true })
+    const lexer = new XMLStringLexer(str, { skipWhitespaceOnlyText: this._builderOptions.skipWhitespaceOnlyText })
 
     let lastChild = node
     let context = node
