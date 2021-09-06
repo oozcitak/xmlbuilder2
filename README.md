@@ -17,6 +17,11 @@ An XML builder for [node.js](https://nodejs.org/).
 npm install xmlbuilder2
 ```
 
+### Documentation:
+
+See: https://oozcitak.github.io/xmlbuilder2/
+
+
 ### Usage:
 
 `xmlbuilder2` is a wrapper around DOM nodes which adds chainable functions to make it easier to create and work with XML documents. For example the following XML document:
@@ -171,10 +176,6 @@ You can build the minified production bundle (`lib/xmlbuilder2.min.js`) after cl
 <!-- latest version from unpkg -->
 <script src="https://unpkg.com/xmlbuilder2/lib/xmlbuilder2.min.js"></script>
 ```
-
-### Documentation:
-
-See: https://oozcitak.github.io/xmlbuilder2/
 
 ### Donations:
 Please consider becoming a backer or sponsor to help support development.
