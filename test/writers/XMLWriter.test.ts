@@ -389,6 +389,10 @@ describe('XMLWriter', () => {
   test('escape text data', () => {
     const ele = $$.create().ele('root').txt('&<>')
     expect(ele.toString()).toBe('<root>&amp;&lt;&gt;</root>')
+    const ele1 = $$.create().ele('root').txt('&<>;')
+    expect(ele1.toString()).toBe('<root>&amp;&lt;&gt;;</root>')
+    const ele2 = $$.create().ele('root').txt('& amp;')
+    expect(ele2.toString()).toBe('<root>&amp; amp;</root>')
   })
 
   test('escape attribute value', () => {
@@ -397,6 +401,8 @@ describe('XMLWriter', () => {
     const ele2 = $$.create().ele('root').att('att', 'val')
     Object.defineProperty((ele2.node as Element).attributes.item(0), "value", { value: null })
     expect(ele2.toString()).toBe('<root att=""/>')
+    const ele3 = $$.create().ele('root').att('att', '"&<>;')
+    expect(ele3.toString()).toBe('<root att="&quot;&amp;&lt;&gt;;"/>')
   })
 
   test('duplicate attribute name not well-formed', () => {
