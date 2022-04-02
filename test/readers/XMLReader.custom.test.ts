@@ -91,4 +91,31 @@ describe('custom XMLReader', () => {
     })
   })
 
+  test("skip whitespace only text", () => {
+    const xml = $$.t`
+    <?xml version="1.0"?>
+    <root>
+      <ele>      </ele>
+    </root>`
+
+    const doc = $$.create({ skipWhitespaceOnlyText: true }, xml).doc()
+    expect(doc.end()).toBe(`<?xml version="1.0"?><root><ele/></root>`)
+  })
+
+  test("retain whitespace only text", () => {
+    const xml = $$.t`
+    <?xml version="1.0"?>
+    <root>
+      <ele>    </ele>
+    </root>`
+
+    const doc = $$.create({ skipWhitespaceOnlyText: false }, xml).doc()
+
+    expect(doc.end()).toBe(
+      $$.t`
+      <?xml version="1.0"?><root>
+        <ele>    </ele>
+      </root>
+      `)
+  })
 })
