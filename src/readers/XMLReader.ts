@@ -3,6 +3,7 @@ import {
   TokenType, DeclarationToken, DocTypeToken, CDATAToken, CommentToken,
   TextToken, PIToken, ElementToken
 } from "@oozcitak/dom/lib/parser/interfaces"
+import { NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { namespace_extractQName } from "@oozcitak/dom/lib/algorithm"
 import { XMLBuilder, XMLBuilderOptions } from "../interfaces"
@@ -20,7 +21,7 @@ export class XMLReader extends BaseReader<string> {
    * @param str - XML document string to parse
    */
   _parse(node: XMLBuilder, str: string): XMLBuilder {
-    const lexer = new XMLStringLexer(str, { skipWhitespaceOnlyText: true })
+    const lexer = new XMLStringLexer(str, { skipWhitespaceOnlyText: this._builderOptions.skipWhitespaceOnlyText })
 
     let lastChild = node
     let context = node
@@ -62,6 +63,7 @@ export class XMLReader extends BaseReader<string> {
           context = this.instruction(context, this.sanitize(pi.target), this.sanitize(pi.data)) || context
           break
         case TokenType.Text:
+          if(context.node.nodeType === NodeType.Document) break
           const text = <TextToken>token
           context = this.text(context, this._decodeText(this.sanitize(text.data))) || context
           break
