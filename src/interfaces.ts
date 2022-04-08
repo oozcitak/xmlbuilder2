@@ -102,6 +102,10 @@ export interface XMLBuilderOptions {
    */
   invalidCharReplacement: string | ((char: string, offset: number, str: string) => string) | undefined
   /**
+   * Whether predefined entities and character references in text nodes are converted or not.
+   */
+  keepEntityCharRefs: boolean
+  /**
    * Defines custom parser functions.
    */
   parser: ParserOptions | undefined
@@ -143,6 +147,7 @@ export const DefaultBuilderOptions: XMLBuilderOptions = {
     xlink: "http://www.w3.org/1999/xlink"
   },
   invalidCharReplacement: undefined,
+  keepEntityCharRefs: false,
   parser: undefined
 }
 
@@ -1342,6 +1347,10 @@ export type XMLBuilderCBOptions = CBWriterOptions & {
  * a replacement character.
  */
   invalidCharReplacement: string | ((substring: string, ...args: any[]) => string) | undefined
+  /**
+   * Whether predefined entities and character references in text nodes are converted or not.
+   */
+  keepEntityCharRefs: boolean
 }
 
 /**
@@ -1507,7 +1516,8 @@ export const DefaultXMLBuilderCBOptions: Partial<XMLBuilderCBOptions> = {
     mathml: "http://www.w3.org/1998/Math/MathML",
     svg: "http://www.w3.org/2000/svg",
     xlink: "http://www.w3.org/1999/xlink"
-  }
+  },
+  keepEntityCharRefs: false
 }
 
 type RecursivePartial<T> = {
