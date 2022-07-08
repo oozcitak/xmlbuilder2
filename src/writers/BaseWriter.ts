@@ -928,7 +928,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * 5. Replace any occurrences of ">" in markup by "&gt;".
      * 6. Return the value of markup.
      */
-    const markup = node.data.replace(/(?!&([^&; ]*);)&/g, '&amp;')
+    const markup = node.data.replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
 
