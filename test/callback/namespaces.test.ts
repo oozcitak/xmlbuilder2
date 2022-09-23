@@ -29,6 +29,20 @@ describe('namespaces', () => {
         <bar/>
       </root>`, done)
   })
+  
+  test('do not add default namespace to later elements', (done) => {
+    const xmlStream = $$.createCB({ defaultNamespace: { ele: 'default-ns' }, namespaceAlias: {other:'other-ns'}, prettyPrint: true });
+    
+    xmlStream.ele('@other', 'o:root', {'xmlns':'default-ns'})
+        .ele('foo').up()
+        .ele('bar').up().end()
+    
+    $$.expectCBResult(xmlStream, $$.t`
+      <o:root xmlns="default-ns" xmlns:o="other-ns">
+        <foo/>
+        <bar/>
+      </root>`, done)
+  })
 
   test('XML namespace', (done) => {
     const xmlStream = $$.createCB({ prettyPrint: true })
