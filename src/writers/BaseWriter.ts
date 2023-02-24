@@ -7,6 +7,7 @@ import { LocalNameSet } from "@oozcitak/dom/lib/serializer/LocalNameSet"
 import { NamespacePrefixMap } from "@oozcitak/dom/lib/serializer/NamespacePrefixMap"
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { xml_isName, xml_isLegalChar, xml_isPubidChar } from "@oozcitak/dom/lib/algorithm"
+import { nonEntityAmpersandRegex } from "../constants"
 
 /**
  * Pre-serializes XML nodes.
@@ -928,7 +929,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * 5. Replace any occurrences of ">" in markup by "&gt;".
      * 6. Return the value of markup.
      */
-    const markup = node.data.replace(/(?!&([^&; ]*);)&/g, '&amp;')
+    const markup = node.data.replace(nonEntityAmpersandRegex, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
 
@@ -1597,7 +1598,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
      * grammar requirement in the XML specification's AttValue production by
      * also replacing ">" characters.
      */
-    return value.replace(/(?!&([^&; ]*);)&/g, '&amp;')
+    return value.replace(nonEntityAmpersandRegex, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
