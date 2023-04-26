@@ -30,7 +30,6 @@
     "@oozcitak/dom": "1.15.10",
     "@oozcitak/infra": "1.0.8",
     "@oozcitak/util": "8.3.8",
-    "@types/node": "*",
     "js-yaml": "3.14.0"
   },
   "devDependencies": {
@@ -40,6 +39,7 @@
     "@types/dedent": "*",
     "@types/jest": "*",
     "@types/js-yaml": "3.11.1",
+    "@types/node": "*",
     "babel-loader": "*",
     "benchmark": "*",
     "chalk": "*",
