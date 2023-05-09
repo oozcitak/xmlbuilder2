@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [3.1.1] - 2023-05-08
+
+### Bug Fixes
+
+- Moved `@types/node` to a dev dependency (see [#165](https://github.com/oozcitak/xmlbuilder2/issues/165)).
+- Bumped `js-yaml` up from a version with a known vulnerability (see [#141](https://github.com/oozcitak/xmlbuilder2/pull/141) and [#167](https://github.com/oozcitak/xmlbuilder2/pull/167)).
+
 ## [3.1.0] - 2023-04-24
 
 ### Features
@@ -299,3 +306,4 @@ All notable changes to this project are documented in this file. This project ad
 [3.0.1]: https://github.com/oozcitak/xmlbuilder2/compare/v3.0.0...v3.0.1
 [3.0.2]: https://github.com/oozcitak/xmlbuilder2/compare/v3.0.1...v3.0.2
 [3.1.0]: https://github.com/oozcitak/xmlbuilder2/compare/v3.0.2...v3.1.0
+[3.1.1]: https://github.com/oozcitak/xmlbuilder2/compare/v3.1.0...v3.1.1
