@@ -30,7 +30,7 @@
     "@oozcitak/dom": "1.15.10",
     "@oozcitak/infra": "1.0.8",
     "@oozcitak/util": "8.3.8",
-    "js-yaml": "3.14.0"
+    "js-yaml": "3.14.1"
   },
   "devDependencies": {
     "@babel/preset-env": "*",
