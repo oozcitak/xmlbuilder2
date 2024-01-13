@@ -73,6 +73,9 @@
     
     {% endif %}
 
+    {% if site.google_analytics %}
+    {% include google_analytics.html %}
+    {% endif %}
 </head>
 <body>
 {% include topnav.html %}
@@ -102,7 +105,4 @@
     </div>
 
 </body>
-{% if site.google_analytics %}
-{% include google_analytics.html %}
-{% endif %}
 </html>
