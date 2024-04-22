@@ -384,8 +384,6 @@ export class XMLBuilderImpl implements XMLBuilder {
           clone.prefix ? clone.prefix + ':' + clone.localName : clone.localName
         );
         const namespace = hostNode.lookupNamespaceURI(prefix)
-        console.log(prefix, namespace)
-    
         new XMLBuilderImpl(clone)._updateNamespace(namespace)
       }
     };
