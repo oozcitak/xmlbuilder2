@@ -384,6 +384,8 @@ export class XMLBuilderImpl implements XMLBuilder {
           clone.prefix ? clone.prefix + ':' + clone.localName : clone.localName
         );
         const namespace = hostNode.lookupNamespaceURI(prefix)
+        console.log(prefix, namespace)
+    
         new XMLBuilderImpl(clone)._updateNamespace(namespace)
       }
     };
@@ -771,7 +773,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       for (const childNode of ele.childNodes) {
         const newChildNode = childNode.cloneNode(true)
         newEle.appendChild(newChildNode)
-        if (Guard.isElementNode(newChildNode)) {
+        if (Guard.isElementNode(newChildNode) && !newChildNode._namespace) {
           const [newChildNodePrefix] = namespace_extractQName(newChildNode.prefix ? newChildNode.prefix + ':' + newChildNode.localName : newChildNode.localName)
           const newChildNodeNS = newEle.lookupNamespaceURI(newChildNodePrefix)
           new XMLBuilderImpl(newChildNode)._updateNamespace(newChildNodeNS)
