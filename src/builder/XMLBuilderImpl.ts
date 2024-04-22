@@ -377,6 +377,17 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     const importedNode = node.node
 
+    const updateImportedNodeNs = (clone: Element) => {
+      // update namespace of imported node only when not specified
+      if (!clone._namespace) {
+        const [prefix] = namespace_extractQName(
+          clone.prefix ? clone.prefix + ':' + clone.localName : clone.localName
+        );
+        const namespace = hostNode.lookupNamespaceURI(prefix)
+        new XMLBuilderImpl(clone)._updateNamespace(namespace)
+      }
+    };
+
     if (Guard.isDocumentNode(importedNode)) {
       // import document node
       const elementNode = importedNode.documentElement
@@ -385,18 +396,14 @@ export class XMLBuilderImpl implements XMLBuilder {
       }
       const clone = hostDoc.importNode(elementNode, true) as Element
       hostNode.appendChild(clone)
-      const [prefix] = namespace_extractQName(clone.prefix ? clone.prefix + ':' + clone.localName : clone.localName)
-      const namespace = hostNode.lookupNamespaceURI(prefix)
-      new XMLBuilderImpl(clone)._updateNamespace(namespace)
+      updateImportedNodeNs(clone)
     } else if (Guard.isDocumentFragmentNode(importedNode)) {
       // import child nodes
       for (const childNode of importedNode.childNodes) {
         const clone = hostDoc.importNode(childNode, true)
         hostNode.appendChild(clone)
         if (Guard.isElementNode(clone)) {
-          const [prefix] = namespace_extractQName(clone.prefix ? clone.prefix + ':' + clone.localName : clone.localName)
-          const namespace = hostNode.lookupNamespaceURI(prefix)
-          new XMLBuilderImpl(clone)._updateNamespace(namespace)
+          updateImportedNodeNs(clone)
         }
       }
     } else {
@@ -404,9 +411,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       const clone = hostDoc.importNode(importedNode, true)
       hostNode.appendChild(clone)
       if (Guard.isElementNode(clone)) {
-        const [prefix] = namespace_extractQName(clone.prefix ? clone.prefix + ':' + clone.localName : clone.localName)
-        const namespace = hostNode.lookupNamespaceURI(prefix)
-        new XMLBuilderImpl(clone)._updateNamespace(namespace)
+        updateImportedNodeNs(clone)
       }
     }
 
