@@ -1,9 +1,0 @@
-## Topnav single links
-## if you want to list an external url, use external_url instead of url. the theme will apply a different link base.
-topnav:
-- title: Topnav
-  items:
-    - title: '<i class="fa fa-github fa-lg"></i> GitHub'
-      external_url: https://github.com/oozcitak/xmlbuilder2
-    - title: '<i class="fa fa-npm fa-lg"></i> npm'
-      external_url: https://www.npmjs.com/package/xmlbuilder2
