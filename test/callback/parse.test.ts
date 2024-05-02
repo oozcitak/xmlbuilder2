@@ -10,9 +10,7 @@ describe('parse()', () => {
     xmlStream.ele(str).end()
 
     $$.expectCBResult(xmlStream, $$.t`
-    <root att="val">
-      text
-    </root>
+    <root att="val">text</root>
     `, done)
   })
 

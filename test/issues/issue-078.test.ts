@@ -28,9 +28,7 @@ describe("Replicate issue", () => {
     $$.expectCBResult(xmlStream, $$.t`
     <root>
       <title/>
-      <description>
-        Test description
-      </description>
+      <description>Test description</description>
     </root>
     `, done)
   })
