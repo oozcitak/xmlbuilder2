@@ -46,7 +46,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
   private _hasDocumentElement = false
   private _currentElement?: XMLBuilder
   private _currentElementSerialized = false
-  private _openTags: Array<[string, string | null, NamespacePrefixMap, boolean]> = []
+  private _openTags: Array<[string, string | null, NamespacePrefixMap, boolean /** has children */, boolean | undefined /** has text payload */]> = []
 
   private _prefixMap: NamespacePrefixMap
   private _prefixIndex: PrefixIndex
@@ -217,6 +217,11 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       .replace(/>/g, '&gt;')
 
     this._push(this._writer.text(markup))
+    const lastEl = this._openTags[this._openTags.length - 1]
+    // edge case: text on top level.
+    if (lastEl) {
+      lastEl[lastEl.length - 1] = true
+    }
     return this
   }
 
@@ -478,7 +483,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
      * Save qualified name, original inherited ns, original prefix map, and
      * hasChildren flag.
      */
-    this._openTags.push([qualifiedName, inheritedNS, this._prefixMap, hasChildren])
+    this._openTags.push([qualifiedName, inheritedNS, this._prefixMap, hasChildren, undefined])
 
     /**
      * New values of inherited namespace and prefix map will be used while
@@ -507,14 +512,14 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       return
     }
 
-    const [qualifiedName, ns, map, hasChildren] = lastEle
+    const [qualifiedName, ns, map, hasChildren, hasTextPayload] = lastEle
     /**
      * Restore original values of inherited namespace and prefix map.
      */
     this._prefixMap = map
     if (!hasChildren) return
 
-    this._push(this._writer.closeTag(qualifiedName))
+    this._push(this._writer.closeTag(qualifiedName, hasTextPayload))
     this._writer.endElement(qualifiedName)
   }
 

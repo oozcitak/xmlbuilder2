@@ -103,6 +103,7 @@ export abstract class BaseCBWriter<T extends BaseCBWriterOptions> {
    * 
    * @param name - node name
    */
+  abstract closeTag(name: string, hasTextPayload?: boolean): string
   abstract closeTag(name: string): string
 
   /**
