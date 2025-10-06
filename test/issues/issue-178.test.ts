@@ -1,7 +1,7 @@
 import $$ from '../TestHelpers';
 
 describe('Replicate issue', () => {
-  // https://github.com/oozcitak/xmlbuilder2/issues/90
+  // https://github.com/oozcitak/xmlbuilder2/issues/178
   describe(`#178 - Namespace is removed when importing fragments.`, () => {
     const expectedOutput = $$.t`<?xml version="1.0"?><Root xmlns="ns1"><Parent xmlns="ns2"><Child xmlns="ns3"><GrandChild xmlns="ns4">txt</GrandChild></Child></Parent></Root>`;
     describe(`with defined namespaces on each element`, () => {
