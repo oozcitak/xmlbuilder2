@@ -17,7 +17,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
 
   /**
    * Initializes a new instance of `ObjectWriter`.
-   * 
+   *
    * @param builderOptions - XML builder options
    * @param writerOptions - serialization options
    */
@@ -33,7 +33,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
 
   /**
    * Produces an XML serialization of the given node.
-   * 
+   *
    * @param node - node to serialize
    */
   serialize(node: Node): XMLSerializedAsObject | XMLSerializedAsObjectArray {
@@ -67,7 +67,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
      * {
      *   root: {
      *     node: [
-     *       { 
+     *       {
      *         "@att1": "val1",
      *         "@att2": "val2",
      *         "#1": "node text",
@@ -141,10 +141,12 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
         if (key === "@") {
           const attrs = (item as AttrNode)["@"]
           const attrKeys = Object.keys(attrs)
-          if (attrKeys.length === 1) {
-            obj[defAttrKey + attrKeys[0]] = attrs[attrKeys[0]]
+          if (!options.group || attrKeys.length === 1) {
+            for (const attrName in attrs) {
+              obj[defAttrKey + attrName] = attrs[attrName]
+            }
           } else {
-            obj[defAttrKey] = (item as AttrNode)["@"]
+            obj[defAttrKey] = attrs
           }
         }
       }
@@ -432,7 +434,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
 
   /**
    * Returns an object key for the given node type.
-   * 
+   *
    * @param nodeType - node type to get a key for
    */
   private _getNodeKey(nodeType: NodeType): string {
