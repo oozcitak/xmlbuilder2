@@ -49,7 +49,6 @@
     "glob": "*",
     "harmony-reflect": "*",
     "jest": "*",
-    "libxmljs2": "*",
     "ts-jest": "*",
     "ts-loader": "*",
     "ts-node": "*",
@@ -73,9 +72,6 @@
     "prepare": "tsc && webpack",
     "pretest": "rm -rf ./lib && tsc --version && tsc && webpack",
     "test": "jest --coverage",
-    "perf": "npm run pretest && ts-node ./perf/perf.ts",
-    "perf-cb": "npm run pretest && ts-node ./perf/perf-cb.ts",
-    "prof-serialize": "npm run pretest && rm -f isolate-*-v8.log && node --prof ./perf/prof-serialize.js && find . -name isolate-*-v8.log -exec mv {} isolate-v8.log ; && node --prof-process isolate-v8.log > isolate-serialize.log && rm isolate-v8.log",
     "postpublish": "git push --all && git push --tags",
     "servedocs": "(cd docs && bundle exec jekyll serve)"
   }
