@@ -1,3 +1,5 @@
+import { suite, test } from "node:test"
+import { deepEqual, notDeepEqual, throws, doesNotThrow } from "node:assert"
 import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
@@ -6,6 +8,14 @@ import { builder, create, fragment, convert, createCB, fragmentCB } from "../src
 import { XMLBuilderCB, XMLBuilderCBOptions, XMLBuilderCBCreateOptions } from "../src/interfaces"
 
 export default class TestHelpers {
+  suite = suite
+  test = test
+
+  deepEqual = deepEqual
+  notDeepEqual = notDeepEqual
+  throws = throws
+  doesNotThrow = doesNotThrow
+
   static builder = builder
   static create = create
   static fragment = fragment
@@ -47,7 +57,7 @@ export default class TestHelpers {
   }
 
   static expectCBResult(str: XMLBuilderCB, result: string, done: any) {
-    expect((str as any).result).toBe(result)
+    deepEqual((str as any).result, result)
     done()
   }
 
@@ -57,7 +67,8 @@ export default class TestHelpers {
 
   static expectCBError(str: XMLBuilderCB, testFunc: () => any, done: any) {
     testFunc()
-    expect((str as any).error).toBeInstanceOf(Error)
+    const test = (str as any).error instanceof Error
+    deepEqual(test , true)
     done()
   }
 
@@ -126,7 +137,7 @@ export default class TestHelpers {
 
   /**
    * Returns a string representation of the XML tree rooted at `node`.
-   * 
+   *
    * @param node - a DOM node
    * @param level - indentation level
    */

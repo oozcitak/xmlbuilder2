@@ -1,23 +1,17 @@
 {
   "compilerOptions": {
-      "target": "ES5",
-      "module": "CommonJS",
-      "declaration": true,
-      "lib": [
-          "ES5"
-      ],
-      "downlevelIteration": true,
-      "locale": "en",
-      "strict": true,
-      "newLine": "lf",
-      "sourceMap": true,
-      "esModuleInterop": true,
-      "outDir": "lib",
-      "types": [
-          "node",
-          "jest",
-          "dedent"
-      ]
+        "lib": [ "es2023" ],
+        "module": "nodenext",
+        "target": "es2022",
+
+        "strict": true,
+        "declaration": true,
+        "esModuleInterop": true,
+        "isolatedModules": true,
+        "newLine": "lf",
+        "sourceMap": true,
+        "outDir": "lib",
+        "types": [ "node", "dedent" ]
   },
   "include": [
       "src/**/*"

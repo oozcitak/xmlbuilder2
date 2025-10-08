@@ -13,7 +13,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
 
   /**
    * Parses the given document representation.
-   * 
+   *
    * @param node - node receive parsed XML nodes
    * @param obj - object to parse
    */
@@ -25,7 +25,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
 
     if (isFunction(obj)) {
       // evaluate if function
-      lastChild = this.parse(node, obj.apply(this))
+      lastChild = this.parse(node, Function.prototype.apply(obj, this))
     } else if (isArray(obj) || isSet(obj)) {
       forEachArray(obj, item => lastChild = this.parse(node, item), this)
     } else if (isMap(obj) || isObject(obj)) {
@@ -33,7 +33,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
       forEachObject(obj, (key, val) => {
         if (isFunction(val)) {
           // evaluate if function
-          val = val.apply(this)
+          val = Function.prototype.apply(val, this)
         }
 
         if (!options.ignoreConverters && key.indexOf(options.convert.att) === 0) {

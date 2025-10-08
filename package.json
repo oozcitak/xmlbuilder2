@@ -1,6 +1,6 @@
 {
   "name": "xmlbuilder2",
-  "version": "3.1.1",
+  "version": "4.0.0",
   "keywords": [
     "xml",
     "xmlbuilder"
@@ -20,59 +20,42 @@
   "main": "./lib/index",
   "browser": "./lib/xmlbuilder2.min.js",
   "engines": {
-    "node": ">=12.0"
+    "node": ">=20.0"
   },
   "files": [
     "lib/**/*"
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
-    "@oozcitak/dom": "1.15.10",
-    "@oozcitak/infra": "1.0.8",
-    "@oozcitak/util": "8.3.8",
-    "js-yaml": "3.14.1"
+    "@oozcitak/dom": "^2.0.1",
+    "@oozcitak/infra": "^2.0.1",
+    "@oozcitak/util": "^9.0.2",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "*",
+    "@babel/preset-env": "^7.28.3",
     "@babel/runtime-corejs3": "7.10.3",
-    "@types/benchmark": "*",
-    "@types/dedent": "*",
-    "@types/jest": "*",
-    "@types/js-yaml": "3.11.1",
-    "@types/node": "*",
-    "babel-loader": "*",
-    "benchmark": "*",
-    "chalk": "*",
-    "core-js": "3.6.5",
-    "dedent": "*",
-    "es6-proxy-polyfill": "*",
-    "glob": "*",
-    "harmony-reflect": "*",
-    "jest": "*",
-    "ts-jest": "*",
-    "ts-loader": "*",
-    "ts-node": "*",
-    "typescript": "*",
-    "webpack": "*",
-    "webpack-cli": "*",
-    "xmlbuilder": "*",
-    "xpath": "*"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "/test/.*\\.test\\.tsx?$",
-    "testEnvironment": "node",
-    "collectCoverageFrom": [
-      "src/**/*.{ts,tsx}"
-    ]
+    "@types/dedent": "^0.7.2",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.7.0",
+    "babel-loader": "^10.0.0",
+    "core-js": "^3.45.1",
+    "dedent": "^1.7.0",
+    "es6-proxy-polyfill": "^2.1.1",
+    "glob": "^11.0.3",
+    "harmony-reflect": "^1.6.2",
+    "ts-loader": "^9.5.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "webpack": "^5.102.0",
+    "webpack-cli": "^6.0.1",
+    "xmlbuilder": "^15.1.1",
+    "xpath": "^0.0.34",
+    "tsx": "^4.20.6"
   },
   "scripts": {
-    "prepare": "tsc && webpack",
-    "pretest": "rm -rf ./lib && tsc --version && tsc && webpack",
-    "test": "jest --coverage",
-    "postpublish": "git push --all && git push --tags",
-    "servedocs": "(cd docs && bundle exec jekyll serve)"
+    "test": "tsc && tsx --test --experimental-test-coverage test/**/*test.ts",
+    "cover": "tsc && tsx --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=./coverage/lcov.info test/**/*test.ts",
+    "publish-public": "tsc && npm run cover && npm publish --access public"
   }
 }
