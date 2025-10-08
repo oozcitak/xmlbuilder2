@@ -1,9 +1,9 @@
 import $$ from '../TestHelpers'
 import { XMLBuilderCBImpl } from '../../src/builder'
 
-describe('XMLStream options', () => {
+$$.suite('XMLStream options', () => {
 
-  test('options defaults', () => {
+  $$.test('options defaults', () => {
     const xmlStream = new XMLBuilderCBImpl({
       data: (() => { }),
       end: (() => { }),
@@ -12,22 +12,22 @@ describe('XMLStream options', () => {
 
     const options = xmlStream._options
 
-    expect(typeof options.data).toBe('function')
-    expect(typeof options.end).toBe('function')
-    expect(typeof options.error).toBe('function')
-    expect(options.wellFormed).toBe(false)
-    expect(options.prettyPrint).toBe(false)
-    expect(options.indent).toBe("  ")
-    expect(options.newline).toBe("\n")
-    expect(options.offset).toBe(0)
-    expect(options.width).toBe(0)
-    expect(options.allowEmptyTags).toBe(false)
-    expect(options.spaceBeforeSlash).toBe(false)
-    expect(options.defaultNamespace).toEqual({
+    $$.deepEqual(typeof options.data, 'function')
+    $$.deepEqual(typeof options.end, 'function')
+    $$.deepEqual(typeof options.error, 'function')
+    $$.deepEqual(options.wellFormed, false)
+    $$.deepEqual(options.prettyPrint, false)
+    $$.deepEqual(options.indent, "  ")
+    $$.deepEqual(options.newline, "\n")
+    $$.deepEqual(options.offset, 0)
+    $$.deepEqual(options.width, 0)
+    $$.deepEqual(options.allowEmptyTags, false)
+    $$.deepEqual(options.spaceBeforeSlash, false)
+    $$.deepEqual(options.defaultNamespace, {
       ele: undefined,
       att: undefined
     })
-    expect(options.namespaceAlias).toEqual({
+    $$.deepEqual(options.namespaceAlias, {
       html: "http://www.w3.org/1999/xhtml",
       xml: "http://www.w3.org/XML/1998/namespace",
       xmlns: "http://www.w3.org/2000/xmlns/",
@@ -40,83 +40,83 @@ describe('XMLStream options', () => {
     xmlStream.ele('\0')
   })
 
-  test('no options', (done) => {
+  $$.test('no options', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.dec().ele('root').end()
 
-    $$.expectCBResult(xmlStream, `<?xml version="1.0"?><root/>`, done)
+    await $$.expectCBResult(xmlStream, `<?xml version="1.0"?><root/>`)
   })
 
-  test('prettyPrint', (done) => {
+  $$.test('prettyPrint', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec().ele('root').end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0"?>
-      <root/>`, done)
+      <root/>`)
   })
 
-  test('wellFormed', (done) => {
+  $$.test('wellFormed', async () => {
     const xmlStream = $$.createCB({ wellFormed: true })
     xmlStream.ele('ns', 'root')
-    $$.expectCBError(xmlStream, () => xmlStream.com('--'), done)
+    await $$.expectCBError(xmlStream, () => xmlStream.com('--'))
   })
 
-  test('indent', (done) => {
+  $$.test('indent', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true, indent: "    " })
     xmlStream.ele('root').ele('node').end()
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <root>
           <node/>
-      </root>`, done)
+      </root>`)
   })
 
-  test('newline', (done) => {
+  $$.test('newline', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true, indent: '', newline: "!" })
     xmlStream.ele('root').ele('node').end()
-    $$.expectCBResult(xmlStream, `<root>!<node/>!</root>`, done)
+    await $$.expectCBResult(xmlStream, `<root>!<node/>!</root>`)
   })
 
-  test('offset', (done) => {
+  $$.test('offset', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true, offset: 2 })
     xmlStream.ele('root').ele('node').end()
-    $$.expectCBResult(xmlStream,
+    await $$.expectCBResult(xmlStream,
       '    <root>\n' +
       '      <node/>\n' +
-      '    </root>', done)
+      '    </root>')
   })
 
-  test('allowEmptyTags', (done) => {
+  $$.test('allowEmptyTags', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true, allowEmptyTags: true })
     xmlStream.ele('root').ele('node').end()
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <root>
         <node></node>
-      </root>`, done)
+      </root>`)
   })
 
-  test('spaceBeforeSlash', (done) => {
+  $$.test('spaceBeforeSlash', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true, spaceBeforeSlash: true })
     xmlStream.ele('root').ele('node').end()
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <root>
         <node />
-      </root>`, done)
+      </root>`)
   })
 
-  test('width', (done) => {
+  $$.test('width', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true, width: 20 })
     xmlStream.ele('test').ele('node', { "first": "1", "second": "2" }).end()
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <test>
         <node first="1"
           second="2"/>
-      </test>`, done)
+      </test>`)
   })
 
-  test('skip null and undefined att values', (done) => {
+  $$.test('skip null and undefined att values', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
     xmlStream.ele({
       root: {
@@ -129,13 +129,13 @@ describe('XMLStream options', () => {
       }
     }).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <root>
         <node1 att="val" att1="val1"/>
-      </root>`, done)
+      </root>`)
   })
 
-  test('keep null att value with keepNullAttributes flag', (done) => {
+  $$.test('keep null att value with keepNullAttributes flag', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true, keepNullAttributes: true })
     xmlStream.ele({
       root: {
@@ -148,13 +148,13 @@ describe('XMLStream options', () => {
       }
     }).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <root>
         <node1 att="val" att1="val1" att2="" att3=""/>
-      </root>`, done)
+      </root>`)
   })
 
-  test('skip null and undefined node value', (done) => {
+  $$.test('skip null and undefined node value', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
     xmlStream.ele({
       root: {
@@ -173,14 +173,14 @@ describe('XMLStream options', () => {
       }
     }).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <root>
         <node1/>
         <node2/>
-      </root>`, done)
+      </root>`)
   })
 
-  test('keep null node value with keepNullNodes flag', (done) => {
+  $$.test('keep null node value with keepNullNodes flag', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true, keepNullNodes: true })
     xmlStream.ele({
       root: {
@@ -195,11 +195,11 @@ describe('XMLStream options', () => {
         '$1': null,
         '$2': undefined,
         '?1': null,
-        '?2': undefined        
+        '?2': undefined
       }
     }).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <root>
         <node1/>
         <node2/>
@@ -209,10 +209,10 @@ describe('XMLStream options', () => {
         <!---->
         <![CDATA[]]>
         <![CDATA[]]>
-      </root>`, done)
+      </root>`)
   })
 
-  test('custom converter', (done) => {
+  $$.test('custom converter', async () => {
     const obj = {
       'root': {
         '_att': 'val',
@@ -221,7 +221,7 @@ describe('XMLStream options', () => {
     }
     const xmlStream = $$.createCB({ convert: { att: '_' } })
     xmlStream.ele(obj).end()
-    $$.expectCBResult(xmlStream, '<root att="val">42</root>', done)
+    await $$.expectCBResult(xmlStream, '<root att="val">42</root>')
   })
 
 })

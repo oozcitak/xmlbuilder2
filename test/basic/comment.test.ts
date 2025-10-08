@@ -1,14 +1,14 @@
 import $$ from '../TestHelpers'
 
-describe('com()', () => {
+$$.suite('com()', () => {
 
-  test('basic', () => {
+  $$.test('basic', () => {
     const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     node1.com('node1 comment').ele('node1-2')
     const node2 = root.ele('node2')
 
-    expect($$.printTree(root.doc().node)).toBe($$.t`
+    $$.deepEqual($$.printTree(root.doc().node), $$.t`
       root
         node1
           ! node1 comment

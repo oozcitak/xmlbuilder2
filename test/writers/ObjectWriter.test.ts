@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('ObjectWriter', () => {
+$$.suite('ObjectWriter', () => {
 
-  test('basic', () => {
+  $$.test('basic', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -29,7 +29,7 @@ describe('ObjectWriter', () => {
     const result = $$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele('root').ele(obj).end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           ele: simple element,
@@ -60,7 +60,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('consecutive attributes', () => {
+  $$.test('consecutive attributes', () => {
     const result = $$.create().ele('root')
       .att("att1", "val1")
       .att("att2", "val2")
@@ -68,7 +68,7 @@ describe('ObjectWriter', () => {
       .ele("node").att("att", "val").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           @: {
@@ -82,7 +82,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('consecutive text nodes', () => {
+  $$.test('consecutive text nodes', () => {
     const result = $$.create().ele('root')
       .txt("text1")
       .txt("text2")
@@ -90,7 +90,7 @@ describe('ObjectWriter', () => {
       .ele("node").txt("text").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           #: [
@@ -104,7 +104,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('consecutive comment nodes', () => {
+  $$.test('consecutive comment nodes', () => {
     const result = $$.create().ele('root')
       .com("text1")
       .com("text2")
@@ -112,7 +112,7 @@ describe('ObjectWriter', () => {
       .ele("node").com("text").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           !: [
@@ -126,7 +126,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('consecutive cdata nodes', () => {
+  $$.test('consecutive cdata nodes', () => {
     const result = $$.create().ele('root')
       .dat("text1")
       .dat("text2")
@@ -134,7 +134,7 @@ describe('ObjectWriter', () => {
       .ele("node").dat("text").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           $: [
@@ -148,7 +148,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('consecutive instruction nodes', () => {
+  $$.test('consecutive instruction nodes', () => {
     const result = $$.create().ele('root')
       .ins("target1", "text1")
       .ins("target2", "text2")
@@ -156,7 +156,7 @@ describe('ObjectWriter', () => {
       .ele("node").ins("target", "text").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           ?: [
@@ -170,22 +170,22 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('duplicate tag names', () => {
+  $$.test('duplicate tag names', () => {
     const result = $$.create().ele('people')
       .ele('person').up()
       .ele('person').up()
       .end({ format: "object" })
 
-    expect(result).toEqual( { people: { person: [ {}, {} ] } } )
+    $$.deepEqual(result,  { people: { person: [ {}, {} ] } } )
   })
 
-  test('duplicate tag names with attributes', () => {
+  $$.test('duplicate tag names with attributes', () => {
     const result = $$.create().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         people: {
           person: [
@@ -197,13 +197,13 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('duplicate tag names with text child nodes', () => {
+  $$.test('duplicate tag names with text child nodes', () => {
     const result = $$.create().ele('people')
       .ele('person').txt("text").up()
       .ele('person').txt("text").up()
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         people: {
           person: [
@@ -215,14 +215,14 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content', () => {
+  $$.test('mixed content', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         people: {
           #1: hello,
@@ -233,7 +233,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content and duplicate tags', () => {
+  $$.test('mixed content and duplicate tags', () => {
     const result = $$.create().ele('people')
       .txt('text1')
       .ele('person', { name: "xxx" }).up()
@@ -243,7 +243,7 @@ describe('ObjectWriter', () => {
       .txt('text3')
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         people: {
           #1: text1,
@@ -259,7 +259,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content and interspersed duplicate tags', () => {
+  $$.test('mixed content and interspersed duplicate tags', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -269,7 +269,7 @@ describe('ObjectWriter', () => {
       .ele('person', { name: "aaa" }).up()
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         people: {
           #: [
@@ -289,7 +289,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - attributes', () => {
+  $$.test('mixed content - attributes', () => {
     const result = $$.create().ele('root')
       .att("att", "val")
       .ele("node").att("att", "val").up()
@@ -297,7 +297,7 @@ describe('ObjectWriter', () => {
       .ele("node").up()
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           @att: val,
@@ -311,7 +311,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - consecutive attributes', () => {
+  $$.test('mixed content - consecutive attributes', () => {
     const result = $$.create().ele('root')
       .att("att1", "val1")
       .att("att2", "val2")
@@ -321,7 +321,7 @@ describe('ObjectWriter', () => {
       .ele("node").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           @: {
@@ -339,7 +339,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - consecutive text nodes', () => {
+  $$.test('mixed content - consecutive text nodes', () => {
     const result = $$.create().ele('root')
       .txt("text1")
       .txt("text2")
@@ -349,7 +349,7 @@ describe('ObjectWriter', () => {
       .ele("node").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           #: [
@@ -369,7 +369,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - consecutive comment nodes', () => {
+  $$.test('mixed content - consecutive comment nodes', () => {
     const result = $$.create().ele('root')
       .com("text1")
       .com("text2")
@@ -379,7 +379,7 @@ describe('ObjectWriter', () => {
       .ele("node").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           #: [
@@ -399,7 +399,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - consecutive cdata nodes', () => {
+  $$.test('mixed content - consecutive cdata nodes', () => {
     const result = $$.create().ele('root')
       .dat("text1")
       .dat("text2")
@@ -409,7 +409,7 @@ describe('ObjectWriter', () => {
       .ele("node").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           #: [
@@ -429,7 +429,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - consecutive instruction nodes', () => {
+  $$.test('mixed content - consecutive instruction nodes', () => {
     const result = $$.create().ele('root')
       .ins("target1", "text1")
       .ins("target2", "text2")
@@ -439,7 +439,7 @@ describe('ObjectWriter', () => {
       .ele("node").up()
       .end({ format: "object", group: true })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           #: [
@@ -459,7 +459,7 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - consecutive nodes without group', () => {
+  $$.test('mixed content - consecutive nodes without group', () => {
     const result = $$.create().ele('root')
       .att("att1", "val1")
       .att("att2", "val2")
@@ -480,7 +480,7 @@ describe('ObjectWriter', () => {
       .txt("text")
       .end({ format: "object", group: false })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           @att1: val1,
@@ -505,14 +505,14 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - text suffix', () => {
+  $$.test('mixed content - text suffix', () => {
     const result = $$.create().ele('people')
       .txt('text1')
       .ele('person').up()
       .txt('text2')
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         people: {
           #1: text1,
@@ -523,14 +523,14 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - comment suffix', () => {
+  $$.test('mixed content - comment suffix', () => {
     const result = $$.create().ele('people')
       .com('text1')
       .ele('person').up()
       .com('text2')
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         people: {
           !1: text1,
@@ -541,14 +541,14 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - cdata suffix', () => {
+  $$.test('mixed content - cdata suffix', () => {
     const result = $$.create().ele('people')
       .dat('text1')
       .ele('person').up()
       .dat('text2')
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         people: {
           $1: text1,
@@ -559,14 +559,14 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('mixed content - processing instruction suffix', () => {
+  $$.test('mixed content - processing instruction suffix', () => {
     const result = $$.create().ele('people')
       .ins('target1', 'text1')
       .ele('person').up()
       .ins('target2', 'text2')
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         people: {
           ?1: target1 text1,
@@ -577,23 +577,23 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('doctype', () => {
+  $$.test('doctype', () => {
     const result = $$.create()
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       { root: { } }
       `)
   })
 
-  test('namespaces', () => {
+  $$.test('namespaces', () => {
     const result = $$.create().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .ele('bar').up()
       .doc()
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         root: {
           @xmlns: myns,
@@ -604,19 +604,19 @@ describe('ObjectWriter', () => {
       `)
   })
 
-  test('unknown node', () => {
+  $$.test('unknown node', () => {
     const ele = $$.create().ele('root').ele('alien')
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
-    expect(() => ele.end({ format: "object" })).toThrow()
+    $$.throws(() => ele.end({ format: "object" }))
   })
 
-  test('auto group', () => {
+  $$.test('auto group', () => {
     const root = $$.create().ele('root')
       .ele('node').up()
       .txt('text')
       .ele('node').up()
       .up()
-    expect(root.end({ format: "object", group: false })).toEqual({
+    $$.deepEqual(root.end({ format: "object", group: false }), {
       root: {
         '#': [
           { node: {} },
@@ -627,7 +627,7 @@ describe('ObjectWriter', () => {
     })
   })
 
-  test('fragment', () => {
+  $$.test('fragment', () => {
     const result = $$.fragment()
       .ele('foo', { att: "val" }).up()
       .ele('foo').up()
@@ -635,7 +635,7 @@ describe('ObjectWriter', () => {
       .ele('foo').up()
       .end({ format: "object" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       {
         #: [
           {
@@ -648,19 +648,19 @@ describe('ObjectWriter', () => {
           { foo: { } }
         ]
       }
-      `)      
+      `)
   })
 
-  test('fragment with unique keys', () => {
+  $$.test('fragment with unique keys', () => {
     const result = $$.fragment()
       .ele('foo').up()
       .ele('bar').up()
       .end({ format: "object" })
 
-    expect(result).toEqual({ foo: { }, bar: { } })
+    $$.deepEqual(result, { foo: { }, bar: { } })
   })
 
-  test("verbose", () => {
+  $$.test("verbose", () => {
     const input2 = $$.t`
     <data>
       <row id="0">
@@ -675,7 +675,7 @@ describe('ObjectWriter', () => {
     </data>`
 
     const obj2 = $$.convert(input2, { format: 'object', verbose: true })
-    expect(obj2).toEqual(
+    $$.deepEqual(obj2,
       {
         "data": [
           {
@@ -695,7 +695,7 @@ describe('ObjectWriter', () => {
           }
         ]
       })
-    expect($$.create(obj2).end({ headless: true, prettyPrint: true })).toBe(input2)
+    $$.deepEqual($$.create(obj2).end({ headless: true, prettyPrint: true }), input2)
 
     const input1 = $$.t`
     <data>
@@ -705,7 +705,7 @@ describe('ObjectWriter', () => {
       </row>
     </data>`
     const obj1 = $$.convert(input1, { format: 'object', verbose: true })
-    expect(obj1).toEqual(
+    $$.deepEqual(obj1,
       {
         "data": [
           {
@@ -719,14 +719,14 @@ describe('ObjectWriter', () => {
           }
         ]
       })
-    expect($$.create(obj1).end({ headless: true, prettyPrint: true })).toBe(input1)
+    $$.deepEqual($$.create(obj1).end({ headless: true, prettyPrint: true }), input1)
 
     const input3 = $$.t`
     <data>
       <row/>
     </data>`
     const obj3 = $$.convert(input3, { format: 'object', verbose: true })
-    expect(obj3).toEqual(
+    $$.deepEqual(obj3,
       {
         "data": [
           {
@@ -734,10 +734,10 @@ describe('ObjectWriter', () => {
           }
         ]
       })
-    expect($$.create(obj1).end({ headless: true, prettyPrint: true })).toBe(input1)    
+    $$.deepEqual($$.create(obj1).end({ headless: true, prettyPrint: true }), input1)
   })
 
-  test('fragment with verbose', () => {
+  $$.test('fragment with verbose', () => {
     const obj = $$.fragment()
       .ele('foo', { att: "val" }).up()
       .ele('foo').up()
@@ -745,7 +745,7 @@ describe('ObjectWriter', () => {
       .ele('foo').up()
       .end({ format: "object", verbose: true })
 
-    expect($$.printMap(obj)).toBe($$.t`
+    $$.deepEqual($$.printMap(obj), $$.t`
       {
         #: [
           {
@@ -758,7 +758,7 @@ describe('ObjectWriter', () => {
           { foo: [ { } ] }
         ]
       }
-      `)      
+      `)
   })
 
 })

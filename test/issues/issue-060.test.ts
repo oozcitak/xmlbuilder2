@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/60
-  test(`#60 - How to add stylesheet for sitemap?`, () => {
+  $$.test(`#60 - How to add stylesheet for sitemap?`, () => {
     const doc = $$.create({ version: '1.0', encoding: 'UTF-8' })
       .ins('xml-stylesheet', 'type="text/xsl" href="//example.com/sitemap.xsl"')
       .ele('sitemapindex', { xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9' })
@@ -13,7 +13,7 @@ describe("Replicate issue", () => {
       .up()
     .doc()
 
-    expect(doc.end({prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({prettyPrint: true }), $$.t`
     <?xml version="1.0" encoding="UTF-8"?>
     <?xml-stylesheet type="text/xsl" href="//example.com/sitemap.xsl"?>
     <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -25,7 +25,7 @@ describe("Replicate issue", () => {
     `)
   })
 
-  test(`#60 - How to add stylesheet for sitemap?`, () => {
+  $$.test(`#60 - How to add stylesheet for sitemap?`, () => {
     const doc = $$.create(
       { version: '1.0', encoding: 'UTF-8' },
       {
@@ -39,7 +39,7 @@ describe("Replicate issue", () => {
         }
       }).doc()
 
-    expect(doc.end({prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({prettyPrint: true }), $$.t`
     <?xml version="1.0" encoding="UTF-8"?>
     <?xml-stylesheet type="text/xsl" href="//example.com/sitemap.xsl"?>
     <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

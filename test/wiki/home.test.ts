@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('examples in the home wiki page', () => {
+$$.suite('examples in the home wiki page', () => {
 
-  test('example with ele', () => {
+  $$.test('example with ele', () => {
     const xmlStr = $$.t`
     <?xml version="1.0"?>
     <root att="val">
@@ -20,10 +20,10 @@ describe('examples in the home wiki page', () => {
       .ele("baz")
     .doc()
 
-    expect(doc.end({ prettyPrint: true })).toBe(xmlStr)
+    $$.deepEqual(doc.end({ prettyPrint: true }), xmlStr)
   })
 
-  test('example with JS object', () => {
+  $$.test('example with JS object', () => {
     const xmlStr = $$.t`
     <?xml version="1.0"?>
     <root att="val">
@@ -43,10 +43,10 @@ describe('examples in the home wiki page', () => {
       }
     })
 
-    expect(doc.end({ prettyPrint: true })).toBe(xmlStr)
+    $$.deepEqual(doc.end({ prettyPrint: true }), xmlStr)
   })
 
-  test('example with parser', () => {
+  $$.test('example with parser', () => {
     const xmlStr1 = $$.t`
     <?xml version="1.0"?>
     <root att="val">
@@ -66,7 +66,7 @@ describe('examples in the home wiki page', () => {
     `
     const doc = $$.create(xmlStr1)
     doc.root().ele("baz")
-    expect(doc.end({ prettyPrint: true })).toBe(xmlStr2)
+    $$.deepEqual(doc.end({ prettyPrint: true }), xmlStr2)
   })
 
 })

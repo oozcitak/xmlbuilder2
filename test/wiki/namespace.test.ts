@@ -1,24 +1,24 @@
 import $$ from '../TestHelpers'
 
-describe('namespaces examples in the wiki', () => {
+$$.suite('namespaces examples in the wiki', () => {
 
-  test('default namespace', () => {
+  $$.test('default namespace', () => {
     const ns1 = 'http://example.com/ns1'
     const doc = $$.create().ele(ns1, 'root')
       .ele('foo').txt('bar').doc()
 
-    expect(doc.end({ headless: true })).toBe('<root xmlns="http://example.com/ns1"><foo>bar</foo></root>')
+    $$.deepEqual(doc.end({ headless: true }), '<root xmlns="http://example.com/ns1"><foo>bar</foo></root>')
   })
 
-  test('reset default namespace', () => {
+  $$.test('reset default namespace', () => {
     const ns1 = 'http://example.com/ns1'
     const doc = $$.create().ele(ns1, 'root')
       .ele('', 'foo').txt('bar').doc()
 
-    expect(doc.end({ headless: true })).toBe('<root xmlns="http://example.com/ns1"><foo xmlns="">bar</foo></root>')
+    $$.deepEqual(doc.end({ headless: true }), '<root xmlns="http://example.com/ns1"><foo xmlns="">bar</foo></root>')
   })
 
-  test('namespace declaration attribute', () => {
+  $$.test('namespace declaration attribute', () => {
     const ns1 = 'http://example.com/ns1'
     const xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
@@ -27,7 +27,7 @@ describe('namespaces examples in the wiki', () => {
       "xsi:schemaLocation": "http://example.com/n1 schema.xsd" })
       .ele('', 'foo').txt('bar').doc()
 
-    expect(doc.end({ headless: true })).toBe(
+    $$.deepEqual(doc.end({ headless: true }),
       '<root xmlns="http://example.com/ns1"' +
         ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
         ' xsi:schemaLocation="http://example.com/n1 schema.xsd">' +
@@ -35,7 +35,7 @@ describe('namespaces examples in the wiki', () => {
       '</root>')
   })
 
-  test('element with namespace', () => {
+  $$.test('element with namespace', () => {
     const svgNs = 'http://www.w3.org/2000/svg'
     const xlinkNs = 'http://www.w3.org/1999/xlink'
 
@@ -43,21 +43,21 @@ describe('namespaces examples in the wiki', () => {
       .ele('script', { xmlns: "", type: "text/ecmascript", "xlink:href": "foo.js" })
       .doc()
 
-    expect(doc.end({ headless: true })).toBe(
+    $$.deepEqual(doc.end({ headless: true }),
       '<svg xmlns="http://www.w3.org/2000/svg"' +
         ' xmlns:xlink="http://www.w3.org/1999/xlink">' +
         '<script xmlns="" type="text/ecmascript" xlink:href="foo.js"/>' +
       '</svg>')
   })
 
-  test('attribute with namespace', () => {
+  $$.test('attribute with namespace', () => {
     const ns1 = 'http://example.com/ns1'
     const doc = $$.create().ele('root').att(ns1, 'att', 'val').doc()
 
-    expect(doc.end({ headless: true })).toBe('<root xmlns:ns1="http://example.com/ns1" ns1:att="val"/>')
+    $$.deepEqual(doc.end({ headless: true }), '<root xmlns:ns1="http://example.com/ns1" ns1:att="val"/>')
   })
 
-  test('default namespace with function chaining', () => {
+  $$.test('default namespace with function chaining', () => {
     const result = $$.t`
       <?xml version="1.0"?>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -73,10 +73,10 @@ describe('namespaces examples in the wiki', () => {
       .ele("path").att("d", "M50,2a48,48 0 1 1 0,96a24 24 0 1 1 0-48a24 24 0 1 0 0-48").up()
       .ele("circle").att({ cx: 50, cy: 26, r: 6 }).up()
       .ele("circle").att({ cx: 50, cy: 74, r: 6, fill: "#FFF" }).up()
-    expect(svgDoc.end({ prettyPrint: true })).toBe(result)
+    $$.deepEqual(svgDoc.end({ prettyPrint: true }), result)
   })
 
-  test('default namespace with JS objects', () => {
+  $$.test('default namespace with JS objects', () => {
     const result = $$.t`
       <?xml version="1.0"?>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -98,7 +98,7 @@ describe('namespaces examples in the wiki', () => {
       }
     }
     const svgDoc = $$.create({ defaultNamespace: { ele: svgNs, att: null } }, svgObj)
-    expect(svgDoc.end({ prettyPrint: true })).toBe(result)
+    $$.deepEqual(svgDoc.end({ prettyPrint: true }), result)
   })
 
 })

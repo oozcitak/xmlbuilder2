@@ -1,27 +1,27 @@
 import $$ from '../TestHelpers'
 
-describe('withOptions()', () => {
+$$.suite('withOptions()', () => {
 
-  test('XML declaration', () => {
-    expect(
+  $$.test('XML declaration', () => {
+    $$.deepEqual(
       $$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
-        .ele('root').end()).toBe(
+        .ele('root').end(),
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root/>'
         )
 
-    expect(
+    $$.deepEqual(
       $$.create({ version: "1.0", encoding: "UTF-16", standalone: false })
-        .ele('root').end()).toBe(
+        .ele('root').end(),
           '<?xml version="1.0" encoding="UTF-16" standalone="no"?><root/>'
         )
   })
 
-  test('zero length converter strings', () => {
-    expect(() => $$.create({ convert: { att: "" } })).toThrow()
-    expect(() => $$.create({ convert: { ins: "" } })).toThrow()
-    expect(() => $$.create({ convert: { text: "" } })).toThrow()
-    expect(() => $$.create({ convert: { cdata: "" } })).toThrow()
-    expect(() => $$.create({ convert: { comment: "" } })).toThrow()
+  $$.test('zero length converter strings', () => {
+    $$.throws(() => $$.create({ convert: { att: "" } }))
+    $$.throws(() => $$.create({ convert: { ins: "" } }))
+    $$.throws(() => $$.create({ convert: { text: "" } }))
+    $$.throws(() => $$.create({ convert: { cdata: "" } }))
+    $$.throws(() => $$.create({ convert: { comment: "" } }))
   })
 
 })

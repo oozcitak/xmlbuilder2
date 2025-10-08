@@ -1,6 +1,6 @@
 import $$ from '../TestHelpers'
 
-describe('convert()', () => {
+$$.suite('convert()', () => {
 
   const matrix: { [key: string]: any } = {
     xml: `<?xml version="1.0"?><root att="val">text</root>`,
@@ -15,7 +15,7 @@ describe('convert()', () => {
       `
   }
 
-  test('Conversion matrix', () => {
+  $$.test('Conversion matrix', () => {
     const formats = Object.keys(matrix)
     for (const inputFormat of formats)
     {
@@ -23,22 +23,22 @@ describe('convert()', () => {
       for (const outputFormat of formats)
       {
         const output = matrix[outputFormat]
-        expect($$.convert(input, { format: outputFormat})).toEqual(output)
+        $$.deepEqual($$.convert(input, { format: outputFormat}), output)
       }
     }
   })
 
-  test('From XML string to XML string with default options', () => {
+  $$.test('From XML string to XML string with default options', () => {
     const xml = $$.convert('<root att="val">text</root>')
-    expect(xml).toBe(`<?xml version="1.0"?><root att="val">text</root>`)
+    $$.deepEqual(xml, `<?xml version="1.0"?><root att="val">text</root>`)
   })
 
-  test('Conversion to XML string with options', () => {
+  $$.test('Conversion to XML string with options', () => {
     const formats = Object.keys(matrix)
     for (const inputFormat of formats)
     {
       const input = matrix[inputFormat]
-      expect($$.convert({ version: "1.0" }, input, { format: "xml" })).toBe(matrix["xml"])
+      $$.deepEqual($$.convert({ version: "1.0" }, input, { format: "xml" }), matrix["xml"])
     }
   })
 

@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/2
-  test(`#2 - Reconsider allowing XML file creation in chunks`, (done) => {
+  $$.test(`#2 - Reconsider allowing XML file creation in chunks`, async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     const item1 = $$.create({
@@ -20,7 +20,7 @@ describe("Replicate issue", () => {
 
     xmlStream.dec().ele('rss').import(item1).import(item2).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
     <?xml version="1.0"?>
     <rss>
       <item>
@@ -40,7 +40,7 @@ describe("Replicate issue", () => {
         </name>
       </item>
     </rss>
-    `, done)
+    `)
   })
 
 })

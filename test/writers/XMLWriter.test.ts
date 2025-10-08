@@ -1,9 +1,9 @@
 import $$ from '../TestHelpers'
 import { Element } from "@oozcitak/dom/lib/dom/interfaces"
 
-describe('XMLWriter', () => {
+$$.suite('XMLWriter', () => {
 
-  test('basic', () => {
+  $$.test('basic', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -27,8 +27,8 @@ describe('XMLWriter', () => {
       }
     }
 
-    expect($$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
-      .ele('root').ele(obj).doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
+    $$.deepEqual($$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
+      .ele('root').ele(obj).doc().toString({ format: "xml", prettyPrint: true }), $$.t`
       <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <root>
         <ele>simple element</ele>
@@ -53,7 +53,7 @@ describe('XMLWriter', () => {
       `)
   })
 
-  test('offset', () => {
+  $$.test('offset', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -62,8 +62,8 @@ describe('XMLWriter', () => {
       }
     }
 
-    expect($$.create().ele('root').ele(obj).root().
-      toString({ format: "xml", prettyPrint: true, offset: 2 })).toBe(
+    $$.deepEqual($$.create().ele('root').ele(obj).root().
+      toString({ format: "xml", prettyPrint: true, offset: 2 }),
         '    <root>\n' +
         '      <ele>simple element</ele>\n' +
         '      <person age="35">\n' +
@@ -73,7 +73,7 @@ describe('XMLWriter', () => {
       )
   })
 
-  test('negative offset', () => {
+  $$.test('negative offset', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -82,8 +82,8 @@ describe('XMLWriter', () => {
       }
     }
 
-    expect($$.create().ele('root').ele(obj).root().
-      toString({ format: "xml", prettyPrint: true, offset: -2 })).toBe(
+    $$.deepEqual($$.create().ele('root').ele(obj).root().
+      toString({ format: "xml", prettyPrint: true, offset: -2 }),
         '<root>\n' +
         '<ele>simple element</ele>\n' +
         '<person age="35">\n' +
@@ -93,66 +93,66 @@ describe('XMLWriter', () => {
       )
   })
 
-  test('empty document', () => {
-    expect($$.create().end()).toBe(`<?xml version="1.0"?>`)
+  $$.test('empty document', () => {
+    $$.deepEqual($$.create().end(), `<?xml version="1.0"?>`)
   })
 
-  test('doctype with both public and system identifier', () => {
-    expect($$.create().dtd({ pubID: "pub", sysID: "sys" })
-      .ele('root').doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
+  $$.test('doctype with both public and system identifier', () => {
+    $$.deepEqual($$.create().dtd({ pubID: "pub", sysID: "sys" })
+      .ele('root').doc().toString({ format: "xml", prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub" "sys">
       <root/>
       `)
   })
 
-  test('doctype with public identifier', () => {
-    expect($$.create().dtd({ pubID: "pub" })
-      .ele('root').doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
+  $$.test('doctype with public identifier', () => {
+    $$.deepEqual($$.create().dtd({ pubID: "pub" })
+      .ele('root').doc().toString({ format: "xml", prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root PUBLIC "pub">
       <root/>
       `)
   })
 
-  test('doctype with system identifier', () => {
-    expect($$.create().dtd({ sysID: "sys" })
-      .ele('root').doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
+  $$.test('doctype with system identifier', () => {
+    $$.deepEqual($$.create().dtd({ sysID: "sys" })
+      .ele('root').doc().toString({ format: "xml", prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root SYSTEM "sys">
       <root/>
       `)
   })
 
-  test('doctype without identifiers', () => {
-    expect($$.create().dtd()
-      .ele('root').doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
+  $$.test('doctype without identifiers', () => {
+    $$.deepEqual($$.create().dtd()
+      .ele('root').doc().toString({ format: "xml", prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root>
       <root/>
       `)
   })
 
-  test('allowEmptyTags', () => {
-    expect($$.create().ele('root').end({ allowEmptyTags: true, prettyPrint: true })).toBe($$.t`
+  $$.test('allowEmptyTags', () => {
+    $$.deepEqual($$.create().ele('root').end({ allowEmptyTags: true, prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <root></root>
       `)
   })
 
-  test('spaceBeforeSlash', () => {
-    expect($$.create().ele('root').end({ spaceBeforeSlash: true, prettyPrint: true })).toBe($$.t`
+  $$.test('spaceBeforeSlash', () => {
+    $$.deepEqual($$.create().ele('root').end({ spaceBeforeSlash: true, prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <root />
       `)
   })
 
-  test('Pretty printing with indentTextOnlyNodes, no mixed content', () => {
+  $$.test('Pretty printing with indentTextOnlyNodes, no mixed content', () => {
     const doc = $$.create().ele('root')
       .ele('node', { 'att': 'val' }).txt('text').up()
       .ele('node').att('att', 'val').txt('text').doc()
 
-    expect(doc.end({ indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ indentTextOnlyNodes: true, prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <root>
         <node att="val">
@@ -165,13 +165,13 @@ describe('XMLWriter', () => {
       `)
   })
 
-  test('Pretty printing with mixed content', () => {
+  $$.test('Pretty printing with mixed content', () => {
     const doc = $$.create().ele('root')
       .ele('node', { 'att': 'val' }).txt('mixed content')
       .ele('node').att('att', 'val').txt('text').up()
       .txt('more text after node').doc()
 
-    expect(doc.end({ prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <root>
         <node att="val">
@@ -183,13 +183,13 @@ describe('XMLWriter', () => {
       `)
   })
 
-  test('Pretty printing with indentTextOnlyNodes, mixed content', () => {
+  $$.test('Pretty printing with indentTextOnlyNodes, mixed content', () => {
     const doc = $$.create().ele('root')
       .ele('node', { 'att': 'val' }).txt('mixed content')
       .ele('node').att('att', 'val').txt('text').up()
       .txt('more text after node').doc()
 
-    expect(doc.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true }), $$.t`
       <root>
         <node att="val">
           mixed content
@@ -202,12 +202,12 @@ describe('XMLWriter', () => {
       `)
   })
 
-  test('Various types of text nodes', () => {
+  $$.test('Various types of text nodes', () => {
     const doc1 = $$.create().ele('root')
       .txt('text1')
       .doc()
 
-    expect(doc1.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc1.end({ headless: true, prettyPrint: true }), $$.t`
       <root>text1</root>
       `)
 
@@ -216,7 +216,7 @@ describe('XMLWriter', () => {
       .txt('text2')
       .doc()
 
-    expect(doc2.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc2.end({ headless: true, prettyPrint: true }), $$.t`
       <root>text1text2</root>
       `)
 
@@ -226,7 +226,7 @@ describe('XMLWriter', () => {
       .txt('text2')
       .doc()
 
-    expect(doc3.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc3.end({ headless: true, prettyPrint: true }), $$.t`
       <root>
         text1
         <node/>
@@ -238,17 +238,17 @@ describe('XMLWriter', () => {
       .txt('')
       .doc()
 
-    expect(doc4.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc4.end({ headless: true, prettyPrint: true }), $$.t`
       <root/>
       `)
   })
 
-  test('Various types of text nodes with indentTextOnlyNodes', () => {
+  $$.test('Various types of text nodes with indentTextOnlyNodes', () => {
     const doc1 = $$.create().ele('root')
       .txt('text1')
       .doc()
 
-    expect(doc1.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc1.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true }), $$.t`
       <root>
         text1
       </root>
@@ -259,7 +259,7 @@ describe('XMLWriter', () => {
       .txt('text2')
       .doc()
 
-    expect(doc2.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc2.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true }), $$.t`
       <root>
         text1
         text2
@@ -272,7 +272,7 @@ describe('XMLWriter', () => {
       .txt('text2')
       .doc()
 
-    expect(doc3.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc3.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true }), $$.t`
       <root>
         text1
         <node/>
@@ -281,12 +281,12 @@ describe('XMLWriter', () => {
       `)
   })
 
-  test('Various types of cdata nodes', () => {
+  $$.test('Various types of cdata nodes', () => {
     const doc1 = $$.create().ele('root')
       .dat('text1')
       .doc()
 
-    expect(doc1.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc1.end({ headless: true, prettyPrint: true }), $$.t`
       <root><![CDATA[text1]]></root>
       `)
 
@@ -295,7 +295,7 @@ describe('XMLWriter', () => {
       .dat('text2')
       .doc()
 
-    expect(doc2.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc2.end({ headless: true, prettyPrint: true }), $$.t`
       <root>
         <![CDATA[text1]]>
         <![CDATA[text2]]>
@@ -307,7 +307,7 @@ describe('XMLWriter', () => {
       .dat('text2')
       .doc()
 
-    expect(doc2a.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc2a.end({ headless: true, prettyPrint: true }), $$.t`
       <root>
         text1
         <![CDATA[text2]]>
@@ -320,7 +320,7 @@ describe('XMLWriter', () => {
       .dat('text2')
       .doc()
 
-    expect(doc3.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc3.end({ headless: true, prettyPrint: true }), $$.t`
       <root>
         <![CDATA[text1]]>
         <node/>
@@ -332,17 +332,17 @@ describe('XMLWriter', () => {
       .dat('')
       .doc()
 
-    expect(doc4.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc4.end({ headless: true, prettyPrint: true }), $$.t`
       <root/>
       `)
   })
 
-  test('Various types of cdata nodes with indentTextOnlyNodes', () => {
+  $$.test('Various types of cdata nodes with indentTextOnlyNodes', () => {
     const doc1 = $$.create().ele('root')
       .dat('text1')
       .doc()
 
-    expect(doc1.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc1.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true }), $$.t`
       <root>
         <![CDATA[text1]]>
       </root>
@@ -353,7 +353,7 @@ describe('XMLWriter', () => {
       .dat('text2')
       .doc()
 
-    expect(doc2.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc2.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true }), $$.t`
       <root>
         <![CDATA[text1]]>
         <![CDATA[text2]]>
@@ -366,7 +366,7 @@ describe('XMLWriter', () => {
       .dat('text2')
       .doc()
 
-    expect(doc3.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc3.end({ headless: true, indentTextOnlyNodes: true, prettyPrint: true }), $$.t`
       <root>
         <![CDATA[text1]]>
         <node/>
@@ -375,152 +375,152 @@ describe('XMLWriter', () => {
       `)
   })
 
-  test('element node with xml prefix', () => {
+  $$.test('element node with xml prefix', () => {
     const ele = $$.create().ele('http://www.w3.org/2000/xmlns/', 'xmlns:root')
-    expect(ele.end({ headless: true })).toBe('<xmlns:root/>')
+    $$.deepEqual(ele.end({ headless: true }), '<xmlns:root/>')
   })
 
-  test('unknown node', () => {
+  $$.test('unknown node', () => {
     const ele = $$.create().ele('root').ele('alien')
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
-    expect(() => ele.end()).toThrow()
+    $$.throws(() => ele.end())
   })
 
-  test('escape text data', () => {
+  $$.test('escape text data', () => {
     const ele = $$.create().ele('root').txt('&<>')
-    expect(ele.toString()).toBe('<root>&amp;&lt;&gt;</root>')
+    $$.deepEqual(ele.toString(), '<root>&amp;&lt;&gt;</root>')
     const ele1 = $$.create().ele('root').txt('&<>;')
-    expect(ele1.toString()).toBe('<root>&amp;&lt;&gt;;</root>')
+    $$.deepEqual(ele1.toString(), '<root>&amp;&lt;&gt;;</root>')
     const ele2 = $$.create().ele('root').txt('& amp;')
-    expect(ele2.toString()).toBe('<root>&amp; amp;</root>')
+    $$.deepEqual(ele2.toString(), '<root>&amp; amp;</root>')
   })
 
-  test('escape attribute value', () => {
+  $$.test('escape attribute value', () => {
     const ele1 = $$.create().ele('root').att('att', '"&<>')
-    expect(ele1.toString()).toBe('<root att="&quot;&amp;&lt;&gt;"/>')
+    $$.deepEqual(ele1.toString(), '<root att="&quot;&amp;&lt;&gt;"/>')
     const ele2 = $$.create().ele('root').att('att', 'val')
     Object.defineProperty((ele2.node as Element).attributes.item(0), "value", { value: null })
-    expect(ele2.toString()).toBe('<root att=""/>')
+    $$.deepEqual(ele2.toString(), '<root att=""/>')
     const ele3 = $$.create().ele('root').att('att', '"&<>;')
-    expect(ele3.toString()).toBe('<root att="&quot;&amp;&lt;&gt;;"/>')
+    $$.deepEqual(ele3.toString(), '<root att="&quot;&amp;&lt;&gt;;"/>')
   })
 
-  test('duplicate attribute name not well-formed', () => {
+  $$.test('duplicate attribute name not well-formed', () => {
     // duplicate name
     const ele1 = $$.create().ele('root').att('att', 'val').att('att2', 'val')
     Object.defineProperty((ele1.node as Element).attributes.item(1), "localName", { value: "att" })
-    expect(ele1.toString()).toBe('<root att="val" att="val"/>')
+    $$.deepEqual(ele1.toString(), '<root att="val" att="val"/>')
   })
 
-  test('wellFormed checks - invalid element node', () => {
+  $$.test('wellFormed checks - invalid element node', () => {
     const ele = $$.create().ele('root')
     Object.defineProperty(ele.node, "localName", { value: "x:y", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.node, "localName", { value: "abc\0", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.node, "localName", { value: "\0abc", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.node, "prefix", { value: "xmlns" })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.node, "localName", { value: "abc\uDBFF", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.node, "localName", { value: "abc🌃\0", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.node, "localName", { value: "abc\uDBFFx", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
   })
 
-  test('wellFormed checks - invalid element node', () => {
+  $$.test('wellFormed checks - invalid element node', () => {
     const ele = $$.create().ele('http://www.w3.org/2000/xmlns/', 'xmlns:root')
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
   })
 
-  test('wellFormed checks - invalid document node', () => {
+  $$.test('wellFormed checks - invalid document node', () => {
     const doc = $$.create()
     Object.defineProperty(doc.node, "documentElement", { value: null })
-    expect(() => doc.end({ wellFormed: true })).toThrow()
+    $$.throws(() => doc.end({ wellFormed: true }))
   })
 
-  test('wellFormed checks - invalid comment node', () => {
+  $$.test('wellFormed checks - invalid comment node', () => {
     const ele1 = $$.create().ele('root').com('--')
-    expect(() => ele1.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele1.end({ wellFormed: true }))
     const ele2 = $$.create().ele('root').com('text-')
-    expect(() => ele2.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele2.end({ wellFormed: true }))
   })
 
-  test('wellFormed checks - invalid text node - 1.0', () => {
+  $$.test('wellFormed checks - invalid text node - 1.0', () => {
     const ele = $$.create().ele('root').txt('abc😊\0')
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.first().node, "data", { value: "abc\uDBFFx", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.first().node, "data", { value: "abc\0", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.first().node, "data", { value: "abc\uE000🌃\0", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
     Object.defineProperty(ele.first().node, "data", { value: "abc\uE000🌃", configurable: true })
-    expect(() => ele.end({ wellFormed: true })).not.toThrow()
+    $$.doesNotThrow(() => ele.end({ wellFormed: true }))
   })
 
-  test('wellFormed checks - invalid document type node', () => {
+  $$.test('wellFormed checks - invalid document type node', () => {
     const ele1 = $$.create().ele('root').dtd({ pubID: 'abc😊\0' })
-    expect(() => ele1.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele1.end({ wellFormed: true }))
     const ele2 = $$.create().ele('root').dtd({ sysID: '\0' })
-    expect(() => ele2.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele2.end({ wellFormed: true }))
     const ele3 = $$.create().ele('root').dtd({ sysID: '\'quote mismatch"' })
-    expect(() => ele3.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele3.end({ wellFormed: true }))
   })
 
-  test('wellFormed checks - invalid processing instruction node', () => {
+  $$.test('wellFormed checks - invalid processing instruction node', () => {
     const ele1 = $$.create().ele('root').ins(':')
-    expect(() => ele1.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele1.end({ wellFormed: true }))
     const ele2 = $$.create().ele('root').ins('xml')
-    expect(() => ele2.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele2.end({ wellFormed: true }))
     const ele3 = $$.create().ele('root').ins('name', '\0')
-    expect(() => ele3.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele3.end({ wellFormed: true }))
     const ele4 = $$.create().ele('root').ins('name', 'data')
     Object.defineProperty(ele4.node.firstChild, "data", { value: "?>" })
-    expect(() => ele4.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele4.end({ wellFormed: true }))
   })
 
-  test('wellFormed checks - invalid cdata node', () => {
+  $$.test('wellFormed checks - invalid cdata node', () => {
     const ele = $$.create().ele('root').dat('data')
     Object.defineProperty(ele.node.firstChild, "data", { value: "]]>" })
-    expect(() => ele.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele.end({ wellFormed: true }))
   })
 
-  test('wellFormed checks - invalid attribute', () => {
+  $$.test('wellFormed checks - invalid attribute', () => {
     // duplicate name
     const ele1 = $$.create().ele('root').att('att', 'val').att('att2', 'val')
     Object.defineProperty((ele1.node as Element).attributes.item(1), "localName", { value: "att" })
-    expect(() => ele1.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele1.end({ wellFormed: true }))
     // invalid name
     const ele4 = $$.create().ele('root').att('att', '')
     Object.defineProperty((ele4.node as Element).attributes.item(0), "localName", { value: "att:name" })
-    expect(() => ele4.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele4.end({ wellFormed: true }))
     const ele5 = $$.create().ele('root').att('att', '')
     Object.defineProperty((ele5.node as Element).attributes.item(0), "localName", { value: "att\0" })
-    expect(() => ele5.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele5.end({ wellFormed: true }))
     // invalid value
     const ele7 = $$.create().ele('root').att('att', '\0')
-    expect(() => ele7.end({ wellFormed: true })).toThrow()
+    $$.throws(() => ele7.end({ wellFormed: true }))
   })
 
-  test('void HTML element', () => {
+  $$.test('void HTML element', () => {
     const doc = $$.create().ele('root')
       .ele('http://www.w3.org/1999/xhtml', 'hr')
       .doc()
-    expect(doc.end({ prettyPrint: true, headless: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ prettyPrint: true, headless: true }), $$.t`
       <root>
         <hr xmlns="http://www.w3.org/1999/xhtml" />
       </root>
       `)
   })
 
-  test('Pretty print attributes - 1', () => {
-    expect(
+  $$.test('Pretty print attributes - 1', () => {
+    $$.deepEqual(
       $$.create().ele('test').ele('node', { "first": "1", "second": "2" })
         .end({ headless: true, prettyPrint: true, width: 20 })
-    ).toBe($$.t`
+    , $$.t`
     <test>
       <node first="1"
         second="2"/>
@@ -528,12 +528,12 @@ describe('XMLWriter', () => {
     `)
   })
 
-  test('Pretty print attributes - 2', () => {
-    expect(
+  $$.test('Pretty print attributes - 2', () => {
+    $$.deepEqual(
       $$.create().ele('test')
         .ele('node', { "first": "1", "second": "2", "third": "33333333333333333333", "fourth": 4 })
         .end({ headless: true, prettyPrint: true, width: 10 })
-    ).toBe($$.t`
+    , $$.t`
     <test>
       <node
         first="1"
@@ -544,12 +544,12 @@ describe('XMLWriter', () => {
     `)
   })
 
-  test('Pretty print attributes - 3', () => {
-    expect(
+  $$.test('Pretty print attributes - 3', () => {
+    $$.deepEqual(
       $$.create().ele('test')
         .ele('node', { "first": "1", "second": "2", "third": "33333333333333333333", "fourth": 4 })
         .end({ headless: true, prettyPrint: true, width: 1 })
-    ).toBe($$.t`
+    , $$.t`
     <test>
       <node
         first="1"
@@ -560,12 +560,12 @@ describe('XMLWriter', () => {
     `)
   })
 
-  test('Pretty print attributes - 4', () => {
-    expect(
+  $$.test('Pretty print attributes - 4', () => {
+    $$.deepEqual(
       $$.create().ele('test')
         .ele('node', { "first": "1", "second": "2" }).ele('child')
         .end({ headless: true, prettyPrint: true, width: 10 })
-    ).toBe($$.t`
+    , $$.t`
     <test>
       <node
         first="1"
@@ -576,12 +576,12 @@ describe('XMLWriter', () => {
     `)
   })
 
-  test('Pretty print attributes - 4', () => {
-    expect(
+  $$.test('Pretty print attributes - 4', () => {
+    $$.deepEqual(
       $$.create().ele('test')
         .ele('node', { "first": "1", "second": "2" }).ele('child')
         .end({ headless: true, prettyPrint: true, width: 10 })
-    ).toBe($$.t`
+    , $$.t`
       <test>
         <node
           first="1"
@@ -592,7 +592,7 @@ describe('XMLWriter', () => {
       `)
   })
 
-  test('Encoding', () => {
+  $$.test('Encoding', () => {
     const obj = {
       root: {
         '@att': 'attribute value with &amp; and &#38;',
@@ -600,7 +600,7 @@ describe('XMLWriter', () => {
       }
     }
 
-    expect($$.create(obj).end()).toBe(
+    $$.deepEqual($$.create(obj).end(),
       '<?xml version="1.0"?>' +
       '<root att="attribute value with &amp; and &amp;">' +
       'XML entities for ampersand are &amp; and &amp;.' +

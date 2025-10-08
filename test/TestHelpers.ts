@@ -1,73 +1,96 @@
+import { suite, test } from "node:test"
+import { equal, notEqual, deepEqual, notDeepEqual, throws, doesNotThrow } from "node:assert"
 import dedent from "dedent"
 import { XMLSerializer } from "@oozcitak/dom/lib/serializer"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
 import { isObject, isArray, isMap, forEachObject, objectLength, forEachArray } from "@oozcitak/util"
-import { builder, create, fragment, convert, createCB, fragmentCB } from "../src"
+import { builder, create, fragment, convert, createCB, fragmentCB } from "../lib"
 import { XMLBuilderCB, XMLBuilderCBOptions, XMLBuilderCBCreateOptions } from "../src/interfaces"
 
 export default class TestHelpers {
+  static suite = suite
+  static test = test
+
+  static equal = equal
+  static notEqual = notEqual
+  static deepEqual = deepEqual
+  static notDeepEqual = notDeepEqual
+  static throws = throws
+  static doesNotThrow = doesNotThrow
+
   static builder = builder
   static create = create
   static fragment = fragment
   static convert = convert
 
-  static serialize(node: Node): string {
+  static serialize(node: Node) {
     const s = new XMLSerializer()
     return s.serializeToString(node)
   }
 
-  static createCB(options?: XMLBuilderCBCreateOptions): XMLBuilderCB {
-    options = options || {}
-    options.data = options.data || (function (this: any, chunk: string) {
-      if (this.result === undefined) this.result = ""
-      this.result += chunk
-    })
-    options.end = options.end || (() => { })
-    options.error = options.error || (function (this: any, err: Error) {
-      this.error = err
+  static createCB(options?: XMLBuilderCBCreateOptions) {
+    const promise = new Promise((resolve, reject) => {
+      let result = ''
+      options = options || {}
+      options.data = options.data || (function (this: any, chunk: string) {
+        result += chunk
+      })
+      options.end = options.end || (() => resolve(result))
+      options.error = options.error || (function (this: any, err: Error) {
+        reject(err)
+      })
     })
     const str = createCB(options as XMLBuilderCBOptions) as any
-    str.error = "Did not throw"
+    str.promise = promise
     return str
   }
 
-  static fragmentCB(options?: XMLBuilderCBCreateOptions): XMLBuilderCB {
-    options = options || {}
-    options.data = options.data || (function (this: XMLBuilderCB, chunk: string) {
-      (this as any).result += chunk
-    })
-    options.end = options.end || (() => { })
-    options.error = options.error || (function (this: XMLBuilderCB, err: Error) {
-      str.error = err
+  static fragmentCB(options?: XMLBuilderCBCreateOptions) {
+    const promise = new Promise((resolve, reject) => {
+      let result = ''
+      options = options || {}
+      options.data = options.data || (function (this: any, chunk: string) {
+        result += chunk
+      })
+      options.end = options.end || (() => resolve(result))
+      options.error = options.error || (function (this: any, err: Error) {
+        reject(err)
+      })
     })
     const str = fragmentCB(options as XMLBuilderCBOptions) as any
-    str.error = "Did not throw"
-    str.result = ""
+    str.promise = promise
     return str
   }
 
-  static expectCBResult(str: XMLBuilderCB, result: string, done: any) {
-    expect((str as any).result).toBe(result)
-    done()
+  static async expectCBResult(str: XMLBuilderCB, result: string) {
+    const promise = (str as any).promise
+    const actualResult = await promise
+    deepEqual(actualResult, result)
   }
 
-  static getCBResult(str: XMLBuilderCB) {
-    return (str as any).result
+  static async getCBResult(str: XMLBuilderCB) {
+    const promise = (str as any).promise
+    return await promise
   }
 
-  static expectCBError(str: XMLBuilderCB, testFunc: () => any, done: any) {
-    testFunc()
-    expect((str as any).error).toBeInstanceOf(Error)
-    done()
+  static async expectCBError(str: XMLBuilderCB, testFunc: () => any) {
+    const promise = (str as any).promise
+    try {
+      testFunc()
+      await promise
+    } catch (err) {
+      const test = err instanceof Error
+      deepEqual(test , true)
+    }
   }
 
-  private static indent(indentLevel: number): string {
+  private static indent(indentLevel: number) {
     return '  '.repeat(indentLevel)
   }
-  private static isLeafNode(obj: any): boolean {
+  private static isLeafNode(obj: any) {
     return this.descendantCount(obj) <= 1
   }
-  private static descendantCount(obj: any, count?: number): number {
+  private static descendantCount(obj: any, count?: number) {
     count = count || 0
     if (isArray(obj)) {
       for (const val of obj) {
@@ -88,7 +111,7 @@ export default class TestHelpers {
     return count
   }
 
-  static printMap(map: any, level: number = 0): string {
+  static printMap(map: any, level: number = 0) {
 
     let r = ''
     const leaf = TestHelpers.isLeafNode(map)
@@ -126,11 +149,11 @@ export default class TestHelpers {
 
   /**
    * Returns a string representation of the XML tree rooted at `node`.
-   * 
+   *
    * @param node - a DOM node
    * @param level - indentation level
    */
-  static printTree(node: any, level?: number | undefined): string {
+  static printTree(node: any, level?: number | undefined) {
     const removeLastNewline = (level === undefined)
     level = level || 0
     const indent = '  '.repeat(level)

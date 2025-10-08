@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('end()', () => {
+$$.suite('end()', () => {
 
-  test('simple document', () => {
+  $$.test('simple document', () => {
     const xml = $$.create()
       .dtd({ pubID: "pub", sysID: "sys" })
       .ele('root')
@@ -13,8 +13,8 @@ describe('end()', () => {
       .ele('node', {att: 'val', att2: 'val2'})
         .txt('more text')
         .end()
-        
-    expect(xml).toBe(
+
+    $$.deepEqual(xml,
       '<?xml version="1.0"?>' +
       '<!DOCTYPE root PUBLIC "pub" "sys">' +
       '<root>' +
@@ -29,9 +29,9 @@ describe('end()', () => {
       )
   })
 
-  test('invalid writer format', () => {
+  $$.test('invalid writer format', () => {
     const xml = $$.create() as any
-    expect(() => xml.end({ format: "invalid" })).toThrow()
+    $$.throws(() => xml.end({ format: "invalid" }))
   })
 
 })

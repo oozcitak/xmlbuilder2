@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('custom parser examples in wiki', () => {
+$$.suite('custom parser examples in wiki', () => {
 
-  test('skip comments', () => {
+  $$.test('skip comments', () => {
     const xmlString = `
       <?xml version="1.0"?>
       <!-- records read from database -->
@@ -16,7 +16,7 @@ describe('custom parser examples in wiki', () => {
 
     const doc = $$.create({ parser: { comment: () => undefined } }, xmlString);
 
-    expect(doc.end({ prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <records>
         <record id="1"/>
@@ -26,7 +26,7 @@ describe('custom parser examples in wiki', () => {
     `)
   })
 
-  test("namespace scope", () => {
+  $$.test("namespace scope", () => {
     const obj = {
       'root': {
         '-ns1:some/uri': { // namespace scope - prefix: ns1, ns: some/uri
@@ -60,7 +60,7 @@ describe('custom parser examples in wiki', () => {
 
     const doc = $$.create({ parser: { element: elementParser } }, obj);
 
-    expect(doc.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true, prettyPrint: true }), $$.t`
       <root xmlns:ns1="some/uri">
         <ns1:node1/>
         <ns1:node2/>

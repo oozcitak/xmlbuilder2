@@ -1,9 +1,9 @@
 import $$ from "../TestHelpers";
 import { XMLBuilder } from "../../src/interfaces";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/46
-  test("#46 - Renaming elements through custom parser throws closing tag error", () => {
+  $$.test("#46 - Renaming elements through custom parser throws closing tag error", () => {
     const xml = $$.t`
     <root>
       <node1/>
@@ -15,11 +15,11 @@ describe("Replicate issue", () => {
       parser: {
         element: (parent, _, name) => parent.ele("_" + name)
       },
-    }, xml, { 
-      format: 'object' 
+    }, xml, {
+      format: 'object'
     })
 
-    expect(obj).toEqual(
+    $$.deepEqual(obj,
     {
       "_root": {
         "_node1": {},

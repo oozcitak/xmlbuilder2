@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('MapWriter', () => {
+$$.suite('MapWriter', () => {
 
-  test('basic', () => {
+  $$.test('basic', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -28,7 +28,7 @@ describe('MapWriter', () => {
     const result = $$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele('root').ele(obj).end({ format: "map" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       M{
         root: M{
           ele: simple element,
@@ -56,13 +56,13 @@ describe('MapWriter', () => {
       `)
   })
 
-  test('duplicate tag names', () => {
+  $$.test('duplicate tag names', () => {
     const result = $$.create().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "map" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       M{
         people: M{
           person: [
@@ -74,14 +74,14 @@ describe('MapWriter', () => {
       `)
   })
 
-  test('mixed content', () => {
+  $$.test('mixed content', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
       .end({ format: "map" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       M{
         people: M{
           #1: hello,
@@ -92,7 +92,7 @@ describe('MapWriter', () => {
       `)
   })
 
-  test('mixed content and duplicate tags', () => {
+  $$.test('mixed content and duplicate tags', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -100,7 +100,7 @@ describe('MapWriter', () => {
       .txt('world')
       .end({ format: "map" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       M{
         people: M{
           #1: hello,
@@ -114,7 +114,7 @@ describe('MapWriter', () => {
       `)
   })
 
-  test('mixed content and interspersed duplicate tags', () => {
+  $$.test('mixed content and interspersed duplicate tags', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -122,7 +122,7 @@ describe('MapWriter', () => {
       .ele('person', { name: "yyy" }).up()
       .end({ format: "map" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       M{
         people: M{
           #: [
@@ -136,23 +136,23 @@ describe('MapWriter', () => {
       `)
   })
 
-  test('doctype', () => {
+  $$.test('doctype', () => {
     const result = $$.create()
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "map" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       M{ root: M{ } }
       `)
   })
 
-  test('namespaces', () => {
+  $$.test('namespaces', () => {
     const result = $$.create().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .ele('bar').up()
       .doc()
       .end({ format: "map" })
 
-    expect($$.printMap(result)).toBe($$.t`
+    $$.deepEqual($$.printMap(result), $$.t`
       M{
         root: M{
           @xmlns: myns,
@@ -163,13 +163,13 @@ describe('MapWriter', () => {
       `)
   })
 
-  test('unknown node', () => {
+  $$.test('unknown node', () => {
     const ele = $$.create().ele('root').ele('alien')
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
-    expect(() => ele.end({ format: "map" })).toThrow()
+    $$.throws(() => ele.end({ format: "map" }))
   })
 
-  test("verbose", () => {
+  $$.test("verbose", () => {
     const input2 = $$.t`
     <data>
       <row id="0">
@@ -183,7 +183,7 @@ describe('MapWriter', () => {
     </data>`
 
     const result2 = $$.convert(input2, { format: 'map', verbose: true })
-    expect($$.printMap(result2)).toBe($$.t`
+    $$.deepEqual($$.printMap(result2), $$.t`
       M{
         data: [
           M{
@@ -202,7 +202,7 @@ describe('MapWriter', () => {
           }
         ]
       }`)
-    expect($$.create(result2).end({ headless: true, prettyPrint: true })).toBe(input2)
+    $$.deepEqual($$.create(result2).end({ headless: true, prettyPrint: true }), input2)
 
     const input1 = $$.t`
     <data>
@@ -212,7 +212,7 @@ describe('MapWriter', () => {
       </row>
     </data>`
     const result1 = $$.convert(input1, { format: 'map', verbose: true })
-    expect($$.printMap(result1)).toEqual($$.t`
+    $$.deepEqual($$.printMap(result1), $$.t`
       M{
         data: [
           M{
@@ -226,7 +226,7 @@ describe('MapWriter', () => {
           }
         ]
       }`)
-    expect($$.create(result1).end({ headless: true, prettyPrint: true })).toBe(input1)
+    $$.deepEqual($$.create(result1).end({ headless: true, prettyPrint: true }), input1)
   })
 
 })

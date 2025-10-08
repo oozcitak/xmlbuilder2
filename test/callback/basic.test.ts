@@ -1,24 +1,24 @@
 import $$ from '../TestHelpers'
 
-describe('basic callback API tests', () => {
+$$.suite('basic callback API tests', () => {
 
-  test('empty document', (done) => {
+  $$.test('empty document', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.dec().end()
 
-    $$.expectCBResult(xmlStream, `<?xml version="1.0"?>`, done)
+    await $$.expectCBResult(xmlStream, `<?xml version="1.0"?>`)
   })
 
-  test('ele', (done) => {
+  $$.test('ele', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.ele("root").end()
 
-    $$.expectCBResult(xmlStream, `<root/>`, done)
+    await $$.expectCBResult(xmlStream, `<root/>`)
   })
 
-  test('ele with children', (done) => {
+  $$.test('ele with children', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
@@ -27,30 +27,30 @@ describe('basic callback API tests', () => {
       .ele("baz").up()
       .end()
 
-    $$.expectCBResult(xmlStream, `<root><foo><bar/><baz/></foo></root>`, done)
+    await $$.expectCBResult(xmlStream, `<root><foo><bar/><baz/></foo></root>`)
   })
 
-  test('dec', (done) => {
+  $$.test('dec', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.dec({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele("root")
       .end()
 
-    $$.expectCBResult(xmlStream, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root/>`, done)
+    await $$.expectCBResult(xmlStream, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><root/>`)
   })
 
-  test('dtd', (done) => {
+  $$.test('dtd', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.dtd({ name: "root", pubID: "pub", sysID: "sys" })
       .ele("root")
       .end()
 
-    $$.expectCBResult(xmlStream, `<!DOCTYPE root PUBLIC "pub" "sys"><root/>`, done)
+    await $$.expectCBResult(xmlStream, `<!DOCTYPE root PUBLIC "pub" "sys"><root/>`)
   })
 
-  test('att', (done) => {
+  $$.test('att', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
@@ -58,10 +58,10 @@ describe('basic callback API tests', () => {
       .att("att2", "val2")
       .end()
 
-    $$.expectCBResult(xmlStream, `<root att1="val1" att2="val2"/>`, done)
+    await $$.expectCBResult(xmlStream, `<root att1="val1" att2="val2"/>`)
   })
 
-  test('txt', (done) => {
+  $$.test('txt', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
@@ -69,40 +69,40 @@ describe('basic callback API tests', () => {
       .txt("")
       .end()
 
-    $$.expectCBResult(xmlStream, `<root>text</root>`, done)
+    await $$.expectCBResult(xmlStream, `<root>text</root>`)
   })
 
-  test('com', (done) => {
+  $$.test('com', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
       .com("text")
       .end()
 
-    $$.expectCBResult(xmlStream, `<root><!--text--></root>`, done)
+    await $$.expectCBResult(xmlStream, `<root><!--text--></root>`)
   })
 
-  test('dat', (done) => {
+  $$.test('dat', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
       .dat("text")
       .end()
 
-    $$.expectCBResult(xmlStream, `<root><![CDATA[text]]></root>`, done)
+    await $$.expectCBResult(xmlStream, `<root><![CDATA[text]]></root>`)
   })
 
-  test('ins', (done) => {
+  $$.test('ins', async () => {
     const xmlStream = $$.createCB()
 
     xmlStream.ele("root")
       .ins("target", "value")
       .end()
 
-    $$.expectCBResult(xmlStream, `<root><?target value?></root>`, done)
+    await $$.expectCBResult(xmlStream, `<root><?target value?></root>`)
   })
 
-  test('import', (done) => {
+  $$.test('import', async () => {
     const frag1 = $$.fragment().ele("node1")
     const frag2 = $$.fragment().ele("node2")
 
@@ -113,10 +113,10 @@ describe('basic callback API tests', () => {
       .import(frag2)
       .end()
 
-    $$.expectCBResult(xmlStream, `<root><node1/><node2/></root>`, done)
+    await $$.expectCBResult(xmlStream, `<root><node1/><node2/></root>`)
   })
 
-  test('nodes at root level', (done) => {
+  $$.test('nodes at root level', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec()
@@ -126,26 +126,25 @@ describe('basic callback API tests', () => {
       .com("comment2")
       .end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0"?>
       <!DOCTYPE root>
       <!--comment1-->
       <root/>
-      <!--comment2-->`, done)
+      <!--comment2-->`)
   })
 
-  test('test level', (done) => {
+  $$.test('test level', async () => {
     const xmlStream = $$.createCB({
       data: (chunk: string, level: number) => {
         if (chunk === "<root>") {
-          expect(level).toBe(0)
+          $$.deepEqual(level, 0)
         } else if (chunk === "<child>") {
-          expect(level).toBe(1)
+          $$.deepEqual(level, 1)
         } else if (chunk === "<grandchild>") {
-          expect(level).toBe(2)
+          $$.deepEqual(level, 2)
         }
       },
-      end: () => done()
     })
 
     xmlStream.dec()
@@ -160,7 +159,7 @@ describe('basic callback API tests', () => {
     xmlStream.end()
   })
 
-  test('Encoding', (done) => {
+  $$.test('Encoding', async () => {
     const obj = {
       root: {
         '@att': 'attribute value with &amp; and &#38;',
@@ -172,22 +171,22 @@ describe('basic callback API tests', () => {
 
     xmlStream.ele(obj).end()
 
-    $$.expectCBResult(xmlStream,
+    await $$.expectCBResult(xmlStream,
       '<root att="attribute value with &amp; and &amp;">' +
       'XML entities for ampersand are &amp; and &amp;.' +
-      '</root>', done)
+      '</root>')
   })
 
-  test('empty ele should throw', (done) => {
+  $$.test('empty ele should throw', async () => {
     const xmlStream = $$.createCB()
 
-    $$.expectCBError(xmlStream, () => xmlStream.ele(undefined as any), done)
+    await $$.expectCBError(xmlStream, () => xmlStream.ele(undefined as any))
   })
 
-  test('empty import should throw', (done) => {
+  $$.test('empty import should throw', async () => {
     const xmlStream = $$.createCB()
 
-    $$.expectCBError(xmlStream, () => xmlStream.import(undefined as any), done)
+    await $$.expectCBError(xmlStream, () => xmlStream.import(undefined as any))
   })
 
 })

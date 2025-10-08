@@ -1,20 +1,20 @@
 import $$ from '../TestHelpers';
 
-describe('Replicate issue', () => {
+$$.suite('Replicate issue', () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/178
-  describe(`#178 - Namespace is removed when importing fragments.`, () => {
+  $$.suite(`#178 - Namespace is removed when importing fragments.`, () => {
     const expectedOutput = $$.t`<?xml version="1.0"?><Root xmlns="ns1"><Parent xmlns="ns2"><Child xmlns="ns3"><GrandChild xmlns="ns4">txt</GrandChild></Child></Parent></Root>`;
-    describe(`with defined namespaces on each element`, () => {
-      test(`using .ele()`, () => {
+    $$.suite(`with defined namespaces on each element`, () => {
+      $$.test(`using .ele()`, () => {
         const doc = $$.create();
         const root = doc.ele('ns1', 'Root');
         const parent = root.ele('ns2', 'Parent');
         const child = parent.ele('ns3', 'Child');
         child.ele('ns4', 'GrandChild').txt('txt');
 
-        expect(doc.end()).toBe(expectedOutput);
+        $$.deepEqual(doc.end(), expectedOutput);
       });
-      test(`using .import()`, () => {
+      $$.test(`using .import()`, () => {
         const doc = $$.create();
         const root = doc.ele('ns1', 'Root');
         const parent = $$.fragment().ele('ns2', 'Parent');
@@ -25,21 +25,21 @@ describe('Replicate issue', () => {
         parent.import(child);
         root.import(parent);
 
-        expect(doc.end()).toBe(expectedOutput);
+        $$.deepEqual(doc.end(), expectedOutput);
       });
     });
-    describe(`with undefined namespaces on parent element`, () => {
+    $$.suite(`with undefined namespaces on parent element`, () => {
       const expectedOutput = $$.t`<?xml version="1.0"?><Root xmlns="ns1"><Parent><Child xmlns="ns3"><GrandChild xmlns="ns4">txt</GrandChild></Child></Parent></Root>`;
-      test(`using .ele()`, () => {
+      $$.test(`using .ele()`, () => {
         const doc = $$.create();
         const root = doc.ele('ns1', 'Root');
         const parent = root.ele('Parent');
         const child = parent.ele('ns3', 'Child');
         child.ele('ns4', 'GrandChild').txt('txt');
 
-        expect(doc.end()).toBe(expectedOutput);
+        $$.deepEqual(doc.end(), expectedOutput);
       });
-      test(`using .import()`, () => {
+      $$.test(`using .import()`, () => {
         const doc = $$.create();
         const root = doc.ele('ns1', 'Root');
         const parent = $$.fragment().ele('Parent');
@@ -50,7 +50,7 @@ describe('Replicate issue', () => {
         parent.import(child);
         root.import(parent);
 
-        expect(doc.end()).toBe(expectedOutput);
+        $$.deepEqual(doc.end(), expectedOutput);
       });
     });
   });

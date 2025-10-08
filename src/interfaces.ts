@@ -12,6 +12,8 @@ export interface DocumentWithSettings extends Document {
  * Defines the options used while creating an XML document.
  */
 export interface XMLBuilderOptions {
+  [key: string]: unknown
+
   /**
    * A version number string, e.g. `"1.0"`
    */
@@ -32,8 +34,8 @@ export interface XMLBuilderOptions {
    * Whether attributes with `null` values will be kept or ignored
    */
   keepNullAttributes: boolean
-  /** 
-   * Whether converter strings will be ignored when converting JS 
+  /**
+   * Whether converter strings will be ignored when converting JS
    * objects to nodes
    */
   ignoreConverters: boolean
@@ -43,7 +45,7 @@ export interface XMLBuilderOptions {
    */
   skipWhitespaceOnlyText: boolean
 
-  /** 
+  /**
    * Defines string keys used while converting JS objects to nodes.
    */
   convert: ConvertOptions
@@ -89,12 +91,12 @@ export interface XMLBuilderOptions {
   }
   /**
    * Defines a replacement for invalid characters in input strings.
-   * 
+   *
    * If `invalidCharReplacement` is a string, each invalid character in an input
    * string will be replaced with it; otherwise if `invalidCharReplacement`
    * is a function it will be passed each invalid character and should return
-   * a replacement character. 
-   * 
+   * a replacement character.
+   *
    * The arguments to the replacement function are:
    * - char - the invalid character to be replaced
    * - offset - the offset of the invalid character
@@ -174,8 +176,8 @@ export interface DTDOptions {
  * Defines string keys used while converting JS objects to nodes.
  */
 export interface ConvertOptions {
-  /** 
-   * When prepended to a JS object key, converts its key-value pair 
+  /**
+   * When prepended to a JS object key, converts its key-value pair
    * to an attribute. Defaults to `"@"`. Multiple attributes can also be grouped
    * under the attribute key. For example:
    * ```js
@@ -188,12 +190,12 @@ export interface ConvertOptions {
    * ````
    */
   att: string
-  /** 
+  /**
    * When prepended to a JS object key, converts its value to a processing
    * instruction node. Defaults to `"?"`. Instruction target and value should
    * be separated with a single space character. For example:
    * ```js
-   * obj = { 
+   * obj = {
    *   '?': 'background classified ref="NAM#123456"',
    *   pilot: 'Pete Mitchell'
    * }
@@ -205,8 +207,8 @@ export interface ConvertOptions {
    * ````
    */
   ins: string
-  /** 
-   * When prepended to a JS object key, converts its value to a text node. 
+  /**
+   * When prepended to a JS object key, converts its value to a text node.
    * Defaults to `"#"`. For example:
    * ```js
    * obj = { monologue: {
@@ -217,10 +219,10 @@ export interface ConvertOptions {
    * ```xml
    * <monologue>Talk to me Goose!</monologue>
    * ````
-   * 
-   * _Note:_ Since JS objects cannot contain duplicate keys, multiple text 
-   * nodes can be created by adding some unique text after each object 
-   * key. For example: 
+   *
+   * _Note:_ Since JS objects cannot contain duplicate keys, multiple text
+   * nodes can be created by adding some unique text after each object
+   * key. For example:
    * ```js
    * obj = { monologue: {
    *   '#1': 'Talk to me Goose!',
@@ -231,7 +233,7 @@ export interface ConvertOptions {
    * ```xml
    * <monologue>Talk to me Goose!Talk to me...</monologue>
    * ````
-   * 
+   *
    * _Note:_ `"#"` also allows mixed content. Example:
    * ```js
    * obj = { monologue: {
@@ -250,11 +252,11 @@ export interface ConvertOptions {
    * ````
    */
   text: string
-  /** 
-   * When prepended to a JS object key, converts its value to a CDATA 
+  /**
+   * When prepended to a JS object key, converts its value to a CDATA
    * node. Defaults to `"$"`. For example:
    * ```js
-   * obj = { 
+   * obj = {
    *   '$': '<a href="https://topgun.fandom.com/wiki/MiG-28"/>',
    *   aircraft: 'MiG-28'
    * }
@@ -266,8 +268,8 @@ export interface ConvertOptions {
    * ````
    */
   cdata: string
-  /** 
-   * When prepended to a JS object key, converts its value to a 
+  /**
+   * When prepended to a JS object key, converts its value to a
    * comment node. Defaults to `"!"`. For example:
    * ```js
    * obj = {
@@ -290,10 +292,10 @@ export interface ConvertOptions {
 export type ParserOptions = {
   /**
    * Main parser function which parses the given object and returns an `XMLBuilder`.
-   * 
+   *
    * @param node - node to recieve parsed content
    * @param obj - object to parse
-   * 
+   *
    * @returns the last top level element node created
    */
   parse?: (parent: XMLBuilder, obj: string | ExpandObject) => XMLBuilder
@@ -301,12 +303,12 @@ export type ParserOptions = {
   /**
    * Creates a DocType node.
    * The node will be skipped if the function returns `undefined`.
-   * 
+   *
    * @param parent - parent node
    * @param name - node name
    * @param publicId - public identifier
    * @param systemId - system identifier
-   * 
+   *
    * @returns the parent document node
    */
   docType?: (parent: XMLBuilder, name: string, publicId: string, systemId: string) => XMLBuilder | undefined
@@ -314,10 +316,10 @@ export type ParserOptions = {
   /**
    * Creates a comment node.
    * The node will be skipped if the function returns `undefined`.
-   * 
+   *
    * @param parent - parent node
    * @param data - node data
-   * 
+   *
    * @returns the parent element node
    */
   comment?: (parent: XMLBuilder, data: string) => XMLBuilder | undefined
@@ -325,10 +327,10 @@ export type ParserOptions = {
   /**
    * Creates a text node.
    * The node will be skipped if the function returns `undefined`.
-   * 
+   *
    * @param parent - parent node
    * @param data - node data
-   * 
+   *
    * @returns the parent element node
    */
   text?: (parent: XMLBuilder, data: string) => XMLBuilder | undefined
@@ -336,11 +338,11 @@ export type ParserOptions = {
   /**
    * Creates a processing instruction node.
    * The node will be skipped if the function returns `undefined`.
-   * 
+   *
    * @param parent - parent node
    * @param target - instruction target
    * @param data - node data
-   * 
+   *
    * @returns the parent element node
    */
   instruction?: (parent: XMLBuilder, target: string, data: string) => XMLBuilder | undefined
@@ -348,10 +350,10 @@ export type ParserOptions = {
   /**
    * Creates a CData section node.
    * The node will be skipped if the function returns `undefined`.
-   * 
+   *
    * @param parent - parent node
    * @param data - node data
-   * 
+   *
    * @returns the parent element node
    */
   cdata?: (parent: XMLBuilder, data: string) => XMLBuilder | undefined
@@ -359,11 +361,11 @@ export type ParserOptions = {
   /**
    * Creates an element node.
    * The node will be skipped if the function returns `undefined`.
-   * 
+   *
    * @param parent - parent node
    * @param namespace - element namespace
    * @param name - node name
-   * 
+   *
    * @returns the new element node
    */
   element?: (parent: XMLBuilder, namespace: string | null | undefined, name: string) => XMLBuilder | undefined
@@ -371,19 +373,19 @@ export type ParserOptions = {
   /**
    * Creates an attribute or namespace declaration.
    * The node will be skipped if the function returns `undefined`.
-   * 
+   *
    * @param parent - parent node
    * @param namespace - attribute namespace
    * @param name - attribute name
    * @param value - attribute value
-   * 
+   *
    * @returns the parent element node
    */
   attribute?: (parent: XMLBuilder, namespace: string | null | undefined, name: string, value: string) => XMLBuilder | undefined
 
   /**
    * Sanitizes input strings.
-   * 
+   *
    * @param str - input string
    */
   sanitize?(str: string): string
@@ -396,7 +398,7 @@ export type BaseWriterOptions = {
   /**
    * Output format. Defaults to `"xml"`.
    * - `"xml"` - Serializes the document as a string in XML format.
-   * - `"map"` - Serializes the document as an object using `Map`s and 
+   * - `"map"` - Serializes the document as an object using `Map`s and
    * `Array`s.
    * - `"object"` - Serializes the document as an object using `Object`s and
    * `Array`s.
@@ -472,7 +474,7 @@ export type XMLWriterOptions = BaseWriterOptions & {
    */
   newline?: string
   /**
-   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * Defines a fixed number of indentations to add to every line. Defaults to
    * `0`.
    */
   offset?: number
@@ -495,7 +497,7 @@ export type XMLWriterOptions = BaseWriterOptions & {
    */
   allowEmptyTags?: boolean
   /**
-   * Indents contents of text-only element nodes. Defaults to `false` which 
+   * Indents contents of text-only element nodes. Defaults to `false` which
    * keeps a text node on the same line with its containing element node, e.g.
    * ```xml
    * <node>some text</node>
@@ -511,8 +513,8 @@ export type XMLWriterOptions = BaseWriterOptions & {
    */
   indentTextOnlyNodes?: boolean
   /**
-   * Inserts a space character before the slash character of self-closing tags. 
-   * Defaults to `false`. With this options set to `true`, a space character 
+   * Inserts a space character before the slash character of self-closing tags.
+   * Defaults to `false`. With this options set to `true`, a space character
    * will be inserted before the slash character of self-closing tags, e.g.
    * ```xml
    * <node />
@@ -541,7 +543,7 @@ export type JSONWriterOptions = BaseWriterOptions & {
    */
   newline?: string
   /**
-   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * Defines a fixed number of indentations to add to every line. Defaults to
    * `0`.
    */
   offset?: number
@@ -572,7 +574,7 @@ export type YAMLWriterOptions = BaseWriterOptions & {
    */
   newline?: string
   /**
-   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * Defines a fixed number of indentations to add to every line. Defaults to
    * `0`.
    */
   offset?: number
@@ -605,7 +607,7 @@ export type XMLSerializedAsMap = Map<string, string | XMLSerializedAsMap | XMLSe
 export type XMLSerializedAsMapArray = Array<string | XMLSerializedAsMap>
 
 /**
- * Represents the type of a variable that can be expanded by the `ele` function 
+ * Represents the type of a variable that can be expanded by the `ele` function
  * into nodes.
  */
 export type ExpandObject = { [key: string]: any } | Map<string, any> |
@@ -651,30 +653,30 @@ export interface XMLBuilder {
 
   /**
    * Sets builder options.
-   * 
+   *
    * @param - builder options
-   * 
+   *
    * @returns current element node
    */
   set(builderOptions: Partial<XMLBuilderOptions>): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
-   * 
+   *
    * @param namespace - element namespace
    * @param name - element name
    * @param attributes - a JS object with element attributes
-   * 
+   *
    * @returns the new element node
    */
   ele(namespace: string | null, name: string, attributes?: AttributesObject): XMLBuilder
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
-   * 
+   *
    * @param name - element name
    * @param attributes - a JS object with element attributes
-   * 
+   *
    * @returns the new element node
    */
   ele(name: string, attributes?: AttributesObject): XMLBuilder
@@ -682,9 +684,9 @@ export interface XMLBuilder {
   /**
    * Creates new element nodes from the given JS object and appends it to the
    * list of child nodes.
-   * 
+   *
    * @param obj - a JS object representing nodes to insert
-   * 
+   *
    * @returns the last top level element node created
    */
   ele(obj: ExpandObject): XMLBuilder
@@ -692,122 +694,122 @@ export interface XMLBuilder {
   /**
  * Creates new element nodes from the given XML document string appends it to the
  * list of child nodes.
- * 
+ *
  * @param content - an XML document string representing nodes to insert
- * 
+ *
  * @returns the last top level element node created
  */
   ele(content: string): XMLBuilder
 
   /**
    * Removes this node from the XML document.
-   * 
+   *
    * @returns parent element node
    */
   remove(): XMLBuilder
 
   /**
    * Creates or updates an element attribute.
-   * 
+   *
    * @param namespace - namespace of the attribute
    * @param name - attribute name
    * @param value - attribute value
-   * 
+   *
    * @returns current element node
    */
   att(namespace: string | null, name: string, value: string): XMLBuilder
 
   /**
    * Creates or updates an element attribute.
-   * 
+   *
    * @param name - attribute name
    * @param value - attribute value
-   * 
+   *
    * @returns current element node
    */
   att(name: string, value: string): XMLBuilder
 
   /**
    * Creates or updates an element attribute.
-   * 
+   *
    * @param obj - a JS object containing element attributes and values
-   * 
+   *
    * @returns current element node
    */
   att(obj: AttributesObject): XMLBuilder
 
   /**
    * Removes an attribute.
-   * 
+   *
    * @param name - attribute name
-   * 
+   *
    * @returns current element node
    */
   removeAtt(name: string): XMLBuilder
 
   /**
    * Removes a list of attributes.
-   * 
+   *
    * @param names - an array with attribute names
-   * 
+   *
    * @returns current element node
    */
   removeAtt(names: string[]): XMLBuilder
 
   /**
    * Removes an attribute.
-   * 
+   *
    * @param namespace - namespace of the attribute to remove
    * @param name - attribute name
-   * 
+   *
    * @returns current element node
    */
   removeAtt(namespace: string | null, name: string): XMLBuilder
 
   /**
    * Removes a list of attributes.
-   * 
+   *
    * @param namespace - namespace of the attributes to remove
    * @param names - an array with attribute names
-   * 
+   *
    * @returns current element node
    */
   removeAtt(namespace: string | null, names: string[]): XMLBuilder
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
-   * 
+   *
    * @param content - node content
-   * 
+   *
    * @returns current element node
    */
   txt(content: string): XMLBuilder
 
   /**
    * Creates a new comment node and appends it to the list of child nodes.
-   * 
+   *
    * @param content - node content
-   * 
+   *
    * @returns current element node
    */
   com(content: string): XMLBuilder
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.
-   * 
+   *
    * @param content - node content
-   * 
+   *
    * @returns current element node
    */
   dat(content: string): XMLBuilder
 
   /**
-   * Creates a new processing instruction node and appends it to the list of 
+   * Creates a new processing instruction node and appends it to the list of
    * child nodes.
-   * 
+   *
    * @param target - instruction target
    * @param content - node content
-   * 
+   *
    * @returns current element node
    */
   ins(target: string, content?: string): XMLBuilder
@@ -815,47 +817,47 @@ export interface XMLBuilder {
   /**
    * Creates new processing instruction nodes by expanding the given object and
    * appends them to the list of child nodes.
-   * 
-   * @param contents - a JS object containing processing instruction targets 
+   *
+   * @param contents - a JS object containing processing instruction targets
    * and values or an array of strings
-   * 
+   *
    * @returns current element node
    */
   ins(target: PIObject): XMLBuilder
 
   /**
    * Updates XML declaration.
-   * 
+   *
    * @param options - declaration options
-   * 
+   *
    * @returns current element node
    */
   dec(options: { version?: "1.0", encoding?: string, standalone?: boolean }): XMLBuilder
 
   /**
-   * Creates a new DocType node and inserts it into the document. If the 
+   * Creates a new DocType node and inserts it into the document. If the
    * document already contains a DocType node it will be replaced by the new
    * node. Otherwise it will be inserted before the document element node.
-   * 
+   *
    * @param options - DocType identifiers
-   * 
+   *
    * @returns current element node
    */
   dtd(options?: DTDOptions): XMLBuilder
 
   /**
    * Imports a node as a child node of this node. The nodes' descendants and
-   * attributes will also be imported. 
-   * 
+   * attributes will also be imported.
+   *
    * @param node - the node to import
-   * 
+   *
    * _Note:_ The node will be cloned before being imported and this clone will
    * be inserted into the document; not the original node.
-   * 
+   *
    * _Note:_ If the imported node is a document, its document element node will
    * be imported. If the imported node is a document fragment its child nodes
    * will be imported.
-   * 
+   *
    * @returns current element node
    */
   import(node: XMLBuilder): XMLBuilder
@@ -898,7 +900,7 @@ export interface XMLBuilder {
   /**
    * Traverses through the child nodes of a node. `callback` is called with three
    * arguments: `(node, index, level)`.
-   * 
+   *
    * @param callback - a callback function to apply to each child node
    * @param self - whether to visit the current node along with child nodes
    * @param recursive - whether to visit all descendant nodes in tree-order or
@@ -910,9 +912,9 @@ export interface XMLBuilder {
 
   /**
    * Produces an array of values by transforming each child node with the given
-   * callback function. `callback` is called with three arguments: 
+   * callback function. `callback` is called with three arguments:
    * `(node, index, level)`.
-   * 
+   *
    * @param callback - a callback function to apply to each child node
    * @param self - whether to visit the current node along with child nodes
    * @param recursive - whether to visit all descendant nodes in tree-order or
@@ -923,10 +925,10 @@ export interface XMLBuilder {
     self?: boolean, recursive?: boolean, thisArg?: any): T[]
 
   /**
-   * Reduces child nodes into a single value by applying the given callback 
+   * Reduces child nodes into a single value by applying the given callback
    * function. `callback` is called with four arguments:
    * `(value, node, index, level)`.
-   * 
+   *
    * @param callback - a callback function to apply to each child node
    * @param initialValue - initial value of the iteration
    * @param self - whether to visit the current node along with child nodes
@@ -940,7 +942,7 @@ export interface XMLBuilder {
   /**
    * Returns the first child node satisfying the given predicate. `predicate` is
    * called with three arguments: `(node, index, level)`.
-   * 
+   *
    * @param predicate - a callback function to apply to each child node
    * @param self - whether to visit the current node along with child nodes
    * @param recursive - whether to visit all descendant nodes in tree-order or
@@ -953,7 +955,7 @@ export interface XMLBuilder {
   /**
    * Produces an array of child nodes which pass the given predicate test.
    * `predicate` is called with three arguments: `(node, index, level)`.
-   * 
+   *
    * @param predicate - a callback function to apply to each child node
    * @param self - whether to visit the current node along with child nodes
    * @param recursive - whether to visit all descendant nodes in tree-order or
@@ -966,7 +968,7 @@ export interface XMLBuilder {
   /**
    * Returns `true` if all child nodes pass the given predicate test.
    * `predicate` is called with three arguments: `(node, index, level)`.
-   * 
+   *
    * @param predicate - a callback function to apply to each child node
    * @param self - whether to visit the current node along with child nodes
    * @param recursive - whether to visit all descendant nodes in tree-order or
@@ -979,7 +981,7 @@ export interface XMLBuilder {
   /**
    * Returns `true` if any of the child nodes pass the given predicate test.
    * `predicate` is called with three arguments: `(node, index, level)`.
-   * 
+   *
    * @param predicate - a callback function to apply to each child node
    * @param self - whether to visit the current node along with child nodes
    * @param recursive - whether to visit all descendant nodes in tree-order or
@@ -991,7 +993,7 @@ export interface XMLBuilder {
 
   /**
    * Produces an array of child nodes.
-   * 
+   *
    * @param self - whether to visit the current node along with child nodes
    * @param recursive - whether to visit all descendant nodes in tree-order or
    * only the immediate child nodes
@@ -1000,35 +1002,35 @@ export interface XMLBuilder {
 
   /**
    * Converts the node into an XML string.
-   * 
+   *
    * @param options - serialization options
    */
   toString(writerOptions?: XMLWriterOptions): string
 
   /**
    * Converts the node into a JSON string.
-   * 
+   *
    * @param options - serialization options
    */
   toString(writerOptions: JSONWriterOptions): string
 
   /**
  * Converts the node into a YAML string.
- * 
+ *
  * @param options - serialization options
  */
   toString(writerOptions: YAMLWriterOptions): string
 
   /**
    * Converts the node into its object representation.
-   * 
+   *
    * @param options - serialization options
    */
   toObject(writerOptions?: ObjectWriterOptions): XMLSerializedAsObject | XMLSerializedAsObjectArray
 
   /**
  * Converts the node into its object representation using ES6 maps.
- * 
+ *
  * @param options - serialization options
  */
   toObject(writerOptions: MapWriterOptions): XMLSerializedAsMap | XMLSerializedAsMapArray
@@ -1041,35 +1043,35 @@ export interface XMLBuilder {
 
   /**
    * Converts the entire XML document into an XML document string.
-   * 
+   *
    * @param options - serialization options
    */
   end(writerOptions: XMLWriterOptions): string
 
   /**
    * Converts the entire XML document into a JSON string.
-   * 
+   *
    * @param options - serialization options
    */
   end(writerOptions: JSONWriterOptions): string
 
   /**
    * Converts the entire XML document into a YAML string.
-   * 
+   *
    * @param options - serialization options
    */
   end(writerOptions: YAMLWriterOptions): string
 
   /**
    * Converts the entire XML document into its object representation.
-   * 
+   *
    * @param options - serialization options
    */
   end(writerOptions: ObjectWriterOptions): XMLSerializedAsObject | XMLSerializedAsObjectArray
 
   /**
    * Converts the entire XML document into its object representation using ES6 maps.
-   * 
+   *
    * @param options - serialization options
    */
   end(writerOptions: MapWriterOptions): XMLSerializedAsMap | XMLSerializedAsMapArray
@@ -1080,9 +1082,9 @@ export interface XMLBuilder {
  */
 export interface XMLBuilderCB {
   /**
-   * Adds a listener for the data event which is emitted when a chunk of data 
+   * Adds a listener for the data event which is emitted when a chunk of data
    * is produced.
-   * 
+   *
    * @param event - event name
    * @param listener - an event listener callback
    */
@@ -1090,23 +1092,23 @@ export interface XMLBuilderCB {
   /**
    * Adds a listener for the end event which is emitted when the XML document is
    * completed.
-   * 
+   *
    * @param event - event name
    * @param listener - an event listener callback
    */
   on(event: "end", listener: () => void): this
   /**
    * Adds a listener for the error event which is emitted when an error occurs.
-   * 
+   *
    * @param event - event name
    * @param listener - an event listener callback
    */
   on(event: "error", listener: (err: Error) => void): this
 
   /**
-   * Removes a listener for the data event which is emitted when a chunk of data 
+   * Removes a listener for the data event which is emitted when a chunk of data
    * is produced.
-   * 
+   *
    * @param event - event name
    * @param listener - an event listener callback
    */
@@ -1114,7 +1116,7 @@ export interface XMLBuilderCB {
   /**
    * Removes a listener for the end event which is emitted when the XML document
    * is completed.
-   * 
+   *
    * @param event - event name
    * @param listener - an event listener callback
    */
@@ -1122,7 +1124,7 @@ export interface XMLBuilderCB {
   /**
    * Removes a listener for the error event which is emitted when an error
    * occurs.
-   * 
+   *
    * @param event - event name
    * @param listener - an event listener callback
    */
@@ -1130,21 +1132,21 @@ export interface XMLBuilderCB {
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
-   * 
+   *
    * @param namespace - element namespace
    * @param name - element name
    * @param attributes - a JS object with element attributes
-   * 
+   *
    * @returns the builder
    */
   ele(namespace: string | null, name: string, attributes?: AttributesObject): this
 
   /**
    * Creates a new element node and appends it to the list of child nodes.
-   * 
+   *
    * @param name - element name
    * @param attributes - a JS object with element attributes
-   * 
+   *
    * @returns callback builder
    */
   ele(name: string, attributes?: AttributesObject): this
@@ -1152,77 +1154,77 @@ export interface XMLBuilderCB {
   /**
    * Creates new element nodes from the given JS object and appends it to the
    * list of child nodes.
-   * 
+   *
    * @param obj - a JS object representing nodes to insert
-   * 
+   *
    * @returns the last top level element node created
    */
   ele(obj: ExpandObject): this
 
   /**
    * Creates or updates an element attribute.
-   * 
+   *
    * @param namespace - namespace of the attribute
    * @param name - attribute name
    * @param value - attribute value
-   * 
+   *
    * @returns callback builder
    */
   att(namespace: string | null, name: string, value: string): this
 
   /**
    * Creates or updates an element attribute.
-   * 
+   *
    * @param name - attribute name
    * @param value - attribute value
-   * 
+   *
    * @returns callback builder
    */
   att(name: string, value: string): this
 
   /**
    * Creates or updates an element attribute.
-   * 
+   *
    * @param obj - a JS object containing element attributes and values
-   * 
+   *
    * @returns callback builder
    */
   att(obj: AttributesObject): this
 
   /**
    * Creates a new text node and appends it to the list of child nodes.
-   * 
+   *
    * @param content - node content
-   * 
+   *
    * @returns callback builder
    */
   txt(content: string): this
 
   /**
    * Creates a new comment node and appends it to the list of child nodes.
-   * 
+   *
    * @param content - node content
-   * 
+   *
    * @returns callback builder
    */
   com(content: string): this
 
   /**
    * Creates a new CDATA node and appends it to the list of child nodes.
-   * 
+   *
    * @param content - node content
-   * 
+   *
    * @returns callback builder
    */
   dat(content: string): this
 
   /**
-   * Creates a new processing instruction node and appends it to the list of 
+   * Creates a new processing instruction node and appends it to the list of
    * child nodes.
-   * 
+   *
    * @param target - instruction target
    * @param content - node content
-   * 
+   *
    * @returns callback builder
    */
   ins(target: string, content?: string): this
@@ -1230,59 +1232,59 @@ export interface XMLBuilderCB {
   /**
    * Creates new processing instruction nodes by expanding the given object and
    * appends them to the list of child nodes.
-   * 
-   * @param contents - a JS object containing processing instruction targets 
+   *
+   * @param contents - a JS object containing processing instruction targets
    * and values or an array of strings
-   * 
+   *
    * @returns callback builder
    */
   ins(target: PIObject): this
 
   /**
    * Creates the XML declaration.
-   * 
+   *
    * @param options - declaration options
-   * 
+   *
    * @returns callback builder
    */
   dec(options?: { version?: "1.0", encoding?: string, standalone?: boolean }): this
 
   /**
    * Creates a new DocType node and inserts it into the document.
-   * 
+   *
    * @param options - DocType identifiers
-   * 
+   *
    * @returns callback builder
    */
   dtd(options: DTDOptions & { name: string }): this
 
   /**
    * Imports a node as a child node of this node. The nodes' descendants and
-   * attributes will also be imported. 
-   * 
+   * attributes will also be imported.
+   *
    * @param node - the node to import
-   * 
+   *
    * _Note:_ The node will be cloned before being imported and this clone will
    * be inserted into the document; not the original node.
-   * 
+   *
    * _Note:_ If the imported node is a document, its document element node will
    * be imported. If the imported node is a document fragment its child nodes
    * will be imported.
-   * 
+   *
    * @returns callback builder
    */
   import(node: XMLBuilder): this
 
   /**
    * Closes the current element node.
-   * 
+   *
    * @returns callback builder
    */
   up(): this
 
   /**
    * Completes serializing the XML document.
-   * 
+   *
    * @returns callback builder
    */
   end(): this
@@ -1313,12 +1315,12 @@ export type XMLBuilderCBOptions = CBWriterOptions & {
    * Whether attributes with `null` values will be kept or ignored
    */
   keepNullAttributes: boolean
-  /** 
-   * Whether converter strings will be ignored when converting JS 
+  /**
+   * Whether converter strings will be ignored when converting JS
    * objects to nodes
    */
   ignoreConverters: boolean
-  /** 
+  /**
    * Defines string keys used while converting JS objects to nodes.
    */
   convert: ConvertOptions
@@ -1383,7 +1385,7 @@ export type XMLCBWriterOptions = BaseCBWriterOptions & {
    */
   newline: string
   /**
-   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * Defines a fixed number of indentations to add to every line. Defaults to
    * `0`.
    */
   offset: number
@@ -1406,8 +1408,8 @@ export type XMLCBWriterOptions = BaseCBWriterOptions & {
    */
   allowEmptyTags: boolean
   /**
-   * Inserts a space character before the slash character of self-closing tags. 
-   * Defaults to `false`. With this options set to `true`, a space character 
+   * Inserts a space character before the slash character of self-closing tags.
+   * Defaults to `false`. With this options set to `true`, a space character
    * will be inserted before the slash character of self-closing tags, e.g.
    * ```xml
    * <node />
@@ -1436,7 +1438,7 @@ export type JSONCBWriterOptions = BaseCBWriterOptions & {
    */
   newline: string
   /**
-   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * Defines a fixed number of indentations to add to every line. Defaults to
    * `0`.
    */
   offset: number
@@ -1457,7 +1459,7 @@ export type YAMLCBWriterOptions = BaseCBWriterOptions & {
    */
   newline: string
   /**
-   * Defines a fixed number of indentations to add to every line. Defaults to 
+   * Defines a fixed number of indentations to add to every line. Defaults to
    * `0`.
    */
   offset: number

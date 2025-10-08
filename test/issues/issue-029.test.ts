@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/29
-  test("#29 - Attribute is a node", () => {
+  $$.test("#29 - Attribute is a node", () => {
     const input = $$.t`
     <resources>
       <string name="countdown">
@@ -14,7 +14,7 @@ describe("Replicate issue", () => {
     </resources>`
 
     // test with default converter
-    expect($$.convert(input, { format: 'object' })).toEqual(
+    $$.deepEqual($$.convert(input, { format: 'object' }),
       {
         resources: {
           string: {
@@ -45,7 +45,7 @@ describe("Replicate issue", () => {
     // test with custom converter
     const obj = $$.convert({ encoding: 'UTF-8', convert: { text: 'value' } }, input, { format: 'object' })
 
-    expect(obj).toEqual(
+    $$.deepEqual(obj,
       {
         resources: {
           string: {

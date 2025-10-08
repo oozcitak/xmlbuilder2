@@ -27,7 +27,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /**
    * Initializes a new instance of `XMLBuilderNodeImpl`.
-   * 
+   *
    * @param domNode - the DOM node to wrap
    */
   constructor(domNode: Node) {
@@ -53,19 +53,19 @@ export class XMLBuilderImpl implements XMLBuilder {
     p3?: AttributesObject): XMLBuilder {
 
     let namespace: string | null | undefined
-    let name: string | ExpandObject | undefined
+    let name: string | ExpandObject | undefined | null
     let attributes: AttributesObject | undefined
 
-    if (isObject(p1)) {
+    if (isObject<string>(p1)) {
       // ele(obj: ExpandObject)
       return new ObjectReader(this._options).parse(this, p1)
-    } else if (p1 !== null && /^\s*</.test(p1)) {
+    } else if (isString(p1) && p1 !== null && /^\s*</.test(p1)) {
       // parse XML document string
       return new XMLReader(this._options).parse(this, p1)
-    } else if (p1 !== null && /^\s*[\{\[]/.test(p1)) {
+    } else if (isString(p1) && p1 !== null && /^\s*[\{\[]/.test(p1)) {
       // parse JSON string
       return new JSONReader(this._options).parse(this, p1)
-    } else if (p1 !== null && /^(\s*|(#.*)|(%.*))*---/.test(p1)) {
+    } else if (isString(p1) && p1 !== null && /^(\s*|(#.*)|(%.*))*---/.test(p1)) {
       // parse YAML string
       return new YAMLReader(this._options).parse(this, p1)
     }
@@ -86,7 +86,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
     [namespace, name] = this._extractNamespace(
       sanitizeInput(namespace, this._options.invalidCharReplacement),
-      sanitizeInput(name, this._options.invalidCharReplacement), true)
+      sanitizeInput(name as string, this._options.invalidCharReplacement), true)
 
     // inherit namespace from parent
     if (namespace === undefined) {
@@ -130,7 +130,7 @@ export class XMLBuilderImpl implements XMLBuilder {
   /** @inheritdoc */
   att(p1: AttributesObject | string | null, p2?: string, p3?: string): XMLBuilder {
 
-    if (isMap(p1) || isObject(p1)) {
+    if (isMap<string>(p1) || isObject<string>(p1)) {
       // att(obj: AttributesObject)
       // expand if object
       forEachObject(p1, (attName, attValue) => this.att(attName, attValue), this)
@@ -228,7 +228,7 @@ export class XMLBuilderImpl implements XMLBuilder {
       throw new Error("Attribute namespace must be a string. " + this._debugInfo())
     }
 
-    if (isArray(name) || isSet(name)) {
+    if (isArray<string>(name) || isSet<string>(name)) {
       // removeAtt(names: string[])
       // removeAtt(namespace: string, names: string[])
       forEachArray(name, attName =>
@@ -316,15 +316,15 @@ export class XMLBuilderImpl implements XMLBuilder {
       }
     }
 
-    if (isArray(target) || isSet(target)) {
-      forEachArray(target, item => {
+    if (isArray<string>(target) || isSet<string>(target)) {
+      forEachArray<string>(target, item => {
         item += ""
         const insIndex = item.indexOf(' ')
         const insTarget = (insIndex === -1 ? item : item.substr(0, insIndex))
         const insValue = (insIndex === -1 ? '' : item.substr(insIndex + 1))
         this.ins(insTarget, insValue)
       }, this)
-    } else if (isMap(target) || isObject(target)) {
+    } else if (isMap<string>(target) || isObject<string>(target)) {
       forEachObject(target, (insTarget, insValue) => this.ins(insTarget, insValue), this)
     } else {
       const child = this._doc.createProcessingInstruction(
@@ -619,7 +619,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * Gets the next descendant of the given node of the tree rooted at `root`
    * in depth-first pre-order. Returns a three-tuple with
    * [descendant, descendant_index, descendant_level].
-   * 
+   *
    * @param root - root node of the tree
    * @param self - whether to visit the current node along with child nodes
    * @param recursive - whether to visit all descendant nodes in tree-order or
@@ -638,7 +638,7 @@ export class XMLBuilderImpl implements XMLBuilder {
    * Gets the next descendant of the given node of the tree rooted at `root`
    * in depth-first pre-order. Returns a three-tuple with
    * [descendant, descendant_index, descendant_level].
-   * 
+   *
    * @param root - root node of the tree
    * @param node - current node
    * @param recursive - whether to visit all descendant nodes in tree-order or
@@ -675,7 +675,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /**
    * Converts the node into its string or object representation.
-   * 
+   *
    * @param options - serialization options
    */
   private _serialize(writerOptions: WriterOptions): XMLSerializedValue {
@@ -701,7 +701,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /**
    * Extracts a namespace and name from the given string.
-   * 
+   *
    * @param namespace - namespace
    * @param name - a string containing both a name and namespace separated by an
    * `'@'` character
@@ -732,7 +732,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /**
    * Updates the element's namespace.
-   * 
+   *
    * @param ns - new namespace
    */
   private _updateNamespace(ns: string | null): void {
@@ -797,7 +797,7 @@ export class XMLBuilderImpl implements XMLBuilder {
 
   /**
    * Returns debug information for this node.
-   * 
+   *
    * @param name - node name
    */
   protected _debugInfo(name?: string): string {

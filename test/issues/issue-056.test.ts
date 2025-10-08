@@ -1,11 +1,11 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/56
-  test(`#56 - Throws TypeError "Cannot read property 'length' of null" when specifying null txt`, () => {
+  $$.test(`#56 - Throws TypeError "Cannot read property 'length' of null" when specifying null txt`, () => {
     const xml = $$.create().ele('test').txt(null as any).end({ headless: true })
 
-    expect(xml).toBe('<test/>')
+    $$.deepEqual(xml, '<test/>')
   })
 
 })

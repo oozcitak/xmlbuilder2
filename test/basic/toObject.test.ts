@@ -1,13 +1,13 @@
 import $$ from '../TestHelpers'
 
-describe('toObject() with map', () => {
+$$.suite('toObject() with map', () => {
 
-  test('element', () => {
+  $$.test('element', () => {
     const root = $$.create().ele('root', { "att": "val", "att2": "val2" })
       .ele('node1').up()
       .ele('node2').root()
     const obj = root.toObject({ format: "map", group: true })
-    expect($$.printMap(obj)).toBe($$.t`
+    $$.deepEqual($$.printMap(obj), $$.t`
       M{
         root: M{
           @: M{
@@ -21,68 +21,68 @@ describe('toObject() with map', () => {
     `)
   })
 
-  test('document', () => {
+  $$.test('document', () => {
     const obj = $$.create().ele('root').doc().toObject({ format: "map" })
-    expect($$.printMap(obj)).toBe('M{ root: M{ } }')
+    $$.deepEqual($$.printMap(obj), 'M{ root: M{ } }')
   })
 
-  test('document type', () => {
+  $$.test('document type', () => {
     const dtd = $$.create().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
-    expect(dtd.toObject({ format: "map" })).toEqual(new Map())
+    $$.deepEqual(dtd.toObject({ format: "map" }), new Map())
   })
 
-  test('document fragment', () => {
+  $$.test('document fragment', () => {
     const frag = $$.fragment().ele('foo').ele('bar').up().up()
-    expect($$.printMap(frag.toObject({ format: "map" }))).toBe('M{ foo: M{ bar: M{ } } }')
+    $$.deepEqual($$.printMap(frag.toObject({ format: "map" })), 'M{ foo: M{ bar: M{ } } }')
   })
 
-  test('element', () => {
+  $$.test('element', () => {
     const root = $$.create().ele('root')
-    expect($$.printMap(root.toObject({ format: "map" }))).toBe('M{ root: M{ } }')
+    $$.deepEqual($$.printMap(root.toObject({ format: "map" })), 'M{ root: M{ } }')
   })
 
-  test('text', () => {
+  $$.test('text', () => {
     const node = $$.create().ele('root').txt('content').first()
-    expect($$.printMap(node.toObject({ format: "map" }))).toBe('content')
+    $$.deepEqual($$.printMap(node.toObject({ format: "map" })), 'content')
   })
 
-  test('cdata', () => {
+  $$.test('cdata', () => {
     const node = $$.create().ele('root').dat('content').first()
-    expect($$.printMap(node.toObject({ format: "map" }))).toBe('M{ $: content }')
+    $$.deepEqual($$.printMap(node.toObject({ format: "map" })), 'M{ $: content }')
   })
 
-  test('comment', () => {
+  $$.test('comment', () => {
     const node = $$.create().ele('root').com('content').first()
-    expect($$.printMap(node.toObject({ format: "map" }))).toBe('M{ !: content }')
+    $$.deepEqual($$.printMap(node.toObject({ format: "map" })), 'M{ !: content }')
   })
 
-  test('processing instruction', () => {
+  $$.test('processing instruction', () => {
     const node = $$.create().ele('root').ins('target', 'content').first()
-    expect($$.printMap(node.toObject({ format: "map" }))).toBe('M{ ?: target content }')
+    $$.deepEqual($$.printMap(node.toObject({ format: "map" })), 'M{ ?: target content }')
   })
 
-  test('attribute', () => {
+  $$.test('attribute', () => {
     const root = $$.create().ele('root').att("att", "val")
-    expect($$.printMap(root.toObject({ format: "map" }))).toBe($$.t`
+    $$.deepEqual($$.printMap(root.toObject({ format: "map" })), $$.t`
       M{ root: M{ @att: val } }
     `)
   })
 
 })
 
-describe('toObject() with object', () => {
+$$.suite('toObject() with object', () => {
 
-  test('object is the default format', () => {
+  $$.test('object is the default format', () => {
     const obj = $$.create().ele('root').doc().toObject()
-    expect(obj).toEqual({ root: { } })
+    $$.deepEqual(obj, { root: { } })
   })
 
-  test('element', () => {
+  $$.test('element', () => {
     const root = $$.create().ele('root', { "att": "val", "att2": "val2" })
       .ele('node1').up()
       .ele('node2').root()
     const obj = root.toObject({ format: "object", group: true })
-    expect($$.printMap(obj)).toBe($$.t`
+    $$.deepEqual($$.printMap(obj), $$.t`
       {
         root: {
           @: {
@@ -96,49 +96,49 @@ describe('toObject() with object', () => {
     `)
   })
 
-  test('document', () => {
+  $$.test('document', () => {
     const obj = $$.create().ele('root').doc().toObject({ format: "object" })
-    expect($$.printMap(obj)).toBe('{ root: { } }')
+    $$.deepEqual($$.printMap(obj), '{ root: { } }')
   })
 
-  test('document type', () => {
+  $$.test('document type', () => {
     const dtd = $$.create().dtd({ pubID: "pub", sysID: "sys" }).ele('root').doc().first()
-    expect(dtd.toObject({ format: "object" })).toEqual({})
+    $$.deepEqual(dtd.toObject({ format: "object" }), {})
   })
 
-  test('document fragment', () => {
+  $$.test('document fragment', () => {
     const frag = $$.fragment().ele('foo').ele('bar').up().up()
-    expect($$.printMap(frag.toObject({ format: "object" }))).toBe('{ foo: { bar: { } } }')
+    $$.deepEqual($$.printMap(frag.toObject({ format: "object" })), '{ foo: { bar: { } } }')
   })
 
-  test('element', () => {
+  $$.test('element', () => {
     const root = $$.create().ele('root')
-    expect($$.printMap(root.toObject({ format: "object" }))).toBe('{ root: { } }')
+    $$.deepEqual($$.printMap(root.toObject({ format: "object" })), '{ root: { } }')
   })
 
-  test('text', () => {
+  $$.test('text', () => {
     const node = $$.create().ele('root').txt('content').first()
-    expect($$.printMap(node.toObject({ format: "object" }))).toBe('content')
+    $$.deepEqual($$.printMap(node.toObject({ format: "object" })), 'content')
   })
 
-  test('cdata', () => {
+  $$.test('cdata', () => {
     const node = $$.create().ele('root').dat('content').first()
-    expect($$.printMap(node.toObject({ format: "object" }))).toBe('{ $: content }')
+    $$.deepEqual($$.printMap(node.toObject({ format: "object" })), '{ $: content }')
   })
 
-  test('comment', () => {
+  $$.test('comment', () => {
     const node = $$.create().ele('root').com('content').first()
-    expect($$.printMap(node.toObject({ format: "object" }))).toBe('{ !: content }')
+    $$.deepEqual($$.printMap(node.toObject({ format: "object" })), '{ !: content }')
   })
 
-  test('processing instruction', () => {
+  $$.test('processing instruction', () => {
     const node = $$.create().ele('root').ins('target', 'content').first()
-    expect($$.printMap(node.toObject({ format: "object" }))).toBe('{ ?: target content }')
+    $$.deepEqual($$.printMap(node.toObject({ format: "object" })), '{ ?: target content }')
   })
 
-  test('attribute', () => {
+  $$.test('attribute', () => {
     const root = $$.create().ele('root').att("att", "val")
-    expect($$.printMap(root.toObject({ format: "object" }))).toBe($$.t`
+    $$.deepEqual($$.printMap(root.toObject({ format: "object" })), $$.t`
       { root: { @att: val } }
     `)
   })

@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('ele()', () => {
+$$.suite('ele()', () => {
 
-  test('string name', () => {
+  $$.test('string name', () => {
     const root = $$.create().ele('root')
     const node1 = root.ele('node1')
     node1.ele('node1-1')
@@ -12,7 +12,7 @@ describe('ele()', () => {
     node2.ele('node2-2')
     node2.ele('node2-3')
 
-    expect($$.printTree(root.doc().node)).toBe($$.t`
+    $$.deepEqual($$.printTree(root.doc().node), $$.t`
       root
         node1
           node1-1
@@ -24,23 +24,23 @@ describe('ele()', () => {
       `)
   })
 
-  test('null name', () => {
-    expect(() => $$.create().ele(null as any)).toThrow()
+  $$.test('null name', () => {
+    $$.throws(() => $$.create().ele(null as any))
   })
 
-  test('element namespace cannot be overwritten', () => {
+  $$.test('element namespace cannot be overwritten', () => {
     const root = $$.create().ele('ns1', 'root@ns2')
-    expect((root.node as any).namespaceURI).toBe('ns1')
+    $$.deepEqual((root.node as any).namespaceURI, 'ns1')
   })
 
-  test('from JS object', () => {
+  $$.test('from JS object', () => {
     const root = $$.create().ele('root')
     root.ele({
       'node1': { 'node1-1': '', 'node1-2': '' },
       'node2': { 'node2-1': '', 'node2-2': '', 'node2-3': '' }
     })
 
-    expect($$.printTree(root.doc().node)).toBe($$.t`
+    $$.deepEqual($$.printTree(root.doc().node), $$.t`
       root
         node1
           node1-1
@@ -52,11 +52,11 @@ describe('ele()', () => {
       `)
   })
 
-  test('from XML string', () => {
+  $$.test('from XML string', () => {
     const root = $$.create().ele('root')
     root.ele('<node1><node1-1/><node1-2/></node1><node2><node2-1/><node2-2/><node2-3/></node2>')
 
-    expect($$.printTree(root.doc().node)).toBe($$.t`
+    $$.deepEqual($$.printTree(root.doc().node), $$.t`
       root
         node1
           node1-1
@@ -68,13 +68,13 @@ describe('ele()', () => {
       `)
   })
 
-  test('from JSON string', () => {
+  $$.test('from JSON string', () => {
     const root = $$.create().ele('root')
     root.ele(`{
       "node1": { "node1-1": "", "node1-2": "" },
       "node2": { "node2-1": "", "node2-2": "", "node2-3": "" }
     }`)
-    expect($$.printTree(root.doc().node)).toBe($$.t`
+    $$.deepEqual($$.printTree(root.doc().node), $$.t`
       root
         node1
           node1-1

@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('YAMLWriter', () => {
+$$.suite('YAMLWriter', () => {
 
-  test('basic', () => {
+  $$.test('basic', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -28,7 +28,7 @@ describe('YAMLWriter', () => {
     const result = $$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele('root').ele(obj).end({ format: "yaml" })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
       ---
       "root":
         "ele": "simple element"
@@ -50,7 +50,7 @@ describe('YAMLWriter', () => {
       `)
   })
 
-  test('offset', () => {
+  $$.test('offset', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -59,8 +59,8 @@ describe('YAMLWriter', () => {
       }
     }
 
-    expect($$.create().ele('root').ele(obj).root().
-      toString({ format: "yaml", offset: 2 })).toBe(
+    $$.deepEqual($$.create().ele('root').ele(obj).root().
+      toString({ format: "yaml", offset: 2 }),
       '    ---\n' +
       '    "root":\n' +
       '      "ele": "simple element"\n' +
@@ -70,7 +70,7 @@ describe('YAMLWriter', () => {
       )
   })
 
-  test('negative offset', () => {
+  $$.test('negative offset', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -81,10 +81,10 @@ describe('YAMLWriter', () => {
 
     const root = $$.create().ele('root').ele(obj).root()
 
-    expect(() => root.toString({ format: "yaml", offset: -4 })).toThrow()
+    $$.throws(() => root.toString({ format: "yaml", offset: -4 }))
   })
 
-  test('invalid indentation', () => {
+  $$.test('invalid indentation', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -95,17 +95,17 @@ describe('YAMLWriter', () => {
 
     const root = $$.create().ele('root').ele(obj).root()
 
-    expect(() => root.toString({ format: "yaml", indent: " " })).toThrow()
+    $$.throws(() => root.toString({ format: "yaml", indent: " " }))
   })
 
-  test('duplicate tag names', () => {
+  $$.test('duplicate tag names', () => {
     const result = $$.create().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .ele('person').up()
       .end({ format: "yaml" })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
     ---
     "people":
       "person":
@@ -115,14 +115,14 @@ describe('YAMLWriter', () => {
     `)
   })
 
-  test('mixed content', () => {
+  $$.test('mixed content', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
       .end({ format: "yaml" })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
     ---
     "people":
       "#1": "hello"
@@ -132,7 +132,7 @@ describe('YAMLWriter', () => {
     `)
   })
 
-  test('mixed content and duplicate tags', () => {
+  $$.test('mixed content and duplicate tags', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -140,7 +140,7 @@ describe('YAMLWriter', () => {
       .txt('world')
       .end({ format: "yaml" })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
     ---
     "people":
       "#1": "hello"
@@ -151,7 +151,7 @@ describe('YAMLWriter', () => {
       `)
   })
 
-  test('mixed content and interspersed duplicate tags', () => {
+  $$.test('mixed content and interspersed duplicate tags', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -159,7 +159,7 @@ describe('YAMLWriter', () => {
       .ele('person', { name: "yyy" }).up()
       .end({ format: "yaml" })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
     ---
     "people":
       "#":
@@ -172,24 +172,24 @@ describe('YAMLWriter', () => {
       `)
   })
 
-  test('doctype', () => {
+  $$.test('doctype', () => {
     const result = $$.create()
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "yaml" })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
     ---
     "root": ""
     `)
   })
 
-  test('namespaces', () => {
+  $$.test('namespaces', () => {
     const result = $$.create().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .ele('bar').up()
       .doc()
       .end({ format: "yaml" })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
     ---
     "root":
       "@xmlns": "myns"
@@ -198,13 +198,13 @@ describe('YAMLWriter', () => {
       `)
   })
 
-  test('unknown node', () => {
+  $$.test('unknown node', () => {
     const ele = $$.create().ele('root').ele('alien')
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
-    expect(() => ele.end({ format: "yaml" })).toThrow()
+    $$.throws(() => ele.end({ format: "yaml" }))
   })
-  
-  test("verbose", () => {
+
+  $$.test("verbose", () => {
     const input2 = $$.t`
     <data>
       <row id="0">
@@ -218,7 +218,7 @@ describe('YAMLWriter', () => {
     </data>`
 
     const json2 = $$.convert(input2, { format: 'yaml', verbose: true })
-    expect(json2).toBe($$.t`
+    $$.deepEqual(json2, $$.t`
     ---
     "data":
     - "row":
@@ -231,7 +231,7 @@ describe('YAMLWriter', () => {
         "TYPE":
         - "Y"
         "ID":
-        - "321"           
+        - "321"
     `)
 
     const input1 = $$.t`
@@ -242,7 +242,7 @@ describe('YAMLWriter', () => {
       </row>
     </data>`
     const json1 = $$.convert(input1, { format: 'yaml', verbose: true })
-    expect(json1).toEqual($$.t`
+    $$.deepEqual(json1, $$.t`
     ---
     "data":
     - "row":
@@ -254,7 +254,7 @@ describe('YAMLWriter', () => {
     `)
   })
 
-  test('round trip', () => {
+  $$.test('round trip', () => {
     const obj = {
       root: {
         ele: "simple element",
@@ -280,7 +280,7 @@ describe('YAMLWriter', () => {
     }
 
     const yamlStr = $$.create(obj).end({ format: "yaml"})
-    expect($$.convert({ version: "1.0", encoding: "UTF-8", standalone: true }, yamlStr, { format: "xml", prettyPrint: true })).toBe($$.t`
+    $$.deepEqual($$.convert({ version: "1.0", encoding: "UTF-8", standalone: true }, yamlStr, { format: "xml", prettyPrint: true }), $$.t`
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <root>
       <ele>simple element</ele>
@@ -301,7 +301,7 @@ describe('YAMLWriter', () => {
         <id xmlns="ns">42</id>
         <details>classified</details>
       </person>
-    </root>    
+    </root>
     `)
   })
 

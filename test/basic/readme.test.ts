@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('examples in README', () => {
+$$.suite('examples in README', () => {
 
-  test('with functions', () => {
+  $$.test('with functions', () => {
     const root = $$.create().ele('topgun')
       .ele('pilots')
         .ele('pilot', { 'callsign': 'Iceman', 'rank': 'Lieutenant' }).txt('Tom Kazansky').up()
@@ -15,7 +15,7 @@ describe('examples in README', () => {
       .up()
     .up()
 
-    expect(root.end( { prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(root.end( { prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <topgun>
         <pilots>
@@ -31,7 +31,7 @@ describe('examples in README', () => {
     `)
   })
 
-  test('from JS object', () => {
+  $$.test('from JS object', () => {
     const obj = {
       topgun: {
         pilots: {
@@ -48,7 +48,7 @@ describe('examples in README', () => {
     }
 
     const root = $$.create(obj)
-    expect(root.end( { prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(root.end( { prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <topgun>
         <pilots>
@@ -64,12 +64,12 @@ describe('examples in README', () => {
     `)
   })
 
-  test('parsing', () => {
+  $$.test('parsing', () => {
     const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>'
     const doc = $$.create(xmlStr)
     doc.root().ele("baz")
 
-    expect(doc.end( { prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end( { prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <root att="val">
         <foo>
@@ -80,12 +80,12 @@ describe('examples in README', () => {
     `)
   })
 
-  test('serializing', () => {
+  $$.test('serializing', () => {
     const xmlStr = '<root att="val"><foo><bar>foobar</bar></foo></root>'
     const doc = $$.create(xmlStr)
     doc.root().ele("baz")
 
-    expect(doc.end( { format: "object" })).toEqual(
+    $$.deepEqual(doc.end( { format: "object" }),
       {
         "root": {
           "@att": "val",
@@ -98,7 +98,7 @@ describe('examples in README', () => {
     )
   })
 
-  test('processing', () => {
+  $$.test('processing', () => {
     const root = $$.create().ele('squares')
     root.com('f(x) = x^2')
     for(let i = 1; i <= 5; i++)
@@ -108,7 +108,7 @@ describe('examples in README', () => {
       item.att('y', i * i)
     }
 
-    expect(root.end( { prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(root.end( { prettyPrint: true }), $$.t`
       <?xml version="1.0"?>
       <squares>
         <!--f(x) = x^2-->
