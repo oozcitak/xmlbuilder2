@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('YAMLReader', () => {
+$$.suite('YAMLReader', () => {
 
-  test('basic', () => {
+  $$.test('basic', () => {
     const yaml = $$.t`
     # yaml test
     %YAML 1.2
@@ -49,12 +49,12 @@ describe('YAMLReader', () => {
     }
 
     const result = $$.create(yaml).end({ format: "object" })
-    expect(result).toEqual(obj)
+    $$.deepEqual(result, obj)
   })
 
-  test('empty document', () => {
+  $$.test('empty document', () => {
     const doc = $$.create('---')
-    expect(doc.end()).toBe('<?xml version="1.0"?>')
+    $$.deepEqual(doc.end(), '<?xml version="1.0"?>')
   })
 
 })

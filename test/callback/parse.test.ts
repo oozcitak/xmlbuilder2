@@ -1,17 +1,17 @@
 import $$ from '../TestHelpers'
 
-describe('parse()', () => {
+$$.suite('parse()', () => {
 
-  test('XML string', (done) => {
+  $$.test('XML string', async () => {
     const str = '<root att="val">text</root>'
 
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.ele(str).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
     <root att="val">text</root>
-    `, done)
+    `)
   })
 
 

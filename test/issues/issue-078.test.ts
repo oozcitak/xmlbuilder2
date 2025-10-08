@@ -1,7 +1,7 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
-  const obj = { 
+$$.suite("Replicate issue", () => {
+  const obj = {
     title: {
       $: null
     },
@@ -9,11 +9,11 @@ describe("Replicate issue", () => {
   }
 
   // https://github.com/oozcitak/xmlbuilder2/issues/78
-  test(`#78 - Throws TypeError: Cannot read property 'indexOf' of null when use null in CDATA ($)`, () => {   
+  $$.test(`#78 - Throws TypeError: Cannot read property 'indexOf' of null when use null in CDATA ($)`, () => {
     const doc = $$.create()
       .ele('root').ele(obj).end({prettyPrint: true, headless: true })
 
-    expect(doc).toBe($$.t`
+    $$.deepEqual(doc, $$.t`
     <root>
       <title/>
       <description>Test description</description>
@@ -21,16 +21,16 @@ describe("Replicate issue", () => {
     `)
   })
 
-  test(`#78 - Throws TypeError: Cannot read property 'indexOf' of null when use null in CDATA ($) - callback`, (done) => {
+  $$.test(`#78 - Throws TypeError: Cannot read property 'indexOf' of null when use null in CDATA ($) - callback`, async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
       .ele('root').ele(obj).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
     <root>
       <title/>
       <description>Test description</description>
     </root>
-    `, done)
+    `)
   })
 
 })

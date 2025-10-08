@@ -1,6 +1,6 @@
 import $$ from '../TestHelpers'
 
-describe('serialization examples in wiki', () => {
+$$.suite('serialization examples in wiki', () => {
 
   const xmlStr = $$.t`
     <?xml version="1.0"?>
@@ -18,7 +18,7 @@ describe('serialization examples in wiki', () => {
     `
   const doc = $$.create(xmlStr)
 
-  test('JS object', () => {
+  $$.test('JS object', () => {
     const obj = {
       topgun: {
         pilots: {
@@ -37,10 +37,10 @@ describe('serialization examples in wiki', () => {
       }
     }
 
-    expect(doc.end({ format: "object" })).toEqual(obj)
+    $$.deepEqual(doc.end({ format: "object" }), obj)
   })
 
-  test('XML string', () => {
+  $$.test('XML string', () => {
     const serializedXML = $$.t`
     <?xml version="1.0"?>
     <topgun>
@@ -56,10 +56,10 @@ describe('serialization examples in wiki', () => {
     </topgun>
     `
 
-    expect(doc.end({ format: "xml", prettyPrint: true })).toBe(serializedXML)
+    $$.deepEqual(doc.end({ format: "xml", prettyPrint: true }), serializedXML)
   })
 
-  test('JSON', () => {
+  $$.test('JSON', () => {
     const jsonString = $$.t`{
       "topgun": {
         "pilots": {
@@ -90,10 +90,10 @@ describe('serialization examples in wiki', () => {
       }
     }`
 
-    expect(doc.end({ format: "json", prettyPrint: true })).toBe(jsonString)
+    $$.deepEqual(doc.end({ format: "json", prettyPrint: true }), jsonString)
   })
 
-  test('YAML', () => {
+  $$.test('YAML', () => {
     const yamlString = $$.t`
     ---
     "topgun":
@@ -113,10 +113,10 @@ describe('serialization examples in wiki', () => {
         - "F-14 Tomcat"
         - "MiG-28"`
 
-    expect(doc.end({ format: "yaml" })).toBe(yamlString)
+    $$.deepEqual(doc.end({ format: "yaml" }), yamlString)
   })
 
-  test('Map', () => {
+  $$.test('Map', () => {
     const pilots = new Map<string, any>()
     pilots.set("pilot", [
       new Map([['@callsign', 'Iceman'], ['@rank', 'Lieutenant'], ['#', 'Tom Kazansky']]),
@@ -134,30 +134,30 @@ describe('serialization examples in wiki', () => {
     const obj = new Map<string, any>()
     obj.set("topgun", topgun)
 
-    expect(doc.end({ format: "map" })).toEqual(obj)
+    $$.deepEqual(doc.end({ format: "map" }), obj)
   })
 
-  test('group settings', () => {
+  $$.test('group settings', () => {
     const doc2 = $$.create().ele('root').att({ foo: 'bar', fizz: 'buzz' })
 
-    expect(doc2.end({ format: "object", group: true })).toEqual(
+    $$.deepEqual(doc2.end({ format: "object", group: true }),
       {
         root: { '@': { foo: 'bar', fizz: 'buzz' }}
       })
 
-    expect(doc2.end({ format: "object", group: false })).toEqual(
+    $$.deepEqual(doc2.end({ format: "object", group: false }),
       {
         root: { '@foo': 'bar', '@fizz': 'buzz' }
-      })      
+      })
   })
 
-  test('verbose settings', () => {
+  $$.test('verbose settings', () => {
     const doc2 = $$.create().ele('root').ele('node').txt('text').up().ele('node');
 
-    expect(doc2.end({ format: "object", verbose: true })).toEqual(
+    $$.deepEqual(doc2.end({ format: "object", verbose: true }),
       {
         root: [
-          { 
+          {
             node: [
               "text",
               {}
@@ -166,7 +166,7 @@ describe('serialization examples in wiki', () => {
         ]
       })
 
-    expect(doc2.end({ format: "object", verbose: false })).toEqual(
+    $$.deepEqual(doc2.end({ format: "object", verbose: false }),
       {
         root: {
           node: [
@@ -174,7 +174,7 @@ describe('serialization examples in wiki', () => {
             {}
           ]
         }
-      })      
+      })
   })
 
 })

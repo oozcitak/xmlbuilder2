@@ -1,16 +1,16 @@
 import $$ from '../TestHelpers'
 
-describe('options()', () => {
+$$.suite('options()', () => {
 
-  test('get encoding', () => {
+  $$.test('get encoding', () => {
     const doc = $$.create({ encoding: "Shift-JIS" }).ele('root').doc()
-    expect(doc.options.encoding).toBe('Shift-JIS')
+    $$.deepEqual(doc.options.encoding, 'Shift-JIS')
   })
 
-  test('set encoding', () => {
+  $$.test('set encoding', () => {
     const doc = $$.create({ encoding: "UTF-8" }).ele('root')
       .set({ encoding: "Shift-JIS" }).doc()
-    expect(doc.end()).toBe('<?xml version="1.0" encoding="Shift-JIS"?><root/>')
+    $$.deepEqual(doc.end(), '<?xml version="1.0" encoding="Shift-JIS"?><root/>')
   })
 
 })

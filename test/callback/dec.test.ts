@@ -1,65 +1,65 @@
 import $$ from '../TestHelpers'
 
-describe('dec()', () => {
+$$.suite('dec()', () => {
 
-  test('dec() with default version', (done) => {
+  $$.test('dec() with default version', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec().ele('root').end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0"?>
-      <root/>`, done)
+      <root/>`)
   })
 
-  test('dec() with version', (done) => {
+  $$.test('dec() with version', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0" }).ele('root').end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0"?>
-      <root/>`, done)
+      <root/>`)
   })
 
-  test('dec() with encoding', (done) => {
+  $$.test('dec() with encoding', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec({ encoding: "US-ASCII" }).ele('root').end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0" encoding="US-ASCII"?>
-      <root/>`, done)
+      <root/>`)
   })
 
-  test('dec() with standalone true', (done) => {
+  $$.test('dec() with standalone true', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec({ standalone: true }).ele('root').end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0" standalone="yes"?>
-      <root/>`, done)
+      <root/>`)
   })
 
-  test('dec() with standalone false', (done) => {
+  $$.test('dec() with standalone false', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec({ standalone: false }).ele('root').end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0" standalone="no"?>
-      <root/>`, done)
+      <root/>`)
   })
 
-  test('dec() with all settings', (done) => {
+  $$.test('dec() with all settings', async () => {
     const xmlStream = $$.createCB({ prettyPrint: true })
 
     xmlStream.dec({ version: "1.0", encoding: "US-ASCII", standalone: false }).ele('root').end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       <?xml version="1.0" encoding="US-ASCII" standalone="no"?>
-      <root/>`, done)
+      <root/>`)
   })
 
 })

@@ -1,9 +1,9 @@
 import $$ from "../TestHelpers";
 import { XMLBuilder } from "../../src/interfaces";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/45
-  test("#45 - How to convert an Json Array into Xml Array like this", () => {
+  $$.test("#45 - How to convert an Json Array into Xml Array like this", () => {
     const obj = {
       'root': {
         'items': [
@@ -30,10 +30,10 @@ describe("Replicate issue", () => {
         return parent.ele(name)
       }
     }
-    
+
     const doc = $$.create({ parser: { element: elementParser } }, obj)
 
-    expect(doc.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true, prettyPrint: true }), $$.t`
       <root>
         <items>
           <item id="1"/>

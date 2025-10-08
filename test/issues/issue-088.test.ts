@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/88
-  test(`#88 - DOM textContent returns encoded text`, () => {
+  $$.test(`#88 - DOM textContent returns encoded text`, () => {
     const xmlStr = $$.t`
     <?xml version="1.0" encoding="utf-8"?>
     <root>
@@ -12,8 +12,8 @@ describe("Replicate issue", () => {
     `
 
     const doc = $$.create(xmlStr);
-    expect(doc.root().first().first().node.textContent).toBe('<data>')
-    expect(doc.end({ headless: true, prettyPrint: true})).toBe($$.t`
+    $$.deepEqual(doc.root().first().first().node.textContent, '<data>')
+    $$.deepEqual(doc.end({ headless: true, prettyPrint: true}), $$.t`
     <root>
       <text>&lt;data&gt;</text>
       <text><![CDATA[<data>]]></text>

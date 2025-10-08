@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/90
-  test(`#90 - The Mixed Content example for Text Object Conversion does not work.`, () => {
+  $$.test(`#90 - The Mixed Content example for Text Object Conversion does not work.`, () => {
     const obj2 = {
       monologue: {
         '#': [
@@ -13,7 +13,7 @@ describe("Replicate issue", () => {
       }
     };
     const doc = $$.create().ele(obj2);
-    expect(doc.end({ headless: true, prettyPrint: true})).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true, prettyPrint: true}), $$.t`
     <monologue>
       Talk to me Goose!
       <cut>dog tag shot</cut>

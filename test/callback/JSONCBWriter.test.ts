@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('JSONCBWriter', () => {
+$$.suite('JSONCBWriter', () => {
 
-  test('basic', (done) => {
+  $$.test('basic', async () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -29,7 +29,7 @@ describe('JSONCBWriter', () => {
     const xmlStream = $$.createCB({ format: "json", prettyPrint: true })
     xmlStream.ele('root').ele(obj).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       { "root": {
         "#": [
           { "ele": {
@@ -91,10 +91,10 @@ describe('JSONCBWriter', () => {
           } }
         ]
       } }
-      `, done)
+      `)
   })
 
-  test('offset', (done) => {
+  $$.test('offset', async () => {
     const obj = {
       person: {
         '#': 'text',
@@ -105,7 +105,7 @@ describe('JSONCBWriter', () => {
     const xmlStream = $$.createCB({ format: "json", prettyPrint: true, offset: 2 })
     xmlStream.ele('root').ele(obj).end()
 
-    $$.expectCBResult(xmlStream, 
+    await $$.expectCBResult(xmlStream,
         '    { "root": {\n' +
         '      "#": [\n' +
         '        { "person": {\n' +
@@ -115,11 +115,10 @@ describe('JSONCBWriter', () => {
         '          ]\n' +
         '        } }\n' +
         '      ]\n' +
-        '    } }'
-      , done)
+        '    } }')
   })
 
-  test('negative offset', (done) => {
+  $$.test('negative offset', async () => {
     const obj = {
       person: {
         '#': 'text',
@@ -130,7 +129,7 @@ describe('JSONCBWriter', () => {
     const xmlStream = $$.createCB({ format: "json", prettyPrint: true, offset: -4 })
     xmlStream.ele('root').ele(obj).end()
 
-    $$.expectCBResult(xmlStream, 
+    await $$.expectCBResult(xmlStream,
         '{ "root": {\n' +
         '"#": [\n' +
         '{ "person": {\n' +
@@ -140,20 +139,19 @@ describe('JSONCBWriter', () => {
         ']\n' +
         '} }\n' +
         ']\n' +
-        '} }'
-      , done)
+        '} }')
   })
 
-  test('prologue', (done) => {
+  $$.test('prologue', async () => {
     const xmlStream = $$.createCB({ format: "json" })
     xmlStream.dec({ version: "1.0" })
       .dtd({ name: "root", pubID: "pub", sysID: "sys" })
       .ele('root').end()
 
-    $$.expectCBResult(xmlStream, '{"root":{"#":[]}}', done)
+    await $$.expectCBResult(xmlStream, '{"root":{"#":[]}}')
   })
 
-  test('round trip', (done) => {
+  $$.test('round trip', async () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -178,8 +176,8 @@ describe('JSONCBWriter', () => {
 
     const xmlStream = $$.createCB({ format: "json", prettyPrint: true })
     xmlStream.ele('root').ele(obj).end()
-    const jsonStr = $$.getCBResult(xmlStream)
-    expect($$.convert({ version: "1.0", encoding: "UTF-8", standalone: true }, jsonStr, { format: "xml", prettyPrint: true })).toBe($$.t`
+    const jsonStr = await $$.getCBResult(xmlStream)
+    $$.deepEqual($$.convert({ version: "1.0", encoding: "UTF-8", standalone: true }, jsonStr, { format: "xml", prettyPrint: true }), $$.t`
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <root>
       <ele>simple element</ele>
@@ -200,9 +198,8 @@ describe('JSONCBWriter', () => {
         <id xmlns="ns">42</id>
         <details>classified</details>
       </person>
-    </root>    
+    </root>
     `)
-    done()
   })
 
 })

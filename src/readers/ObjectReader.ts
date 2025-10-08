@@ -23,23 +23,23 @@ export class ObjectReader extends BaseReader<ExpandObject> {
 
     let lastChild: XMLBuilder | null = null
 
-    if (isFunction(obj)) {
+    if (isFunction<ExpandObject>(obj)) {
       // evaluate if function
-      lastChild = this.parse(node, Function.prototype.apply(obj, this))
-    } else if (isArray(obj) || isSet(obj)) {
+      lastChild = this.parse(node, obj.call(this))
+    } else if (isArray<ExpandObject>(obj) || isSet<ExpandObject>(obj)) {
       forEachArray(obj, item => lastChild = this.parse(node, item), this)
-    } else if (isMap(obj) || isObject(obj)) {
+    } else if (isMap<ExpandObject>(obj) || isObject<ExpandObject>(obj)) {
       // expand if object
-      forEachObject(obj, (key, val) => {
-        if (isFunction(val)) {
+      forEachObject<ExpandObject>(obj, (key, val) => {
+        if (isFunction<ExpandObject>(val)) {
           // evaluate if function
-          val = Function.prototype.apply(val, this)
+          val = val.call(this)
         }
 
         if (!options.ignoreConverters && key.indexOf(options.convert.att) === 0) {
           // assign attributes
           if (key === options.convert.att) {
-            if (isArray(val) || isSet(val)) {
+            if (isArray<ExpandObject>(val) || isSet<ExpandObject>(val)) {
               throw new Error("Invalid attribute: " + val.toString() + ". " + (node as any)._debugInfo())
             } else /* if (isMap(val) || isObject(val)) */ {
               forEachObject(val, (attrKey, attrVal) => {
@@ -49,8 +49,8 @@ export class ObjectReader extends BaseReader<ExpandObject> {
             }
           } else {
             lastChild = this.attribute(node, undefined,
-              this.sanitize(key.substr(options.convert.att.length)),
-              this._decodeAttributeValue(this.sanitize(val))) || lastChild
+              this.sanitize(key.substring(options.convert.att.length)),
+              this._decodeAttributeValue(this.sanitize(val?.toString()))) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.text) === 0) {
           // text node
@@ -58,21 +58,21 @@ export class ObjectReader extends BaseReader<ExpandObject> {
             // if the key is #text expand child nodes under this node to support mixed content
             lastChild = this.parse(node, val)
           } else {
-            lastChild = this.text(node, this._decodeText(this.sanitize(val))) || lastChild
+            lastChild = this.text(node, this._decodeText(this.sanitize(val?.toString()))) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.cdata) === 0) {
           // cdata node
-          if (isArray(val) || isSet(val)) {
+          if (isArray<string>(val) || isSet<string>(val)) {
             forEachArray(val, item => lastChild = this.cdata(node, this.sanitize(item)) || lastChild, this)
           } else {
-            lastChild = this.cdata(node, this.sanitize(val)) || lastChild
+            lastChild = this.cdata(node, this.sanitize(val?.toString())) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.comment) === 0) {
           // comment node
-          if (isArray(val) || isSet(val)) {
+          if (isArray<string>(val) || isSet<string>(val)) {
             forEachArray(val, item => lastChild = this.comment(node, this.sanitize(item)) || lastChild, this)
           } else {
-            lastChild = this.comment(node, this.sanitize(val)) || lastChild
+            lastChild = this.comment(node, this.sanitize(val?.toString())) || lastChild
           }
         } else if (!options.ignoreConverters && key.indexOf(options.convert.ins) === 0) {
           // processing instruction
@@ -81,7 +81,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
             const insTarget = (insIndex === -1 ? val : val.substr(0, insIndex))
             const insValue = (insIndex === -1 ? '' : val.substr(insIndex + 1))
             lastChild = this.instruction(node, this.sanitize(insTarget), this.sanitize(insValue)) || lastChild
-          } else if (isArray(val) || isSet(val)) {
+          } else if (isArray<string>(val) || isSet<string>(val)) {
             forEachArray(val, item => {
               const insIndex = item.indexOf(' ')
               const insTarget = (insIndex === -1 ? item : item.substr(0, insIndex))
@@ -115,12 +115,12 @@ export class ObjectReader extends BaseReader<ExpandObject> {
             // expand child nodes under parent
             this.parse(parent, val)
           }
-        } else if (val != null && val !== '') {
+        } else if (val != null && (!isString(val) || val !== '')) {
           // leaf element node with a single text node
           const parent = this.element(node, undefined, this.sanitize(key))
           if (parent) {
             lastChild = parent
-            this.text(parent, this._decodeText(this.sanitize(val)))
+            this.text(parent, this._decodeText(this.sanitize(val?.toString())))
           }
         } else {
           // leaf element node
@@ -131,7 +131,7 @@ export class ObjectReader extends BaseReader<ExpandObject> {
       // skip null and undefined nodes
     } else {
       // text node
-      lastChild = this.text(node, this._decodeText(this.sanitize(obj))) || lastChild
+      lastChild = this.text(node, this._decodeText(this.sanitize(obj?.toString()))) || lastChild
     }
 
     return lastChild || node

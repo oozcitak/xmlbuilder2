@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('object', () => {
+$$.suite('object', () => {
 
-  test('from JS object with decorators', () => {
+  $$.test('from JS object with decorators', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -28,7 +28,7 @@ describe('object', () => {
 
     const doc = $$.create().ele('root').ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         ele
           # simple element
@@ -56,7 +56,7 @@ describe('object', () => {
       `)
   })
 
-  test('from map with decorators', () => {
+  $$.test('from map with decorators', () => {
     const obj = new Map<string, any>()
     obj.set("ele", "simple element")
     const person = new Map<string, any>()
@@ -83,7 +83,7 @@ describe('object', () => {
 
     const doc = $$.create().ele('root').ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         ele
           # simple element
@@ -110,7 +110,7 @@ describe('object', () => {
       `)
   })
 
-  test('from function', () => {
+  $$.test('from function', () => {
     const doc = $$.create().ele('root').ele(() => {
       const arr = []
       for (let i = 1; i < 5; i++) {
@@ -119,7 +119,7 @@ describe('object', () => {
       return { node: arr }
     }).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         node
           # ele1
@@ -132,37 +132,37 @@ describe('object', () => {
     `)
   })
 
-  test('multiple cdata nodes', () => {
+  $$.test('multiple cdata nodes', () => {
     const doc = $$.create().ele('root').ele({
       '$': ['data1', 'data2']
     }).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         $ data1
         $ data2
     `)
   })
 
-  test('multiple comment nodes', () => {
+  $$.test('multiple comment nodes', () => {
     const doc = $$.create().ele('root').ele({
       '!': ['comment1', 'comment2']
     }).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         ! comment1
         ! comment2
     `)
   })
 
-  test('multiple processing instruction nodes', () => {
+  $$.test('multiple processing instruction nodes', () => {
     const doc = $$.create().ele('root').ele({
       '?1': ['target0', 'target1 value1', 'target2 value2'],
       '?2': { target3: 'value3', target4: 'value4' }
     }).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         ? target0
         ? target1 value1
@@ -172,7 +172,7 @@ describe('object', () => {
     `)
   })
 
-  test('empty nodes', () => {
+  $$.test('empty nodes', () => {
     const obj = {
       root: {
         node1: [],
@@ -182,13 +182,13 @@ describe('object', () => {
     }
     const doc = $$.create().ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         node2
     `)
   })
 
-  test('mixed content', () => {
+  $$.test('mixed content', () => {
     const obj = {
       root: {
         node1: "val1",
@@ -202,7 +202,7 @@ describe('object', () => {
     }
     const doc = $$.create().ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         node1
           # val1
@@ -215,7 +215,7 @@ describe('object', () => {
     `)
   })
 
-  test('namespace', () => {
+  $$.test('namespace', () => {
     const obj = {
       root: {
         "@xmlns": "myns",
@@ -224,23 +224,23 @@ describe('object', () => {
     }
     const doc = $$.create().ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root (ns:myns) xmlns="myns" (ns:http://www.w3.org/2000/xmlns/)
         node (ns:myns)
           # val
     `)
   })
 
-  test('default custom namespace', () => {
+  $$.test('default custom namespace', () => {
     const obj = { ele: { '@att': 'val' } }
     const doc = $$.create({ defaultNamespace: { ele: 'ele-ns', att: 'att-ns' } }).ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       ele (ns:ele-ns) att="val" (ns:att-ns)
     `)
   })
 
-  test('namespace prefix', () => {
+  $$.test('namespace prefix', () => {
     const obj = {
       "ns1:root": {
         "@xmlns:ns1": "myns",
@@ -249,14 +249,14 @@ describe('object', () => {
     }
     const doc = $$.create().ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       ns1:root (ns:myns) xmlns:ns1="myns" (ns:http://www.w3.org/2000/xmlns/)
         node
           # val
     `)
   })
 
-  test('skip null and undefined att values', () => {
+  $$.test('skip null and undefined att values', () => {
     const root = $$.create().ele({
       root: {
         node1: {
@@ -267,13 +267,13 @@ describe('object', () => {
         }
       }
     })
-    expect($$.printTree(root.doc().node)).toBe($$.t`
+    $$.deepEqual($$.printTree(root.doc().node), $$.t`
       root
         node1 att="val" att1="val1"
       `)
   })
 
-  test('keep null att value with keepNullAttributes flag', () => {
+  $$.test('keep null att value with keepNullAttributes flag', () => {
     const root = $$.create({ keepNullAttributes: true }).ele({
       root: {
         node1: {
@@ -284,13 +284,13 @@ describe('object', () => {
         }
       }
     })
-    expect($$.printTree(root.doc().node)).toBe($$.t`
+    $$.deepEqual($$.printTree(root.doc().node), $$.t`
       root
         node1 att="val" att1="val1" att2="" att3=""
       `)
   })
 
-  test('skip null and undefined node value', () => {
+  $$.test('skip null and undefined node value', () => {
     const root = $$.create({ keepNullAttributes: true }).ele({
       root: {
         node1: '',
@@ -299,14 +299,14 @@ describe('object', () => {
         node4: undefined
       }
     })
-    expect($$.printTree(root.doc().node)).toBe($$.t`
+    $$.deepEqual($$.printTree(root.doc().node), $$.t`
       root
         node1
         node2
       `)
   })
 
-  test('keep null node value with keepNullNodes flag', () => {
+  $$.test('keep null node value with keepNullNodes flag', () => {
     const root = $$.create({ keepNullNodes: true }).ele({
       root: {
         node1: '',
@@ -315,7 +315,7 @@ describe('object', () => {
         node4: undefined
       }
     })
-    expect($$.printTree(root.doc().node)).toBe($$.t`
+    $$.deepEqual($$.printTree(root.doc().node), $$.t`
       root
         node1
         node2
@@ -324,15 +324,15 @@ describe('object', () => {
       `)
   })
 
-  test('invalid attributes', () => {
+  $$.test('invalid attributes', () => {
     const obj = {
       '@': [ 'att1 val1', 'att2 val2' ]
     }
     const root = $$.create({ keepNullNodes: true }).ele('root')
-    expect(() => root.ele(obj)).toThrow()
+    $$.throws(() => root.ele(obj))
   })
 
-  test('custom converter', () => {
+  $$.test('custom converter', () => {
     const obj = {
       'root': {
         '_att': 'val',
@@ -340,22 +340,22 @@ describe('object', () => {
       }
     }
     const doc = $$.create({ convert: { att: '_' } }).ele(obj).doc()
-    expect(doc.end({ headless: true })).toBe('<root att="val">42</root>')
+    $$.deepEqual(doc.end({ headless: true }), '<root att="val">42</root>')
   })
 
-  test('return parent node if no nodes created', () => {
+  $$.test('return parent node if no nodes created', () => {
     const doc = $$.create()
-    expect(doc.ele({})).toBe(doc)
+    $$.deepEqual(doc.ele({}), doc)
   })
 
-  test('exec function', () => {
+  $$.test('exec function', () => {
     const nums = [1, 2, 3, 4, 5]
     const obj = {
       squares: {
         '#': () => nums.map(i => ({ data: { '@x': i, '@y': i * i } }))
       }
     }
-    expect($$.create(obj).end({ prettyPrint: true, headless: true })).toBe($$.t`
+    $$.deepEqual($$.create(obj).end({ prettyPrint: true, headless: true }), $$.t`
     <squares>
       <data x="1" y="1"/>
       <data x="2" y="4"/>
@@ -366,7 +366,7 @@ describe('object', () => {
     `)
   })
 
-  test('falsy values', () => {
+  $$.test('falsy values', () => {
     const obj = {
       value: {
         string: '',
@@ -374,7 +374,7 @@ describe('object', () => {
         boolean: false
       }
     }
-    expect($$.create(obj).end({ prettyPrint: true, headless: true })).toBe($$.t`
+    $$.deepEqual($$.create(obj).end({ prettyPrint: true, headless: true }), $$.t`
     <value>
       <string/>
       <number>0</number>

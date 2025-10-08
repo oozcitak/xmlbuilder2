@@ -1,20 +1,20 @@
 import $$ from '../TestHelpers'
 
-describe('create()', () => {
+$$.suite('create()', () => {
 
-  test('Empty document', () => {
+  $$.test('Empty document', () => {
     const doc = $$.create()
-    expect($$.printTree(doc.node)).toBe('')
-    expect(doc.end()).toBe('<?xml version="1.0"?>')
+    $$.deepEqual($$.printTree(doc.node), '')
+    $$.deepEqual(doc.end(), '<?xml version="1.0"?>')
   })
 
-  test('Document with root element', () => {
+  $$.test('Document with root element', () => {
     const ele = $$.create().ele('root', { att: "val" }).txt("text")
-    expect($$.printTree(ele.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(ele.node), $$.t`
       root att="val"
         # text
       `)
-    expect(ele.end()).toBe('<?xml version="1.0"?><root att="val">text</root>')
+    $$.deepEqual(ele.end(), '<?xml version="1.0"?><root att="val">text</root>')
   })
 
 })

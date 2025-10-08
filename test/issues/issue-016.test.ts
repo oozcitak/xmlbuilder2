@@ -1,21 +1,21 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/16
-  test("#16 - Named entities produce invalid XML", () => {
-    expect(
+  $$.test("#16 - Named entities produce invalid XML", () => {
+    $$.deepEqual(
       $$.convert(
         { example: "&lt;p&gt;Hello&nbsp;World&lt;/p&gt;" },
         { format: "xml" }
       )
-    ).toBe(
+    ,
       '<?xml version="1.0"?><example>&lt;p&gt;Hello&nbsp;World&lt;/p&gt;</example>'
     );
-    expect(
+    $$.deepEqual(
       $$.convert(
         { example: "&notanentity&lt;" },
         { format: "xml" }
       )
-    ).toBe('<?xml version="1.0"?><example>&amp;notanentity&lt;</example>')
+    , '<?xml version="1.0"?><example>&amp;notanentity&lt;</example>')
   })
 })

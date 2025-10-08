@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/78
-  test(`#81 - Using the .Up() method does not really move up to the parent node`, () => {
+  $$.test(`#81 - Using the .Up() method does not really move up to the parent node`, () => {
     const messageReference = $$.fragment().ele('MessageReference')
       .ele('MessageType').txt('4005').up()
       .ele('MessageTypeVersion').txt('5.3.1.GB').up()
@@ -21,7 +21,7 @@ describe("Replicate issue", () => {
       .ele('<MessageStatus>1</MessageStatus>').root()
       .doc();
 
-    expect(doc.end({ prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ prettyPrint: true }), $$.t`
     <?xml version="1.0"?>
     <TrainRunningInformationMessage xmlns:ns0="http://www.era.europa.eu/schemes/TAFTSI/5.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.era.europa.eu/schemes/TAFTSI/5.3 taf_cat_complete.xsd">
       <MessageHeader>
