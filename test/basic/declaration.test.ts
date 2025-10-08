@@ -1,15 +1,15 @@
 import $$ from '../TestHelpers'
 
-describe('dec()', () => {
+$$.suite('dec()', () => {
 
-  test('version', () => {
+  $$.test('version', () => {
     const doc = $$.create().ele('root').dec({ encoding: "UTF-8" }).doc()
-    expect(doc.end()).toBe('<?xml version="1.0" encoding="UTF-8"?><root/>')
+    $$.deepEqual(doc.end(), '<?xml version="1.0" encoding="UTF-8"?><root/>')
   })
 
-  test('all params', () => {
+  $$.test('all params', () => {
     const doc = $$.create().ele('root').dec({ version: "1.0", encoding: "UTF-8", standalone: false }).doc()
-    expect(doc.end()).toBe('<?xml version="1.0" encoding="UTF-8" standalone="no"?><root/>')
+    $$.deepEqual(doc.end(), '<?xml version="1.0" encoding="UTF-8" standalone="no"?><root/>')
   })
 
 })

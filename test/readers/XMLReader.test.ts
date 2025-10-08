@@ -1,17 +1,17 @@
 import $$ from '../TestHelpers'
 
-describe('XMLReader', () => {
+$$.suite('XMLReader', () => {
 
-  test('invalid version', () => {
+  $$.test('invalid version', () => {
     const xml = $$.t`
     <?xml version="1.1"?>
     <root/>
     `
 
-    expect(() => $$.create(xml)).toThrow()
+    $$.throws(() => $$.create(xml))
   })
 
-  test('docType', () => {
+  $$.test('docType', () => {
     const xml = $$.t`
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <!DOCTYPE root PUBLIC "pub" "sys">
@@ -38,10 +38,10 @@ describe('XMLReader', () => {
     `
 
     const result = $$.create(xml).end({ prettyPrint: true })
-    expect(result).toEqual(xml)
+    $$.deepEqual(result, xml)
   })
 
-  test('returned node should be the top level node', () => {
+  $$.test('returned node should be the top level node', () => {
     const baz = $$.create().ele('Qroot').ele($$.t`
       <Qfoo>
         <Qbar>foobar</Qbar>
@@ -49,7 +49,7 @@ describe('XMLReader', () => {
       <Qbaz/>
     `);
 
-    expect(baz.toString()).toBe('<Qbaz/>')
+    $$.deepEqual(baz.toString(), '<Qbaz/>')
   })
 
 })

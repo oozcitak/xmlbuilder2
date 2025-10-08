@@ -1,25 +1,25 @@
 import $$ from '../TestHelpers'
 import { Document, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 
-describe('builder()', () => {
+$$.suite('builder()', () => {
 
-  test('wrap node', () => {
+  $$.test('wrap node', () => {
     const doc = $$.create()
     const root = (doc.node as Document).createElement('root')
     const builder = $$.builder(root)
     const ele = builder.ele('ele')
-    expect(ele.toString()).toBe('<ele/>')
+    $$.deepEqual(ele.toString(), '<ele/>')
   })
 
-  test('invalid wrapper', () => {
+  $$.test('invalid wrapper', () => {
     const doc = $$.create()
     const root = (doc.node as Document).createElement('root')
-    expect(() => $$.builder({ version: "1.0" } as any)).toThrow()
+    $$.throws(() => $$.builder({ version: "1.0" } as any))
   })
 
-  test('node', () => {
+  $$.test('node', () => {
     const node = $$.create().ele('root').ele('node')
-    expect(node.node.nodeType).toBe(NodeType.Element)
+    $$.deepEqual(node.node.nodeType, NodeType.Element)
   })
 
 })

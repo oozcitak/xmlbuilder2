@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('custom JSONReader', () => {
+$$.suite('custom JSONReader', () => {
 
-  test('skip comments', () => {
+  $$.test('skip comments', () => {
     const json = `{
       "ele": "element",
       "!": "comment"
@@ -10,7 +10,7 @@ describe('custom JSONReader', () => {
 
     const doc = $$.create({ parser: { comment: () => undefined } }).ele('root').ele(json).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         ele
           # element

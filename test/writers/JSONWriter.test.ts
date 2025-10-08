@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('JSONWriter', () => {
+$$.suite('JSONWriter', () => {
 
-  test('basic', () => {
+  $$.test('basic', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -28,7 +28,7 @@ describe('JSONWriter', () => {
     const result = $$.create({ version: "1.0", encoding: "UTF-8", standalone: true })
       .ele('root').ele(obj).end({ format: "json", prettyPrint: true })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
       {
         "root": {
           "ele": "simple element",
@@ -56,7 +56,7 @@ describe('JSONWriter', () => {
       `)
   })
 
-  test('offset', () => {
+  $$.test('offset', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -65,8 +65,8 @@ describe('JSONWriter', () => {
       }
     }
 
-    expect($$.create().ele('root').ele(obj).root().
-      toString({ format: "json", prettyPrint: true, offset: 2 })).toBe(
+    $$.deepEqual($$.create().ele('root').ele(obj).root().
+      toString({ format: "json", prettyPrint: true, offset: 2 }),
       '    {\n' +
       '      "root": {\n' +
       '        "ele": "simple element",\n' +
@@ -79,7 +79,7 @@ describe('JSONWriter', () => {
       )
   })
 
-  test('negative offset', () => {
+  $$.test('negative offset', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -88,8 +88,8 @@ describe('JSONWriter', () => {
       }
     }
 
-    expect($$.create().ele('root').ele(obj).root().
-      toString({ format: "json", prettyPrint: true, offset: -4 })).toBe(
+    $$.deepEqual($$.create().ele('root').ele(obj).root().
+      toString({ format: "json", prettyPrint: true, offset: -4 }),
       '{\n' +
       '"root": {\n' +
       '"ele": "simple element",\n' +
@@ -102,26 +102,26 @@ describe('JSONWriter', () => {
       )
   })
 
-  test('duplicate tag names', () => {
+  $$.test('duplicate tag names', () => {
     const result = $$.create().ele('people')
       .ele('person', { name: "xxx" }).up()
       .ele('person', { name: "yyy" }).up()
       .end({ format: "json" })
 
-    expect(result).toBe('{"people":{"person":[{"@name":"xxx"},{"@name":"yyy"}]}}')
+    $$.deepEqual(result, '{"people":{"person":[{"@name":"xxx"},{"@name":"yyy"}]}}')
   })
 
-  test('mixed content', () => {
+  $$.test('mixed content', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
       .txt('world')
       .end({ format: "json" })
 
-    expect(result).toBe('{"people":{"#1":"hello","person":{"@name":"xxx"},"#2":"world"}}')
+    $$.deepEqual(result, '{"people":{"#1":"hello","person":{"@name":"xxx"},"#2":"world"}}')
   })
 
-  test('mixed content and duplicate tags', () => {
+  $$.test('mixed content and duplicate tags', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -129,7 +129,7 @@ describe('JSONWriter', () => {
       .txt('world')
       .end({ format: "json", prettyPrint: true })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
       {
         "people": {
           "#1": "hello",
@@ -143,7 +143,7 @@ describe('JSONWriter', () => {
       `)
   })
 
-  test('mixed content and interspersed duplicate tags', () => {
+  $$.test('mixed content and interspersed duplicate tags', () => {
     const result = $$.create().ele('people')
       .txt('hello')
       .ele('person', { name: "xxx" }).up()
@@ -151,7 +151,7 @@ describe('JSONWriter', () => {
       .ele('person', { name: "yyy" }).up()
       .end({ format: "json", prettyPrint: true })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
       {
         "people": {
           "#": [
@@ -165,21 +165,21 @@ describe('JSONWriter', () => {
       `)
   })
 
-  test('doctype', () => {
+  $$.test('doctype', () => {
     const result = $$.create()
       .dtd({ pubID: "pub", sysID: "sys" }).ele('root').end({ format: "json" })
 
-    expect(result).toBe('{"root":{}}')
+    $$.deepEqual(result, '{"root":{}}')
   })
 
-  test('namespaces', () => {
+  $$.test('namespaces', () => {
     const result = $$.create().ele('root', { xmlns: "myns" })
       .ele('foo').up()
       .ele('bar').up()
       .doc()
       .end({ format: "json", prettyPrint: true })
 
-    expect(result).toBe($$.t`
+    $$.deepEqual(result, $$.t`
       {
         "root": {
           "@xmlns": "myns",
@@ -190,13 +190,13 @@ describe('JSONWriter', () => {
       `)
   })
 
-  test('unknown node', () => {
+  $$.test('unknown node', () => {
     const ele = $$.create().ele('root').ele('alien')
     Object.defineProperty(ele.node, "nodeType", { value: 1001, writable: false })
-    expect(() => ele.end({ format: "json" })).toThrow()
+    $$.throws(() => ele.end({ format: "json" }))
   })
-  
-  test("verbose", () => {
+
+  $$.test("verbose", () => {
     const input2 = $$.t`
     <data>
       <row id="0">
@@ -210,7 +210,7 @@ describe('JSONWriter', () => {
     </data>`
 
     const json2 = $$.convert(input2, { format: 'json', verbose: true, prettyPrint: true })
-    expect(json2).toBe($$.t`
+    $$.deepEqual(json2, $$.t`
       {
         "data": [
           {
@@ -237,7 +237,7 @@ describe('JSONWriter', () => {
           }
         ]
       }`)
-    expect($$.create(json2).end({ headless: true, prettyPrint: true })).toBe(input2)
+    $$.deepEqual($$.create(json2).end({ headless: true, prettyPrint: true }), input2)
 
     const input1 = $$.t`
     <data>
@@ -247,7 +247,7 @@ describe('JSONWriter', () => {
       </row>
     </data>`
     const json1 = $$.convert(input1, { format: 'json', verbose: true, prettyPrint: true })
-    expect(json1).toEqual($$.t`
+    $$.deepEqual(json1, $$.t`
       {
         "data": [
           {
@@ -265,7 +265,7 @@ describe('JSONWriter', () => {
           }
         ]
       }`)
-    expect($$.create(json1).end({ headless: true, prettyPrint: true })).toBe(input1)
+    $$.deepEqual($$.create(json1).end({ headless: true, prettyPrint: true }), input1)
   })
 
 })

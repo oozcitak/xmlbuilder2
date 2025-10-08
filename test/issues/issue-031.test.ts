@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/31
-  test("#31 - `convert` method don't group multiple attributes", () => {
+  $$.test("#31 - `convert` method don't group multiple attributes", () => {
     const input = $$.t`
     <resources>
       <string name="app_name" id="app_name">Main title</string>
@@ -24,7 +24,7 @@ describe("Replicate issue", () => {
     </resources>`
 
     const obj = $$.convert({ convert: { text: 'value' } }, input, { format: 'object', group: true })
-    expect(obj).toEqual(
+    $$.deepEqual(obj,
     {
       "resources": {
         "string": [

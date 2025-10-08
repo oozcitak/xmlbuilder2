@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/82
-  test(`#82 - convert does not respect encoding`, () => {
+  $$.test(`#82 - convert does not respect encoding`, () => {
     const obj = {
       xliff: {
         "@version": "1.2",
@@ -32,7 +32,7 @@ describe("Replicate issue", () => {
 
     const str = $$.convert(obj, { prettyPrint: true })
     const obj2 = $$.convert(str, { format: "object" })
-    expect(obj2).toEqual(objProcessed)
+    $$.deepEqual(obj2, objProcessed)
   })
 
 })

@@ -1,6 +1,6 @@
 import $$ from '../TestHelpers'
 
-describe('parsing examples in wiki', () => {
+$$.suite('parsing examples in wiki', () => {
 
   const xmlStr = $$.t`
     <?xml version="1.0"?>
@@ -17,7 +17,7 @@ describe('parsing examples in wiki', () => {
     </topgun>
     `
 
-  test('JS object', () => {
+  $$.test('JS object', () => {
     const obj = {
       topgun: {
         pilots: {
@@ -37,10 +37,10 @@ describe('parsing examples in wiki', () => {
     }
 
     const doc = $$.create(obj)
-    expect(doc.end( { prettyPrint: true })).toBe(xmlStr)
+    $$.deepEqual(doc.end( { prettyPrint: true }), xmlStr)
   })
 
-  test('XML string', () => {
+  $$.test('XML string', () => {
     const serializedXML = `
     <?xml version="1.0"?>
     <topgun>
@@ -57,10 +57,10 @@ describe('parsing examples in wiki', () => {
     `
 
     const doc = $$.create(serializedXML)
-    expect(doc.end( { prettyPrint: true })).toBe(xmlStr)
+    $$.deepEqual(doc.end( { prettyPrint: true }), xmlStr)
   })
 
-  test('JSON', () => {
+  $$.test('JSON', () => {
     const jsonString = `{
       "topgun": {
         "pilots": {
@@ -80,10 +80,10 @@ describe('parsing examples in wiki', () => {
     }`
 
     const doc = $$.create(jsonString)
-    expect(doc.end( { prettyPrint: true })).toBe(xmlStr)
+    $$.deepEqual(doc.end( { prettyPrint: true }), xmlStr)
   })
 
-  test('YAML', () => {
+  $$.test('YAML', () => {
     const yamlString = $$.t`
       ---
       "topgun":
@@ -104,10 +104,10 @@ describe('parsing examples in wiki', () => {
           - "MiG-28"`
 
     const doc = $$.create(yamlString)
-    expect(doc.end( { prettyPrint: true })).toBe(xmlStr)
-  })  
+    $$.deepEqual(doc.end( { prettyPrint: true }), xmlStr)
+  })
 
-  test('Map', () => {
+  $$.test('Map', () => {
     const pilots = new Map<string, any>()
     pilots.set("pilot", [
       new Map([['@callsign', 'Iceman'], ['@rank', 'Lieutenant'], ['#', 'Tom Kazansky']]),
@@ -126,7 +126,7 @@ describe('parsing examples in wiki', () => {
     obj.set("topgun", topgun)
 
     const doc = $$.create(obj)
-    expect(doc.end( { prettyPrint: true })).toBe(xmlStr)
+    $$.deepEqual(doc.end( { prettyPrint: true }), xmlStr)
   })
 
 })

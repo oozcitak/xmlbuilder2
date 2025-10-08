@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/30
-  test("#30 - Conversion from XML to JSON array inconsistency", () => {
+  $$.test("#30 - Conversion from XML to JSON array inconsistency", () => {
     const input2 = $$.t`
     <data>
       <row id="0">
@@ -16,7 +16,7 @@ describe("Replicate issue", () => {
     </data>`
 
     const obj2 = $$.convert(input2, { format: 'object', verbose: true })
-    expect(obj2).toEqual(
+    $$.deepEqual(obj2,
       {
         "data": [
           {
@@ -35,7 +35,7 @@ describe("Replicate issue", () => {
           }
         ]
       })
-    expect($$.create(obj2).end({ headless: true, prettyPrint: true })).toBe(input2)
+    $$.deepEqual($$.create(obj2).end({ headless: true, prettyPrint: true }), input2)
 
     const input1 = $$.t`
     <data>
@@ -45,7 +45,7 @@ describe("Replicate issue", () => {
       </row>
     </data>`
     const obj1 = $$.convert(input1, { format: 'object', verbose: true })
-    expect(obj1).toEqual(
+    $$.deepEqual(obj1,
       {
         "data": [
           {
@@ -59,7 +59,7 @@ describe("Replicate issue", () => {
           }
         ]
       })
-    expect($$.create(obj1).end({ headless: true, prettyPrint: true })).toBe(input1)
+    $$.deepEqual($$.create(obj1).end({ headless: true, prettyPrint: true }), input1)
   })
 
 })

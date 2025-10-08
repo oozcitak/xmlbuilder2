@@ -1,34 +1,34 @@
 import $$ from '../TestHelpers'
 
-describe('Sanitize input strings', () => {
+$$.suite('Sanitize input strings', () => {
 
-  test('parser', () => {
+  $$.test('parser', () => {
     const doc = $$.create({ invalidCharReplacement: '' }, '<root\x00>te\x08xt</\x00root\x00>')
 
-    expect(doc.end({ headless: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true }), $$.t`
       <root>text</root>
       `)
   })
 
-  test('JS object', () => {
+  $$.test('JS object', () => {
     const doc = $$.create({ invalidCharReplacement: '' }, { 'root\x00': 'te\x08xt' })
 
-    expect(doc.end({ headless: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true }), $$.t`
       <root>text</root>
       `)
   })
 
-  test('ele', () => {
+  $$.test('ele', () => {
     const doc = $$.create({ invalidCharReplacement: '' })
       .ele('root\x00').txt('te\x08xt')
       .doc()
 
-    expect(doc.end({ headless: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true }), $$.t`
       <root>text</root>
       `)
   })
 
-  test('ele et al.', () => {
+  $$.test('ele et al.', () => {
     const obj = {
       ele: "simple \x00element",
       person: {
@@ -52,8 +52,8 @@ describe('Sanitize input strings', () => {
       }
     }
 
-    expect($$.create({ version: "1.0", encoding: "UTF-8", standalone: true, invalidCharReplacement: '' })
-      .ele('root').ele(obj).doc().toString({ format: "xml", prettyPrint: true })).toBe($$.t`
+    $$.deepEqual($$.create({ version: "1.0", encoding: "UTF-8", standalone: true, invalidCharReplacement: '' })
+      .ele('root').ele(obj).doc().toString({ format: "xml", prettyPrint: true }), $$.t`
       <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <root>
         <ele>simple element</ele>
@@ -78,23 +78,23 @@ describe('Sanitize input strings', () => {
       `)
   })
 
-  test('with replacement function - 1', () => {
+  $$.test('with replacement function - 1', () => {
     const doc = $$.create({ invalidCharReplacement: c => c === '\x00' ? '' : '_' })
       .ele('root\x00').txt('text\x08content')
       .doc()
 
-    expect(doc.end({ headless: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true }), $$.t`
       <root>text_content</root>
       `)
   })
 
-  test('with replacement function - 2', () => {
+  $$.test('with replacement function - 2', () => {
     const doc = $$.create({
       invalidCharReplacement: (c, i, str) => str.startsWith('root') ? '' : i === 0 ? '_' : ' '
     }).ele('root\x00').txt('\x00text\x08content')
       .doc()
 
-    expect(doc.end({ headless: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true }), $$.t`
       <root>_text content</root>
       `)
   })

@@ -1,34 +1,34 @@
 import $$ from '../TestHelpers'
 import { sanitizeInput } from '../../src/builder/dom'
 
-describe('sanitizeInput', () => {
+$$.suite('sanitizeInput', () => {
 
-  test('replacement char', () => {
-    expect(sanitizeInput(undefined, '')).toBe(undefined)
-    expect(sanitizeInput(null, '')).toBe(null)
-    expect(sanitizeInput('hello\x00')).toBe('hello\x00')
-    expect(sanitizeInput('\x09\x0A\x0D\x20\uE000', '')).toBe('\x09\x0A\x0D\x20\uE000')
+  $$.test('replacement char', () => {
+    $$.deepEqual(sanitizeInput(undefined, ''), undefined)
+    $$.deepEqual(sanitizeInput(null, ''), null)
+    $$.deepEqual(sanitizeInput('hello\x00'), 'hello\x00')
+    $$.deepEqual(sanitizeInput('\x09\x0A\x0D\x20\uE000', ''), '\x09\x0A\x0D\x20\uE000')
     // surrogate pair
-    expect(sanitizeInput('😀', '')).toBe('😀')
-    expect(sanitizeInput('\uD83D\uDE00', '')).toBe('😀')
+    $$.deepEqual(sanitizeInput('😀', ''), '😀')
+    $$.deepEqual(sanitizeInput('\uD83D\uDE00', ''), '😀')
     // lone surrogate
-    expect(sanitizeInput('\uD83D\uFFFF', '')).toBe('')
+    $$.deepEqual(sanitizeInput('\uD83D\uFFFF', ''), '')
     // invalid surrogate pair
-    expect(sanitizeInput('😀', '')).toBe('😀')
+    $$.deepEqual(sanitizeInput('😀', ''), '😀')
   })
 
-  test('replacement function', () => {
-    expect(sanitizeInput(undefined, () => '')).toBe(undefined)
-    expect(sanitizeInput(null, () => '')).toBe(null)
-    expect(sanitizeInput('hello\x00')).toBe('hello\x00')
-    expect(sanitizeInput('\x09\x0A\x0D\x20\uE000', () => '')).toBe('\x09\x0A\x0D\x20\uE000')
+  $$.test('replacement function', () => {
+    $$.deepEqual(sanitizeInput(undefined, () => ''), undefined)
+    $$.deepEqual(sanitizeInput(null, () => ''), null)
+    $$.deepEqual(sanitizeInput('hello\x00'), 'hello\x00')
+    $$.deepEqual(sanitizeInput('\x09\x0A\x0D\x20\uE000', () => ''), '\x09\x0A\x0D\x20\uE000')
     // surrogate pair
-    expect(sanitizeInput('😀', () => '')).toBe('😀')
-    expect(sanitizeInput('\uD83D\uDE00', () => '')).toBe('😀')
+    $$.deepEqual(sanitizeInput('😀', () => ''), '😀')
+    $$.deepEqual(sanitizeInput('\uD83D\uDE00', () => ''), '😀')
     // lone surrogate
-    expect(sanitizeInput('\uD83D\uFFFF', () => '')).toBe('')
+    $$.deepEqual(sanitizeInput('\uD83D\uFFFF', () => ''), '')
     // invalid surrogate pair
-    expect(sanitizeInput('😀', () => '')).toBe('😀')
+    $$.deepEqual(sanitizeInput('😀', () => ''), '😀')
   })
 
 })

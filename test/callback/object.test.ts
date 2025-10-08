@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('object', () => {
+$$.suite('object', () => {
 
-  test('from JS object with decorators', (done) => {
+  $$.test('from JS object with decorators', async () => {
     const obj = {
       root: {
         ele: "simple element",
@@ -33,7 +33,7 @@ describe('object', () => {
 
     xmlStream.ele(obj).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
     <root>
       <ele>
         simple element
@@ -71,10 +71,10 @@ describe('object', () => {
         </details>
       </person>
     </root>
-    `, done)    
+    `)
   })
 
-  test('namespace', (done) => {
+  $$.test('namespace', async () => {
     const obj = {
       root: {
         "@xmlns": "ns"
@@ -85,12 +85,12 @@ describe('object', () => {
 
     xmlStream.ele(obj).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
     <root xmlns="ns"/>
-    `, done)
+    `)
   })
 
-  test('element with namespace', (done) => {
+  $$.test('element with namespace', async () => {
     const obj = {
       "root@ns": {}
     }
@@ -99,12 +99,12 @@ describe('object', () => {
 
     xmlStream.ele(obj).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
     <root xmlns="ns"/>
-    `, done)
+    `)
   })
 
-  test('attribute with namespace', (done) => {
+  $$.test('attribute with namespace', async () => {
     const obj = {
       root: {
         "@isbn@book": "111"
@@ -115,9 +115,9 @@ describe('object', () => {
 
     xmlStream.ele(obj).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
     <root xmlns:ns1="book" ns1:isbn="111"/>
-    `, done)
+    `)
   })
- 
+
 })

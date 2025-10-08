@@ -1,19 +1,19 @@
 import $$ from '../TestHelpers'
 import { sanitizeInput } from '../../src/builder/dom'
 
-describe('custom XMLReader', () => {
+$$.suite('custom XMLReader', () => {
 
-  test('skip DocType', () => {
+  $$.test('skip DocType', () => {
     const xml = $$.t`
     <?xml version="1.0"?>
     <!DOCTYPE root PUBLIC "pub" "sys">
     <root xmlns="ns"/>`
 
     const doc = $$.create({ parser: { docType: () => undefined } }, xml).doc()
-    expect(doc.end()).toBe('<?xml version="1.0"?><root xmlns="ns"/>')
+    $$.deepEqual(doc.end(), '<?xml version="1.0"?><root xmlns="ns"/>')
   })
 
-  test('skip all nodes', () => {
+  $$.test('skip all nodes', () => {
     const xml = $$.t`
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <!DOCTYPE root PUBLIC "pub" "sys">
@@ -51,22 +51,22 @@ describe('custom XMLReader', () => {
       }
     }).ele('root').ele(xml).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
       `)
   })
 
-  test('skip DocType', () => {
+  $$.test('skip DocType', () => {
     const xml = $$.t`
     <?xml version="1.0"?>
     <!DOCTYPE root PUBLIC "pub" "sys">
     <root xmlns="ns"/>`
 
     const doc = $$.create({ parser: { docType: () => undefined } }, xml).doc()
-    expect(doc.end()).toBe('<?xml version="1.0"?><root xmlns="ns"/>')
+    $$.deepEqual(doc.end(), '<?xml version="1.0"?><root xmlns="ns"/>')
   })
 
-  test("invalidCharReplacement should apply before parser functions", () => {
+  $$.test("invalidCharReplacement should apply before parser functions", () => {
     const xml = `
     <root>
       <node1\x00/>
@@ -78,12 +78,12 @@ describe('custom XMLReader', () => {
       invalidCharReplacement: '',
       parser: {
         element: (parent, ns, name: string) => {
-          expect(sanitizeInput(name, '')).toBe(name)
+          $$.deepEqual(sanitizeInput(name, ''), name)
           return parent.ele(name)
         }
       }
     }, xml, { format: 'object' })
-    expect(obj).toEqual({
+    $$.deepEqual(obj, {
       root: {
         node1: {},
         node2: {}
@@ -91,7 +91,7 @@ describe('custom XMLReader', () => {
     })
   })
 
-  test("skip whitespace only text", () => {
+  $$.test("skip whitespace only text", () => {
     const xml = $$.t`
     <?xml version="1.0"?>
     <root>
@@ -99,10 +99,10 @@ describe('custom XMLReader', () => {
     </root>`
 
     const doc = $$.create({ skipWhitespaceOnlyText: true }, xml).doc()
-    expect(doc.end()).toBe(`<?xml version="1.0"?><root><ele/></root>`)
+    $$.deepEqual(doc.end(), `<?xml version="1.0"?><root><ele/></root>`)
   })
 
-  test("retain whitespace only text", () => {
+  $$.test("retain whitespace only text", () => {
     const xml = $$.t`
     <?xml version="1.0"?>
     <root>
@@ -111,7 +111,7 @@ describe('custom XMLReader', () => {
 
     const doc = $$.create({ skipWhitespaceOnlyText: false }, xml).doc()
 
-    expect(doc.end()).toBe(
+    $$.deepEqual(doc.end(),
       $$.t`
       <?xml version="1.0"?><root>
         <ele>    </ele>

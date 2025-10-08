@@ -1,9 +1,9 @@
 import $$ from "../TestHelpers";
 import { XMLBuilder } from "../../src/interfaces";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/25
-  test("#25 - Custom converter", () => {
+  $$.test("#25 - Custom converter", () => {
     const obj = {
       'root': {
         '-ns:ns1:some/uri': {
@@ -36,15 +36,15 @@ describe("Replicate issue", () => {
       }
     }, obj);
 
-    expect(doc.end({ headless: true, prettyPrint: true })).toBe($$.t`
+    $$.deepEqual(doc.end({ headless: true, prettyPrint: true }), $$.t`
       <root xmlns:ns1="some/uri">
         <ns1:node1>Some text</ns1:node1>
         <ns1:node2>1234</ns1:node2>
       </root>
     `)
 
-    expect((doc.root().first().node as any).namespaceURI).toBe('some/uri')
-    expect((doc.root().last().node as any).namespaceURI).toBe('some/uri')
+    $$.deepEqual((doc.root().first().node as any).namespaceURI, 'some/uri')
+    $$.deepEqual((doc.root().last().node as any).namespaceURI, 'some/uri')
   })
 
 })

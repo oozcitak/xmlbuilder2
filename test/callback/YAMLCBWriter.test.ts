@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('YAMLCBWriter', () => {
+$$.suite('YAMLCBWriter', () => {
 
-  test('basic', (done) => {
+  $$.test('basic', async () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -29,7 +29,7 @@ describe('YAMLCBWriter', () => {
     const xmlStream = $$.createCB({ format: "yaml" })
     xmlStream.ele('root').ele(obj).end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
       ---
       "root":
         "#":
@@ -68,10 +68,10 @@ describe('YAMLCBWriter', () => {
             - "details":
                 "#":
                 - "#": "classified"
-      `, done)
+      `)
   })
 
-  test('offset', (done) => {
+  $$.test('offset', async () => {
     const obj = {
       person: {
         '#': 'text',
@@ -82,39 +82,38 @@ describe('YAMLCBWriter', () => {
     const xmlStream = $$.createCB({ format: "yaml", offset: 2 })
     xmlStream.ele('root').ele(obj).end()
 
-    $$.expectCBResult(xmlStream, 
+    await $$.expectCBResult(xmlStream,
         '    ---\n' +
         '    "root":\n' +
         '      "#":\n' +
         '      - "person":\n' +
         '          "#":\n' +
         '          - "@age": "35"\n' +
-        '          - "#": "text"'
-      , done)
+        '          - "#": "text"')
   })
 
-  test('negative offset', () => {
-    expect(() => $$.createCB({ format: "yaml", offset: -4 })).toThrow()
+  $$.test('negative offset', () => {
+    $$.throws(() => $$.createCB({ format: "yaml", offset: -4 }))
   })
 
-  test('invalid indentation', () => {
-    expect(() => $$.createCB({ format: "yaml", indent: " " })).toThrow()
+  $$.test('invalid indentation', () => {
+    $$.throws(() => $$.createCB({ format: "yaml", indent: " " }))
   })
 
-  test('prologue', (done) => {
+  $$.test('prologue', async () => {
     const xmlStream = $$.createCB({ format: "yaml" })
     xmlStream.dec({ version: "1.0" })
       .dtd({ name: "root", pubID: "pub", sysID: "sys" })
       .ele('root').end()
 
-    $$.expectCBResult(xmlStream, $$.t`
+    await $$.expectCBResult(xmlStream, $$.t`
     ---
     "root":
       "#": ""
-    `, done)
+    `)
   })
 
-  test('round trip', (done) => {
+  $$.test('round trip', async () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -139,8 +138,8 @@ describe('YAMLCBWriter', () => {
 
     const xmlStream = $$.createCB({ format: "yaml" })
     xmlStream.ele('root').ele(obj).end()
-    const yamlStr = $$.getCBResult(xmlStream)
-    expect($$.convert({ version: "1.0", encoding: "UTF-8", standalone: true }, yamlStr, { format: "xml", prettyPrint: true })).toBe($$.t`
+    const yamlStr = await $$.getCBResult(xmlStream)
+    $$.deepEqual($$.convert({ version: "1.0", encoding: "UTF-8", standalone: true }, yamlStr, { format: "xml", prettyPrint: true }), $$.t`
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <root>
       <ele>simple element</ele>
@@ -161,9 +160,8 @@ describe('YAMLCBWriter', () => {
         <id xmlns="ns">42</id>
         <details>classified</details>
       </person>
-    </root>    
+    </root>
     `)
-    done()
   })
 
 })

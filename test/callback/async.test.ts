@@ -2,9 +2,9 @@ import $$ from '../TestHelpers'
 import { createWriteStream, readFile } from 'fs'
 import { resolve } from 'path'
 
-describe('Use callback API with fs async', () => {
+$$.suite('Use callback API with fs async', () => {
 
-  test('basic', (done) => {
+  $$.test('basic', async () => {
     const xmlStr = `<root><foo/><bar fizz="buzz"/></root>`
 
     const filename = resolve(__dirname, 'async-basic.test.out')
@@ -17,8 +17,7 @@ describe('Use callback API with fs async', () => {
 
     outFile.on('close', () => {
       readFile(filename, 'utf8', (err, result) => {
-        expect(result).toBe(xmlStr)
-        done()
+        $$.deepEqual(result, xmlStr)
       })
     })
 
@@ -28,7 +27,7 @@ describe('Use callback API with fs async', () => {
       .end()
   })
 
-  test('many', (done) => {
+  $$.test('many', async () => {
     const count = 1000
     let xmlStr = "<root>"
     for (let i = 1; i < count; i++) {
@@ -46,8 +45,7 @@ describe('Use callback API with fs async', () => {
 
     outFile.on('close', () => {
       readFile(filename, 'utf8', (err, result) => {
-        expect(result).toBe(xmlStr)
-        done()
+        $$.deepEqual(result, xmlStr)
       })
     })
 

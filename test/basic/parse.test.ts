@@ -1,29 +1,29 @@
 import $$ from '../TestHelpers'
 
-describe('parse()', () => {
+$$.suite('parse()', () => {
 
-  test('XML string', () => {
+  $$.test('XML string', () => {
     const doc = $$.create('<?xml version="1.0"?><root att="val">text</root>')
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root att="val"
         # text
       `)
   })
 
-  test('JS object', () => {
+  $$.test('JS object', () => {
     const doc = $$.create({ root: { "@att": "val", "#": "text" }})
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root att="val"
         # text
       `)
   })
 
-  test('JSON string', () => {
+  $$.test('JSON string', () => {
     const doc = $$.create(JSON.stringify({ root: { "@att": "val", "#": "text" }}))
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root att="val"
         # text
       `)

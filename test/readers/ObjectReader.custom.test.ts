@@ -1,8 +1,8 @@
 import $$ from '../TestHelpers'
 
-describe('custom ObjectReader', () => {
+$$.suite('custom ObjectReader', () => {
 
-  test('skip comments', () => {
+  $$.test('skip comments', () => {
     const obj = {
       ele: 'element',
       '!': 'comment'
@@ -10,14 +10,14 @@ describe('custom ObjectReader', () => {
 
     const doc = $$.create({ parser: { comment: () => undefined } }).ele('root').ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         ele
           # element
       `)
   })
 
-  test('skip all nodes', () => {
+  $$.test('skip all nodes', () => {
     const obj = {
       ele: "simple element",
       person: {
@@ -53,12 +53,12 @@ describe('custom ObjectReader', () => {
       }
     }).ele('root').ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
       `)
   })
 
-  test('custom sanitizer', () => {
+  $$.test('custom sanitizer', () => {
     const obj = {
       ele: 'element\0',
       '!': '\0comment'
@@ -66,7 +66,7 @@ describe('custom ObjectReader', () => {
 
     const doc = $$.create({ parser: { sanitize: () => "clean" } }).ele('root').ele(obj).doc()
 
-    expect($$.printTree(doc.node)).toBe($$.t`
+    $$.deepEqual($$.printTree(doc.node), $$.t`
       root
         clean
           # clean

@@ -1,8 +1,8 @@
 import $$ from "../TestHelpers";
 
-describe("Replicate issue", () => {
+$$.suite("Replicate issue", () => {
   // https://github.com/oozcitak/xmlbuilder2/issues/48
-  test("#48 - invalidCharReplacement does not work in a convert scenario", () => {
+  $$.test("#48 - invalidCharReplacement does not work in a convert scenario", () => {
     const xml = `
     <root>
       <node1\x00/>
@@ -12,7 +12,7 @@ describe("Replicate issue", () => {
 
     const obj = $$.convert({ invalidCharReplacement: '' }, xml, { format: 'object' })
 
-    expect(obj).toEqual(
+    $$.deepEqual(obj,
     {
       "root": {
         "node1": {},
