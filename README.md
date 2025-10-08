@@ -9,7 +9,6 @@ An XML builder for [node.js](https://nodejs.org/).
 
 [![Node.js CI](https://github.com/oozcitak/xmlbuilder2/workflows/build/badge.svg)](https://github.com/oozcitak/xmlbuilder2/actions)
 [![Code Coverage](https://codecov.io/gh/oozcitak/xmlbuilder2/branch/master/graph/badge.svg)](https://codecov.io/gh/oozcitak/xmlbuilder2)
-[![Dev Dependency Status](https://badgen.net/david/dep/oozcitak/xmlbuilder2)](https://david-dm.org/oozcitak/xmlbuilder2)
 
 ### Installation:
 
