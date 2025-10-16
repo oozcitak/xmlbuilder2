@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [4.0.0] - 2025-10-08
+
+### Bug Fixes
+
+- Fixed a bug where attributes were grouped even if the group option was not set (see [#192](https://github.com/oozcitak/xmlbuilder2/issues/192)).
+
+### BREAKING CHANGES
+
+- Changed minimum required node.js version to 20.
+
 ## [3.1.1] - 2023-05-08
 
 ### Bug Fixes
@@ -307,3 +317,4 @@ All notable changes to this project are documented in this file. This project ad
 [3.0.2]: https://github.com/oozcitak/xmlbuilder2/compare/v3.0.1...v3.0.2
 [3.1.0]: https://github.com/oozcitak/xmlbuilder2/compare/v3.0.2...v3.1.0
 [3.1.1]: https://github.com/oozcitak/xmlbuilder2/compare/v3.1.0...v3.1.1
+
