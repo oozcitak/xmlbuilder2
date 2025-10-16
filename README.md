@@ -2,10 +2,10 @@
 
 An XML builder for [node.js](https://nodejs.org/).
 
-[![License](https://badgen.net/github/license/oozcitak/xmlbuilder2)](http://opensource.org/licenses/MIT)
-[![NPM Version](https://badgen.net/npm/v/xmlbuilder2)](https://www.npmjs.com/package/xmlbuilder2)
-[![NPM Downloads](https://badgen.net/npm/dm/xmlbuilder2)](https://www.npmjs.com/package/xmlbuilder2)
-[![jsDelivr](https://badgen.net/jsdelivr/hits/npm/xmlbuilder2)](https://www.jsdelivr.com/package/npm/xmlbuilder2)
+![GitHub License](https://img.shields.io/github/license/oozcitak/xmlbuilder2)
+![NPM Version](https://img.shields.io/npm/v/xmlbuilder2)
+![NPM Downloads](https://img.shields.io/npm/dm/xmlbuilder2)
+![jsDelivr hits (npm)](https://img.shields.io/jsdelivr/npm/hm/xmlbuilder2)
 
 [![Node.js CI](https://github.com/oozcitak/xmlbuilder2/workflows/build/badge.svg)](https://github.com/oozcitak/xmlbuilder2/actions)
 [![Code Coverage](https://codecov.io/gh/oozcitak/xmlbuilder2/branch/master/graph/badge.svg)](https://codecov.io/gh/oozcitak/xmlbuilder2)
