@@ -1,6 +1,6 @@
 {
   "name": "xmlbuilder2",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "keywords": [
     "xml",
     "xmlbuilder"
@@ -27,10 +27,10 @@
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
-    "@oozcitak/dom": "^2.0.1",
-    "@oozcitak/infra": "^2.0.1",
-    "@oozcitak/util": "^9.0.4",
-    "js-yaml": "^4.1.0"
+    "@oozcitak/dom": "^2.0.2",
+    "@oozcitak/infra": "^2.0.2",
+    "@oozcitak/util": "^10.0.0",
+    "js-yaml": "^4.1.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.3",
