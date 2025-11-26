@@ -10,6 +10,8 @@ An XML builder for [node.js](https://nodejs.org/).
 [![Node.js CI](https://github.com/oozcitak/xmlbuilder2/workflows/build/badge.svg)](https://github.com/oozcitak/xmlbuilder2/actions)
 [![Code Coverage](https://codecov.io/gh/oozcitak/xmlbuilder2/branch/master/graph/badge.svg)](https://codecov.io/gh/oozcitak/xmlbuilder2)
 
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/oozcitak)](https://github.com/sponsors/oozcitak)
+
 ### Installation:
 
 ``` sh
@@ -177,6 +179,6 @@ You can build the minified production bundle (`lib/xmlbuilder2.min.js`) after cl
 ```
 
 ### Donations:
-Please consider becoming a backer or sponsor to help support development.
+Please consider becoming a sponsor to help support development.
 
-[<img src="https://opencollective.com/webpack/donate/button@2x.png?color=blue" alt="Donate Button" width="300"/>](https://opencollective.com/xmlbuilder2)
+[:heart: Github Sponsors](https://github.com/sponsors/oozcitak)
