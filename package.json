@@ -18,7 +18,6 @@
     "url": "http://github.com/oozcitak/xmlbuilder2/issues"
   },
   "main": "./lib/index",
-  "browser": "./lib/xmlbuilder2.min.js",
   "engines": {
     "node": ">=20.0"
   },
