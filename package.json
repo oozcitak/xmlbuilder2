@@ -18,7 +18,7 @@
     "url": "http://github.com/oozcitak/xmlbuilder2/issues"
   },
   "main": "./lib/index",
-  "type": "module",
+  "type": "commonjs",
   "engines": {
     "node": ">=20.0"
   },
