@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [4.0.2] - 2025-11-01
+
+### Features
+
+- Added back minified browser bundle.
+
 ## [4.0.1] - 2025-10-26
 
 ### Bug Fixes
@@ -325,3 +331,4 @@ All notable changes to this project are documented in this file. This project ad
 [3.1.1]: https://github.com/oozcitak/xmlbuilder2/compare/v3.1.0...v3.1.1
 [4.0.0]: https://github.com/oozcitak/xmlbuilder2/compare/v3.1.1...v4.0.0
 [4.0.1]: https://github.com/oozcitak/xmlbuilder2/compare/v4.0.0...v4.0.1
+[4.0.2]: https://github.com/oozcitak/xmlbuilder2/compare/v4.0.1...v4.0.2

@@ -1,4 +1,5 @@
 const path = require('path');
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 module.exports = {
   entry: './src/index.ts',
@@ -21,7 +22,7 @@ module.exports = {
               presets: [
                 [
                   '@babel/preset-env',
-                  { 
+                  {
                     useBuiltIns: "usage",
                     modules: false,
                     corejs: 3,
@@ -46,6 +47,9 @@ module.exports = {
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ],
   },
+  plugins: [
+    new NodePolyfillPlugin()
+  ],
   output: {
     filename: 'xmlbuilder2.min.js',
     path: path.resolve(__dirname, 'lib'),
