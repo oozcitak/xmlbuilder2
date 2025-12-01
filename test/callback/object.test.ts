@@ -35,40 +35,24 @@ $$.suite('object', () => {
 
     await $$.expectCBResult(xmlStream, $$.t`
     <root>
-      <ele>
-        simple element
-      </ele>
+      <ele>simple element</ele>
       <person age="35">
-        <name>
-          John
-        </name>
+        <name>John</name>
         <?pi val?>
         <?pi?>
         <!--Good guy-->
         <![CDATA[well formed!]]>
         <address>
           <?pi?>
-          <city>
-            Istanbul
-          </city>
-          <street>
-            End of long and winding road
-          </street>
+          <city>Istanbul</city>
+          <street>End of long and winding road</street>
         </address>
         <contact>
-          <phone>
-            555-1234
-          </phone>
-          <phone>
-            555-1235
-          </phone>
+          <phone>555-1234</phone>
+          <phone>555-1235</phone>
         </contact>
-        <id>
-          42
-        </id>
-        <details>
-          classified
-        </details>
+        <id>42</id>
+        <details>classified</details>
       </person>
     </root>
     `)

@@ -10,9 +10,7 @@ $$.suite('parse()', () => {
     xmlStream.ele(str).end()
 
     await $$.expectCBResult(xmlStream, $$.t`
-    <root att="val">
-      text
-    </root>
+    <root att="val">text</root>
     `)
   })
 

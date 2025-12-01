@@ -55,7 +55,7 @@ export class XMLCBWriter extends BaseCBWriter<XMLCBWriterOptions> {
   }
   /** @inheritdoc */
   text(data: string): string {
-    return this._beginLine() + data
+    return data
   }
   /** @inheritdoc */
   instruction(target: string, data: string): string {
@@ -91,8 +91,9 @@ export class XMLCBWriter extends BaseCBWriter<XMLCBWriterOptions> {
     }
   }
   /** @inheritdoc */
-  closeTag(name: string): string {
-    return this._beginLine() + "</" + name + ">"
+  closeTag(name: string, hasTextPayload?: boolean): string {
+    const ending = hasTextPayload ? '' : this._beginLine();
+    return ending + "</" + name + ">";
   }
   /** @inheritdoc */
   attribute(name: string, value: string): string {

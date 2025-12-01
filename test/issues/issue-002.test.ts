@@ -24,20 +24,12 @@ $$.suite("Replicate issue", () => {
     <?xml version="1.0"?>
     <rss>
       <item>
-        <sku>
-          001
-        </sku>
-        <name>
-          Product name 1
-        </name>
+        <sku>001</sku>
+        <name>Product name 1</name>
       </item>
       <item>
-        <sku>
-          002
-        </sku>
-        <name>
-          Product name 2
-        </name>
+        <sku>002</sku>
+        <name>Product name 2</name>
       </item>
     </rss>
     `)
