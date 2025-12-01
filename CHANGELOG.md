@@ -323,4 +323,5 @@ All notable changes to this project are documented in this file. This project ad
 [3.0.2]: https://github.com/oozcitak/xmlbuilder2/compare/v3.0.1...v3.0.2
 [3.1.0]: https://github.com/oozcitak/xmlbuilder2/compare/v3.0.2...v3.1.0
 [3.1.1]: https://github.com/oozcitak/xmlbuilder2/compare/v3.1.0...v3.1.1
-[4.0.1]: https://github.com/oozcitak/xmlbuilder2/compare/v3.1.1...v4.0.1
+[4.0.0]: https://github.com/oozcitak/xmlbuilder2/compare/v3.1.1...v4.0.0
+[4.0.1]: https://github.com/oozcitak/xmlbuilder2/compare/v4.0.0...v4.0.1
