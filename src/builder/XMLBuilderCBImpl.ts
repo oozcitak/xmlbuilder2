@@ -46,8 +46,13 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
   private _hasDocumentElement = false
   private _currentElement?: XMLBuilder
   private _currentElementSerialized = false
-  private _openTags: Array<[string, string | null, NamespacePrefixMap, boolean /** has children */, boolean | undefined /** has text payload */]> = []
-
+  private _openTags: Array<[
+    string,             // qualified name
+    string | null,      // original inherited ns
+    NamespacePrefixMap, // original prefix map
+    boolean,            // has children,
+    boolean | undefined // has text payload
+  ]> = []
   private _prefixMap: NamespacePrefixMap
   private _prefixIndex: PrefixIndex
 
@@ -55,10 +60,10 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
   /**
    * Initializes a new instance of `XMLStream`.
-   * 
+   *
    * @param options - stream writer options
    * @param fragment - whether to create fragment stream or a document stream
-   * 
+   *
    * @returns XML stream
    */
   public constructor(options?: XMLBuilderCBCreateOptions, fragment = false) {
@@ -366,7 +371,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
   /**
    * Serializes the opening tag of an element node.
-   * 
+   *
    * @param hasChildren - whether the element node has child nodes
    */
   private _serializeOpenTag(hasChildren: boolean): void {
@@ -525,7 +530,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
   /**
    * Pushes data to internal buffer.
-   * 
+   *
    * @param data - data
    */
   private _push(data: string | null): void {
@@ -542,7 +547,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
   /**
    * Reads and serializes an XML tree.
-   * 
+   *
    * @param node - root node
    */
   private _fromNode(node: Node) {
@@ -578,7 +583,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
   /**
    * Produces an XML serialization of the attributes of an element node.
-   * 
+   *
    * @param node - node to serialize
    * @param map - namespace prefix map
    * @param prefixIndex - generated namespace prefix index
@@ -644,7 +649,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
             (!map.hasPrefix(attr.prefix) ||
               map.has(attr.prefix, attributeNamespace))) {
             /**
-             * Check if we can use the attribute's own prefix.  
+             * Check if we can use the attribute's own prefix.
              * We deviate from the spec here.
              * TODO: This is not an efficient way of searching for prefixes.
              * Follow developments to the spec.
@@ -674,7 +679,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
   /**
    * Produces an XML serialization of an attribute value.
-   * 
+   *
    * @param value - attribute value
    * @param requireWellFormed - whether to check conformance
    */
@@ -693,12 +698,12 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
   }
 
   /**
-   * Records namespace information for the given element and returns the 
+   * Records namespace information for the given element and returns the
    * default namespace attribute value.
-   * 
+   *
    * @param node - element node to process
    * @param map - namespace prefix map
-   * @param localPrefixesMap - local prefixes map  
+   * @param localPrefixesMap - local prefixes map
    */
   private _recordNamespaceInformation(node: Element, map: NamespacePrefixMap,
     localPrefixesMap: { [key: string]: string }): string | null {
@@ -737,7 +742,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
   /**
    * Generates a new prefix for the given namespace.
-   * 
+   *
    * @param newNamespace - a namespace to generate prefix for
    * @param prefixMap - namespace prefix map
    * @param prefixIndex - generated namespace prefix index
@@ -753,7 +758,7 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
   /**
    * Determines if the namespace prefix map was modified from its original.
-   * 
+   *
    * @param originalMap - original namespace prefix map
    * @param newMap - new namespace prefix map
    */
