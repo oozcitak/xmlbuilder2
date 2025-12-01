@@ -5,17 +5,17 @@
     "xml",
     "xmlbuilder"
   ],
-  "homepage": "http://github.com/oozcitak/xmlbuilder2",
+  "homepage": "https://github.com/oozcitak/xmlbuilder2",
   "description": "An XML builder for node.js",
   "author": "Ozgur Ozcitak <oozcitak@gmail.com>",
   "contributors": [],
   "license": "MIT",
   "repository": {
-    "type": "git",
-    "url": "git://github.com/oozcitak/xmlbuilder2.git"
+    "type": "https",
+    "url": "https://github.com/oozcitak/xmlbuilder2.git"
   },
   "bugs": {
-    "url": "http://github.com/oozcitak/xmlbuilder2/issues"
+    "url": "https://github.com/oozcitak/xmlbuilder2/issues"
   },
   "main": "./lib/index",
   "type": "commonjs",
@@ -44,6 +44,7 @@
     "es6-proxy-polyfill": "^2.1.1",
     "glob": "^11.0.3",
     "harmony-reflect": "^1.6.2",
+    "publint": "^0.3.15",
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
@@ -54,9 +55,9 @@
     "tsx": "^4.20.6"
   },
   "scripts": {
-    "test": "tsc && tsx --test test/**/*test.ts",
-    "cover": "tsc && tsx --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=./coverage/lcov.info test/**/*test.ts",
-    "publish-public": "tsc && npm run cover && npm publish --access public",
+    "test": "tsc && npx publint && tsx --test test/**/*test.ts",
+    "cover": "tsc && mkdir -p coverage && tsx --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=./coverage/lcov.info test/**/*test.ts",
+    "publish-public": "tsc && npx publint && npm run cover && npm publish --access public",
     "servedocs": "(cd docs && bundle exec jekyll serve)"
   }
 }
