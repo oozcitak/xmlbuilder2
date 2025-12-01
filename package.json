@@ -5,17 +5,17 @@
     "xml",
     "xmlbuilder"
   ],
-  "homepage": "http://github.com/oozcitak/xmlbuilder2",
+  "homepage": "https://github.com/oozcitak/xmlbuilder2",
   "description": "An XML builder for node.js",
   "author": "Ozgur Ozcitak <oozcitak@gmail.com>",
   "contributors": [],
   "license": "MIT",
   "repository": {
-    "type": "git",
-    "url": "git://github.com/oozcitak/xmlbuilder2.git"
+    "type": "https",
+    "url": "https://github.com/oozcitak/xmlbuilder2.git"
   },
   "bugs": {
-    "url": "http://github.com/oozcitak/xmlbuilder2/issues"
+    "url": "https://github.com/oozcitak/xmlbuilder2/issues"
   },
   "main": "./lib/index",
   "type": "commonjs",
@@ -33,30 +33,32 @@
     "js-yaml": "^4.1.1"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.28.3",
-    "@babel/runtime-corejs3": "7.10.3",
-    "@types/dedent": "^0.7.2",
-    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.7.0",
-    "babel-loader": "^10.0.0",
-    "core-js": "^3.45.1",
-    "dedent": "^1.7.0",
-    "es6-proxy-polyfill": "^2.1.1",
-    "glob": "^11.0.3",
-    "harmony-reflect": "^1.6.2",
-    "ts-loader": "^9.5.4",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "webpack": "^5.102.0",
-    "webpack-cli": "^6.0.1",
+    "@types/dedent": "^0.7.2",
+    "dedent": "^1.7.0",
     "xmlbuilder": "^15.1.1",
     "xpath": "^0.0.34",
-    "tsx": "^4.20.6"
+    "@babel/preset-env": "^7.28.3",
+    "@babel/runtime-corejs3": "7.10.3",
+    "@types/js-yaml": "^4.0.9",
+    "babel-loader": "^10.0.0",
+    "core-js": "^3.45.1",
+    "es6-proxy-polyfill": "^2.1.1",
+    "node-polyfill-webpack-plugin": "^4.1.0",
+    "glob": "^11.0.3",
+    "harmony-reflect": "^1.6.2",
+    "publint": "^0.3.15",
+    "ts-loader": "^9.5.4",
+    "ts-node": "^10.9.2",
+    "webpack": "^5.102.0",
+    "webpack-cli": "^6.0.1"
   },
   "scripts": {
-    "test": "tsc && tsx --test test/**/*test.ts",
-    "cover": "tsc && tsx --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=./coverage/lcov.info test/**/*test.ts",
-    "publish-public": "tsc && npm run cover && npm publish --access public",
+    "test": "tsc && npx publint && tsx --test test/**/*test.ts",
+    "cover": "tsc && mkdir -p coverage && tsx --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=./coverage/lcov.info test/**/*test.ts",
+    "publish-public": "tsc && npx publint && npx webpack && npm run cover && npm publish --access public",
     "servedocs": "(cd docs && bundle exec jekyll serve)"
   }
 }
