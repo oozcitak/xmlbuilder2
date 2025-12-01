@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file. This project adheres to [Semantic Versioning](http://semver.org/#semantic-versioning-200).
 
+## [4.0.1] - 2025-10-26
+
+### Bug Fixes
+
+- Updated dependencies.
+
 ## [4.0.0] - 2025-10-08
 
 ### Bug Fixes
