@@ -1,0 +1,12 @@
+{
+  "name": "xmlbuilder2-performance",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "bench": "node --expose-gc run.js"
+  },
+  "devDependencies": {
+    "xmlbuilder": "^15.1.1",
+    "mitata": "^1.0.34"
+  }
+}
