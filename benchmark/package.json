@@ -1,7 +1,8 @@
 {
-  "name": "xmlbuilder2-performance",
+  "name": "xmlbuilder2-benchmark",
   "version": "1.0.0",
   "type": "module",
+  "main": "./run.js",
   "scripts": {
     "bench": "node --expose-gc run.js"
   },
