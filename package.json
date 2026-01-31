@@ -57,10 +57,12 @@
     "webpack-cli": "^6.0.1"
   },
   "scripts": {
-    "test": "tsc && npx publint && tsx --test test/**/*test.ts",
-    "cover": "tsc && mkdir -p coverage && tsx --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=./coverage/lcov.info test/**/*test.ts",
-    "build": "tsc && npx publint && npx webpack && npm run cover",
-    "publish-public": "npm run build && npm publish --access public",
-    "servedocs": "(cd docs && bundle exec jekyll serve)"
+    "build": "tsc",
+    "build-browser": "npm run build && npx webpack",
+    "test": "npm run build && tsx --test test/**/*test.ts",
+    "cover": "npm run build && mkdir -p coverage && tsx --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=./coverage/lcov.info test/**/*test.ts",
+    "bench": "npm run build && cd benchmark && npm run bench",
+    "publish-public": "npx publint && npm run build && npm run build-browser && npm publish --access public",
+    "servedocs": "cd docs && bundle exec jekyll serve"
   }
 }
