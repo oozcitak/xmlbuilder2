@@ -8,7 +8,7 @@ $$.suite("Replicate issue", () => {
     }).ele('child').txt('Line 1\r\nLine 2\r\nLine 3')
 
     $$.deepEqual(root.end({ headless: true, prettyPrint: true, newline: '\r\n' }),
-    '<parent text="Hello \r\n">\r\n' +
+    '<parent text="Hello &#13;&#10;">\r\n' +
     '  <child>Line 1\r\n' +
     'Line 2\r\n' +
     'Line 3</child>\r\n' +

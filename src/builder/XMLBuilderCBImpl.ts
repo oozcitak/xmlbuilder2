@@ -20,6 +20,10 @@ import { XMLCBWriter } from "../writers/XMLCBWriter"
 import { JSONCBWriter } from "../writers/JSONCBWriter"
 import { YAMLCBWriter } from "../writers/YAMLCBWriter"
 import { EventEmitter } from "events"
+import {
+   nonEntityAmpersandRegex, encodeTextValueRegex, encodeTextValueLookup,
+   encodeAttributeValueRegex, encodeAttributeValueLookup
+} from "../constants"
 
 /**
  * Stores the last generated prefix. An object is used instead of a number so
@@ -217,9 +221,8 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
       return this
     }
 
-    const markup = node.data.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
+    const markup = node.data.replace(nonEntityAmpersandRegex, '&amp;')
+      .replace(encodeTextValueRegex, token => encodeTextValueLookup[token])
 
     this._push(this._writer.text(markup))
     const lastEl = this._openTags[this._openTags.length - 1]
@@ -691,10 +694,8 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
 
     if (value === null) return ""
 
-    return value.replace(/(?!&(lt|gt|amp|apos|quot);)&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
+    return value.replace(nonEntityAmpersandRegex, '&amp;')
+      .replace(encodeAttributeValueRegex, token => encodeAttributeValueLookup[token])
   }
 
   /**

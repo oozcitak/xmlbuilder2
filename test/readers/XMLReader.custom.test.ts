@@ -109,7 +109,7 @@ $$.suite('custom XMLReader', () => {
       <ele>    </ele>
     </root>`
 
-    const doc = $$.create({ skipWhitespaceOnlyText: false }, xml).doc()
+    const doc = $$.create({ skipWhitespaceOnlyText: false }, xml)
 
     $$.deepEqual(doc.end(),
       $$.t`

@@ -15,7 +15,7 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
 
   /**
    * Initializes a new instance of `XMLWriter`.
-   * 
+   *
    * @param builderOptions - XML builder options
    * @param writerOptions - serialization options
    */
@@ -35,10 +35,10 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
       spaceBeforeSlash: false
     }) as Required<XMLWriterOptions>
   }
-  
+
   /**
    * Produces an XML serialization of the given node.
-   * 
+   *
    * @param node - node to serialize
    */
   serialize(node: Node): string {
@@ -223,7 +223,7 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
 
   /**
    * Produces an indentation string.
-   * 
+   *
    * @param level - depth of the tree
    */
   private _indent(level: number): string {

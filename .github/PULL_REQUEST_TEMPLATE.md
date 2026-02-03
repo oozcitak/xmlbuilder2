@@ -9,5 +9,6 @@ Please include a summary of the change and which issue is fixed. Fixes # (issue 
 
 **Notes (delete after reading)**:
 
+* If your issue is related to character encoding please read `CHARACTER_ENCODING_AND_DECODING_RULES.md`inside the root folder of the repository.
 * Breaking changes should rarely be necessary. If this change introduces a breaking change, make sure you have a very good reason for it.
 * Please make sure this change is thoroughly tested. Add your tests to the `test` folder in a relevant sub folder. If this pull request is a bug fix, add a test specific to the fixed issue in the `test/issues` sub folder. If this change decreases code coverage you may be asked to add additional tests.
