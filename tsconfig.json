@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
         "lib": [ "es2023" ],
-        "module": "nodenext",
+        "module": "preserve",
         "target": "es2022",
 
         "strict": true,
