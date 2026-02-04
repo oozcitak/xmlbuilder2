@@ -914,6 +914,7 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
    * @param level - current depth of the XML tree
    */
   private _serializeText(node: CharacterData, requireWellFormed: boolean): void {
+    if (this._builderOptions.keepEntityCharRefs) return
 
     /**
      * 1. If the require well-formed flag is set (its value is true), and
@@ -935,6 +936,8 @@ export abstract class BaseWriter<T extends BaseWriterOptions, U extends XMLSeria
     const markup = node.data
       .replace(nonEntityAmpersandRegex, '&amp;')
       .replace(encodeTextValueRegex, (tag) => encodeTextValueLookup[tag])
+
+    if (this._builderOptions.keepEntityCharRefs) markup = node.data
 
     this.text(markup)
   }

@@ -61,7 +61,7 @@ export abstract class BaseReader<U extends string | ExpandObject> {
    * @param text - text value to serialize
    */
   _decodeText(text: string): string {
-    if (text == null) return text
+    if (text == null || this._builderOptions.keepEntityCharRefs) return text
 
     return text
       .replace(decodeValueRegex, (_match, tag) => decodeValueLookup[tag])
