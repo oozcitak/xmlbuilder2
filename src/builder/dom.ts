@@ -69,3 +69,16 @@ export function sanitizeInput(str: any,
     return result
   }
 }
+
+/**
+ * Splits CDATA content at its forbidden closing sequence while preserving the
+ * original text across adjacent CDATA sections.
+ *
+ * @param str - CDATA content
+ */
+export function splitCDATA(str: string): string[] {
+  const parts = str.split("]]>")
+  return parts.map((part, index) =>
+    (index === 0 ? "" : ">") + part +
+    (index === parts.length - 1 ? "" : "]]"))
+}

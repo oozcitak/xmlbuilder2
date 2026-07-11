@@ -67,7 +67,8 @@ export class XMLCBWriter extends BaseCBWriter<XMLCBWriterOptions> {
   }
   /** @inheritdoc */
   cdata(data: string): string {
-    return this._beginLine() + "<![CDATA[" + data + "]]>"
+    return this._beginLine() + "<![CDATA[" +
+      data.replace(/]]>/g, "]]]]><![CDATA[>") + "]]>"
   }
   /** @inheritdoc */
   openTagBegin(name: string): string {
