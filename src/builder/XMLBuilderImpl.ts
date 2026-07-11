@@ -14,7 +14,7 @@ import { Guard } from "@oozcitak/dom/lib/util"
 import {
   namespace_extractQName, tree_index, create_element
 } from "@oozcitak/dom/lib/algorithm"
-import { sanitizeInput } from "./dom"
+import { sanitizeInput, splitCDATA } from "./dom"
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { ObjectReader, JSONReader, XMLReader, YAMLReader } from "../readers"
 
@@ -297,9 +297,11 @@ export class XMLBuilderImpl implements XMLBuilder {
       }
     }
 
-    const child = this._doc.createCDATASection(
-      sanitizeInput(content, this._options.invalidCharReplacement))
-    this.node.appendChild(child)
+    const data = sanitizeInput(content, this._options.invalidCharReplacement)
+    for (const section of splitCDATA(data)) {
+      const child = this._doc.createCDATASection(section)
+      this.node.appendChild(child)
+    }
 
     return this
   }

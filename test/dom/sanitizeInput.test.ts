@@ -1,5 +1,5 @@
 import $$ from '../TestHelpers'
-import { sanitizeInput } from '../../src/builder/dom'
+import { sanitizeInput, splitCDATA } from '../../src/builder/dom'
 
 $$.suite('sanitizeInput', () => {
 
@@ -31,4 +31,16 @@ $$.suite('sanitizeInput', () => {
     $$.deepEqual(sanitizeInput('😀', () => ''), '😀')
   })
 
+})
+
+$$.suite('splitCDATA', () => {
+  $$.test('preserves text across forbidden closing sequences', () => {
+    $$.deepEqual(splitCDATA('before]]>after'), ['before]]', '>after'])
+    $$.deepEqual(splitCDATA('before]]>middle]]>after'), [
+      'before]]',
+      '>middle]]',
+      '>after'
+    ])
+    $$.deepEqual(splitCDATA('unchanged'), ['unchanged'])
+  })
 })

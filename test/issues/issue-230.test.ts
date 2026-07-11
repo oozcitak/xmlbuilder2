@@ -5,13 +5,19 @@ $$.suite('Replicate issue', () => {
   const expected = '<root><![CDATA[before]]]]><![CDATA[>after]]></root>'
 
   $$.test('#230 - escapes CDATA terminators', () => {
-    const xml = $$.create()
+    const doc = $$.create()
       .ele('root')
       .dat(content)
       .doc()
-      .end({ headless: true })
 
-    $$.deepEqual(xml, expected)
+    $$.deepEqual(doc.root().node.textContent, content)
+    $$.deepEqual(doc.end({ headless: true }), expected)
+    $$.deepEqual(doc.end({ headless: true, prettyPrint: true }), expected)
+    $$.deepEqual(doc.end({
+      headless: true,
+      prettyPrint: true,
+      indentTextOnlyNodes: true
+    }), expected)
   })
 
   $$.test('#230 - escapes CDATA terminators with the callback API', async () => {
@@ -21,5 +27,15 @@ $$.suite('Replicate issue', () => {
       .end()
 
     await $$.expectCBResult(xmlStream, expected)
+  })
+
+  $$.test('#230 - escapes CDATA terminators from an object', () => {
+    const xml = $$.create(
+      { convert: { text: '#text', cdata: '#cdata' } },
+      { root: { '#cdata': content } }
+    )
+      .end({ headless: true, prettyPrint: true })
+
+    $$.deepEqual(xml, expected)
   })
 })

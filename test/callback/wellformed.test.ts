@@ -178,10 +178,10 @@ $$.suite('well-formed checks', () => {
     await $$.expectCBError(xmlStream, () => xmlStream.ins('name', '\0'))
   })
 
-  $$.test('invalid cdata node', async () => {
+  $$.test('escaped cdata terminator', async () => {
     const xmlStream = $$.createCB({ wellFormed: true })
-    xmlStream.ele('ns', 'root')
-    await $$.expectCBError(xmlStream, () => xmlStream.dat(']]>'))
+    xmlStream.ele('ns', 'root').dat(']]>').end()
+    await $$.expectCBResult(xmlStream, '<root xmlns="ns"><![CDATA[]]]]><![CDATA[>]]></root>')
   })
 
   $$.test('same attribute', async () => {

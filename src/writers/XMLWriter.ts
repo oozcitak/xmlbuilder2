@@ -1,6 +1,6 @@
 import { XMLWriterOptions, XMLBuilderOptions } from "../interfaces"
 import { applyDefaults } from "@oozcitak/util"
-import { Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
+import { CDATASection, Node, NodeType } from "@oozcitak/dom/lib/dom/interfaces"
 import { BaseWriter } from "./BaseWriter"
 import { Guard } from "@oozcitak/dom/lib/util"
 
@@ -112,14 +112,23 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
       let childNode = this.currentNode.firstChild
       let cdataCount = 0
       let textCount = 0
+      let splitCDATASequence = true
+      let previousCData: CDATASection | undefined
       while (childNode) {
         if (Guard.isExclusiveTextNode(childNode)) {
           textCount++
+          splitCDATASequence = false
         } else if (Guard.isCDATASectionNode(childNode)) {
+          if (previousCData !== undefined &&
+            (!previousCData.data.endsWith("]]") || !childNode.data.startsWith(">"))) {
+            splitCDATASequence = false
+          }
+          previousCData = childNode
           cdataCount++
         } else {
           textOnlyNode = false
           emptyNode = false
+          splitCDATASequence = false
           break
         }
 
@@ -129,7 +138,12 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
 
         childNode = childNode.nextSibling
       }
-      this._refs.suppressPretty = !this._writerOptions.indentTextOnlyNodes && textOnlyNode && ((cdataCount <= 1 && textCount === 0) || cdataCount === 0)
+      // Adjacent CDATA sections created by splitCDATA must remain adjacent so
+      // pretty-printing does not change their combined text content.
+      const escapedCDATA = cdataCount > 1 && textCount === 0 && splitCDATASequence
+      this._refs.suppressPretty = escapedCDATA ||
+        (!this._writerOptions.indentTextOnlyNodes && textOnlyNode &&
+          ((cdataCount <= 1 && textCount === 0) || cdataCount === 0))
       this._refs.emptyNode = emptyNode
     }
 

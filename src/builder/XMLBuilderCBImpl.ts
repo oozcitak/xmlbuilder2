@@ -5,13 +5,14 @@ import {
 } from "../interfaces"
 import { applyDefaults, isString, isObject } from "@oozcitak/util"
 import { fragment, create } from "./BuilderFunctions"
+import { sanitizeInput } from "./dom"
 import {
   xml_isName, xml_isLegalChar, xml_isPubidChar
 } from "@oozcitak/dom/lib/algorithm"
 import { namespace as infraNamespace } from "@oozcitak/infra"
 import { NamespacePrefixMap } from "@oozcitak/dom/lib/serializer/NamespacePrefixMap"
 import {
-  Comment, Text, ProcessingInstruction, CDATASection, DocumentType, Element, Node
+  Comment, Text, ProcessingInstruction, DocumentType, Element, Node
 } from "@oozcitak/dom/lib/dom/interfaces"
 import { LocalNameSet } from "@oozcitak/dom/lib/serializer/LocalNameSet"
 import { Guard } from "@oozcitak/dom/lib/util"
@@ -266,15 +267,28 @@ export class XMLBuilderCBImpl extends EventEmitter implements XMLBuilderCB {
   dat(content: string): this {
     this._serializeOpenTag(true)
 
-    let node: CDATASection
+    if (content === null || content === undefined) {
+      if (this._options.keepNullNodes) {
+        content = ""
+      } else {
+        return this
+      }
+    }
+
+    let data: string
     try {
-      node = fragment(this._builderOptions).dat(content).first().node as CDATASection
+      data = sanitizeInput(content, this._options.invalidCharReplacement)
     } catch (err) {
       this.emit("error", err)
       return this
     }
 
-    this._push(this._writer.cdata(node.data))
+    if (this._options.wellFormed && !xml_isLegalChar(data)) {
+      this.emit("error", new Error("CDATA contains invalid characters (well-formed required)."))
+      return this
+    }
+
+    this._push(this._writer.cdata(data))
     return this
   }
 
