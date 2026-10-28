@@ -2,6 +2,8 @@ import { XMLBuilderOptions, ExpandObject, XMLBuilder } from "../interfaces"
 import { sanitizeInput } from "../builder/dom"
 import { decodeValueRegex, decodeValueLookup, decodeNumberedEntityRegex } from "../constants"
 
+const decodeEntityRegex = new RegExp(`${decodeValueRegex.source}|${decodeNumberedEntityRegex.source}`, "g")
+
 /**
  * Parses XML nodes.
  */
@@ -63,11 +65,9 @@ export abstract class BaseReader<U extends string | ExpandObject> {
   _decodeText(text: string): string {
     if (text == null) return text
 
-    return text
-      .replace(decodeValueRegex, (_match, tag) => decodeValueLookup[tag])
-      .replace(decodeNumberedEntityRegex, (_match, hexStr, numStr) =>
-        String.fromCodePoint(parseInt(hexStr || numStr, hexStr ? 16 : 10))
-      )
+    return text.replace(decodeEntityRegex, (_match, tag, hexStr, numStr) =>
+      tag ? decodeValueLookup[tag] : String.fromCodePoint(parseInt(hexStr || numStr, hexStr ? 16 : 10))
+    )
   }
 
   /**
