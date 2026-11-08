@@ -83,7 +83,9 @@ export class XMLReader extends BaseReader<string> {
             attName = this.sanitize(attName)
             attValue = this.sanitize(attValue)
             if (attName === "xmlns") {
-              namespace = attValue
+              if (prefix === null) {
+                namespace = attValue
+              }
             } else {
               const [attPrefix, attLocalName] = namespace_extractQName(attName)
               if (attPrefix === "xmlns") {
@@ -111,11 +113,11 @@ export class XMLReader extends BaseReader<string> {
             if (attPrefix === "xmlns" || (attPrefix === null && attLocalName === "xmlns")) {
               // namespace declaration attribute
               attNamespace = infraNamespace.XMLNS
-            } else {
+            } else if (attPrefix !== null) {
+              // Default namespaces never apply to attributes, but a prefix
+              // may be bound to the same URI as the default namespace.
               attNamespace = elementNode.node.lookupNamespaceURI(attPrefix)
-              if (attNamespace !== null && elementNode.node.isDefaultNamespace(attNamespace)) {
-                attNamespace = null
-              } else if (attNamespace === null && attPrefix !== null) {
+              if (attNamespace === null) {
                 attNamespace = nsDeclarations[attPrefix] || null
               }
             }
