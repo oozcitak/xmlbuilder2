@@ -50,6 +50,16 @@ $$.suite('basic callback API tests', () => {
     await $$.expectCBResult(xmlStream, `<!DOCTYPE root PUBLIC "pub" "sys"><root/>`)
   })
 
+  $$.test('dtd with system identifier containing a quotation mark', async () => {
+    const xmlStream = $$.createCB({ wellFormed: true })
+
+    xmlStream.dtd({ name: "root", sysID: 'a"><evil/>' })
+      .ele("root")
+      .end()
+
+    await $$.expectCBResult(xmlStream, `<!DOCTYPE root SYSTEM 'a"><evil/>'><root/>`)
+  })
+
   $$.test('att', async () => {
     const xmlStream = $$.createCB()
 
