@@ -124,6 +124,23 @@ $$.suite('XMLWriter', () => {
       `)
   })
 
+  $$.test('doctype with system identifier containing a quotation mark', () => {
+    $$.deepEqual($$.create().dtd({ sysID: 'a"b' })
+      .ele('root').doc().toString({ format: "xml", prettyPrint: true }), $$.t`
+      <?xml version="1.0"?>
+      <!DOCTYPE root SYSTEM 'a"b'>
+      <root/>
+      `)
+    $$.deepEqual($$.create().dtd({ pubID: "pub", sysID: 'a"><evil/>' })
+      .ele('root').end({ wellFormed: true }),
+      `<?xml version="1.0"?><!DOCTYPE root PUBLIC "pub" 'a"><evil/>'><root/>`)
+  })
+
+  $$.test('doctype round trip with apostrophe-delimited system identifier', () => {
+    const xml = `<?xml version="1.0"?><!DOCTYPE root SYSTEM 'a"b'><root/>`
+    $$.deepEqual($$.create(xml).end(), xml)
+  })
+
   $$.test('doctype without identifiers', () => {
     $$.deepEqual($$.create().dtd()
       .ele('root').doc().toString({ format: "xml", prettyPrint: true }), $$.t`

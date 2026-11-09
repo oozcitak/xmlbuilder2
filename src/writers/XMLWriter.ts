@@ -82,12 +82,15 @@ export class XMLWriter extends BaseWriter<XMLWriterOptions, string> {
   docType(name: string, publicId: string, systemId: string): void {
     this._beginLine()
 
+    // a system literal may be delimited by either quote; use apostrophes
+    // when the identifier itself contains a quotation mark
+    const quote = systemId.indexOf('"') === -1 ? '"' : "'"
     if (publicId && systemId) {
-      this._refs.markup += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\" \"" + systemId + "\">"
+      this._refs.markup += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\" " + quote + systemId + quote + ">"
     } else if (publicId) {
       this._refs.markup += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\">"
     } else if (systemId) {
-      this._refs.markup += "<!DOCTYPE " + name + " SYSTEM \"" + systemId + "\">"
+      this._refs.markup += "<!DOCTYPE " + name + " SYSTEM " + quote + systemId + quote + ">"
     } else {
       this._refs.markup += "<!DOCTYPE " + name + ">"
     }

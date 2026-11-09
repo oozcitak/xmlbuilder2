@@ -38,12 +38,15 @@ export class XMLCBWriter extends BaseCBWriter<XMLCBWriterOptions> {
   /** @inheritdoc */
   docType(name: string, publicId: string, systemId: string): string {
     let markup = this._beginLine()
+    // a system literal may be delimited by either quote; use apostrophes
+    // when the identifier itself contains a quotation mark
+    const quote = systemId.indexOf('"') === -1 ? '"' : "'"
     if (publicId && systemId) {
-      markup += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\" \"" + systemId + "\">"
+      markup += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\" " + quote + systemId + quote + ">"
     } else if (publicId) {
       markup += "<!DOCTYPE " + name + " PUBLIC \"" + publicId + "\">"
     } else if (systemId) {
-      markup += "<!DOCTYPE " + name + " SYSTEM \"" + systemId + "\">"
+      markup += "<!DOCTYPE " + name + " SYSTEM " + quote + systemId + quote + ">"
     } else {
       markup += "<!DOCTYPE " + name + ">"
     }
