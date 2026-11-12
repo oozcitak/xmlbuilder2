@@ -4,7 +4,7 @@ import {
 } from "../interfaces"
 import { ObjectWriter } from "./ObjectWriter"
 import {
-  applyDefaults, isArray, isObject, objectLength, forEachObject,
+  applyDefaults, isArray, isObject,
   forEachArray
 } from "@oozcitak/util"
 import { Node } from "@oozcitak/dom/lib/dom/interfaces"
@@ -82,9 +82,11 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
       markup += ']'
     } else if (isObject(obj)) {
       markup += '{'
-      const len = objectLength(obj)
+      const keys = Object.keys(obj)
+      const len = keys.length
       let i = 0
-      forEachObject(obj, (key, val) => {
+      for (const key of keys) {
+        const val = obj[key]
         if (isLeaf && options.prettyPrint) {
           markup += ' '
         } else {
@@ -95,7 +97,7 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
         markup += this._convertObject(val, options, level + 1)
         if (i < len - 1) { markup += ',' }
         i++
-      }, this)
+      }
       if (isLeaf && options.prettyPrint) {
         markup += ' '
       } else {
@@ -177,7 +179,9 @@ export class JSONWriter extends BaseWriter<JSONWriterOptions, string> {
     if (isArray(obj)) {
       forEachArray(obj, val => count += this._descendantCount(val, count), this)
     } else if (isObject(obj)) {
-      forEachObject(obj, (key, val) => count += this._descendantCount(val, count), this)
+      for (const key of Object.keys(obj)) {
+        count += this._descendantCount(obj[key], count)
+      }
     } else {
       count++
     }
