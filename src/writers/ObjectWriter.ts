@@ -89,7 +89,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
     if (items.length === 0) return {}
 
     // determine if there are non-unique element names
-    const namesSeen: { [key: string]: boolean } = {}
+    const namesSeen: { [key: string]: boolean } = Object.create(null)
     let hasNonUniqueNames = false
     let textCount = 0
     let commentCount = 0
@@ -249,13 +249,21 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
               for (let i = 0; i < listOfLists.length; i++) {
                 eleGroup.push(this._process(listOfLists[i], options) as any)
               }
-              obj[key] = eleGroup
+              Object.defineProperty(obj, key, {
+                value: eleGroup, enumerable: true, configurable: true, writable: true
+              })
             } else {
               // single element node
               if (options.verbose) {
-                obj[key] = [this._process(ele[key] as NodeList, options) as any]
+                Object.defineProperty(obj, key, {
+                  value: [this._process(ele[key] as NodeList, options) as any],
+                  enumerable: true, configurable: true, writable: true
+                })
               } else {
-                obj[key] = this._process(ele[key] as NodeList, options)
+                Object.defineProperty(obj, key, {
+                  value: this._process(ele[key] as NodeList, options),
+                  enumerable: true, configurable: true, writable: true
+                })
               }
             }
             break
@@ -422,7 +430,7 @@ export class ObjectWriter extends BaseWriter<ObjectWriterOptions, XMLSerializedA
   }
 
   private _isElementNode(x: any, name: string): x is ElementNode {
-    return name in x
+    return Object.prototype.hasOwnProperty.call(x, name)
   }
 
   /**
