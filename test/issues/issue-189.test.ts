@@ -12,8 +12,7 @@ $$.suite('Replicate issue', () => {
     }
     const xml = `
 <content>
-  <Label text="SUPPLY
-AIR"/>
+  <Label text="SUPPLY&#xa;AIR"/>
 </content>
     `;
     const obj = $$.create(xml).end({ format: 'object' });

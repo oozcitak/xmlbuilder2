@@ -65,7 +65,8 @@ export class XMLReader extends BaseReader<string> {
         case TokenType.Text:
           if(context.node.nodeType === NodeType.Document) break
           const text = <TextToken>token
-          context = this.text(context, this._decodeText(this.sanitize(text.data))) || context
+          // Normalize literal line endings before decoding character references.
+          context = this.text(context, this._decodeText(this.sanitize(text.data.replace(/\r\n?/g, "\n")))) || context
           break
         case TokenType.Element:
           const element = <ElementToken>token
@@ -77,11 +78,12 @@ export class XMLReader extends BaseReader<string> {
 
           // override namespace if there is a namespace declaration
           // attribute
-          // also lookup namespace declaration attributes
+          // also lookup namespace declaration attributes. Literal attribute
+          // whitespace is normalized before decoding references, not after.
           const nsDeclarations: { [key: string]: string } = {}
           for (let [attName, attValue] of element.attributes) {
             attName = this.sanitize(attName)
-            attValue = this.sanitize(attValue)
+            attValue = this.sanitize(attValue.replace(/\r\n?|\n|\t/g, " "))
             if (attName === "xmlns") {
               namespace = attValue
             } else {
@@ -105,7 +107,7 @@ export class XMLReader extends BaseReader<string> {
           // assign attributes
           for (let [attName, attValue] of element.attributes) {
             attName = this.sanitize(attName)
-            attValue = this.sanitize(attValue)
+            attValue = this.sanitize(attValue.replace(/\r\n?|\n|\t/g, " "))
             const [attPrefix, attLocalName] = namespace_extractQName(attName)
             let attNamespace: string | null = null
             if (attPrefix === "xmlns" || (attPrefix === null && attLocalName === "xmlns")) {
